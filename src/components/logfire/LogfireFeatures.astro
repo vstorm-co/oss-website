@@ -1,0 +1,36 @@
+---
+import type { translations } from '../../i18n/translations';
+
+interface Props {
+  t: typeof translations.en;
+}
+
+const { t } = Astro.props;
+
+const features = [
+  { title: t["logfire.features.nlquery.title"], description: t["logfire.features.nlquery.desc"] },
+  { title: t["logfire.features.sql.title"], description: t["logfire.features.sql.desc"] },
+  { title: t["logfire.features.viz.title"], description: t["logfire.features.viz.desc"] },
+  { title: t["logfire.features.span.title"], description: t["logfire.features.span.desc"] },
+  { title: t["logfire.features.prompts.title"], description: t["logfire.features.prompts.desc"] },
+  { title: t["logfire.features.memory.title"], description: t["logfire.features.memory.desc"] },
+];
+---
+
+<section class="px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
+  <div class="mx-auto max-w-6xl">
+    <div class="reveal text-center">
+      <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl">{t["logfire.features.title"]}</h2>
+      <p class="mt-4 text-lg text-text-secondary">{t["logfire.features.subtitle"]}</p>
+    </div>
+
+    <div class="reveal-group mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      {features.map((feature) => (
+        <div class="reveal glow-card rounded-2xl border border-border bg-surface p-6 transition-colors hover:border-border-hover">
+          <h3 class="text-base font-semibold">{feature.title}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-text-secondary">{feature.description}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,31 @@
+---
+import { languages, defaultLang, type Lang } from '../../i18n/translations';
+
+interface Props {
+  translations: { lang: Lang; slug: string }[];
+  currentLang: Lang;
+  label: string;
+}
+
+const { translations, currentLang, label } = Astro.props;
+---
+
+<div class="mt-4 flex items-center gap-2 text-sm text-text-tertiary">
+  <span>{label}:</span>
+  {translations
+    .filter((tr) => tr.lang !== currentLang)
+    .map((tr, i) => {
+      const href = tr.lang === defaultLang
+        ? `/blog/${tr.slug}/`
+        : `/${tr.lang}/blog/${tr.slug}/`;
+      return (
+        <>
+          {i > 0 && <span class="text-border">&middot;</span>}
+          <a href={href} class="text-accent hover:text-accent-hover transition-colors">
+            {languages[tr.lang]}
+          </a>
+        </>
+      );
+    })
+  }
+</div>

@@ -1,0 +1,88 @@
+---
+import type { translations } from '../../i18n/translations';
+
+interface Props {
+  t: typeof translations.en;
+}
+
+const { t } = Astro.props;
+const rawBase = import.meta.env.BASE_URL;
+const base = rawBase.endsWith("/") ? rawBase : rawBase + "/";
+
+const logos = [
+  { name: "Pydantic AI", src: "pydantic.png", invert: false },
+  { name: "LangChain", src: "langchain.png", invert: true },
+  { name: "LangGraph", src: "langgraph.png", invert: true },
+  { name: "Python", src: "python.png", invert: false },
+  { name: "Claude", src: null, invert: false },
+  { name: "GPT-4", src: null, invert: false },
+  { name: "Gemini", src: null, invert: false },
+  { name: "Docker", src: "docker.png", invert: false },
+  { name: "Logfire", src: "logfire.png", invert: false },
+];
+---
+
+<section class="reveal px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+  <div class="mx-auto max-w-5xl text-center">
+    <p class="text-xs font-medium uppercase tracking-[0.2em] text-text-tertiary">{t["deepagents.providers.title"]}</p>
+
+    <div class="da-marquee-wrapper mt-10 relative overflow-hidden">
+      <div class="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 sm:w-24 bg-gradient-to-r from-bg to-transparent"></div>
+      <div class="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 sm:w-24 bg-gradient-to-l from-bg to-transparent"></div>
+
+      <div class="da-marquee-track flex w-max items-center gap-12 sm:gap-16">
+        {[...logos, ...logos].map((logo) => (
+          <div class="flex-shrink-0 flex items-center justify-center h-12" title={logo.name}>
+            {logo.src ? (
+              <img
+                src={`${base}logos/${logo.src}`}
+                alt={logo.name}
+                class={`da-logo-img object-contain ${
+                  logo.invert ? "da-logo-invert" : ""
+                } ${
+                  logo.invert
+                    ? "h-10 sm:h-14 max-w-[130px] sm:max-w-[160px]"
+                    : "h-8 sm:h-10 max-w-[100px] sm:max-w-[120px]"
+                }`}
+                loading="lazy"
+              />
+            ) : (
+              <span class="text-xs font-semibold text-text-tertiary whitespace-nowrap">{logo.name}</span>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  @keyframes da-marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .da-marquee-track {
+    animation: da-marquee 35s linear infinite;
+  }
+
+  .da-marquee-wrapper:hover .da-marquee-track {
+    animation-play-state: paused;
+  }
+
+  .da-logo-img {
+    opacity: 0.7;
+    transition: opacity 0.2s, filter 0.2s;
+  }
+  .da-logo-img:hover {
+    opacity: 1;
+  }
+
+  html:not([data-theme="light"]) .da-logo-invert {
+    filter: brightness(0) invert(1);
+  }
+  html:not([data-theme="light"]) .da-logo-invert:hover {
+    filter: brightness(0) invert(1);
+    opacity: 1;
+  }
+</style>

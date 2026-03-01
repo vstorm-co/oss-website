@@ -1,0 +1,67 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Hero from '../../components/landing/Hero.astro';
+import FrameworkLogos from '../../components/landing/FrameworkLogos.astro';
+import Features from '../../components/landing/Features.astro';
+import Presets from '../../components/landing/Presets.astro';
+import QuickStart from '../../components/landing/QuickStart.astro';
+import FaqPreview from '../../components/landing/FaqPreview.astro';
+import Footer from '../../components/landing/Footer.astro';
+import BeforeAfter from '../../components/shared/BeforeAfter.astro';
+import ComparisonTable from '../../components/shared/ComparisonTable.astro';
+import StarsBadge from '../../components/shared/StarsBadge.astro';
+import { translations, languages, defaultLang } from '../../i18n/translations';
+import { getProjectBySlug } from '../../data/projects';
+import { getTemplateComparison } from '../../data/comparisons';
+
+const lang = defaultLang;
+const t = translations[lang];
+const project = getProjectBySlug("full-stack-ai-agent-template")!;
+const basePath = "/full-stack-ai-agent-template/";
+
+const alternates = [
+  { lang: "en", href: "/full-stack-ai-agent-template/" },
+  ...Object.keys(languages)
+    .filter((l) => l !== defaultLang)
+    .map((l) => ({ lang: l, href: `/${l}/full-stack-ai-agent-template/` })),
+];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "Fullstack AI Agent Template",
+  description: t["meta.description"],
+  url: "https://oss.vstorm.co/full-stack-ai-agent-template/",
+  applicationCategory: "DeveloperApplication",
+  operatingSystem: "Cross-platform",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  programmingLanguage: ["Python", "TypeScript"],
+  author: { "@type": "Organization", name: "Vstorm" },
+};
+---
+
+<Layout
+  title="Full-Stack AI Agent Template — Ship Production AI Apps In Minutes"
+  description={t["meta.description"]}
+  lang={lang}
+  alternates={alternates}
+  jsonLd={jsonLd}
+>
+  <Navbar currentLang={lang} project={project} pathSuffix="full-stack-ai-agent-template/" />
+  <Hero t={t} basePath={basePath} />
+  <FrameworkLogos t={t} />
+  <BeforeAfter
+    title={t["beforeafter.title"]}
+    beforeTitle={t["beforeafter.template.before.title"]}
+    afterTitle={t["beforeafter.template.after.title"]}
+    beforeItems={[t["beforeafter.template.before.1"], t["beforeafter.template.before.2"], t["beforeafter.template.before.3"], t["beforeafter.template.before.4"], t["beforeafter.template.before.5"]]}
+    afterItems={[t["beforeafter.template.after.1"], t["beforeafter.template.after.2"], t["beforeafter.template.after.3"], t["beforeafter.template.after.4"], t["beforeafter.template.after.5"]]}
+  />
+  <Features t={t} />
+  <ComparisonTable t={t} data={getTemplateComparison(t)} />
+  <Presets t={t} basePath={basePath} />
+  <QuickStart t={t} basePath={basePath} />
+  <FaqPreview t={t} lang={lang} category="template" />
+  <Footer t={t} />
+</Layout>

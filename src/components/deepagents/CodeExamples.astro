@@ -1,0 +1,247 @@
+---
+import type { translations } from '../../i18n/translations';
+
+interface Props {
+  t: typeof translations.en;
+}
+
+const { t } = Astro.props;
+
+const tabs = [
+  { id: "basic", label: t["deepagents.code.tab.basic"], filename: "agent.py" },
+  { id: "tools", label: t["deepagents.code.tab.tools"], filename: "custom_tools.py" },
+  { id: "subagents", label: t["deepagents.code.tab.subagents"], filename: "delegation.py" },
+];
+
+// Plain text for clipboard
+const plainCode: Record<string, string> = {
+  basic: `from pydantic_deep import DeepAgent
+
+agent = DeepAgent(
+    model="claude-sonnet-4-20250514",
+    system_prompt="You are a senior Python developer.",
+    tools=["filesystem", "shell", "web_search"],
+)
+
+result = await agent.run(
+    "Refactor the auth module to use JWT tokens"
+)`,
+  tools: `from pydantic_deep import DeepAgent
+from pydantic_deep.tools import tool
+
+@tool
+def analyze_logs(path: str) -> str:
+    """Analyze log files for errors and patterns."""
+    with open(path) as f:
+        return f.read()
+
+agent = DeepAgent(
+    model="gpt-4o",
+    tools=["filesystem", analyze_logs],
+)
+
+result = await agent.run("Find and fix recent errors")`,
+  subagents: `from pydantic_deep import DeepAgent
+
+agent = DeepAgent(
+    model="claude-sonnet-4-20250514",
+    tools=["filesystem", "shell", "subagent"],
+    system_prompt=\"\"\"You are a tech lead.
+Delegate code review to a sub-agent
+and summarize the findings.\"\"\",
+)
+
+result = await agent.run(
+    "Review the PR changes and suggest improvements"
+)`,
+};
+---
+
+<section class="reveal px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
+  <div class="mx-auto max-w-2xl">
+    <div class="text-center">
+      <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl">{t["deepagents.code.title"]}</h2>
+      <p class="mt-4 text-lg text-text-secondary">{t["deepagents.code.subtitle"]}</p>
+    </div>
+
+    <div class="mt-16">
+      <!-- Tab buttons -->
+      <div class="flex gap-1 border-b border-border" role="tablist">
+        {tabs.map((tab, i) => (
+          <button
+            role="tab"
+            aria-selected={i === 0 ? "true" : "false"}
+            data-tab={tab.id}
+            class:list={[
+              "da-code-tab px-4 py-2.5 text-sm font-medium transition-colors -mb-px border-b-2",
+              i === 0
+                ? "text-accent border-accent"
+                : "text-text-tertiary hover:text-text-secondary border-transparent",
+            ]}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      <!-- Tab panels -->
+      <!-- Basic -->
+      <div id="da-panel-basic" role="tabpanel" class="da-code-panel">
+        <div
+          class="da-copy-block group/copy relative cursor-pointer overflow-hidden rounded-b-xl border border-t-0 border-border bg-surface"
+          data-command={plainCode.basic}
+        >
+          <div class="flex items-center justify-between border-b border-border px-4 py-2">
+            <span class="text-xs text-text-tertiary font-mono">agent.py</span>
+            <div class="flex items-center gap-1.5 opacity-0 transition-opacity group-hover/copy:opacity-100">
+              <span class="da-copy-label text-[11px] text-text-tertiary" data-copied={t["ui.copied"]}>{t["ui.clickToCopy"]}</span>
+              <svg class="da-copy-icon h-4 w-4 text-text-tertiary transition-colors group-hover/copy:text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+              <svg class="da-check-icon hidden h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+          </div>
+          <pre class="p-4 text-sm font-mono overflow-x-auto leading-relaxed"><code><span class="text-violet-400">from</span> <span class="text-cyan-400">pydantic_deep</span> <span class="text-violet-400">import</span> <span class="text-cyan-400">DeepAgent</span>
+
+<span class="text-text">agent</span> <span class="text-violet-400">=</span> <span class="text-cyan-400">DeepAgent</span><span class="text-text-secondary">(</span>
+    <span class="text-text-secondary">model</span><span class="text-violet-400">=</span><span class="text-amber-400">"claude-sonnet-4-20250514"</span><span class="text-text-secondary">,</span>
+    <span class="text-text-secondary">system_prompt</span><span class="text-violet-400">=</span><span class="text-amber-400">"You are a senior Python developer."</span><span class="text-text-secondary">,</span>
+    <span class="text-text-secondary">tools</span><span class="text-violet-400">=</span><span class="text-text-secondary">[</span><span class="text-amber-400">"filesystem"</span><span class="text-text-secondary">,</span> <span class="text-amber-400">"shell"</span><span class="text-text-secondary">,</span> <span class="text-amber-400">"web_search"</span><span class="text-text-secondary">],</span>
+<span class="text-text-secondary">)</span>
+
+<span class="text-text">result</span> <span class="text-violet-400">=</span> <span class="text-violet-400">await</span> <span class="text-text">agent</span><span class="text-text-secondary">.</span><span class="text-cyan-400">run</span><span class="text-text-secondary">(</span>
+    <span class="text-amber-400">"Refactor the auth module to use JWT tokens"</span>
+<span class="text-text-secondary">)</span></code></pre>
+        </div>
+      </div>
+
+      <!-- With Tools -->
+      <div id="da-panel-tools" role="tabpanel" class="da-code-panel hidden">
+        <div
+          class="da-copy-block group/copy relative cursor-pointer overflow-hidden rounded-b-xl border border-t-0 border-border bg-surface"
+          data-command={plainCode.tools}
+        >
+          <div class="flex items-center justify-between border-b border-border px-4 py-2">
+            <span class="text-xs text-text-tertiary font-mono">custom_tools.py</span>
+            <div class="flex items-center gap-1.5 opacity-0 transition-opacity group-hover/copy:opacity-100">
+              <span class="da-copy-label text-[11px] text-text-tertiary" data-copied={t["ui.copied"]}>{t["ui.clickToCopy"]}</span>
+              <svg class="da-copy-icon h-4 w-4 text-text-tertiary transition-colors group-hover/copy:text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+              <svg class="da-check-icon hidden h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+          </div>
+          <pre class="p-4 text-sm font-mono overflow-x-auto leading-relaxed"><code><span class="text-violet-400">from</span> <span class="text-cyan-400">pydantic_deep</span> <span class="text-violet-400">import</span> <span class="text-cyan-400">DeepAgent</span>
+<span class="text-violet-400">from</span> <span class="text-cyan-400">pydantic_deep.tools</span> <span class="text-violet-400">import</span> <span class="text-cyan-400">tool</span>
+
+<span class="text-cyan-400">@tool</span>
+<span class="text-violet-400">def</span> <span class="text-cyan-400">analyze_logs</span><span class="text-text-secondary">(</span><span class="text-text">path</span><span class="text-text-secondary">:</span> <span class="text-cyan-400">str</span><span class="text-text-secondary">)</span> <span class="text-text-secondary">-&gt;</span> <span class="text-cyan-400">str</span><span class="text-text-secondary">:</span>
+    <span class="text-amber-400">"""Analyze log files for errors and patterns."""</span>
+    <span class="text-violet-400">with</span> <span class="text-cyan-400">open</span><span class="text-text-secondary">(</span><span class="text-text">path</span><span class="text-text-secondary">)</span> <span class="text-violet-400">as</span> <span class="text-text">f</span><span class="text-text-secondary">:</span>
+        <span class="text-violet-400">return</span> <span class="text-text">f</span><span class="text-text-secondary">.</span><span class="text-cyan-400">read</span><span class="text-text-secondary">()</span>
+
+<span class="text-text">agent</span> <span class="text-violet-400">=</span> <span class="text-cyan-400">DeepAgent</span><span class="text-text-secondary">(</span>
+    <span class="text-text-secondary">model</span><span class="text-violet-400">=</span><span class="text-amber-400">"gpt-4o"</span><span class="text-text-secondary">,</span>
+    <span class="text-text-secondary">tools</span><span class="text-violet-400">=</span><span class="text-text-secondary">[</span><span class="text-amber-400">"filesystem"</span><span class="text-text-secondary">,</span> <span class="text-text">analyze_logs</span><span class="text-text-secondary">],</span>
+<span class="text-text-secondary">)</span>
+
+<span class="text-text">result</span> <span class="text-violet-400">=</span> <span class="text-violet-400">await</span> <span class="text-text">agent</span><span class="text-text-secondary">.</span><span class="text-cyan-400">run</span><span class="text-text-secondary">(</span><span class="text-amber-400">"Find and fix recent errors"</span><span class="text-text-secondary">)</span></code></pre>
+        </div>
+      </div>
+
+      <!-- Sub-agents -->
+      <div id="da-panel-subagents" role="tabpanel" class="da-code-panel hidden">
+        <div
+          class="da-copy-block group/copy relative cursor-pointer overflow-hidden rounded-b-xl border border-t-0 border-border bg-surface"
+          data-command={plainCode.subagents}
+        >
+          <div class="flex items-center justify-between border-b border-border px-4 py-2">
+            <span class="text-xs text-text-tertiary font-mono">delegation.py</span>
+            <div class="flex items-center gap-1.5 opacity-0 transition-opacity group-hover/copy:opacity-100">
+              <span class="da-copy-label text-[11px] text-text-tertiary" data-copied={t["ui.copied"]}>{t["ui.clickToCopy"]}</span>
+              <svg class="da-copy-icon h-4 w-4 text-text-tertiary transition-colors group-hover/copy:text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+              <svg class="da-check-icon hidden h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+          </div>
+          <pre class="p-4 text-sm font-mono overflow-x-auto leading-relaxed"><code><span class="text-violet-400">from</span> <span class="text-cyan-400">pydantic_deep</span> <span class="text-violet-400">import</span> <span class="text-cyan-400">DeepAgent</span>
+
+<span class="text-text">agent</span> <span class="text-violet-400">=</span> <span class="text-cyan-400">DeepAgent</span><span class="text-text-secondary">(</span>
+    <span class="text-text-secondary">model</span><span class="text-violet-400">=</span><span class="text-amber-400">"claude-sonnet-4-20250514"</span><span class="text-text-secondary">,</span>
+    <span class="text-text-secondary">tools</span><span class="text-violet-400">=</span><span class="text-text-secondary">[</span><span class="text-amber-400">"filesystem"</span><span class="text-text-secondary">,</span> <span class="text-amber-400">"shell"</span><span class="text-text-secondary">,</span> <span class="text-amber-400">"subagent"</span><span class="text-text-secondary">],</span>
+    <span class="text-text-secondary">system_prompt</span><span class="text-violet-400">=</span><span class="text-amber-400">"""You are a tech lead.
+Delegate code review to a sub-agent
+and summarize the findings."""</span><span class="text-text-secondary">,</span>
+<span class="text-text-secondary">)</span>
+
+<span class="text-text">result</span> <span class="text-violet-400">=</span> <span class="text-violet-400">await</span> <span class="text-text">agent</span><span class="text-text-secondary">.</span><span class="text-cyan-400">run</span><span class="text-text-secondary">(</span>
+    <span class="text-amber-400">"Review the PR changes and suggest improvements"</span>
+<span class="text-text-secondary">)</span></code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Tab switching
+  document.querySelectorAll('.da-code-tab').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const tabId = (btn as HTMLElement).dataset.tab;
+      // Deactivate all
+      document.querySelectorAll('.da-code-tab').forEach((t) => {
+        t.setAttribute('aria-selected', 'false');
+        t.classList.remove('text-accent', 'border-accent');
+        t.classList.add('text-text-tertiary', 'border-transparent');
+      });
+      document.querySelectorAll('.da-code-panel').forEach((p) => p.classList.add('hidden'));
+      // Activate
+      btn.setAttribute('aria-selected', 'true');
+      btn.classList.add('text-accent', 'border-accent');
+      btn.classList.remove('text-text-tertiary', 'border-transparent');
+      document.getElementById(`da-panel-${tabId}`)?.classList.remove('hidden');
+    });
+  });
+
+  // Copy to clipboard
+  document.querySelectorAll<HTMLElement>('.da-copy-block').forEach((block) => {
+    block.addEventListener('click', async () => {
+      const command = block.dataset.command;
+      if (!command) return;
+      try {
+        await navigator.clipboard.writeText(command);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = command;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      const label = block.querySelector('.da-copy-label') as HTMLElement | null;
+      const copyIcon = block.querySelector('.da-copy-icon') as HTMLElement | null;
+      const checkIcon = block.querySelector('.da-check-icon') as HTMLElement | null;
+      const originalText = label?.textContent || '';
+      if (label) label.textContent = label.dataset.copied || 'Copied!';
+      if (copyIcon) copyIcon.classList.add('hidden');
+      if (checkIcon) checkIcon.classList.remove('hidden');
+      setTimeout(() => {
+        if (label) label.textContent = originalText;
+        if (copyIcon) copyIcon.classList.remove('hidden');
+        if (checkIcon) checkIcon.classList.add('hidden');
+      }, 2000);
+    });
+  });
+</script>

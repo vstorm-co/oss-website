@@ -1,0 +1,80 @@
+---
+import type { translations } from '../../i18n/translations';
+
+interface Props {
+  t: typeof translations.en;
+}
+
+const { t } = Astro.props;
+const rawBase = import.meta.env.BASE_URL;
+const base = rawBase.endsWith("/") ? rawBase : rawBase + "/";
+
+const techItems = [
+  { name: "Chrome Extension", logo: null },
+  { name: "FastAPI", logo: "fastapi.png" },
+  { name: "Pydantic AI", logo: "pydantic.png" },
+  { name: "PostgreSQL", logo: "postgre.png" },
+  { name: "Redis", logo: "redis.png" },
+  { name: "WebSocket", logo: null },
+  { name: "React", logo: "react.png" },
+  { name: "TypeScript", logo: "typescript.png" },
+];
+---
+
+<section class="reveal px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+  <div class="mx-auto max-w-5xl text-center">
+    <p class="text-xs font-medium uppercase tracking-[0.2em] text-text-tertiary">{t["logfire.tech.title"]}</p>
+
+    <!-- Marquee wrapper with fade edges -->
+    <div class="lf-marquee-wrapper mt-8 relative overflow-hidden">
+      <div class="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 sm:w-20 bg-gradient-to-r from-bg to-transparent"></div>
+      <div class="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 sm:w-20 bg-gradient-to-l from-bg to-transparent"></div>
+
+      <div class="lf-marquee-track flex w-max items-center gap-10 sm:gap-14">
+        {[...techItems, ...techItems].map((item) => (
+          <div class="flex-shrink-0 flex items-center gap-2.5" title={item.name}>
+            {item.logo ? (
+              <img
+                src={`${base}logos/${item.logo}`}
+                alt={item.name}
+                class="lf-tech-logo h-6 sm:h-8 w-auto object-contain"
+                loading="lazy"
+              />
+            ) : null}
+            <span class="lf-tech-label text-sm font-medium text-text-tertiary whitespace-nowrap">{item.name}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  @keyframes lf-marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .lf-marquee-track {
+    animation: lf-marquee 25s linear infinite;
+  }
+
+  .lf-marquee-wrapper:hover .lf-marquee-track {
+    animation-play-state: paused;
+  }
+
+  .lf-tech-logo {
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+  .lf-tech-logo:hover {
+    opacity: 1;
+  }
+
+  .lf-tech-label {
+    transition: color 0.2s;
+  }
+  .lf-tech-label:hover {
+    color: var(--color-text-secondary);
+  }
+</style>

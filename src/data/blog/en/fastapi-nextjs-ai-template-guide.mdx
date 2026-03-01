@@ -1,0 +1,192 @@
+---
+title: "How to Build a Full-Stack AI App with FastAPI and Next.js"
+description: "Step-by-step guide to building a production AI application with FastAPI backend and Next.js frontend. From zero to deployed in 30 minutes."
+pubDate: 2026-02-25
+author: "Vstorm"
+lang: en
+translationKey: fastapi-nextjs-ai-template-guide
+tags: ["fastapi", "nextjs", "tutorial", "python", "ai-agents"]
+category: tutorial
+draft: false
+---
+
+## The Problem
+
+Building a production AI app from scratch means solving the same problems every time: API structure, authentication, database setup, WebSocket streaming, frontend scaffolding, Docker configuration, CI/CD pipelines. We've done this 30+ times for clients and ourselves. It takes 2-4 weeks each time.
+
+The Full-Stack AI Agent Template reduces that to **30 minutes**.
+
+## What You Get
+
+A single `pip install` gives you a complete project with:
+
+- **FastAPI backend** with async API, structured logging, and error handling
+- **Next.js 15 frontend** with App Router, TypeScript, and Tailwind CSS
+- **AI agent integration** — choose from Pydantic AI, LangChain, LangGraph, CrewAI, or DeepAgents
+- **WebSocket streaming** for real-time AI responses
+- **Authentication** — JWT, API keys, or Google OAuth
+- **Database** — PostgreSQL, MongoDB, or SQLite
+- **Docker Compose** for development and production
+- **CI/CD** — GitHub Actions or GitLab CI
+
+## Quick Start
+
+### 1. Install the Generator
+
+```bash title="terminal"
+pip install fastapi-fullstack
+```
+
+### 2. Generate Your Project
+
+```bash title="terminal"
+fastapi-fullstack create my-ai-app
+```
+
+The interactive CLI walks you through 75+ configuration options. Or use a preset:
+
+```bash title="terminal"
+# Minimal — no database, no auth, just FastAPI
+fastapi-fullstack create my-app --preset minimal
+
+# Production — PostgreSQL, JWT, Docker, Kubernetes, CI/CD
+fastapi-fullstack create my-app --preset production
+
+# AI Agent — Pydantic AI, WebSocket streaming, conversation history
+fastapi-fullstack create my-app --preset ai-agent
+```
+
+### 3. Start Development
+
+```bash title="terminal"
+cd my-ai-app
+docker compose up -d
+```
+
+Your app is running at `http://localhost:3000` with hot reload on both backend and frontend.
+
+## Project Structure
+
+The generated project follows a clean, scalable architecture:
+
+```text title="project structure"
+my-ai-app/
+├── backend/
+│   ├── app/
+│   │   ├── api/           # API routes
+│   │   ├── agents/        # AI agent definitions
+│   │   ├── core/          # Config, security, dependencies
+│   │   ├── models/        # Database models
+│   │   ├── schemas/       # Pydantic schemas
+│   │   └── services/      # Business logic
+│   ├── tests/
+│   └── pyproject.toml
+├── frontend/
+│   ├── src/
+│   │   ├── app/           # Next.js App Router pages
+│   │   ├── components/    # React components
+│   │   ├── hooks/         # Custom hooks (WebSocket, auth)
+│   │   └── lib/           # API client, utilities
+│   └── package.json
+├── docker-compose.yml
+├── docker-compose.prod.yml
+└── .env.example
+```
+
+## AI Agent Setup
+
+Here's what the AI agent integration looks like with Pydantic AI:
+
+```python title="backend/app/agents/chat.py"
+from pydantic_ai import Agent, RunContext
+from app.core.deps import AgentDeps
+
+agent = Agent(
+    "openai:gpt-4o",
+    deps_type=AgentDeps,
+    system_prompt="You are a helpful AI assistant.",
+)
+
+@agent.tool
+async def search_knowledge_base(
+    ctx: RunContext[AgentDeps], query: str
+) -> str:
+    """Search the knowledge base for relevant information."""
+    results = await ctx.deps.search_service.search(query)
+    return "\n".join(r.content for r in results)
+```
+
+The WebSocket endpoint handles streaming automatically:
+
+```python title="backend/app/api/ws.py"
+@router.websocket("/ws/chat")
+async def chat_websocket(
+    websocket: WebSocket,
+    current_user: User = Depends(get_ws_user),
+):
+    await websocket.accept()
+    async with agent.run_stream(
+        message, deps=AgentDeps(user=current_user, db=db)
+    ) as response:
+        async for chunk in response.stream_text():
+            await websocket.send_json({"type": "chunk", "content": chunk})
+```
+
+## Web Configurator
+
+Don't like CLIs? The [web configurator](https://template.vstorm.co/configurator/) provides a 9-step visual wizard:
+
+1. **Project basics** — name, description
+2. **AI framework** — Pydantic AI, LangChain, LangGraph, CrewAI, DeepAgents
+3. **LLM provider** — OpenAI, Anthropic, OpenRouter
+4. **Database** — PostgreSQL, MongoDB, SQLite, or none
+5. **Authentication** — JWT, API keys, Google OAuth, or none
+6. **Infrastructure** — Docker, Kubernetes, reverse proxy
+7. **Observability** — Logfire, Sentry, Prometheus
+8. **CI/CD** — GitHub Actions, GitLab CI
+9. **Review & download** — get your configured project as a ZIP
+
+## Production Deployment
+
+The generated project includes everything for production:
+
+```yaml title="docker-compose.prod.yml"
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    environment:
+      - DATABASE_URL=postgresql://...
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    restart: always
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+```
+
+Kubernetes manifests are also generated if you selected that option.
+
+## What's Next
+
+Once your project is running, you can:
+
+- Add custom tools to your AI agent
+- Implement RAG with your own data
+- Add more API endpoints
+- Customize the frontend UI
+- Set up monitoring dashboards
+
+The template gives you the foundation. You focus on what makes your app unique.
+
+**Get started:** [template.vstorm.co/configurator/](https://template.vstorm.co/configurator/)

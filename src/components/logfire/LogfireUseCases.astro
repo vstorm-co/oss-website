@@ -1,0 +1,76 @@
+---
+import type { translations } from '../../i18n/translations';
+
+interface Props {
+  t: typeof translations.en;
+}
+
+const { t } = Astro.props;
+
+const useCases = [
+  {
+    name: t["logfire.usecases.uc1.name"],
+    description: t["logfire.usecases.uc1.desc"],
+    features: [
+      t["logfire.usecases.uc1.f1"],
+      t["logfire.usecases.uc1.f2"],
+      t["logfire.usecases.uc1.f3"],
+      t["logfire.usecases.uc1.f4"],
+    ],
+    highlighted: false,
+  },
+  {
+    name: t["logfire.usecases.uc2.name"],
+    description: t["logfire.usecases.uc2.desc"],
+    features: [
+      t["logfire.usecases.uc2.f1"],
+      t["logfire.usecases.uc2.f2"],
+      t["logfire.usecases.uc2.f3"],
+      t["logfire.usecases.uc2.f4"],
+    ],
+    highlighted: true,
+  },
+  {
+    name: t["logfire.usecases.uc3.name"],
+    description: t["logfire.usecases.uc3.desc"],
+    features: [
+      t["logfire.usecases.uc3.f1"],
+      t["logfire.usecases.uc3.f2"],
+      t["logfire.usecases.uc3.f3"],
+      t["logfire.usecases.uc3.f4"],
+    ],
+    highlighted: false,
+  },
+];
+---
+
+<section class="px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
+  <div class="mx-auto max-w-6xl">
+    <div class="reveal text-center">
+      <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl">{t["logfire.usecases.title"]}</h2>
+      <p class="mt-4 text-lg text-text-secondary">{t["logfire.usecases.subtitle"]}</p>
+    </div>
+
+    <div class="reveal-group mt-16 grid gap-6 lg:grid-cols-3">
+      {useCases.map((uc) => (
+        <div class:list={[
+          "reveal glow-card relative flex flex-col rounded-2xl border p-6 transition-colors",
+          uc.highlighted
+            ? "border-pink-500/40 bg-surface"
+            : "border-border bg-surface hover:border-border-hover",
+        ]}>
+          <h3 class="text-lg font-semibold">{uc.name}</h3>
+          <p class="mt-2 text-sm text-text-secondary leading-relaxed">{uc.description}</p>
+          <ul class="mt-6 flex-1 space-y-2.5">
+            {uc.features.map((f) => (
+              <li class="flex items-center gap-2.5 text-sm text-text-secondary">
+                <span class="text-text-tertiary">&mdash;</span>
+                {f}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

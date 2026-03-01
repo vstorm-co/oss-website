@@ -1,0 +1,136 @@
+---
+title: "Pydantic AI vs LangChain para agentes de IA en producción (2026)"
+description: "Una comparación práctica de Pydantic AI y LangChain para construir agentes de IA en producción. Seguridad de tipos, streaming, inyección de dependencias y compromisos reales."
+pubDate: 2026-02-28
+author: "Vstorm"
+lang: es
+translationKey: pydantic-ai-vs-langchain
+tags: ["pydantic-ai", "langchain", "ai-agents", "python", "comparison"]
+category: comparison
+draft: false
+---
+
+## Por qué importa esta comparación
+
+Elegir un framework de agentes de IA no es solo una decisión técnica — determina tu velocidad de desarrollo, experiencia de depuración y fiabilidad en producción durante meses. Después de construir más de 30 sistemas de agentes de IA en producción, hemos utilizado tanto Pydantic AI como LangChain ampliamente. Esto es lo que hemos aprendido.
+
+## Resumen rápido
+
+| Característica | Pydantic AI | LangChain |
+|----------------|-------------|-----------|
+| **Seguridad de tipos** | Validación completa con Pydantic v2 | Opcional, basada en esquemas |
+| **Streaming** | Streaming asíncrono nativo | Mediante callbacks/LCEL |
+| **Dependencias** | Sistema de DI integrado | Conexión manual |
+| **Proveedores de LLM** | OpenAI, Anthropic, Gemini, Groq, Mistral | 70+ proveedores |
+| **Curva de aprendizaje** | Baja (si conoces Pydantic) | Pronunciada (gran superficie de API) |
+| **Tamaño del paquete** | Mínimo | Pesado (muchas dependencias) |
+| **Observabilidad** | Integración con Logfire | LangSmith |
+
+## Seguridad de tipos: el mayor diferenciador
+
+Pydantic AI hace de la salida estructurada un ciudadano de primera clase. Defines tu salida como un modelo Pydantic, y el framework se encarga automáticamente de la validación, los reintentos y los mensajes de error:
+
+```python title="pydantic_ai_example.py"
+from pydantic import BaseModel
+from pydantic_ai import Agent
+
+class FlightSearch(BaseModel):
+    origin: str
+    destination: str
+    date: str
+    max_price: float | None = None
+
+agent = Agent(
+    "openai:gpt-4o",
+    output_type=FlightSearch,
+    system_prompt="Extract flight search parameters from user queries.",
+)
+
+result = await agent.run("Find me a flight from NYC to London on March 15, under $500")
+# result.output is a validated FlightSearch instance
+print(result.output.origin)  # "NYC"
+print(result.output.max_price)  # 500.0
+```
+
+Con LangChain, necesitarías `with_structured_output()` o un paso de parseo separado. Funciona, pero es más verboso y el manejo de errores es menos elegante.
+
+## Inyección de dependencias
+
+Aquí es donde Pydantic AI realmente brilla para aplicaciones en producción. El sistema de inyección de dependencias permite separar limpiamente la lógica del agente de la infraestructura:
+
+```python title="deps_example.py"
+from dataclasses import dataclass
+from pydantic_ai import Agent, RunContext
+
+@dataclass
+class Deps:
+    db: Database
+    user_id: str
+    api_client: ExternalAPI
+
+agent = Agent("openai:gpt-4o", deps_type=Deps)
+
+@agent.tool
+async def get_user_orders(ctx: RunContext[Deps]) -> list[dict]:
+    """Fetch user's recent orders."""
+    return await ctx.deps.db.get_orders(ctx.deps.user_id)
+
+# In production
+result = await agent.run(
+    "What are my recent orders?",
+    deps=Deps(db=prod_db, user_id="user_123", api_client=prod_api),
+)
+
+# In tests
+result = await agent.run(
+    "What are my recent orders?",
+    deps=Deps(db=mock_db, user_id="test_user", api_client=mock_api),
+)
+```
+
+LangChain logra patrones similares a través de RunnablePassthrough y composición de cadenas, pero requiere más código repetitivo y no impone contratos de tipos de la misma manera.
+
+## Streaming
+
+Ambos frameworks soportan streaming, pero los enfoques difieren significativamente:
+
+```python title="streaming.py"
+from pydantic_ai import Agent
+
+agent = Agent("openai:gpt-4o")
+
+async with agent.run_stream("Explain WebSocket streaming") as response:
+    async for chunk in response.stream_text():
+        print(chunk, end="", flush=True)
+```
+
+El streaming de Pydantic AI es nativamente asíncrono y se integra directamente con `StreamingResponse` de FastAPI. En nuestra plantilla, el streaming por WebSocket con Pydantic AI requirió unas 40 líneas de código. La configuración equivalente de LangChain con streaming LCEL necesitó aproximadamente 80 líneas.
+
+## Cuándo elegir Pydantic AI
+
+- **Estás construyendo una app con FastAPI** — la integración es perfecta
+- **La seguridad de tipos importa** — quieres garantías similares a las de tiempo de compilación
+- **Tu equipo conoce Pydantic** — curva de aprendizaje cero para la capa de modelos
+- **Necesitas testing limpio** — la inyección de dependencias hace que el mocking sea trivial
+- **Quieres dependencias mínimas** — Pydantic AI es ligero
+
+## Cuándo elegir LangChain
+
+- **Necesitas más de 70 proveedores de LLM** — LangChain tiene el soporte más amplio de proveedores
+- **Usas LangGraph** — para orquestación compleja de múltiples agentes
+- **Necesitas LangSmith** — trazabilidad y evaluación de nivel empresarial
+- **Tu equipo ya lo conoce** — el coste de cambio es real
+- **Necesitas cadenas prediseñadas** — RAG, resumen, etc. listos para usar
+
+## Nuestra recomendación
+
+Para nuevos proyectos de agentes de IA en producción en 2026, elegimos por defecto **Pydantic AI**. La seguridad de tipos, la inyección de dependencias y la integración con FastAPI crean una experiencia de desarrollo difícil de igualar. LangChain sigue siendo la elección correcta cuando necesitas la amplitud de su ecosistema — especialmente LangGraph para flujos de trabajo complejos de agentes.
+
+Nuestra [Plantilla Full-Stack AI Agent](https://template.vstorm.co/) soporta ambos frameworks (además de LangGraph, CrewAI y DeepAgents), para que puedas empezar con cualquiera de ellos y cambiar después sin reescribir tu infraestructura.
+
+## Conclusiones clave
+
+1. **Pydantic AI** destaca en agentes de producción con seguridad de tipos y arquitectura limpia
+2. **LangChain** destaca en amplitud de ecosistema y componentes prediseñados
+3. El "mejor" framework depende de la experiencia de tu equipo y los requisitos del proyecto
+4. Ambos funcionan bien — la peor decisión es pasar semanas decidiendo en vez de construir

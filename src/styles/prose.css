@@ -1,0 +1,91 @@
+@reference "./global.css";
+
+.prose {
+  @apply text-text leading-relaxed;
+}
+
+.prose h1 {
+  @apply text-3xl font-bold tracking-tight mt-10 mb-4 text-text;
+}
+
+.prose h2 {
+  @apply text-2xl font-bold tracking-tight mt-10 mb-4 text-text;
+}
+
+.prose h3 {
+  @apply text-xl font-semibold mt-8 mb-3 text-text;
+}
+
+.prose h4 {
+  @apply text-lg font-semibold mt-6 mb-2 text-text;
+}
+
+.prose p {
+  @apply mb-4;
+}
+
+.prose a {
+  @apply text-accent hover:text-accent-hover underline underline-offset-2 transition-colors;
+}
+
+.prose strong {
+  @apply font-semibold text-text;
+}
+
+.prose ul {
+  @apply mb-4 ml-6 list-disc space-y-1;
+}
+
+.prose ol {
+  @apply mb-4 ml-6 list-decimal space-y-1;
+}
+
+.prose li {
+  @apply text-text-secondary;
+}
+
+.prose li strong {
+  @apply text-text;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-accent/40 bg-surface/50 pl-4 py-2 my-4 text-text-secondary italic rounded-r;
+}
+
+.prose hr {
+  @apply my-8 border-border;
+}
+
+.prose table {
+  @apply w-full mb-4 border-collapse text-sm;
+}
+
+.prose thead {
+  @apply border-b border-border;
+}
+
+.prose th {
+  @apply px-4 py-2 text-left font-semibold text-text;
+}
+
+.prose td {
+  @apply px-4 py-2 border-t border-border text-text-secondary;
+}
+
+.prose img {
+  @apply rounded-lg my-6 max-w-full;
+}
+
+.prose code:not(pre code) {
+  @apply bg-surface px-1.5 py-0.5 rounded text-sm font-mono text-accent;
+}
+
+/* Expressive Code handles <pre> blocks — no custom styling needed */
+
+.prose > :first-child {
+  @apply mt-0;
+}
+
+.prose > :last-child {
+  @apply mb-0;
+}

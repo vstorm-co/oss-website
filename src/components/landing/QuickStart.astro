@@ -1,0 +1,128 @@
+---
+import type { translations } from '../../i18n/translations';
+
+interface Props {
+  t: typeof translations.en;
+  basePath?: string;
+}
+
+const { t, basePath = "/" } = Astro.props;
+
+const steps = [
+  {
+    number: "1",
+    title: t["quickstart.step1"],
+    code: "pip install fastapi-fullstack",
+  },
+  {
+    number: "2",
+    title: t["quickstart.step2"],
+    code: "fastapi-fullstack new",
+    alt: "fastapi-fullstack create my_app --preset ai-agent",
+  },
+  {
+    number: "3",
+    title: t["quickstart.step3"],
+    code: "cd my_app && docker compose up",
+  },
+];
+---
+
+<section id="quickstart" class="reveal px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
+  <div class="mx-auto max-w-2xl">
+    <div class="text-center">
+      <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl">{t["quickstart.title"]}</h2>
+    </div>
+
+    <div class="mt-16 space-y-8">
+      {steps.map((step) => (
+        <div class="flex gap-5">
+          <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-accent/40 text-sm font-medium text-accent">
+            {step.number}
+          </div>
+          <div class="flex-1">
+            <h3 class="text-base font-semibold">{step.title}</h3>
+            <div
+              class="copy-block group/copy relative mt-3 cursor-pointer overflow-hidden rounded-xl border border-border bg-surface transition-colors hover:border-accent/40"
+              data-command={step.code}
+            >
+              <div class="flex items-center justify-between px-4 py-3 font-mono text-sm">
+                <div>
+                  <span class="text-text-tertiary">$</span>{" "}
+                  <span class="text-text">{step.code}</span>
+                </div>
+                <!-- Copy icon + tooltip -->
+                <div class="flex items-center gap-1.5 opacity-0 transition-opacity group-hover/copy:opacity-100">
+                  <span class="copy-label text-[11px] text-text-tertiary" data-copied={t["ui.copied"]}>{t["ui.clickToCopy"]}</span>
+                  <svg class="copy-icon h-4 w-4 text-text-tertiary transition-colors group-hover/copy:text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                  </svg>
+                  <!-- Checkmark (hidden, shown after copy) -->
+                  <svg class="check-icon hidden h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            {step.alt && (
+              <p class="mt-2 text-xs text-text-tertiary">
+                {t["ui.orWithPreset"]} <code class="rounded-md border border-border bg-surface px-1.5 py-0.5 font-mono text-xs text-accent">{step.alt}</code>
+              </p>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div class="mt-16 text-center">
+      <a
+        href={`${basePath}configurator/`}
+        class="inline-flex items-center text-sm font-medium text-text-secondary transition-colors hover:text-accent"
+      >
+        {t["quickstart.or"]}
+        <svg class="ml-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.copy-block').forEach((block) => {
+    block.addEventListener('click', async () => {
+      const command = block.dataset.command;
+      if (!command) return;
+
+      try {
+        await navigator.clipboard.writeText(command);
+      } catch {
+        // fallback
+        const ta = document.createElement('textarea');
+        ta.value = command;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+
+      const label = block.querySelector('.copy-label') as HTMLElement | null;
+      const copyIcon = block.querySelector('.copy-icon') as HTMLElement | null;
+      const checkIcon = block.querySelector('.check-icon') as HTMLElement | null;
+
+      const originalText = label?.textContent || '';
+      if (label) label.textContent = label.dataset.copied || 'Copied!';
+      if (copyIcon) copyIcon.classList.add('hidden');
+      if (checkIcon) checkIcon.classList.remove('hidden');
+
+      setTimeout(() => {
+        if (label) label.textContent = originalText;
+        if (copyIcon) copyIcon.classList.remove('hidden');
+        if (checkIcon) checkIcon.classList.add('hidden');
+      }, 2000);
+    });
+  });
+</script>

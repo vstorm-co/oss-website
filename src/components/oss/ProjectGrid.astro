@@ -1,0 +1,37 @@
+---
+import type { Lang } from '../../i18n/translations';
+import { getProjectsByCategory } from '../../data/projects';
+import ProjectCard from './ProjectCard.astro';
+
+interface Props {
+  lang: Lang;
+  t: Record<string, string>;
+}
+
+const { lang, t } = Astro.props;
+const grouped = getProjectsByCategory(lang);
+---
+
+<section id="projects" class="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+  <div class="mx-auto max-w-6xl">
+    <div class="reveal text-center mb-16">
+      <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl">{t["oss.projects.title"]}</h2>
+      <p class="mt-4 text-lg text-text-secondary">{t["oss.projects.subtitle"]}</p>
+    </div>
+
+    {grouped.map((group) => (
+      <div class="mb-12 last:mb-0">
+        <h3 class="reveal mb-6 text-sm font-semibold uppercase tracking-wider text-text-tertiary">
+          {group.label[lang]}
+        </h3>
+        <div class="reveal-group grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {group.projects.map((project) => (
+            <div class="reveal h-full">
+              <ProjectCard project={project} lang={lang} t={t} />
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+</section>

@@ -1,0 +1,192 @@
+---
+title: "Cómo crear una aplicación de IA full-stack con FastAPI y Next.js"
+description: "Guía paso a paso para crear una aplicación de IA lista para producción con backend FastAPI y frontend Next.js. De cero a desplegada en 30 minutos."
+pubDate: 2026-02-25
+author: "Vstorm"
+lang: es
+translationKey: fastapi-nextjs-ai-template-guide
+tags: ["fastapi", "nextjs", "tutorial", "python", "ai-agents"]
+category: tutorial
+draft: false
+---
+
+## El problema
+
+Crear una aplicación de IA lista para producción desde cero significa resolver los mismos problemas cada vez: estructura de API, autenticación, configuración de base de datos, streaming por WebSocket, scaffolding del frontend, configuración de Docker, pipelines de CI/CD. Lo hemos hecho más de 30 veces, para clientes y para nosotros mismos. Cada vez lleva de 2 a 4 semanas.
+
+El Full-Stack AI Agent Template reduce eso a **30 minutos**.
+
+## Lo que obtienes
+
+Un solo `pip install` te da un proyecto completo con:
+
+- **Backend FastAPI** con API asíncrona, logging estructurado y manejo de errores
+- **Frontend Next.js 15** con App Router, TypeScript y Tailwind CSS
+- **Integración con agentes de IA** — elige entre Pydantic AI, LangChain, LangGraph, CrewAI o DeepAgents
+- **Streaming por WebSocket** para respuestas de IA en tiempo real
+- **Autenticación** — JWT, claves API o Google OAuth
+- **Base de datos** — PostgreSQL, MongoDB o SQLite
+- **Docker Compose** para desarrollo y producción
+- **CI/CD** — GitHub Actions o GitLab CI
+
+## Inicio rápido
+
+### 1. Instala el generador
+
+```bash title="terminal"
+pip install fastapi-fullstack
+```
+
+### 2. Genera tu proyecto
+
+```bash title="terminal"
+fastapi-fullstack create my-ai-app
+```
+
+El CLI interactivo te guía a través de más de 75 opciones de configuración. También puedes usar un preset:
+
+```bash title="terminal"
+# Minimal — no database, no auth, just FastAPI
+fastapi-fullstack create my-app --preset minimal
+
+# Production — PostgreSQL, JWT, Docker, Kubernetes, CI/CD
+fastapi-fullstack create my-app --preset production
+
+# AI Agent — Pydantic AI, WebSocket streaming, conversation history
+fastapi-fullstack create my-app --preset ai-agent
+```
+
+### 3. Inicia el desarrollo
+
+```bash title="terminal"
+cd my-ai-app
+docker compose up -d
+```
+
+Tu aplicación está corriendo en `http://localhost:3000` con hot reload tanto en el backend como en el frontend.
+
+## Estructura del proyecto
+
+El proyecto generado sigue una arquitectura limpia y escalable:
+
+```text title="project structure"
+my-ai-app/
+├── backend/
+│   ├── app/
+│   │   ├── api/           # API routes
+│   │   ├── agents/        # AI agent definitions
+│   │   ├── core/          # Config, security, dependencies
+│   │   ├── models/        # Database models
+│   │   ├── schemas/       # Pydantic schemas
+│   │   └── services/      # Business logic
+│   ├── tests/
+│   └── pyproject.toml
+├── frontend/
+│   ├── src/
+│   │   ├── app/           # Next.js App Router pages
+│   │   ├── components/    # React components
+│   │   ├── hooks/         # Custom hooks (WebSocket, auth)
+│   │   └── lib/           # API client, utilities
+│   └── package.json
+├── docker-compose.yml
+├── docker-compose.prod.yml
+└── .env.example
+```
+
+## Configuración del agente de IA
+
+Así se ve la integración del agente de IA con Pydantic AI:
+
+```python title="backend/app/agents/chat.py"
+from pydantic_ai import Agent, RunContext
+from app.core.deps import AgentDeps
+
+agent = Agent(
+    "openai:gpt-4o",
+    deps_type=AgentDeps,
+    system_prompt="You are a helpful AI assistant.",
+)
+
+@agent.tool
+async def search_knowledge_base(
+    ctx: RunContext[AgentDeps], query: str
+) -> str:
+    """Search the knowledge base for relevant information."""
+    results = await ctx.deps.search_service.search(query)
+    return "\n".join(r.content for r in results)
+```
+
+El endpoint WebSocket se encarga del streaming automáticamente:
+
+```python title="backend/app/api/ws.py"
+@router.websocket("/ws/chat")
+async def chat_websocket(
+    websocket: WebSocket,
+    current_user: User = Depends(get_ws_user),
+):
+    await websocket.accept()
+    async with agent.run_stream(
+        message, deps=AgentDeps(user=current_user, db=db)
+    ) as response:
+        async for chunk in response.stream_text():
+            await websocket.send_json({"type": "chunk", "content": chunk})
+```
+
+## Configurador web
+
+No te gustan las CLIs? El [configurador web](https://template.vstorm.co/configurator/) ofrece un asistente visual en 9 pasos:
+
+1. **Datos básicos del proyecto** — nombre, descripción
+2. **Framework de IA** — Pydantic AI, LangChain, LangGraph, CrewAI, DeepAgents
+3. **Proveedor de LLM** — OpenAI, Anthropic, OpenRouter
+4. **Base de datos** — PostgreSQL, MongoDB, SQLite o ninguna
+5. **Autenticación** — JWT, claves API, Google OAuth o ninguna
+6. **Infraestructura** — Docker, Kubernetes, reverse proxy
+7. **Observabilidad** — Logfire, Sentry, Prometheus
+8. **CI/CD** — GitHub Actions, GitLab CI
+9. **Revisión y descarga** — obtén tu proyecto configurado como ZIP
+
+## Despliegue en producción
+
+El proyecto generado incluye todo lo necesario para producción:
+
+```yaml title="docker-compose.prod.yml"
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    environment:
+      - DATABASE_URL=postgresql://...
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    restart: always
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+```
+
+Los manifiestos de Kubernetes también se generan si seleccionaste esa opción.
+
+## Próximos pasos
+
+Una vez que tu proyecto esté en marcha, puedes:
+
+- Agregar herramientas personalizadas a tu agente de IA
+- Implementar RAG con tus propios datos
+- Agregar más endpoints de API
+- Personalizar la interfaz del frontend
+- Configurar dashboards de monitoreo
+
+La plantilla te da la base. Tú te enfocas en lo que hace única a tu aplicación.
+
+**Empieza ahora:** [template.vstorm.co/configurator/](https://template.vstorm.co/configurator/)

@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#09090b"/>
+      <stop offset="100%" stop-color="#18181b"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Subtle grid -->
+  <g opacity="0.06" stroke="#fff" stroke-width="1">
+    <line x1="0" y1="64" x2="1200" y2="64"/>
+    <line x1="0" y1="128" x2="1200" y2="128"/>
+    <line x1="0" y1="192" x2="1200" y2="192"/>
+    <line x1="0" y1="256" x2="1200" y2="256"/>
+    <line x1="0" y1="320" x2="1200" y2="320"/>
+    <line x1="0" y1="384" x2="1200" y2="384"/>
+    <line x1="0" y1="448" x2="1200" y2="448"/>
+    <line x1="0" y1="512" x2="1200" y2="512"/>
+    <line x1="0" y1="576" x2="1200" y2="576"/>
+    <line x1="64" y1="0" x2="64" y2="630"/>
+    <line x1="128" y1="0" x2="128" y2="630"/>
+    <line x1="192" y1="0" x2="192" y2="630"/>
+    <line x1="256" y1="0" x2="256" y2="630"/>
+    <line x1="320" y1="0" x2="320" y2="630"/>
+    <line x1="384" y1="0" x2="384" y2="630"/>
+    <line x1="448" y1="0" x2="448" y2="630"/>
+    <line x1="512" y1="0" x2="512" y2="630"/>
+    <line x1="576" y1="0" x2="576" y2="630"/>
+    <line x1="640" y1="0" x2="640" y2="630"/>
+    <line x1="704" y1="0" x2="704" y2="630"/>
+    <line x1="768" y1="0" x2="768" y2="630"/>
+    <line x1="832" y1="0" x2="832" y2="630"/>
+    <line x1="896" y1="0" x2="896" y2="630"/>
+    <line x1="960" y1="0" x2="960" y2="630"/>
+    <line x1="1024" y1="0" x2="1024" y2="630"/>
+    <line x1="1088" y1="0" x2="1088" y2="630"/>
+    <line x1="1152" y1="0" x2="1152" y2="630"/>
+  </g>
+
+  <!-- Glow blob -->
+  <circle cx="600" cy="260" r="300" fill="#6366f1" opacity="0.08"/>
+  <circle cx="600" cy="260" r="150" fill="#8b5cf6" opacity="0.06"/>
+
+  <!-- Logo badge -->
+  <rect x="540" y="120" width="120" height="48" rx="24" fill="url(#accent)"/>
+  <text x="600" y="151" font-family="monospace, sans-serif" font-size="18" font-weight="700" text-anchor="middle" fill="white">OPEN SOURCE</text>
+
+  <!-- Title -->
+  <text x="600" y="240" font-family="'Inter', system-ui, sans-serif" font-size="56" font-weight="800" text-anchor="middle" fill="white">Ship Production</text>
+  <text x="600" y="310" font-family="'Inter', system-ui, sans-serif" font-size="56" font-weight="800" text-anchor="middle" fill="#8b5cf6">AI Apps</text>
+  <text x="600" y="375" font-family="'Inter', system-ui, sans-serif" font-size="56" font-weight="800" text-anchor="middle" fill="white">In Minutes</text>
+
+  <!-- Subtitle -->
+  <text x="600" y="430" font-family="'Inter', system-ui, sans-serif" font-size="20" text-anchor="middle" fill="#a1a1aa">FastAPI + Next.js &#8226; 5 AI Frameworks &#8226; 75+ Options</text>
+
+  <!-- Tech badges -->
+  <g transform="translate(275, 470)">
+    <rect x="0" y="0" width="100" height="34" rx="17" fill="#27272a" stroke="#3f3f46" stroke-width="1"/>
+    <text x="50" y="22" font-family="'Inter', sans-serif" font-size="13" font-weight="500" text-anchor="middle" fill="#a1a1aa">FastAPI</text>
+
+    <rect x="115" y="0" width="100" height="34" rx="17" fill="#27272a" stroke="#3f3f46" stroke-width="1"/>
+    <text x="165" y="22" font-family="'Inter', sans-serif" font-size="13" font-weight="500" text-anchor="middle" fill="#a1a1aa">Next.js</text>
+
+    <rect x="230" y="0" width="100" height="34" rx="17" fill="#27272a" stroke="#3f3f46" stroke-width="1"/>
+    <text x="280" y="22" font-family="'Inter', sans-serif" font-size="13" font-weight="500" text-anchor="middle" fill="#a1a1aa">Pydantic AI</text>
+
+    <rect x="345" y="0" width="110" height="34" rx="17" fill="#27272a" stroke="#3f3f46" stroke-width="1"/>
+    <text x="400" y="22" font-family="'Inter', sans-serif" font-size="13" font-weight="500" text-anchor="middle" fill="#a1a1aa">LangChain</text>
+
+    <rect x="470" y="0" width="90" height="34" rx="17" fill="#27272a" stroke="#3f3f46" stroke-width="1"/>
+    <text x="515" y="22" font-family="'Inter', sans-serif" font-size="13" font-weight="500" text-anchor="middle" fill="#a1a1aa">Docker</text>
+  </g>
+
+  <!-- Bottom bar -->
+  <rect x="0" y="560" width="1200" height="70" fill="#09090b" opacity="0.8"/>
+  <text x="600" y="602" font-family="'JetBrains Mono', monospace" font-size="16" text-anchor="middle" fill="#71717a">pip install fastapi-fullstack</text>
+</svg>

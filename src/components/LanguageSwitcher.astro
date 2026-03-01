@@ -1,0 +1,94 @@
+---
+import { languages, defaultLang, type Lang } from '../i18n/translations';
+
+interface Props {
+  currentLang: Lang;
+  pathSuffix?: string;
+}
+
+const { currentLang, pathSuffix } = Astro.props;
+const rawBase = import.meta.env.BASE_URL;
+const base = rawBase.endsWith("/") ? rawBase : rawBase + "/";
+
+// Build language switch URLs:
+// If pathSuffix is explicitly provided, use it (landing pages with custom slugs).
+// Otherwise, derive the path automatically from the current URL.
+function getLangHref(targetLang: string): string {
+  if (pathSuffix !== undefined) {
+    const suffix = pathSuffix ? (pathSuffix.endsWith("/") ? pathSuffix : pathSuffix + "/") : "";
+    return targetLang === defaultLang ? `${base}${suffix}` : `${base}${targetLang}/${suffix}`;
+  }
+
+  // Auto-detect: strip the current lang prefix from the URL path
+  const currentPath = Astro.url.pathname;
+  let pathWithoutLang = currentPath;
+
+  // Remove base prefix
+  if (pathWithoutLang.startsWith(base)) {
+    pathWithoutLang = pathWithoutLang.slice(base.length);
+  }
+
+  // Remove current lang prefix if present (e.g. "de/blog/slug/" → "blog/slug/")
+  if (currentLang !== defaultLang && pathWithoutLang.startsWith(currentLang + "/")) {
+    pathWithoutLang = pathWithoutLang.slice(currentLang.length + 1);
+  }
+
+  // Ensure trailing slash
+  if (pathWithoutLang && !pathWithoutLang.endsWith("/")) {
+    pathWithoutLang += "/";
+  }
+
+  return targetLang === defaultLang
+    ? `${base}${pathWithoutLang}`
+    : `${base}${targetLang}/${pathWithoutLang}`;
+}
+---
+
+<div class="relative" id="lang-switcher">
+  <button
+    id="lang-btn"
+    class="flex items-center gap-1.5 rounded-xl border border-border hover:border-border-hover bg-surface px-3 py-2 text-xs font-medium text-text-secondary transition-all cursor-pointer"
+    aria-label="Switch language"
+  >
+    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+    {languages[currentLang]}
+  </button>
+
+  <div
+    id="lang-dropdown"
+    class="absolute right-0 top-full mt-1 hidden min-w-[120px] rounded-xl border border-border bg-surface shadow-xl shadow-black/20 overflow-hidden"
+  >
+    {Object.entries(languages).map(([code, label]) => (
+      <a
+        href={getLangHref(code)}
+        class={`block px-3 py-2 text-xs transition-colors ${
+          code === currentLang
+            ? "bg-accent/10 text-accent font-medium"
+            : "text-text-secondary hover:bg-surface-hover hover:text-text"
+        }`}
+      >
+        {label}
+      </a>
+    ))}
+  </div>
+</div>
+
+<script is:inline>
+  (function() {
+    const btn = document.getElementById('lang-btn');
+    const dropdown = document.getElementById('lang-dropdown');
+    if (!btn || !dropdown) return;
+
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      dropdown.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', function() {
+      dropdown.classList.add('hidden');
+    });
+  })();
+</script>

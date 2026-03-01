@@ -1,0 +1,136 @@
+---
+title: "Pydantic AI vs LangChain für produktionsreife KI-Agenten (2026)"
+description: "Ein praxisnaher Vergleich von Pydantic AI und LangChain für den Bau produktionsreifer KI-Agenten. Typsicherheit, Streaming, Dependency Injection und reale Kompromisse."
+pubDate: 2026-02-28
+author: "Vstorm"
+lang: de
+translationKey: pydantic-ai-vs-langchain
+tags: ["pydantic-ai", "langchain", "ai-agents", "python", "comparison"]
+category: comparison
+draft: false
+---
+
+## Warum dieser Vergleich wichtig ist
+
+Die Wahl eines KI-Agenten-Frameworks ist nicht nur eine technische Entscheidung — sie beeinflusst Ihre Entwicklungsgeschwindigkeit, Debugging-Erfahrung und Produktionszuverlässigkeit über Monate hinweg. Nach dem Bau von über 30 produktionsreifen KI-Agenten-Systemen haben wir sowohl Pydantic AI als auch LangChain intensiv eingesetzt. Hier ist, was wir gelernt haben.
+
+## Schnellübersicht
+
+| Merkmal | Pydantic AI | LangChain |
+|---------|-------------|-----------|
+| **Typsicherheit** | Vollständige Pydantic v2-Validierung | Optional, schema-basiert |
+| **Streaming** | Natives asynchrones Streaming | Über Callbacks/LCEL |
+| **Abhängigkeiten** | Eingebautes DI-System | Manuelle Verdrahtung |
+| **LLM-Anbieter** | OpenAI, Anthropic, Gemini, Groq, Mistral | 70+ Anbieter |
+| **Lernkurve** | Niedrig (wenn Sie Pydantic kennen) | Steil (große API-Oberfläche) |
+| **Paketgröße** | Minimal | Schwer (viele Abhängigkeiten) |
+| **Beobachtbarkeit** | Logfire-Integration | LangSmith |
+
+## Typsicherheit: Der größte Unterschied
+
+Pydantic AI macht strukturierte Ausgaben zu einem erstklassigen Feature. Sie definieren Ihre Ausgabe als Pydantic-Modell, und das Framework übernimmt Validierung, Wiederholungsversuche und Fehlermeldungen automatisch:
+
+```python title="pydantic_ai_example.py"
+from pydantic import BaseModel
+from pydantic_ai import Agent
+
+class FlightSearch(BaseModel):
+    origin: str
+    destination: str
+    date: str
+    max_price: float | None = None
+
+agent = Agent(
+    "openai:gpt-4o",
+    output_type=FlightSearch,
+    system_prompt="Extract flight search parameters from user queries.",
+)
+
+result = await agent.run("Find me a flight from NYC to London on March 15, under $500")
+# result.output is a validated FlightSearch instance
+print(result.output.origin)  # "NYC"
+print(result.output.max_price)  # 500.0
+```
+
+Mit LangChain benötigen Sie `with_structured_output()` oder einen separaten Parsing-Schritt. Es funktioniert, ist aber umständlicher, und die Fehlerbehandlung ist weniger elegant.
+
+## Dependency Injection
+
+Hier glänzt Pydantic AI wirklich bei Produktionsanwendungen. Das Dependency-Injection-System ermöglicht eine saubere Trennung von Agentenlogik und Infrastruktur:
+
+```python title="deps_example.py"
+from dataclasses import dataclass
+from pydantic_ai import Agent, RunContext
+
+@dataclass
+class Deps:
+    db: Database
+    user_id: str
+    api_client: ExternalAPI
+
+agent = Agent("openai:gpt-4o", deps_type=Deps)
+
+@agent.tool
+async def get_user_orders(ctx: RunContext[Deps]) -> list[dict]:
+    """Fetch user's recent orders."""
+    return await ctx.deps.db.get_orders(ctx.deps.user_id)
+
+# In production
+result = await agent.run(
+    "What are my recent orders?",
+    deps=Deps(db=prod_db, user_id="user_123", api_client=prod_api),
+)
+
+# In tests
+result = await agent.run(
+    "What are my recent orders?",
+    deps=Deps(db=mock_db, user_id="test_user", api_client=mock_api),
+)
+```
+
+LangChain erreicht ähnliche Muster durch RunnablePassthrough und Chain-Komposition, erfordert aber mehr Boilerplate-Code und erzwingt Typverträge nicht auf die gleiche Weise.
+
+## Streaming
+
+Beide Frameworks unterstützen Streaming, aber die Ansätze unterscheiden sich erheblich:
+
+```python title="streaming.py"
+from pydantic_ai import Agent
+
+agent = Agent("openai:gpt-4o")
+
+async with agent.run_stream("Explain WebSocket streaming") as response:
+    async for chunk in response.stream_text():
+        print(chunk, end="", flush=True)
+```
+
+Das Streaming von Pydantic AI ist nativ asynchron und integriert sich direkt mit FastAPIs `StreamingResponse`. In unserem Template benötigte WebSocket-Streaming mit Pydantic AI etwa 40 Zeilen Code. Die entsprechende LangChain-Konfiguration mit LCEL-Streaming brauchte ungefähr 80 Zeilen.
+
+## Wann Sie Pydantic AI wählen sollten
+
+- **Sie bauen eine FastAPI-App** — die Integration ist nahtlos
+- **Typsicherheit ist wichtig** — Sie wollen Garantien ähnlich wie bei der Kompilierzeit
+- **Ihr Team kennt Pydantic** — keine Lernkurve für die Modellschicht
+- **Sie brauchen sauberes Testen** — Dependency Injection macht Mocking trivial
+- **Sie wollen minimale Abhängigkeiten** — Pydantic AI ist leichtgewichtig
+
+## Wann Sie LangChain wählen sollten
+
+- **Sie brauchen 70+ LLM-Anbieter** — LangChain hat die breiteste Anbieterunterstützung
+- **Sie nutzen LangGraph** — für komplexe Multi-Agenten-Orchestrierung
+- **Sie brauchen LangSmith** — Enterprise-Tracing und -Evaluation
+- **Ihr Team kennt es bereits** — die Wechselkosten sind real
+- **Sie brauchen vorgefertigte Chains** — RAG, Zusammenfassung usw. sofort einsatzbereit
+
+## Unsere Empfehlung
+
+Für neue produktionsreife KI-Agenten-Projekte im Jahr 2026 setzen wir standardmäßig auf **Pydantic AI**. Die Typsicherheit, Dependency Injection und FastAPI-Integration schaffen ein Entwicklungserlebnis, das schwer zu übertreffen ist. LangChain bleibt die richtige Wahl, wenn Sie die Breite seines Ökosystems benötigen — insbesondere LangGraph für komplexe Agenten-Workflows.
+
+Unser [Full-Stack AI Agent Template](https://template.vstorm.co/) unterstützt beide Frameworks (plus LangGraph, CrewAI und DeepAgents), sodass Sie mit einem davon starten und später wechseln können, ohne Ihre Infrastruktur umschreiben zu müssen.
+
+## Wichtigste Erkenntnisse
+
+1. **Pydantic AI** glänzt bei typsicheren, produktionsreifen Agenten mit sauberer Architektur
+2. **LangChain** glänzt bei Ökosystem-Breite und vorgefertigten Komponenten
+3. Das „beste" Framework hängt von der Erfahrung Ihres Teams und den Projektanforderungen ab
+4. Beide funktionieren gut — die schlechteste Wahl ist, Wochen mit der Entscheidung zu verbringen, anstatt zu bauen

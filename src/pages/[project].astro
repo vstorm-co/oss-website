@@ -1,0 +1,51 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import ProjectPage from '../components/project/ProjectPage.astro';
+import OssFooter from '../components/oss/OssFooter.astro';
+import { translations, languages, defaultLang } from '../i18n/translations';
+import { getGenericProjects } from '../data/projects';
+
+export function getStaticPaths() {
+  return getGenericProjects().map((p) => ({
+    params: { project: p.slug },
+    props: { project: p },
+  }));
+}
+
+const { project } = Astro.props;
+const lang = defaultLang;
+const t = translations[lang];
+
+const alternates = [
+  { lang: "en", href: `/${project.slug}/` },
+  ...Object.keys(languages)
+    .filter((l) => l !== defaultLang)
+    .map((l) => ({ lang: l, href: `/${l}/${project.slug}/` })),
+];
+
+const jsonLd = project.status === "released" ? {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: project.name,
+  description: project.description[lang],
+  url: `https://oss.vstorm.co/${project.slug}/`,
+  applicationCategory: "DeveloperApplication",
+  operatingSystem: "Cross-platform",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  programmingLanguage: ["Python"],
+  author: { "@type": "Organization", name: "Vstorm" },
+} : undefined;
+---
+
+<Layout
+  title={`${project.name} — Vstorm OSS`}
+  description={project.description[lang]}
+  lang={lang}
+  alternates={alternates}
+  jsonLd={jsonLd}
+>
+  <Navbar currentLang={lang} project={project} pathSuffix={`${project.slug}/`} />
+  <ProjectPage project={project} lang={lang} t={t} />
+  <OssFooter t={t} />
+</Layout>

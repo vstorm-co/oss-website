@@ -1,0 +1,36 @@
+---
+import type { translations } from '../../i18n/translations';
+
+interface Props {
+  t: typeof translations.en;
+}
+
+const { t } = Astro.props;
+
+const features = [
+  { title: t["deepagents.features.deepagent.title"], description: t["deepagents.features.deepagent.desc"] },
+  { title: t["deepagents.features.context.title"], description: t["deepagents.features.context.desc"] },
+  { title: t["deepagents.features.subagents.title"], description: t["deepagents.features.subagents.desc"] },
+  { title: t["deepagents.features.memory.title"], description: t["deepagents.features.memory.desc"] },
+  { title: t["deepagents.features.tools.title"], description: t["deepagents.features.tools.desc"] },
+  { title: t["deepagents.features.production.title"], description: t["deepagents.features.production.desc"] },
+];
+---
+
+<section class="px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
+  <div class="mx-auto max-w-6xl">
+    <div class="reveal text-center">
+      <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl">{t["deepagents.features.title"]}</h2>
+      <p class="mt-4 text-lg text-text-secondary">{t["deepagents.features.subtitle"]}</p>
+    </div>
+
+    <div class="reveal-group mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      {features.map((feature) => (
+        <div class="reveal glow-card rounded-2xl border border-border bg-surface p-6 transition-colors hover:border-border-hover">
+          <h3 class="text-base font-semibold">{feature.title}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-text-secondary">{feature.description}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

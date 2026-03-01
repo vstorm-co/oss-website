@@ -1,0 +1,158 @@
+---
+import type { translations } from '../../i18n/translations';
+
+interface Props {
+  t: typeof translations.en;
+}
+
+const { t } = Astro.props;
+const rawBase = import.meta.env.BASE_URL;
+const base = rawBase.endsWith("/") ? rawBase : rawBase + "/";
+
+const showcaseItems = [
+  {
+    id: "cli",
+    title: t["deepagents.showcase.cli.title"],
+    description: t["deepagents.showcase.cli.desc"],
+    features: [
+      t["deepagents.showcase.cli.f1"],
+      t["deepagents.showcase.cli.f2"],
+      t["deepagents.showcase.cli.f3"],
+      t["deepagents.showcase.cli.f4"],
+    ],
+    images: [
+      { src: `${base}deepagents/cli.png`, alt: "Pydantic Deep CLI — interactive terminal with code generation" },
+      { src: `${base}deepagents/cli-demo.gif`, alt: "Pydantic Deep CLI demo — launching agent session" },
+    ],
+  },
+  {
+    id: "research",
+    title: t["deepagents.showcase.research.title"],
+    description: t["deepagents.showcase.research.desc"],
+    features: [
+      t["deepagents.showcase.research.f1"],
+      t["deepagents.showcase.research.f2"],
+      t["deepagents.showcase.research.f3"],
+      t["deepagents.showcase.research.f4"],
+    ],
+    images: [
+      { src: `${base}deepagents/planner-question.png`, alt: "DeepResearch — planner asking clarifying questions" },
+      { src: `${base}deepagents/spawn-subagents.png`, alt: "DeepResearch — parallel sub-agent delegation" },
+      { src: `${base}deepagents/display-files.png`, alt: "DeepResearch — generated files and report" },
+      { src: `${base}deepagents/excalidraw-research.png`, alt: "DeepResearch — Excalidraw diagram generation" },
+    ],
+  },
+];
+---
+
+<section class="px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
+  <div class="mx-auto max-w-6xl">
+    <div class="reveal text-center">
+      <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl">{t["deepagents.showcase.title"]}</h2>
+      <p class="mt-4 text-lg text-text-secondary">{t["deepagents.showcase.subtitle"]}</p>
+    </div>
+
+    <div class="mt-16 space-y-24">
+      {showcaseItems.map((item, idx) => (
+        <div class:list={[
+          "reveal flex flex-col gap-10 lg:gap-16",
+          idx % 2 === 1 ? "lg:flex-row-reverse" : "lg:flex-row",
+        ]}>
+          <!-- Text -->
+          <div class="flex-1 flex flex-col justify-center">
+            <h3 class="text-2xl font-bold">{item.title}</h3>
+            <p class="mt-3 text-text-secondary leading-relaxed">{item.description}</p>
+            <ul class="mt-6 space-y-2.5">
+              {item.features.map((f) => (
+                <li class="flex items-center gap-2.5 text-sm text-text-secondary">
+                  <svg class="h-4 w-4 shrink-0 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  {f}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <!-- Image gallery -->
+          <div class="flex-1">
+            <div class:list={[
+              "da-gallery grid gap-3",
+              item.images.length > 2 ? "grid-cols-2" : "grid-cols-1",
+            ]} data-gallery={item.id}>
+              {item.images.map((img) => (
+                <button
+                  type="button"
+                  class="da-gallery-thumb group/thumb relative overflow-hidden rounded-xl border border-border bg-surface transition-all hover:border-accent/40"
+                  data-full={img.src}
+                  data-alt={img.alt}
+                >
+                  <img
+                    src={img.src}
+                    alt={img.alt}
+                    class="w-full h-auto object-cover"
+                    loading="lazy"
+                  />
+                  <div class="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover/thumb:bg-black/20">
+                    <svg class="h-8 w-8 text-white opacity-0 transition-opacity group-hover/thumb:opacity-100 drop-shadow-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6" />
+                    </svg>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- Lightbox -->
+<div id="da-lightbox" role="dialog" aria-modal="true" aria-label="Image preview" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-8">
+  <button type="button" id="da-lightbox-close" class="absolute top-4 right-4 z-10 rounded-full bg-black/50 p-2 text-white transition-colors hover:bg-black/70">
+    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  </button>
+  <img id="da-lightbox-img" src="" alt="" class="max-h-[90vh] max-w-[90vw] rounded-xl object-contain shadow-2xl" />
+</div>
+
+<script>
+  // Lightbox
+  const lightbox = document.getElementById('da-lightbox');
+  const lightboxImg = document.getElementById('da-lightbox-img') as HTMLImageElement | null;
+  const lightboxClose = document.getElementById('da-lightbox-close');
+
+  document.querySelectorAll<HTMLElement>('.da-gallery-thumb').forEach((thumb) => {
+    thumb.addEventListener('click', () => {
+      const src = thumb.dataset.full;
+      const alt = thumb.dataset.alt || '';
+      if (!lightbox || !lightboxImg || !src) return;
+      lightboxImg.src = src;
+      lightboxImg.alt = alt;
+      lightbox.classList.remove('hidden');
+      lightbox.classList.add('flex');
+    });
+  });
+
+  lightboxClose?.addEventListener('click', () => {
+    if (!lightbox) return;
+    lightbox.classList.add('hidden');
+    lightbox.classList.remove('flex');
+  });
+
+  lightbox?.addEventListener('click', (e) => {
+    if (e.target === lightbox) {
+      lightbox.classList.add('hidden');
+      lightbox.classList.remove('flex');
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && lightbox && !lightbox.classList.contains('hidden')) {
+      lightbox.classList.add('hidden');
+      lightbox.classList.remove('flex');
+    }
+  });
+</script>

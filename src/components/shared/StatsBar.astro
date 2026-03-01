@@ -1,0 +1,67 @@
+---
+interface StatItem {
+  value: string;
+  label: string;
+  suffix?: string;
+}
+
+interface Props {
+  items: StatItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<section class="border-y border-border bg-surface/50 py-12 sm:py-16">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+    <div class="reveal grid grid-cols-2 gap-8 sm:grid-cols-4" id="stats-bar">
+      {items.map((item) => (
+        <div class="text-center">
+          <div class="text-3xl font-bold tracking-tight text-accent sm:text-4xl">
+            <span class="stat-number" data-target={item.value}>{item.value}</span>{item.suffix || ""}
+          </div>
+          <div class="mt-2 text-sm text-text-secondary">{item.label}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  (function() {
+    var observed = false;
+    var bar = document.getElementById('stats-bar');
+    if (!bar) return;
+
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting && !observed) {
+          observed = true;
+          var nums = bar.querySelectorAll('.stat-number');
+          nums.forEach(function(el) {
+            var target = el.getAttribute('data-target') || '';
+            var match = target.match(/^(\d+)/);
+            if (!match) return;
+            var end = parseInt(match[1], 10);
+            var duration = 1200;
+            var start = 0;
+            var startTime = null;
+            var rest = target.slice(match[1].length);
+            function animate(ts) {
+              if (!startTime) startTime = ts;
+              var progress = Math.min((ts - startTime) / duration, 1);
+              var eased = 1 - Math.pow(1 - progress, 3);
+              var current = Math.round(start + (end - start) * eased);
+              el.textContent = current + rest;
+              if (progress < 1) requestAnimationFrame(animate);
+            }
+            requestAnimationFrame(animate);
+          });
+          observer.disconnect();
+        }
+      });
+    }, { threshold: 0.3 });
+
+    observer.observe(bar);
+  })();
+</script>

@@ -1,0 +1,167 @@
+---
+import type { Lang } from '../../i18n/translations';
+import type { Project } from '../../data/projects';
+
+interface Props {
+  project: Project;
+  lang: Lang;
+  t: Record<string, string>;
+}
+
+const { project, lang, t } = Astro.props;
+const isComingSoon = project.status === "coming-soon";
+const homeHref = lang === "en" ? "/" : `/${lang}/`;
+---
+
+<main class="mx-auto max-w-3xl px-4 py-16 sm:py-24">
+  <!-- Back link -->
+  <a href={homeHref} class="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-accent transition-colors mb-8">
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+    </svg>
+    {t["project.backToProjects"]}
+  </a>
+
+  <!-- Header -->
+  <div class="mb-10">
+    <div class="flex items-center gap-3 mb-3">
+      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">{project.name}</h1>
+      {isComingSoon && (
+        <span class="rounded-full bg-surface-hover px-3 py-1 text-xs font-medium text-text-tertiary">
+          {t["project.comingSoon.title"]}
+        </span>
+      )}
+    </div>
+    <p class="text-lg text-text-secondary leading-relaxed">{project.tagline[lang]}</p>
+  </div>
+
+  {isComingSoon ? (
+    <!-- Coming Soon -->
+    <div class="rounded-2xl border border-border bg-surface p-8 text-center">
+      <div class="text-5xl mb-4">🚧</div>
+      <h2 class="text-xl font-semibold mb-2">{t["project.comingSoon.title"]}</h2>
+      <p class="text-text-secondary mb-6">{t["project.comingSoon.description"]}</p>
+      <a
+        href="https://github.com/vstorm-co"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-hover"
+      >
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+        {t["ui.followOnGithub"]}
+      </a>
+    </div>
+  ) : (
+    <>
+      <!-- Description -->
+      <div class="mb-10">
+        <p class="text-text-secondary leading-relaxed">{project.description[lang]}</p>
+      </div>
+
+      <!-- Features -->
+      {project.features[lang] && project.features[lang].length > 0 && (
+        <div class="mb-10">
+          <h2 class="text-lg font-semibold mb-4">{t["project.features"]}</h2>
+          <div class="grid gap-3 sm:grid-cols-2">
+            {project.features[lang].map((feature) => (
+              <div class="flex items-center gap-2.5 rounded-xl border border-border bg-surface px-4 py-3">
+                <span class="text-accent">&mdash;</span>
+                <span class="text-sm text-text-secondary">{feature}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <!-- Install -->
+      {project.installCommand && (
+        <div class="mb-10">
+          <h2 class="text-lg font-semibold mb-4">{t["project.install"]}</h2>
+          <div
+            class="copy-block group/copy relative cursor-pointer overflow-hidden rounded-xl border border-border bg-surface transition-colors hover:border-accent/40"
+            data-command={project.installCommand}
+          >
+            <div class="flex items-center justify-between px-4 py-3 font-mono text-sm">
+              <div>
+                <span class="text-text-tertiary">$</span>{" "}
+                <span class="text-text">{project.installCommand}</span>
+              </div>
+              <div class="flex items-center gap-1.5 opacity-0 transition-opacity group-hover/copy:opacity-100">
+                <span class="copy-label text-[11px] text-text-tertiary" data-copied={t["ui.copied"]}>{t["ui.clickToCopy"]}</span>
+                <svg class="copy-icon h-4 w-4 text-text-tertiary transition-colors group-hover/copy:text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
+                <svg class="check-icon hidden h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <!-- Links -->
+      <div class="flex flex-wrap gap-3">
+        {project.github && (
+          <a
+            href={`https://github.com/${project.github}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-medium text-text transition-colors hover:border-border-hover hover:bg-surface"
+          >
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+            </svg>
+            GitHub
+          </a>
+        )}
+        {project.pypi && (
+          <a
+            href={`https://pypi.org/project/${project.pypi}/`}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-medium text-text transition-colors hover:border-border-hover hover:bg-surface"
+          >
+            PyPI
+          </a>
+        )}
+      </div>
+    </>
+  )}
+</main>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.copy-block').forEach((block) => {
+    block.addEventListener('click', async () => {
+      const command = block.dataset.command;
+      if (!command) return;
+      try {
+        await navigator.clipboard.writeText(command);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = command;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      const label = block.querySelector('.copy-label') as HTMLElement | null;
+      const copyIcon = block.querySelector('.copy-icon') as HTMLElement | null;
+      const checkIcon = block.querySelector('.check-icon') as HTMLElement | null;
+      const originalText = label?.textContent || '';
+      if (label) label.textContent = label.dataset.copied || 'Copied!';
+      if (copyIcon) copyIcon.classList.add('hidden');
+      if (checkIcon) checkIcon.classList.remove('hidden');
+      setTimeout(() => {
+        if (label) label.textContent = originalText;
+        if (copyIcon) copyIcon.classList.remove('hidden');
+        if (checkIcon) checkIcon.classList.add('hidden');
+      }, 2000);
+    });
+  });
+</script>

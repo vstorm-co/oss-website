@@ -1,0 +1,38 @@
+---
+import type { translations } from '../../i18n/translations';
+
+interface Props {
+  t: typeof translations.en;
+}
+
+const { t } = Astro.props;
+
+const features = [
+  { title: t["features.ai.title"], description: t["features.ai.desc"] },
+  { title: t["features.options.title"], description: t["features.options.desc"] },
+  { title: t["features.presets.title"], description: t["features.presets.desc"] },
+  { title: t["features.fullstack.title"], description: t["features.fullstack.desc"] },
+  { title: t["features.production.title"], description: t["features.production.desc"] },
+  { title: t["features.observable.title"], description: t["features.observable.desc"] },
+];
+---
+
+<section class="px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
+  <div class="mx-auto max-w-6xl">
+    <div class="reveal text-center">
+      <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl">{t["features.title"]}</h2>
+      <p class="mt-4 text-lg text-text-secondary">
+        {t["features.subtitle"]}
+      </p>
+    </div>
+
+    <div class="reveal-group mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      {features.map((feature) => (
+        <div class="reveal glow-card rounded-2xl border border-border bg-surface p-6 transition-colors hover:border-border-hover">
+          <h3 class="text-base font-semibold tracking-[-0.01em]">{feature.title}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-text-secondary">{feature.description}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

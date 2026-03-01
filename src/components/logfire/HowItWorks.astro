@@ -1,0 +1,42 @@
+---
+import type { translations } from '../../i18n/translations';
+
+interface Props {
+  t: typeof translations.en;
+}
+
+const { t } = Astro.props;
+
+const steps = [
+  { number: "1", title: t["logfire.howitworks.step1.title"], desc: t["logfire.howitworks.step1.desc"] },
+  { number: "2", title: t["logfire.howitworks.step2.title"], desc: t["logfire.howitworks.step2.desc"] },
+  { number: "3", title: t["logfire.howitworks.step3.title"], desc: t["logfire.howitworks.step3.desc"] },
+  { number: "4", title: t["logfire.howitworks.step4.title"], desc: t["logfire.howitworks.step4.desc"] },
+];
+---
+
+<section class="reveal px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
+  <div class="mx-auto max-w-5xl">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl">{t["logfire.howitworks.title"]}</h2>
+      <p class="mt-4 text-lg text-text-secondary">{t["logfire.howitworks.subtitle"]}</p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {steps.map((step, i) => (
+        <div class="relative flex flex-col items-center text-center">
+          {/* Connecting line (hidden on mobile, shown on lg) */}
+          {i < steps.length - 1 && (
+            <div class="pointer-events-none absolute top-5 left-[calc(50%+24px)] hidden h-px w-[calc(100%-48px)] border-t border-dashed border-border lg:block"></div>
+          )}
+          {/* Number circle */}
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-pink-500/40 text-sm font-semibold text-pink-500">
+            {step.number}
+          </div>
+          <h3 class="mt-4 text-sm font-semibold">{step.title}</h3>
+          <p class="mt-2 text-xs leading-relaxed text-text-secondary">{step.desc}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

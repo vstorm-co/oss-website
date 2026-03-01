@@ -1,0 +1,12 @@
+{
+  "name": "Vstorm OSS",
+  "short_name": "Vstorm OSS",
+  "icons": [
+    { "src": "/favicon.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/favicon.ico", "type": "image/x-icon", "sizes": "16x16 32x32 48x48" }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#6366f1"
+}

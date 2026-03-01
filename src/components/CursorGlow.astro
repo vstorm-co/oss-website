@@ -1,0 +1,51 @@
+---
+// Interactive cursor glow — layered gradient spotlight that follows the mouse.
+// Adapts intensity + colors to the current theme (dark / light).
+---
+
+<div id="cursor-glow" class="pointer-events-none fixed inset-0 z-50 opacity-0 transition-opacity duration-700"></div>
+
+<script>
+  const glow = document.getElementById('cursor-glow');
+  if (glow && window.matchMedia('(pointer: fine)').matches) {
+    let raf: number | null = null;
+    let mx = 0, my = 0;
+
+    function isDark() {
+      return document.documentElement.getAttribute('data-theme') !== 'light';
+    }
+
+    document.addEventListener('mousemove', (e) => {
+      mx = e.clientX;
+      my = e.clientY;
+      if (!raf) {
+        raf = requestAnimationFrame(() => {
+          const dark = isDark();
+          // Layered gradient: warm inner ring + cool outer halo
+          const inner = dark
+            ? 'rgba(139,92,246,0.12)'   // violet
+            : 'rgba(79,70,229,0.08)';    // indigo
+          const mid = dark
+            ? 'rgba(99,102,241,0.06)'    // indigo
+            : 'rgba(139,92,246,0.04)';   // violet
+          const outer = dark
+            ? 'rgba(59,130,246,0.03)'    // blue fringe
+            : 'rgba(99,102,241,0.02)';   // indigo fringe
+
+          glow.style.background = [
+            `radial-gradient(400px circle at ${mx}px ${my}px, ${inner}, transparent 50%)`,
+            `radial-gradient(800px circle at ${mx}px ${my}px, ${mid}, transparent 55%)`,
+            `radial-gradient(1200px circle at ${mx}px ${my}px, ${outer}, transparent 60%)`,
+          ].join(', ');
+
+          glow.style.opacity = '1';
+          raf = null;
+        });
+      }
+    });
+
+    document.addEventListener('mouseleave', () => {
+      glow.style.opacity = '0';
+    });
+  }
+</script>

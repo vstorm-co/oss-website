@@ -1,0 +1,222 @@
+---
+title: "Pydantic AI vs LangChain vs LangGraph vs CrewAI: Which Framework to Choose?"
+description: "A comprehensive comparison of Python AI agent frameworks for 2026. Pydantic AI, LangChain, LangGraph, CrewAI, and DeepAgents — when to use each one."
+pubDate: 2026-02-15
+author: "Vstorm"
+lang: en
+translationKey: choosing-ai-framework
+tags: ["pydantic-ai", "langchain", "langgraph", "crewai", "deepagents", "comparison"]
+category: comparison
+draft: false
+---
+
+## The Framework Landscape in 2026
+
+The Python AI agent ecosystem has matured significantly. Instead of "which framework exists," the question is now "which framework fits my use case." After building production systems with all five major frameworks, here's our honest assessment.
+
+## Framework Comparison
+
+| | Pydantic AI | LangChain | LangGraph | CrewAI | DeepAgents |
+|---|---|---|---|---|---|
+| **Best for** | Type-safe agents | Rapid prototyping | Complex workflows | Multi-agent teams | Modular agent systems |
+| **Learning curve** | Low | Medium | High | Low | Medium |
+| **Type safety** | Excellent | Fair | Fair | Basic | Good |
+| **Streaming** | Native async | Via LCEL | Via LCEL | Limited | Native async |
+| **Multi-agent** | Manual | Manual | Built-in | Built-in | Built-in |
+| **LLM providers** | 6+ | 70+ | 70+ (LangChain) | 10+ | 6+ |
+| **Production readiness** | High | High | High | Medium | Growing |
+| **Dependencies** | Minimal | Heavy | Heavy | Medium | Minimal |
+
+## Pydantic AI — Type-Safe Production Agents
+
+**Choose when:** You're building a FastAPI app, need type safety, or want clean dependency injection.
+
+Pydantic AI treats AI agents like well-typed functions. You define inputs, outputs, and dependencies with Pydantic models, and the framework handles validation, retries, and streaming.
+
+```python title="pydantic_ai_agent.py"
+from pydantic import BaseModel
+from pydantic_ai import Agent, RunContext
+
+class SearchResult(BaseModel):
+    answer: str
+    sources: list[str]
+    confidence: float
+
+agent = Agent(
+    "anthropic:claude-sonnet-4-6",
+    output_type=SearchResult,
+    deps_type=SearchDeps,
+)
+
+result = await agent.run("What is retrieval augmented generation?")
+# result.output.confidence -> 0.95
+```
+
+**Strengths:** Type validation on every response, dependency injection for testing, minimal overhead, Logfire observability.
+
+**Limitations:** Smaller ecosystem than LangChain, no built-in multi-agent orchestration (you wire it yourself).
+
+## LangChain — The Swiss Army Knife
+
+**Choose when:** You need pre-built components, wide provider support, or rapid prototyping.
+
+LangChain has the largest ecosystem of integrations. Need a vector store? 40+ options. Need a document loader? 80+ formats. The trade-off is complexity and dependency weight.
+
+```python title="langchain_agent.py"
+from langchain_openai import ChatOpenAI
+from langchain.agents import create_tool_calling_agent, AgentExecutor
+from langchain_core.prompts import ChatPromptTemplate
+
+llm = ChatOpenAI(model="gpt-4o")
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are a helpful assistant."),
+    ("human", "{input}"),
+    ("placeholder", "{agent_scratchpad}"),
+])
+
+agent = create_tool_calling_agent(llm, tools, prompt)
+executor = AgentExecutor(agent=agent, tools=tools)
+result = await executor.ainvoke({"input": "Search for recent AI news"})
+```
+
+**Strengths:** Massive ecosystem, 70+ LLM providers, LangSmith for enterprise tracing, excellent documentation.
+
+**Limitations:** Heavy dependencies, abstraction layers can obscure what's happening, LCEL has a learning curve.
+
+## LangGraph — Complex Agent Workflows
+
+**Choose when:** You need stateful, multi-step agent workflows with branching logic, human-in-the-loop, or persistence.
+
+LangGraph models agent behavior as a graph — nodes are actions, edges are transitions. This makes complex workflows explicit and debuggable.
+
+```python title="langgraph_agent.py"
+from langgraph.graph import StateGraph, START, END
+
+class AgentState(TypedDict):
+    messages: list
+    next_step: str
+
+graph = StateGraph(AgentState)
+graph.add_node("research", research_node)
+graph.add_node("write", write_node)
+graph.add_node("review", review_node)
+
+graph.add_edge(START, "research")
+graph.add_edge("research", "write")
+graph.add_conditional_edges("write", should_review, {
+    "needs_review": "review",
+    "approved": END,
+})
+graph.add_edge("review", "write")
+
+app = graph.compile()
+```
+
+**Strengths:** Explicit control flow, built-in persistence (checkpointing), human-in-the-loop patterns, excellent for complex workflows.
+
+**Limitations:** Steep learning curve, tightly coupled to LangChain ecosystem, verbose for simple use cases.
+
+## CrewAI — Multi-Agent Teams
+
+**Choose when:** You need multiple AI agents collaborating on tasks with defined roles.
+
+CrewAI uses a "crew" metaphor — you define agents with roles, goals, and backstories, then assign them tasks. It's intuitive for scenarios where you'd naturally describe the work as a team effort.
+
+```python title="crewai_agent.py"
+from crewai import Agent, Task, Crew
+
+researcher = Agent(
+    role="Senior Research Analyst",
+    goal="Find comprehensive data about the topic",
+    backstory="You are an expert researcher...",
+    llm="gpt-4o",
+)
+
+writer = Agent(
+    role="Technical Writer",
+    goal="Create clear, engaging content",
+    backstory="You are a skilled writer...",
+    llm="gpt-4o",
+)
+
+research_task = Task(
+    description="Research {topic}",
+    agent=researcher,
+    expected_output="Detailed research findings",
+)
+
+write_task = Task(
+    description="Write article based on research",
+    agent=writer,
+    expected_output="Published article",
+)
+
+crew = Crew(agents=[researcher, writer], tasks=[research_task, write_task])
+result = await crew.kickoff(inputs={"topic": "AI agents in production"})
+```
+
+**Strengths:** Intuitive mental model, role-based agent design, good for content/research workflows.
+
+**Limitations:** Less control over agent interactions, can be token-expensive (agents discuss with each other), production features still maturing.
+
+## DeepAgents — Modular Agent Architecture
+
+**Choose when:** You want a modular, extensible agent system inspired by Claude Code's architecture.
+
+DeepAgents takes a different approach — agents are composable modules with clear interfaces. Think of it as building blocks rather than a framework.
+
+```python title="deepagents_example.py"
+from deepagents import Agent, Tool, Pipeline
+
+search_tool = Tool(
+    name="web_search",
+    description="Search the web",
+    function=search_web,
+)
+
+agent = Agent(
+    model="anthropic:claude-sonnet-4-6",
+    tools=[search_tool],
+    instructions="Research and summarize topics.",
+)
+
+pipeline = Pipeline([
+    agent.with_config(instructions="Research the topic"),
+    agent.with_config(instructions="Summarize findings"),
+])
+```
+
+**Strengths:** Modular architecture, composable agents, minimal abstractions, type-safe by default.
+
+**Limitations:** Newer framework, smaller community, fewer pre-built integrations.
+
+## Decision Matrix
+
+**Building a simple chatbot or API?** → **Pydantic AI**
+Simple, type-safe, integrates with FastAPI. Don't overcomplicate it.
+
+**Need RAG with many data sources?** → **LangChain**
+Pre-built document loaders, vector stores, and retrieval chains save weeks.
+
+**Complex multi-step workflow with branching?** → **LangGraph**
+Explicit graph-based control flow with persistence and human-in-the-loop.
+
+**Team of agents with distinct roles?** → **CrewAI**
+When the problem naturally decomposes into roles (researcher, writer, reviewer).
+
+**Modular, composable agent system?** → **DeepAgents**
+When you want building blocks, not a framework. Best for teams who like control.
+
+## Don't Commit Too Early
+
+The biggest mistake we see: teams spend weeks evaluating frameworks before writing any application code. Pick one, build a prototype, and switch if needed. The core LLM logic is framework-agnostic — it's the plumbing that changes.
+
+Our [Full-Stack AI Agent Template](https://template.vstorm.co/) lets you generate projects with any of these five frameworks. Same infrastructure, same auth, same database — just swap the agent layer. Try all five and decide based on experience, not blog posts.
+
+## Key Takeaways
+
+1. **No framework is universally "best"** — each excels in specific scenarios
+2. **Pydantic AI** is our default for new FastAPI projects (type safety + DI)
+3. **LangGraph** is the clear winner for complex, stateful workflows
+4. **LangChain** has the widest ecosystem but the highest complexity
+5. **Start building** — you'll learn more in 2 hours of coding than 2 weeks of reading comparisons

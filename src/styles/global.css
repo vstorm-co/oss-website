@@ -1,0 +1,148 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #09090b;
+  --color-surface: #18181b;
+  --color-surface-hover: #27272a;
+  --color-border: #27272a;
+  --color-border-hover: #3f3f46;
+  --color-text: #fafafa;
+  --color-text-secondary: #a1a1aa;
+  --color-text-tertiary: #71717a;
+  --color-accent: #6366f1;
+  --color-accent-hover: #818cf8;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* ---- Dark theme (default) ---- */
+html {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- Light theme ---- */
+html[data-theme="light"] {
+  --color-bg: #ffffff;
+  --color-surface: #f4f4f5;
+  --color-surface-hover: #e4e4e7;
+  --color-border: #e4e4e7;
+  --color-border-hover: #d4d4d8;
+  --color-text: #18181b;
+  --color-text-secondary: #52525b;
+  --color-text-tertiary: #71717a;
+  --color-accent: #4f46e5;
+  --color-accent-hover: #6366f1;
+}
+
+::selection {
+  background-color: rgba(99, 102, 241, 0.3);
+  color: white;
+}
+
+html[data-theme="light"] ::selection {
+  color: #18181b;
+}
+
+.input {
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+/* Smooth theme transition */
+html {
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* ---- Grid background ---- */
+.grid-bg {
+  background-size: 64px 64px;
+  background-image:
+    linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 20%, black 0%, transparent 100%);
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 20%, black 0%, transparent 100%);
+}
+
+/* Dark grid lines */
+html {
+  --grid-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Light grid lines */
+html[data-theme="light"] {
+  --grid-color: rgba(0, 0, 0, 0.10);
+}
+
+/* ---- Scroll reveal animations ---- */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger children inside a reveal-group */
+.reveal-group .reveal { transition-delay: 0ms; }
+.reveal-group .reveal:nth-child(1) { transition-delay: 0ms; }
+.reveal-group .reveal:nth-child(2) { transition-delay: 80ms; }
+.reveal-group .reveal:nth-child(3) { transition-delay: 160ms; }
+.reveal-group .reveal:nth-child(4) { transition-delay: 240ms; }
+.reveal-group .reveal:nth-child(5) { transition-delay: 320ms; }
+.reveal-group .reveal:nth-child(6) { transition-delay: 400ms; }
+
+/* ---- Glow border card ---- */
+.glow-card {
+  position: relative;
+  transition: box-shadow 0.4s;
+}
+
+.glow-card:hover {
+  box-shadow:
+    0 0 0 1px var(--color-accent),
+    0 0 20px -4px rgba(99, 102, 241, 0.3),
+    0 0 50px -8px rgba(99, 102, 241, 0.15);
+}
+
+html[data-theme="light"] .glow-card:hover {
+  box-shadow:
+    0 0 0 1px var(--color-accent),
+    0 0 20px -4px rgba(79, 70, 229, 0.2),
+    0 0 50px -8px rgba(79, 70, 229, 0.1);
+}
+
+/* ---- Terminal typing cursor ---- */
+.typing-cursor::after {
+  content: '▋';
+  display: inline-block;
+  color: var(--color-accent);
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}

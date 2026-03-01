@@ -1,0 +1,32 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import OssHero from '../components/oss/OssHero.astro';
+import ProjectGrid from '../components/oss/ProjectGrid.astro';
+import OssFooter from '../components/oss/OssFooter.astro';
+import FaqPreview from '../components/landing/FaqPreview.astro';
+import { translations, languages, defaultLang } from '../i18n/translations';
+
+const lang = defaultLang;
+const t = translations[lang];
+
+const alternates = [
+  { lang: "en", href: "/" },
+  ...Object.keys(languages)
+    .filter((l) => l !== defaultLang)
+    .map((l) => ({ lang: l, href: `/${l}/` })),
+];
+---
+
+<Layout
+  title={t["oss.meta.title"]}
+  description={t["oss.meta.description"]}
+  lang={lang}
+  alternates={alternates}
+>
+  <Navbar currentLang={lang} />
+  <OssHero t={t} />
+  <ProjectGrid lang={lang} t={t} />
+  <FaqPreview t={t} lang={lang} />
+  <OssFooter t={t} />
+</Layout>

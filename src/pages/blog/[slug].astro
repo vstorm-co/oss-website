@@ -1,0 +1,42 @@
+---
+import { getCollection, render } from 'astro:content';
+import BlogLayout from '../../layouts/BlogLayout.astro';
+import type { Lang } from '../../i18n/translations';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => data.lang === 'en' && !data.draft);
+
+  return posts.map((post) => {
+    const slug = post.id.split('/').slice(1).join('/');
+    return { params: { slug }, props: { post } };
+  });
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+const readingTime = post.body ? Math.max(1, Math.ceil(post.body.split(/\s+/).length / 200)) : undefined;
+
+const allPosts = await getCollection('blog', ({ data }) =>
+  data.translationKey === post.data.translationKey && !data.draft
+);
+const allTranslations = allPosts.map((p) => ({
+  lang: p.data.lang as Lang,
+  slug: p.id.split('/').slice(1).join('/'),
+}));
+---
+
+<BlogLayout
+  title={post.data.title}
+  description={post.data.description}
+  pubDate={post.data.pubDate}
+  updatedDate={post.data.updatedDate}
+  author={post.data.author}
+  tags={post.data.tags}
+  lang="en"
+  translationKey={post.data.translationKey}
+  headings={headings}
+  allTranslations={allTranslations}
+  readingTime={readingTime}
+>
+  <Content />
+</BlogLayout>

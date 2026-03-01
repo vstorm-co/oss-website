@@ -1,0 +1,68 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import LogfireHero from '../../components/logfire/LogfireHero.astro';
+import LogfireFeatures from '../../components/logfire/LogfireFeatures.astro';
+import HowItWorks from '../../components/logfire/HowItWorks.astro';
+import LogfireUseCases from '../../components/logfire/LogfireUseCases.astro';
+import LogfireScreenshots from '../../components/logfire/LogfireScreenshots.astro';
+import LogfireTechStack from '../../components/logfire/LogfireTechStack.astro';
+import OssFooter from '../../components/oss/OssFooter.astro';
+import BeforeAfter from '../../components/shared/BeforeAfter.astro';
+import ComparisonTable from '../../components/shared/ComparisonTable.astro';
+import StarsBadge from '../../components/shared/StarsBadge.astro';
+import FaqPreview from '../../components/landing/FaqPreview.astro';
+import { translations, languages, defaultLang } from '../../i18n/translations';
+import { getProjectBySlug } from '../../data/projects';
+import { getLogfireComparison } from '../../data/comparisons';
+
+const lang = defaultLang;
+const t = translations[lang];
+const project = getProjectBySlug("logfire-assistant")!;
+
+const alternates = [
+  { lang: "en", href: "/logfire-assistant/" },
+  ...Object.keys(languages)
+    .filter((l) => l !== defaultLang)
+    .map((l) => ({ lang: l, href: `/${l}/logfire-assistant/` })),
+];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "Logfire Assistant",
+  description: t["logfire.meta.description"],
+  url: "https://oss.vstorm.co/logfire-assistant/",
+  applicationCategory: "DeveloperApplication",
+  operatingSystem: "Cross-platform",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  programmingLanguage: ["Python", "TypeScript"],
+  author: { "@type": "Organization", name: "Vstorm" },
+};
+---
+
+<Layout
+  title="Logfire Assistant — AI-Powered Debugging for Pydantic Logfire"
+  description={t["logfire.meta.description"]}
+  lang={lang}
+  alternates={alternates}
+  jsonLd={jsonLd}
+>
+  <Navbar currentLang={lang} project={project} pathSuffix="logfire-assistant/" />
+  <LogfireHero t={t} />
+  <LogfireTechStack t={t} />
+  <BeforeAfter
+    title={t["beforeafter.title"]}
+    beforeTitle={t["beforeafter.logfire.before.title"]}
+    afterTitle={t["beforeafter.logfire.after.title"]}
+    beforeItems={[t["beforeafter.logfire.before.1"], t["beforeafter.logfire.before.2"], t["beforeafter.logfire.before.3"], t["beforeafter.logfire.before.4"], t["beforeafter.logfire.before.5"]]}
+    afterItems={[t["beforeafter.logfire.after.1"], t["beforeafter.logfire.after.2"], t["beforeafter.logfire.after.3"], t["beforeafter.logfire.after.4"], t["beforeafter.logfire.after.5"]]}
+  />
+  <LogfireFeatures t={t} />
+  <ComparisonTable t={t} data={getLogfireComparison(t)} />
+  <HowItWorks t={t} />
+  <LogfireUseCases t={t} />
+  <LogfireScreenshots t={t} />
+  <FaqPreview t={t} lang={lang} category="logfire" />
+  <OssFooter t={t} />
+</Layout>

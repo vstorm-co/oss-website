@@ -1,0 +1,142 @@
+---
+import Layout from './Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/landing/Footer.astro';
+import TableOfContents from '../components/blog/TableOfContents.astro';
+import TranslationLinks from '../components/blog/TranslationLinks.astro';
+import type { Lang } from '../i18n/translations';
+import { translations, languages, defaultLang } from '../i18n/translations';
+import '../styles/prose.css';
+
+interface Props {
+  title: string;
+  description: string;
+  pubDate: Date;
+  updatedDate?: Date;
+  author: string;
+  tags: string[];
+  lang: Lang;
+  translationKey: string;
+  headings: { depth: number; slug: string; text: string }[];
+  allTranslations?: { lang: Lang; slug: string }[];
+  readingTime?: number;
+}
+
+const {
+  title,
+  description,
+  pubDate,
+  updatedDate,
+  author,
+  tags,
+  lang,
+  translationKey,
+  headings,
+  allTranslations = [],
+  readingTime,
+} = Astro.props;
+
+const t = translations[lang];
+const blogHref = lang === defaultLang ? '/blog/' : `/${lang}/blog/`;
+
+const alternates = allTranslations.map((tr) => ({
+  lang: tr.lang,
+  href: tr.lang === defaultLang ? `/blog/${tr.slug}/` : `/${tr.lang}/blog/${tr.slug}/`,
+}));
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: title,
+  description,
+  datePublished: pubDate.toISOString(),
+  ...(updatedDate && { dateModified: updatedDate.toISOString() }),
+  author: { "@type": "Organization", name: author },
+  publisher: { "@type": "Organization", name: "Vstorm" },
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": Astro.url.href,
+  },
+  inLanguage: lang,
+};
+
+const formatDate = (date: Date) =>
+  date.toLocaleDateString(lang, { year: "numeric", month: "long", day: "numeric" });
+---
+
+<Layout
+  title={`${title} — Vstorm OSS`}
+  description={description}
+  lang={lang}
+  alternates={alternates}
+>
+  <Navbar currentLang={lang} />
+
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+
+  <main class="mx-auto max-w-7xl px-4 py-16 sm:py-24">
+    <div class="flex gap-10">
+      <!-- Article -->
+      <article class="min-w-0 max-w-3xl flex-1">
+        <a href={blogHref} class="mb-6 inline-flex items-center gap-1 text-sm text-text-secondary hover:text-accent transition-colors">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          {t["blog.backToBlog"]}
+        </a>
+
+        <header class="mb-10">
+          <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">{title}</h1>
+          <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-text-secondary">
+            <span>{author}</span>
+            <span>&middot;</span>
+            <time datetime={pubDate.toISOString()}>
+              {formatDate(pubDate)}
+            </time>
+            {readingTime && (
+              <>
+                <span>&middot;</span>
+                <span>{t["blog.readingTime"].replace("{min}", String(readingTime))}</span>
+              </>
+            )}
+            {updatedDate && (
+              <>
+                <span>&middot;</span>
+                <span>{t["blog.updatedOn"]} {formatDate(updatedDate)}</span>
+              </>
+            )}
+          </div>
+
+          {tags.length > 0 && (
+            <div class="mt-4 flex flex-wrap gap-2">
+              {tags.map((tag) => (
+                <span class="rounded-full bg-surface px-3 py-1 text-xs font-medium text-text-secondary">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {allTranslations.length > 1 && (
+            <TranslationLinks translations={allTranslations} currentLang={lang} label={t["blog.availableIn"]} />
+          )}
+        </header>
+
+        <div class="prose">
+          <slot />
+        </div>
+      </article>
+
+      <!-- Sidebar TOC (desktop only) -->
+      {headings.length > 0 && (
+        <aside class="hidden lg:block w-64 shrink-0">
+          <div class="sticky top-24">
+            <TableOfContents headings={headings} label={t["blog.tableOfContents"]} />
+          </div>
+        </aside>
+      )}
+    </div>
+  </main>
+
+  <Footer t={t} />
+</Layout>
