@@ -6,7 +6,7 @@
  * Output: public/templates.json
  */
 
-import { readdir, readFile, writeFile, stat } from "node:fs/promises";
+import { readdir, readFile, writeFile, stat, access } from "node:fs/promises";
 import { join, relative } from "node:path";
 
 // Path to the full-stack-fastapi-nextjs-llm-template repo's template directory
@@ -62,7 +62,14 @@ async function main() {
   console.log(`Bundled ${Object.keys(files).length} template files → public/templates.json (${kb} KB)`);
 }
 
-main().catch((err) => {
+main().catch(async (err) => {
+  if (err?.code === "ENOENT") {
+    try {
+      await access(OUTPUT);
+      console.log("Template repo not found — using existing public/templates.json");
+      process.exit(0);
+    } catch {}
+  }
   console.error("Bundle failed:", err);
   process.exit(1);
 });
