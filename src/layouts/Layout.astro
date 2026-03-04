@@ -131,8 +131,16 @@ const breadcrumbSchema = breadcrumbItems.length > 1 ? {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
 
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
     <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
@@ -152,9 +160,9 @@ const breadcrumbSchema = breadcrumbItems.length > 1 ? {
     <div class="grid-bg pointer-events-none fixed inset-0 z-0" aria-hidden="true"></div>
 
     <CursorGlow />
-    <div id="main-content" class="relative z-10">
+    <main id="main-content" class="relative z-10">
       <slot />
-    </div>
+    </main>
     <Analytics />
     <SpeedInsights />
     <!-- Scroll reveal observer -->

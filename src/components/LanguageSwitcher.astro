@@ -48,7 +48,7 @@ function getLangHref(targetLang: string): string {
   <button
     id="lang-btn"
     class="flex items-center gap-1.5 rounded-xl border border-border hover:border-border-hover bg-surface px-3 py-2 text-xs font-medium text-text-secondary transition-all cursor-pointer"
-    aria-label="Switch language"
+    aria-label={`${languages[currentLang]} — Switch language`}
   >
     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
       <circle cx="12" cy="12" r="10" />
