@@ -16,6 +16,14 @@ Standardowy model żądanie-odpowiedź HTTP sprawdza się przy szybkich wywołan
 
 Oto jak zaimplementować to poprawnie z FastAPI.
 
+## TL;DR
+
+- **WebSockety bija HTTP dla agentow AI** - uzytkownicy widza tokeny w czasie rzeczywistym zamiast wpatrywac sie w spinner przez 5-30 sekund.
+- **Connection manager obsluguje wielu klientow** - sledzi aktywne polaczenia, broadcastuje eventy i automatycznie sprząta po rozlaczeniach.
+- **Ustrukturyzowane eventy dla frontendu** - oddzielne typy eventow `text_delta`, `tool_call`, `tool_result` i `complete` umozliwiaja bogate renderowanie UI.
+- **Uwierzytelnianie dziala przez query params** - WebSocket nie wspiera headerow, wiec tokeny JWT przekazuje sie jako parametry zapytania i waliduje przy polaczeniu.
+- **Wzorce produkcyjne maja znaczenie** - heartbeat pingi, logika reconnect, persystencja historii wiadomosci i rate limiting zapobiegaja problemom, ktore zabijaja aplikacje WebSocket w skali.
+
 ## Architektura
 
 ```text title="architecture"

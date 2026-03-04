@@ -102,7 +102,7 @@ export const translations = {
 
     // OSS Landing
     "oss.meta.description": "Open-source tools for building production AI agents with Python. By Vstorm.",
-    "oss.hero.badge": "13 Open Source Packages",
+    "oss.hero.badge": "20 Open Source Repos · 1,270+ Stars",
     "oss.hero.title.line1": "Open Source",
     "oss.hero.title.highlight": "AI Agent Tools",
     "oss.hero.title.line2": "for Python",
@@ -119,6 +119,9 @@ export const translations = {
     "project.backToProjects": "All Projects",
     "project.install": "Installation",
     "project.features": "Features",
+    "project.quickStart": "Quick Start",
+    "project.useCases": "Use Cases",
+    "project.lifecycle": "Hook Lifecycle",
     "project.links": "Links",
     "project.comingSoon.title": "Coming Soon",
     "project.comingSoon.description": "This project is currently in development.",
@@ -401,6 +404,25 @@ export const translations = {
     "404.back": "Back to Home",
     "blog.readingTime": "{min} min read",
     "skip.toContent": "Skip to content",
+
+    // About page
+    "about.title": "About Vstorm OSS",
+    "about.subtitle": "Open-source AI agent tools built by practitioners, for practitioners.",
+    "about.meta.description": "Learn about Vstorm OSS - 20 open-source repositories, 1,270+ GitHub stars, and 285K+ PyPI downloads. Production AI agent tools for Python. Built by Vstorm.",
+    "about.company.title": "Who We Are",
+    "about.company.description": "Vstorm is an Applied Agentic AI Engineering Consultancy. We build production AI agent systems for companies across the US, Europe, and the Middle East. Every tool in this portfolio was born from a real production challenge - we open-source what we build.",
+    "about.numbers.title": "By the Numbers",
+    "about.numbers.stars": "GitHub Stars",
+    "about.numbers.downloads": "PyPI Downloads",
+    "about.numbers.repos": "Open-Source Repos",
+    "about.numbers.projects": "Client Projects",
+    "about.company.details": "Founded in 2017, Vstorm specializes in custom AI and LLM-based software development. With a team of 25+ engineers and over 90 successful projects for clients in the US, UK, and Western Europe, we drive ROI through hyper-automation, hyper-personalization, and enhanced decision-making. Recognized by Deloitte Technology Fast 50 and the first AI consultancy accepted into the Agentic AI Foundation.",
+    "about.partners.title": "Partners & Ecosystem",
+    "about.partners.description": "We contribute to leading Agentic AI frameworks and collaborate with organizations shaping the future of AI agents.",
+    "about.philosophy.title": "Why Open Source",
+    "about.philosophy.description": "We believe the best AI agent tooling should be open, modular, and production-tested. Closed-source monoliths lock you into one vendor's decisions. Our approach: build each capability as a standalone package, test it across 90+ client projects, then release it. If it works in production, it should be available to everyone.",
+    "about.links.title": "Connect",
+    "nav.about": "About",
   },
 
   pl: {
@@ -484,7 +506,7 @@ export const translations = {
 
     // OSS Landing
     "oss.meta.description": "Open-source narzędzia do budowania produkcyjnych agentów AI w Pythonie. By Vstorm.",
-    "oss.hero.badge": "13 pakietów Open Source",
+    "oss.hero.badge": "20 repozytoriów Open Source · 1 270+ gwiazdek",
     "oss.hero.title.line1": "Open Source",
     "oss.hero.title.highlight": "Narzędzia AI",
     "oss.hero.title.line2": "dla Pythona",
@@ -501,6 +523,9 @@ export const translations = {
     "project.backToProjects": "Wszystkie projekty",
     "project.install": "Instalacja",
     "project.features": "Funkcje",
+    "project.quickStart": "Szybki Start",
+    "project.useCases": "Przypadki Użycia",
+    "project.lifecycle": "Cykl Życia Hooków",
     "project.links": "Linki",
     "project.comingSoon.title": "Wkrótce",
     "project.comingSoon.description": "Ten projekt jest w trakcie rozwoju.",
@@ -773,6 +798,25 @@ export const translations = {
     "404.back": "Wróć na stronę główną",
     "blog.readingTime": "{min} min czytania",
     "skip.toContent": "Przejdź do treści",
+
+    // About page
+    "about.title": "O Vstorm OSS",
+    "about.subtitle": "Open-source'owe narzędzia do budowania agentów AI - tworzone przez praktyków, dla praktyków.",
+    "about.meta.description": "Poznaj Vstorm OSS - 20 repozytoriów open source, 1 270+ gwiazdek na GitHub i 285K+ pobrań z PyPI. Produkcyjne narzędzia AI dla Pythona. Stworzone przez Vstorm.",
+    "about.company.title": "Kim jesteśmy",
+    "about.company.description": "Vstorm to konsulting specjalizujący się w inżynierii agentowej AI. Budujemy produkcyjne systemy agentów AI dla firm w USA, Europie i na Bliskim Wschodzie. Każde narzędzie w tym portfolio powstało z realnego wyzwania produkcyjnego - udostępniamy jako open source to, co budujemy.",
+    "about.numbers.title": "W liczbach",
+    "about.numbers.stars": "Gwiazdek na GitHub",
+    "about.numbers.downloads": "Pobrań z PyPI",
+    "about.numbers.repos": "Repozytoriów Open Source",
+    "about.numbers.projects": "Projektów klienckich",
+    "about.company.details": "Założony w 2017 roku, Vstorm specjalizuje się w tworzeniu oprogramowania opartego na AI i LLM. Z zespołem 25+ inżynierów i ponad 90 zrealizowanymi projektami dla klientów w USA, Wielkiej Brytanii i Europie Zachodniej, zwiększamy ROI poprzez hiper-automatyzację, hiper-personalizację i usprawnianie procesów decyzyjnych. Wyróżnieni przez Deloitte Technology Fast 50 i pierwszy konsulting AI przyjęty do Agentic AI Foundation.",
+    "about.partners.title": "Partnerzy i ekosystem",
+    "about.partners.description": "Współtworzymy wiodące frameworki agentowe AI i współpracujemy z organizacjami kształtującymi przyszłość agentów AI.",
+    "about.philosophy.title": "Dlaczego open source",
+    "about.philosophy.description": "Wierzymy, że najlepsze narzędzia do agentów AI powinny być otwarte, modularne i przetestowane w produkcji. Zamknięte monolity uzależniają od decyzji jednego dostawcy. Nasze podejście: budujemy każdą funkcjonalność jako osobny pakiet, testujemy w 90+ projektach klienckich, a potem udostępniamy. Jeśli działa w produkcji, powinno być dostępne dla wszystkich.",
+    "about.links.title": "Kontakt",
+    "nav.about": "O nas",
   },
 
   de: {
@@ -856,7 +900,7 @@ export const translations = {
 
     // OSS Landing
     "oss.meta.description": "Open-Source-Tools für produktionsreife KI-Agenten mit Python. Von Vstorm.",
-    "oss.hero.badge": "13 Open-Source-Pakete",
+    "oss.hero.badge": "20 Open-Source-Repos · 1.270+ Sterne",
     "oss.hero.title.line1": "Open Source",
     "oss.hero.title.highlight": "KI-Agent-Tools",
     "oss.hero.title.line2": "für Python",
@@ -873,6 +917,9 @@ export const translations = {
     "project.backToProjects": "Alle Projekte",
     "project.install": "Installation",
     "project.features": "Features",
+    "project.quickStart": "Schnellstart",
+    "project.useCases": "Anwendungsfälle",
+    "project.lifecycle": "Hook-Lebenszyklus",
     "project.links": "Links",
     "project.comingSoon.title": "Demnächst",
     "project.comingSoon.description": "Dieses Projekt befindet sich in Entwicklung.",
@@ -1145,6 +1192,25 @@ export const translations = {
     "404.back": "Zurück zur Startseite",
     "blog.readingTime": "{min} Min. Lesezeit",
     "skip.toContent": "Zum Inhalt springen",
+
+    // About page
+    "about.title": "Über Vstorm OSS",
+    "about.subtitle": "Open-Source-KI-Agent-Tools, von Praktikern für Praktiker entwickelt.",
+    "about.meta.description": "Erfahren Sie mehr über Vstorm OSS - 20 Open-Source-Repositories, 1.270+ GitHub-Sterne und 285K+ PyPI-Downloads. Produktionsreife KI-Agent-Tools für Python. Von Vstorm.",
+    "about.company.title": "Wer wir sind",
+    "about.company.description": "Vstorm ist eine Applied Agentic AI Engineering Consultancy. Wir entwickeln produktionsreife KI-Agent-Systeme für Unternehmen in den USA, Europa und dem Nahen Osten. Jedes Tool in diesem Portfolio entstand aus einer echten Produktionsherausforderung - wir veröffentlichen als Open Source, was wir entwickeln.",
+    "about.numbers.title": "In Zahlen",
+    "about.numbers.stars": "GitHub-Sterne",
+    "about.numbers.downloads": "PyPI-Downloads",
+    "about.numbers.repos": "Open-Source-Repos",
+    "about.numbers.projects": "Kundenprojekte",
+    "about.company.details": "Vstorm wurde 2017 gegründet und ist auf die Entwicklung maßgeschneiderter KI- und LLM-basierter Software spezialisiert. Mit einem Team von 25+ Ingenieuren und über 90 erfolgreichen Projekten für Kunden in den USA, Großbritannien und Westeuropa steigern wir den ROI durch Hyper-Automatisierung, Hyper-Personalisierung und verbesserte Entscheidungsprozesse. Ausgezeichnet von Deloitte Technology Fast 50 und erstes KI-Beratungsunternehmen in der Agentic AI Foundation.",
+    "about.partners.title": "Partner & Ökosystem",
+    "about.partners.description": "Wir tragen zu führenden Agentic-KI-Frameworks bei und arbeiten mit Organisationen zusammen, die die Zukunft von KI-Agenten gestalten.",
+    "about.philosophy.title": "Warum Open Source",
+    "about.philosophy.description": "Wir glauben, dass die besten KI-Agent-Tools offen, modular und produktionserprobt sein sollten. Geschlossene Monolithen binden Sie an die Entscheidungen eines Anbieters. Unser Ansatz: Jede Fähigkeit als eigenständiges Paket entwickeln, in 90+ Kundenprojekten testen und dann veröffentlichen. Wenn es in der Produktion funktioniert, sollte es für alle verfügbar sein.",
+    "about.links.title": "Kontakt",
+    "nav.about": "Über uns",
   },
 
   es: {
@@ -1228,7 +1294,7 @@ export const translations = {
 
     // OSS Landing
     "oss.meta.description": "Herramientas open source para construir agentes IA de producción con Python. Por Vstorm.",
-    "oss.hero.badge": "13 paquetes Open Source",
+    "oss.hero.badge": "20 repos Open Source · 1.270+ estrellas",
     "oss.hero.title.line1": "Open Source",
     "oss.hero.title.highlight": "Herramientas de IA",
     "oss.hero.title.line2": "para Python",
@@ -1245,6 +1311,9 @@ export const translations = {
     "project.backToProjects": "Todos los proyectos",
     "project.install": "Instalación",
     "project.features": "Características",
+    "project.quickStart": "Inicio Rápido",
+    "project.useCases": "Casos de Uso",
+    "project.lifecycle": "Ciclo de Vida de Hooks",
     "project.links": "Enlaces",
     "project.comingSoon.title": "Próximamente",
     "project.comingSoon.description": "Este proyecto está en desarrollo.",
@@ -1517,6 +1586,25 @@ export const translations = {
     "404.back": "Volver al inicio",
     "blog.readingTime": "{min} min de lectura",
     "skip.toContent": "Saltar al contenido",
+
+    // About page
+    "about.title": "Sobre Vstorm OSS",
+    "about.subtitle": "Herramientas de agentes de IA de código abierto creadas por profesionales, para profesionales.",
+    "about.meta.description": "Conoce Vstorm OSS - 20 repositorios de código abierto, 1.270+ estrellas en GitHub y 285K+ descargas de PyPI. Herramientas de agentes de IA para Python. Por Vstorm.",
+    "about.company.title": "Quiénes somos",
+    "about.company.description": "Vstorm es una consultora de ingeniería de IA agéntica aplicada. Construimos sistemas de agentes de IA en producción para empresas en EE.UU., Europa y Oriente Medio. Cada herramienta en este portafolio nació de un desafío real de producción - publicamos como código abierto lo que construimos.",
+    "about.numbers.title": "En números",
+    "about.numbers.stars": "Estrellas en GitHub",
+    "about.numbers.downloads": "Descargas de PyPI",
+    "about.numbers.repos": "Repos Open Source",
+    "about.numbers.projects": "Proyectos de clientes",
+    "about.company.details": "Fundada en 2017, Vstorm se especializa en desarrollo de software personalizado basado en IA y LLM. Con un equipo de 25+ ingenieros y más de 90 proyectos exitosos para clientes en EE.UU., Reino Unido y Europa Occidental, impulsamos el ROI mediante hiper-automatización, hiper-personalización y mejora en la toma de decisiones. Reconocidos por Deloitte Technology Fast 50 y primera consultora de IA aceptada en la Agentic AI Foundation.",
+    "about.partners.title": "Partners y ecosistema",
+    "about.partners.description": "Contribuimos a los principales frameworks de IA agéntica y colaboramos con organizaciones que dan forma al futuro de los agentes de IA.",
+    "about.philosophy.title": "Por qué código abierto",
+    "about.philosophy.description": "Creemos que las mejores herramientas para agentes de IA deben ser abiertas, modulares y probadas en producción. Los monolitos cerrados te atan a las decisiones de un proveedor. Nuestro enfoque: construir cada capacidad como un paquete independiente, probarlo en más de 90 proyectos de clientes y luego publicarlo. Si funciona en producción, debería estar disponible para todos.",
+    "about.links.title": "Conectar",
+    "nav.about": "Acerca de",
   },
 } as const;
 

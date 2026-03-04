@@ -14,6 +14,14 @@ draft: false
 
 Die Wahl eines KI-Agenten-Frameworks ist nicht nur eine technische Entscheidung — sie beeinflusst Ihre Entwicklungsgeschwindigkeit, Debugging-Erfahrung und Produktionszuverlässigkeit über Monate hinweg. Nach dem Bau von über 30 produktionsreifen KI-Agenten-Systemen haben wir sowohl Pydantic AI als auch LangChain intensiv eingesetzt. Hier ist, was wir gelernt haben.
 
+## TL;DR
+
+- **Pydantic AI gewinnt bei Typsicherheit und Developer Experience.** Volle Pydantic v2-Validierung, natives Async-Streaming und eingebaute Dependency Injection - fuehlt sich an wie normales Python.
+- **LangChain gewinnt bei der Breite des Oekosystems.** 70+ LLM-Anbieter, Hunderte Integrationen und eine riesige Community - schwer zu schlagen beim schnellen Prototyping.
+- **Fuer Produktions-Agenten hat Pydantic AI weniger Fallstricke.** Strukturierte Outputs werden zur Compile-Zeit validiert, nicht zur Laufzeit. Dependency Injection ersetzt globalen State.
+- **LangChains Abstraktionsschichten erhoehen die Komplexitaet.** Chains, Runnables, LCEL - die Lernkurve ist steil und Debugging durch die Schichten ist muehsam.
+- **Unsere Empfehlung: Pydantic AI fuer neue Projekte, LangChain wenn eine spezifische Integration** benoetigt wird, die Pydantic AI noch nicht unterstuetzt.
+
 ## Schnellübersicht
 
 | Merkmal | Pydantic AI | LangChain |

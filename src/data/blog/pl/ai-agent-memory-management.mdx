@@ -1,0 +1,301 @@
+---
+title: "Twoj agent AI zapomina wszystko po 50 wiadomosciach. Oto rozwiazanie."
+description: "SummarizationProcessor vs SlidingWindowProcessor - dwie strategie utrzymywania pamieci agenta, gdy okno kontekstowe sie zapelnia."
+pubDate: 2026-02-16
+author: "Vstorm"
+lang: pl
+translationKey: ai-agent-memory-management
+tags: ["ai-agents", "memory-management", "pydantic-ai", "python", "context-window"]
+category: guide
+draft: false
+---
+
+Uruchom agenta Pydantic AI na 50 wiadomosci i zapytaj go o cos z wiadomosci nr 3. Nie bedzie pamietat. Nie dlatego, ze model jest zly - ale dlatego, ze konwersacja stala sie zbyt dluga, okno kontekstowe sie zapelnilo, a wczesne wiadomosci zostaly utracone.
+
+To nie jest problem modelu. To problem infrastruktury. I staje sie jeszcze gorszy w przypadku agentow uzywajacych narzedzi, poniewaz kazde wywolanie narzedzia i odpowiedz to wiadomosc. 20-turowa konwersacja z 3 wywolaniami narzedzi na ture to w rzeczywistosci 80+ wiadomosci. Przy ~4 znakach na token, to dziesiatki tysiecy tokenow zuzytych zanim sie zorientujesz.
+
+## TL;DR
+
+- **Przepelnienie kontekstu to problem infrastruktury, nie modelu.** Kazdy dlugo dzialajacy agent potrzebuje strategii zarzadzania kontekstem.
+- **SummarizationProcessor** uzywa LLM do inteligentnej kompresji starych wiadomosci w podsumowanie - wyzsza jakosc, ale kosztuje jedno wywolanie API na trigger.
+- **SlidingWindowProcessor** po prostu przycina stare wiadomosci bez zadnych kosztow - szybki, ale calkowicie traci kontekst.
+- **Zachowanie par tool call jest krytyczne.** Oba procesory gwarantuja, ze wywolania narzedzi i ich odpowiedzi nigdy nie sa rozdzielane.
+- **Triggery frakcyjne** (`("fraction", 0.8)`) sa najbardziej uniwersalne - automatycznie adaptuja sie do okna kontekstowego dowolnego modelu.
+
+Napotkalismy ten problem w kazdym dlugo dzialajacym wdrozeniu agentow. Boty obslugi klienta, ktore zapominaja imie klienta. Asystenci kodu, ktorzy traca orientacje, ktore pliki juz zmodyfikowali. Agenci badawczy, ktorzy ponownie badaja tematy omowione 30 wiadomosci temu.
+
+Dlatego zbudowalismy `summarization-pydantic-ai` - dwa procesory zarzadzajace historia konwersacji agenta: jeden, ktory inteligentnie podsumowuje za pomoca LLM, i drugi, ktory po prostu przycina stare wiadomosci bez zadnych kosztow.
+
+## Dwa procesory, dwa kompromisy
+
+| Aspekt | SummarizationProcessor | SlidingWindowProcessor |
+|--------|----------------------|----------------------|
+| **Koszt** | Wywolanie API LLM na trigger | Zero |
+| **Opoznienie** | Zalezy od modelu | ~0ms |
+| **Utrata kontekstu** | Minimalna (inteligentne podsumowanie) | Calkowita (stare wiadomosci usuniete) |
+| **Domyslny trigger** | 170 000 tokenow | 100 wiadomosci |
+| **Domyslne zachowanie** | 20 wiadomosci | 50 wiadomosci |
+| **Najlepszy dla** | Agentow krytycznych jakosciowo | Agentow krytycznych kosztowo/szybkosciowo |
+
+Oba dzialaja jako history processors Pydantic AI - funkcje typu drop-in, ktore transformuja historie wiadomosci przed kazdym uruchomieniem agenta.
+
+## SummarizationProcessor: inteligentna kompresja
+
+```python
+from pydantic_ai import Agent
+from pydantic_ai_summarization import create_summarization_processor
+
+processor = create_summarization_processor(
+    model="openai:gpt-4.1",
+    trigger=("tokens", 100000),  # Trigger at 100k tokens
+    keep=("messages", 20),       # Keep last 20 messages
+)
+
+agent = Agent(
+    "openai:gpt-4.1",
+    history_processors=[processor],
+)
+```
+
+Gdy liczba tokenow przekroczy trigger, procesor:
+1. Oblicza bezpieczny punkt odciecia (nigdy nie rozdzielajac par tool call)
+2. Wysyla starsze wiadomosci do LLM w celu podsumowania
+3. Zastepuje stare wiadomosci kompaktowym podsumowaniem
+4. Zachowuje ostatnie 20 wiadomosci w nietkniete
+
+Rezultat: agent utrzymuje kontekst z poczatku konwersacji bez zuzycia calego budzetu tokenow.
+
+## Trzy typy triggerow
+
+Mozesz wyzwalac sumaryzacje na podstawie wiadomosci, tokenow lub frakcji kontekstu:
+
+**Na podstawie wiadomosci** - proste i przewidywalne:
+```python
+processor = SummarizationProcessor(
+    model="openai:gpt-4.1",
+    trigger=("messages", 50),  # After 50 messages
+)
+```
+
+**Na podstawie tokenow** - uwzglednia dlugosc wiadomosci:
+```python
+processor = SummarizationProcessor(
+    model="openai:gpt-4.1",
+    trigger=("tokens", 100000),  # After 100k tokens
+)
+```
+
+**Na podstawie frakcji** - adaptuje sie do kontekstu dowolnego modelu:
+```python
+processor = SummarizationProcessor(
+    model="openai:gpt-4.1",
+    trigger=("fraction", 0.8),    # At 80% of context
+    max_input_tokens=128000,       # GPT-4o's context window
+)
+```
+
+**Wiele triggerow** - logika OR, pierwszy wygrywa:
+```python
+processor = SummarizationProcessor(
+    model="openai:gpt-4.1",
+    trigger=[
+        ("messages", 50),     # OR
+        ("tokens", 100000),   # OR
+        ("fraction", 0.8),
+    ],
+    max_input_tokens=128000,
+)
+```
+
+Triggery frakcyjne sa najbardziej niezawodne w produkcji - automatycznie sie adaptuja, gdy przechodzisz miedzy modelami z roznymi oknami kontekstowymi.
+
+## Zachowanie par Tool Call
+
+To detal, ktory wiekszosc rozwiazan do zarzadzania kontekstem robi zle. Rozwaz taka sekwencje wiadomosci:
+
+```
+User: "Search for Python tutorials"
+Assistant: [tool_call: search("Python tutorials"), id=call_1]
+Tool: [tool_return: "Found 5 results...", id=call_1]
+Assistant: "Here are the top results..."
+User: "Tell me more about the first one"
+```
+
+Jesli przetnesz miedzy wywolaniem narzedzia a jego odpowiedzia, model zobaczy osierocone tool call - i sie zepsuje. Nasze procesory to obsluguja:
+
+```python
+def _is_safe_cutoff_point(self, messages, cutoff_index):
+    """Check if cutting at index would separate tool call/response pairs."""
+    search_start = max(0, cutoff_index - 5)
+    search_end = min(len(messages), cutoff_index + 5)
+
+    for i in range(search_start, search_end):
+        msg = messages[i]
+        if not isinstance(msg, ModelResponse):
+            continue
+
+        tool_call_ids = set()
+        for part in msg.parts:
+            if isinstance(part, ToolCallPart) and part.tool_call_id:
+                tool_call_ids.add(part.tool_call_id)
+
+        if not tool_call_ids:
+            continue
+
+        # Check if cutoff separates this tool call from its response
+        for j in range(i + 1, len(messages)):
+            check_msg = messages[j]
+            if isinstance(check_msg, ModelRequest):
+                for part in check_msg.parts:
+                    if (isinstance(part, ToolReturnPart)
+                        and part.tool_call_id in tool_call_ids):
+                        tool_before = i < cutoff_index
+                        response_before = j < cutoff_index
+                        if tool_before != response_before:
+                            return False  # Unsafe - would split pair
+    return True
+```
+
+Procesor przeszukuje 5 wiadomosci w kazdym kierunku od punktu odciecia, znajduje wszystkie pary tool call/return i upewnia sie, ze pozostaja po tej samej stronie ciecia.
+
+## SlidingWindowProcessor: przycinanie bez kosztow
+
+Gdy nie potrzebujesz inteligentnego podsumowania - gdy szybkosc i koszt sa wazniejsze niz jakosc kontekstu:
+
+```python
+from pydantic_ai_summarization import create_sliding_window_processor
+
+processor = create_sliding_window_processor(
+    trigger=("messages", 100),  # Trim at 100 messages
+    keep=("messages", 50),      # Keep last 50
+)
+
+agent = Agent(
+    "openai:gpt-4.1",
+    history_processors=[processor],
+)
+```
+
+Brak wywolania LLM. Brak opoznienia. Stare wiadomosci sa po prostu odrzucane. To samo zachowanie par tool call obowiazuje - okno przesuwne nie przetnie w srodku sekwencji tool call.
+
+## Zliczanie tokenow: domyslnie przyblizony
+
+Domyslny licznik tokenow uzywa prostej heurystyki - ~4 znaki na token:
+
+```python
+def count_tokens_approximately(messages):
+    total_chars = 0
+    for msg in messages:
+        if isinstance(msg, ModelRequest):
+            for part in msg.parts:
+                if isinstance(part, UserPromptPart):
+                    if isinstance(part.content, str):
+                        total_chars += len(part.content)
+                elif isinstance(part, SystemPromptPart):
+                    total_chars += len(part.content)
+                elif isinstance(part, ToolReturnPart):
+                    total_chars += len(str(part.content))
+        elif isinstance(msg, ModelResponse):
+            for part in msg.parts:
+                if isinstance(part, TextPart):
+                    total_chars += len(part.content)
+                elif isinstance(part, ToolCallPart):
+                    total_chars += len(part.tool_name)
+                    total_chars += len(str(part.args))
+    return total_chars // 4
+```
+
+To jest szybkie i wystarczajaco dobre w wiekszosci przypadkow. Dla precyzji, podlacz `tiktoken`:
+
+```python
+import tiktoken
+
+def accurate_counter(messages):
+    encoding = tiktoken.encoding_for_model("gpt-4")
+    total = 0
+    for msg in messages:
+        total += len(encoding.encode(str(msg)))
+    return total
+
+processor = create_summarization_processor(
+    token_counter=accurate_counter,
+    trigger=("tokens", 100000),
+)
+```
+
+## Wlasne prompty do podsumowania
+
+Domyslny prompt wyciaga kluczowy kontekst. Mozesz go dostosowac:
+
+```python
+processor = create_summarization_processor(
+    summary_prompt="""
+    You are summarizing an agent conversation. Extract:
+
+    1. **Key Decisions**: What was decided?
+    2. **Code Changes**: What code was written/modified?
+    3. **Pending Tasks**: What still needs to be done?
+    4. **Important Context**: What context is crucial to preserve?
+
+    Conversation to summarize:
+    {messages}
+
+    Provide a concise summary that preserves essential information.
+    """,
+)
+```
+
+Placeholder `{messages}` jest zastepowany sformatowana historia wiadomosci. Dostosuj to do swojej domeny - agent obslugi klienta moze wyciagac imie klienta i problem, podczas gdy asystent kodu moze skupic sie na zmianach plikow i wynikach testow.
+
+## Wzorzec petli konwersacji
+
+Oto typowy wzorzec produkcyjny:
+
+```python
+from pydantic_ai import Agent
+from pydantic_ai_summarization import create_summarization_processor
+
+processor = create_summarization_processor(
+    trigger=("messages", 20),
+    keep=("messages", 5),
+)
+
+agent = Agent(
+    "openai:gpt-4.1",
+    history_processors=[processor],
+)
+
+async def chat():
+    message_history = []
+
+    while True:
+        user_input = input("You: ")
+        if user_input.lower() == "quit":
+            break
+
+        result = await agent.run(
+            user_input,
+            message_history=message_history,
+        )
+
+        print(f"Assistant: {result.output}")
+        message_history = result.all_messages()
+```
+
+History processor uruchamia sie automatycznie przed kazdym wywolaniem `agent.run()`. Przekazujesz pelna historie wiadomosci, procesor sprawdza, czy sumaryzacja jest potrzebna, i zwraca (potencjalnie skompresowana) historie. Bez recznego liczenia tokenow.
+
+## Kluczowe wnioski
+
+- **Przepelnienie kontekstu to problem infrastruktury, nie modelu.** Kazdy dlugo dzialajacy agent potrzebuje strategii zarzadzania kontekstem. Wybierz miedzy inteligentna sumaryzacja (wyzsza jakosc, koszt LLM) a oknem przesuwnym (zero kosztow, utrata kontekstu).
+- **Zachowanie par tool call jest krytyczne.** Nigdy nie tnij miedzy wywolaniem narzedzia a jego odpowiedzia. Oba procesory obsluguja to automatycznie - przeszukuja 5 wiadomosci w kazdym kierunku w poszukiwaniu osieroconych par.
+- **Triggery frakcyjne sa najbardziej przenosne.** `("fraction", 0.8)` dziala niezaleznie od uzytego modelu czy dlugosci wiadomosci. Liczby tokenow i wiadomosci sa specyficzne dla modelu i tresci.
+- **Heurystyka ~4 znaki/token jest wystarczajaco dobra.** Dla produkcyjnej precyzji uzyj `tiktoken`. Do wszystkiego innego domyslny licznik utrzymuje szybkosc bez dodawania zaleznosci.
+- **Dostosuj prompt podsumowania do swojej domeny.** Domyslny wyciaga generyczny kontekst. Prompt specyficzny dla domeny ("wyciagnij imie klienta, ID zgłoszenia i status rozwiazania") produkuje duzo lepsze podsumowania.
+
+## Wyprobuj sam
+
+[summarization-pydantic-ai](https://github.com/vstorm-co/summarization-pydantic-ai) - Automatyczna sumaryzacja konwersacji i zarzadzanie kontekstem dla agentow Pydantic AI.
+
+```bash
+pip install summarization-pydantic-ai
+```

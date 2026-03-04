@@ -1,0 +1,208 @@
+---
+title: "Format edycji Hashline: jak 2-znakowe hasze naprawily edycje plikow przez AI"
+description: "Jak format edycji hashline zastepuje podatny na bledy str_replace hashami zawartosci o 2 znakach dla niezawodnej edycji plikow przez AI. Wyniki benchmarkow na 16 modelach i nasza implementacja w Pydantic AI."
+pubDate: 2026-02-25
+author: "Vstorm"
+lang: pl
+translationKey: hashline-file-editing
+tags: ["ai-agents", "file-editing", "hashline", "pydantic-ai", "python", "llm-tools"]
+category: guide
+draft: false
+---
+
+Każdy agent AI do kodowania ma tę samą piętę achillesową: edycję plików.
+
+Agent czyta plik, decyduje co zmienić, a potem... musi odtworzyć dokładny tekst, który chce zastąpić. Znak po znaku. Włącznie z tabulatorami, spacjami i białymi znakami na końcu linii.
+
+Jedna zła spacja i edycja po cichu zawodzi. Albo gorzej — edytuje złą linię.
+
+Budujemy produkcyjne agenty AI od 2 lat. Dokładność edycji plików zawsze była tym, co sprawiało, że wzdrygaliśmy się podczas demo. A potem Can Boluk opublikował benchmark, który całkowicie zmienił nasze myślenie o tym problemie.
+
+## TL;DR
+
+- **Format edycji jest równie ważny jak model.** Benchmark Cana Boluka pokazał od +5 do +64 punktów procentowych poprawy dokładności — zmieniając tylko harness, nie model.
+- **Hashline zastępuje dopasowywanie tekstu kotwiczeniem hashów.** 2-znakowe hasze zawartości eliminują błędy białych znaków i redukują zużycie tokenów.
+- **Najsłabsze modele zyskują najwięcej.** Grok Code Fast 1 skoczył z 6,7% do 68,3% dokładności — poprawa o 61,6pp.
+- **Walidacja hashów wykrywa nieaktualne pliki.** W przeciwieństwie do cichych awarii str_replace, hashline jawnie odrzuca edycje, gdy plik się zmienił.
+- **Jeden parametr do włączenia** w pydantic-ai-backend: `create_console_toolset(edit_format="hashline")`.
+
+## Problem z str_replace
+
+Standardowe podejście do edycji plików przez AI to `str_replace` — daj modelowi stary tekst i nowy tekst, znajdź i zamień:
+
+```python
+edit_file(
+    path="app.py",
+    old_text="  return result",      # must match EXACTLY
+    new_text="  return result + 1",
+)
+```
+
+Wygląda prosto. Nie jest. Oto co idzie nie tak:
+
+1. **Niezgodność białych znaków** — model wypisuje 4 spacje, plik ma tabulator. Edycja po cichu zawodzi.
+2. **Nieunikalny match** — `return result` pojawia się w 3 liniach. Która zostaje zastąpiona? Zwykle ta zła.
+3. **Dryf kontekstu** — po długiej rozmowie pamięć modelu o pliku rozmija się z rzeczywistością. "Zastępuje" tekst, który już nie istnieje.
+4. **Marnowanie tokenów** — model musi odtworzyć stary tekst znak po znaku, żeby wskazać lokalizację. Na 500-liniowym pliku to mnóstwo tokenów wyjściowych wydanych na wskazywanie, a nie zmianę.
+
+To nie są edge case'y. W benchmarku Cana Boluka — 180 zadań na 16 modelach — format `patch` (unified diff), który ma jeszcze bardziej rygorystyczne wymagania formatowania, wykazał wskaźniki błędów na poziomie **50,7% dla Grok 4** i **46,2% dla GLM-4.7**.
+
+## Wchodzi Hashline: kotwiczenie na poziomie linii
+
+Pomysł jest banalnie prosty. Zamiast prosić model o odtworzenie tekstu, nadaj każdej linii 2-znakowy hash zawartości:
+
+```
+1:a3|function hello() {
+2:f1|  return "world";
+3:0e|}
+```
+
+Każda linia dostaje prefiks `{line_number}:{hash}|`. Hash jest deterministyczny — ta sama zawartość zawsze daje ten sam hash. Teraz model nie musi odtwarzać żadnego tekstu, żeby wskazać lokalizację. Po prostu mówi:
+
+```
+replace line 2:f1 with:
+  return "hello world";
+```
+
+Żadnego dopasowywania białych znaków. Żadnej dwuznaczności. Żadnego odtwarzania starego tekstu. Hash działa jako odcisk palca zawartości — jeśli plik zmienił się od ostatniego odczytu przez model, hash się nie zgodzi i edycja zostanie bezpiecznie odrzucona.
+
+## Benchmark Cana Boluka: liczby
+
+W lutym 2026 Can Boluk opublikował ["I Improved 15 LLMs at Coding in One Afternoon. Only the Harness Changed."](https://blog.can.ac/2026/02/12/the-harness-problem/) — benchmark 16 modeli w 3 formatach edycji (patch, str_replace, hashline).
+
+**Setup:**
+- 180 zadań na uruchomienie, 3 uruchomienia na model
+- Pliki React codebase jako test fixtures
+- Mechaniczne mutacje: zamiany operatorów, odwracanie wartości boolean, błędy off-by-one, zmiany nazw identyfikatorów
+- Czysta sesja agenta za każdym razem z czterema narzędziami: read, edit, write
+
+**Kluczowe wyniki:**
+
+| Odkrycie | Liczby |
+|----------|--------|
+| Grok Code Fast 1 | **6,7% do 68,3%** dokładności (+61,6pp) z hashline vs patch |
+| MiniMax | Ponad **podwojona** dokładność |
+| Grok 4 Fast | Tokeny wyjściowe spadły o **61%** |
+| Gemini 3 Flash | **78,3%** dokładności z hashline |
+| Format patch | **Najgorszy dla prawie każdego modelu** |
+
+Wzorzec był czytelny:
+- **Hashline dorównał lub pobił str_replace dla większości modeli**
+- **Najsłabsze modele zyskały najwięcej** — mniejsze modele mają największy problem z dokładnym odtwarzaniem tekstu
+- **Zużycie tokenów drastycznie spadło** — modele wydają mniej tokenów na wskazywanie kodu, a więcej na jego zmianę
+
+Wniosek: "Harness — nie model — jest jednym z wąskich gardeł wydajności LLM-ów w kodowaniu."
+
+## Nasza implementacja w pydantic-ai-backend
+
+Wsparcie dla hashline dostarczyliśmy w [pydantic-ai-backend](https://github.com/vstorm-co/pydantic-ai-backend) v0.1.9, bezpośrednio inspirowani badaniami Cana Boluka. Oto jak to działa.
+
+### Czytanie plików
+
+Gdy `edit_format="hashline"` jest włączony, `read_file` zwraca zawartość z tagami hashów:
+
+```python
+from pydantic_ai_backends import format_hashline_output
+
+content = """function hello() {
+  return "world";
+}"""
+
+print(format_hashline_output(content))
+# 1:a3|function hello() {
+# 2:f1|  return "world";
+# 3:0e|}
+```
+
+### Edycja plików
+
+Model odwołuje się do linii za pomocą pary `line:hash` zamiast odtwarzania tekstu:
+
+```python
+from pydantic_ai_backends import apply_hashline_edit
+
+new_content, error = apply_hashline_edit(
+    content=original_file,
+    start_line=2,
+    start_hash="f1",
+    new_content='  return "hello world";',
+)
+```
+
+**Obsługiwane operacje:**
+- **Zamiana pojedynczej linii** — `start_line` + `start_hash` + `new_content`
+- **Zamiana zakresu** — dodatkowo `end_line` + `end_hash`
+- **Wstawienie po** — ustaw `insert_after=True`
+- **Usunięcie** — ustaw `new_content=""`
+
+### Walidacja hashów = ochrona przed nieaktualnymi plikami
+
+Jeśli plik zmienił się od ostatniego odczytu przez model, hash nie będzie się zgadzał:
+
+```
+Hash mismatch at line 2: expected 'f1', got 'a7'.
+File may have changed — re-read it first.
+```
+
+To feature, nie bug. `str_replace` po cichu nic nie robi, gdy tekst się nie zgadza. Hashline jawnie mówi modelowi, co poszło nie tak i co z tym zrobić.
+
+### Włączanie
+
+Jeden parametr:
+
+```python
+from pydantic_ai_backends.toolsets import create_console_toolset
+
+toolset = create_console_toolset(edit_format="hashline")
+```
+
+Toolset automatycznie zamienia `edit_file` na `hashline_edit` i dostosowuje `read_file` do uwzględnienia tagów hashów. System prompt też się adaptuje.
+
+## Algorytm hashowania: MD5 vs CRC32
+
+Uwaga o różnicach w implementacji. Can Boluk używa CRC32 (zlib) mod 256 do hashu, usuwając białe znaki przed hashowaniem, żeby formatery kodu nie psuły kotwic.
+
+My używamy pierwszych 2 znaków hex z MD5. Ta sama przestrzeń wyników (256 wartości), nieco inny profil kolizji. Wybraliśmy MD5, bo jest już w stdlib Pythona bez importów poza `hashlib`, a częstotliwość kolizji przy 2 znakach jest w praktyce identyczna.
+
+```python
+import hashlib
+
+def line_hash(content: str) -> str:
+    return hashlib.md5(content.encode("utf-8")).hexdigest()[:2]
+```
+
+Oba podejścia dają 2-znakową kotwicę wystarczająco dobrą dla każdego pliku edytowanego przez agenta AI. Potrzebujesz ~20 linii z tym samym hashem, zanim kolizje zaczną mieć znaczenie — a w tym momencie numer linii rozstrzyga niejednoznaczność.
+
+## Dlaczego to ważne poza benchmarkami
+
+Hashline to nie tylko liczby dokładności. Zmienia ekonomię edycji plików przez AI:
+
+**1. Mniejsze modele stają się użyteczne.**
+Największe zyski dokładności były na słabszych modelach. Jeśli uruchamiasz lokalny model lub tańszy tier API, hashline domyka lukę do modeli frontier — nie czyniąc modelu inteligentniejszym, ale usuwając przeszkodę formatowania.
+
+**2. Koszty tokenów spadają.**
+Grok 4 Fast odnotował 61% redukcji tokenów wyjściowych. To nie drobna optymalizacja — to fundamentalnie inna struktura kosztów dla agentów edytujących wiele plików.
+
+**3. Błędy stają się jawne.**
+`str_replace`, który nie znajdzie dopasowania, po prostu... nic nie robi. Bez błędu, bez feedbacku. Model myśli, że zedytował plik. W hashline niezgodność hashu to czytelny sygnał: "odczytaj plik ponownie i spróbuj jeszcze raz."
+
+**4. Workflow wielokrotnych edycji staje się bezpieczniejszy.**
+Przy edycji od dołu do góry numery linii się nie przesuwają. W połączeniu z walidacją hashów możesz łączyć wiele edycji z pewnością, że każda celuje w właściwą linię.
+
+## Kluczowe wnioski
+
+- **Format edycji jest równie ważny jak model.** Can Boluk pokazał od +5 do +64pp poprawy dokładności zmieniając tylko harness, nie model.
+- **Hashline zastępuje dopasowywanie tekstu kotwiczeniem hashów.** 2-znakowe hasze zawartości eliminują błędy białych znaków i redukują marnowanie tokenów.
+- **Najsłabsze modele zyskują najwięcej.** Jeśli używasz lokalnych lub budżetowych modeli, hashline to niemal darmowy boost dokładności.
+- **Walidacja hashów wykrywa nieaktualne pliki.** W przeciwieństwie do cichych awarii str_replace, hashline jawnie odrzuca edycje, gdy plik się zmienił.
+- **Jeden parametr do włączenia.** `create_console_toolset(edit_format="hashline")` — to wszystko.
+
+## Wypróbuj sam
+
+[pydantic-ai-backend](https://github.com/vstorm-co/pydantic-ai-backend) — Docker sandbox, console toolset i abstrakcje backendowe dla agentów Pydantic AI
+
+```bash
+pip install pydantic-ai-backend
+```
+
+**Podziękowania:** Koncept hashline i dane benchmarkowe pochodzą z [badań Cana Boluka](https://blog.can.ac/2026/02/12/the-harness-problem/). Zbudowaliśmy implementację dla agentów Pydantic AI — samo podejście to jego wkład dla społeczności.

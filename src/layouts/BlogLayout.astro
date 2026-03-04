@@ -20,6 +20,7 @@ interface Props {
   headings: { depth: number; slug: string; text: string }[];
   allTranslations?: { lang: Lang; slug: string }[];
   readingTime?: number;
+  category?: string;
 }
 
 const {
@@ -34,6 +35,7 @@ const {
   headings,
   allTranslations = [],
   readingTime,
+  category,
 } = Astro.props;
 
 const t = translations[lang];
@@ -60,6 +62,23 @@ const articleSchema = {
   inLanguage: lang,
 };
 
+const howToSchema = category === "tutorial" && headings.length > 0
+  ? {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      name: title,
+      description,
+      step: headings
+        .filter((h) => h.depth === 2)
+        .map((h, i) => ({
+          "@type": "HowToStep",
+          position: i + 1,
+          name: h.text,
+          url: `${Astro.url.href}#${h.slug}`,
+        })),
+    }
+  : null;
+
 const formatDate = (date: Date) =>
   date.toLocaleDateString(lang, { year: "numeric", month: "long", day: "numeric" });
 ---
@@ -67,12 +86,16 @@ const formatDate = (date: Date) =>
 <Layout
   title={`${title} — Vstorm OSS`}
   description={description}
+  keywords={tags.join(", ")}
   lang={lang}
   alternates={alternates}
 >
   <Navbar currentLang={lang} />
 
   <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  {howToSchema && (
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)} />
+  )}
 
   <main class="mx-auto max-w-7xl px-4 py-16 sm:py-24">
     <div class="flex gap-10">

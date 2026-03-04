@@ -14,6 +14,14 @@ draft: false
 
 The Python AI agent ecosystem has matured significantly. Instead of "which framework exists," the question is now "which framework fits my use case." After building production systems with all five major frameworks, here's our honest assessment.
 
+## TL;DR
+
+- **Pydantic AI for type-safe production agents.** Best developer experience, minimal dependencies, native async. Pick this for new projects.
+- **LangChain for rapid prototyping with many integrations.** 70+ LLM providers and a massive ecosystem. Pay the complexity tax later.
+- **LangGraph for complex multi-step workflows.** State machines with cycles, checkpoints, and human-in-the-loop. Overkill for simple agents.
+- **CrewAI for role-based multi-agent teams.** Easy to set up, but limited customization and weaker type safety.
+- **DeepAgents for modular agent systems.** Claude Code-inspired architecture with standalone packages. Growing fast, best for teams that want fine-grained control.
+
 ## Framework Comparison
 
 | | Pydantic AI | LangChain | LangGraph | CrewAI | DeepAgents |

@@ -1,0 +1,208 @@
+---
+title: "Formato de edicion Hashline: como los hashes de 2 caracteres arreglaron la edicion de archivos por AI"
+description: "Como el formato de edicion hashline reemplaza el propenso a errores str_replace con hashes de contenido de 2 caracteres para edicion confiable de archivos por AI. Resultados de benchmarks en 16 modelos y nuestra implementacion en Pydantic AI."
+pubDate: 2026-02-25
+author: "Vstorm"
+lang: es
+translationKey: hashline-file-editing
+tags: ["ai-agents", "file-editing", "hashline", "pydantic-ai", "python", "llm-tools"]
+category: guide
+draft: false
+---
+
+Todo agente de AI para programar tiene el mismo talon de Aquiles: la edicion de archivos.
+
+El agente lee un archivo, decide que cambiar, y luego... necesita reproducir el texto exacto que quiere reemplazar. Caracter por caracter. Incluyendo tabs, espacios y espacios en blanco al final de la linea.
+
+Un espacio incorrecto y la edicion falla silenciosamente. O peor — edita la linea equivocada.
+
+Llevamos 2 anos construyendo agentes AI de produccion. La precision en la edicion de archivos siempre fue lo que nos hacia estremecernos durante los demos. Entonces Can Boluk publico un benchmark que cambio completamente nuestra forma de pensar sobre este problema.
+
+## TL;DR
+
+- **El formato de edicion importa tanto como el modelo.** El benchmark de Can Boluk mostro de +5 a +64 puntos porcentuales de mejora en precision — cambiando solo el harness, no el modelo.
+- **Hashline reemplaza la coincidencia de texto con anclaje de hashes.** Hashes de contenido de 2 caracteres eliminan errores de espacios en blanco y reducen el desperdicio de tokens.
+- **Los modelos mas debiles ganan mas.** Grok Code Fast 1 salto de 6,7% a 68,3% de precision — una mejora de 61,6pp.
+- **La validacion de hashes detecta archivos desactualizados.** A diferencia de los fallos silenciosos de str_replace, hashline rechaza explicitamente las ediciones cuando el archivo ha cambiado.
+- **Un parametro para activarlo** en pydantic-ai-backend: `create_console_toolset(edit_format="hashline")`.
+
+## El problema de str_replace
+
+El enfoque estandar para la edicion de archivos por AI es `str_replace` — dale al modelo el texto viejo y el texto nuevo, buscar y reemplazar:
+
+```python
+edit_file(
+    path="app.py",
+    old_text="  return result",      # must match EXACTLY
+    new_text="  return result + 1",
+)
+```
+
+Parece simple. No lo es. Esto es lo que sale mal:
+
+1. **Desajuste de espacios en blanco** — el modelo genera 4 espacios, el archivo tiene un tab. La edicion falla silenciosamente.
+2. **Coincidencia no unica** — `return result` aparece en 3 lineas. Cual se reemplaza? Generalmente la incorrecta.
+3. **Deriva de contexto** — despues de una conversacion larga, la memoria del modelo sobre el archivo diverge de la realidad. "Reemplaza" texto que ya no existe.
+4. **Desperdicio de tokens** — el modelo debe reproducir el texto viejo caracter por caracter solo para identificar una ubicacion. En un archivo de 500 lineas, eso es una gran cantidad de tokens de salida gastados en senalar, no en cambiar.
+
+Estos no son casos extremos. En el benchmark de Can Boluk con 180 tareas en 16 modelos, el formato `patch` (unified diff) — que tiene requisitos de formato aun mas estrictos — mostro tasas de error del **50,7% para Grok 4** y **46,2% para GLM-4.7**.
+
+## Entra Hashline: anclaje a nivel de linea
+
+La idea es extremadamente simple. En lugar de pedirle al modelo que reproduzca texto, asigna a cada linea un hash de contenido de 2 caracteres:
+
+```
+1:a3|function hello() {
+2:f1|  return "world";
+3:0e|}
+```
+
+Cada linea recibe un prefijo `{line_number}:{hash}|`. El hash es deterministico — el mismo contenido siempre produce el mismo hash. Ahora el modelo no necesita reproducir ningun texto para senalar una ubicacion. Simplemente dice:
+
+```
+replace line 2:f1 with:
+  return "hello world";
+```
+
+Sin coincidencia de espacios en blanco. Sin ambiguedad. Sin reproducir texto viejo. El hash actua como una huella digital del contenido — si el archivo cambio desde la ultima vez que el modelo lo leyo, el hash no coincidira y la edicion sera rechazada de forma segura.
+
+## El benchmark de Can Boluk: los numeros
+
+En febrero de 2026, Can Boluk publico ["I Improved 15 LLMs at Coding in One Afternoon. Only the Harness Changed."](https://blog.can.ac/2026/02/12/the-harness-problem/) — un benchmark de 16 modelos en 3 formatos de edicion (patch, str_replace, hashline).
+
+**Setup:**
+- 180 tareas por ejecucion, 3 ejecuciones por modelo
+- Archivos de codebase React como test fixtures
+- Mutaciones mecanicas: intercambios de operadores, inversiones de booleanos, errores off-by-one, renombramientos de identificadores
+- Sesion de agente limpia cada vez con cuatro herramientas: read, edit, write
+
+**Resultados clave:**
+
+| Hallazgo | Numeros |
+|----------|---------|
+| Grok Code Fast 1 | **6,7% a 68,3%** de precision (+61,6pp) con hashline vs patch |
+| MiniMax | Precision mas que **duplicada** |
+| Grok 4 Fast | Tokens de salida cayeron un **61%** |
+| Gemini 3 Flash | **78,3%** de precision con hashline |
+| Formato patch | **El peor para casi todos los modelos** |
+
+El patron era claro:
+- **Hashline igualo o supero a str_replace para la mayoria de los modelos**
+- **Los modelos mas debiles ganaron mas** — los modelos mas pequenos tienen mas dificultades con la reproduccion exacta de texto
+- **El uso de tokens cayo drasticamente** — los modelos gastan menos tokens senalando codigo y mas tokens cambiandolo
+
+La conclusion: "El harness — no el modelo — es uno de los cuellos de botella en el rendimiento de codificacion de los LLMs."
+
+## Nuestra implementacion en pydantic-ai-backend
+
+Lanzamos soporte para hashline en [pydantic-ai-backend](https://github.com/vstorm-co/pydantic-ai-backend) v0.1.9, inspirados directamente por la investigacion de Can Boluk. Asi es como funciona.
+
+### Lectura de archivos
+
+Cuando `edit_format="hashline"` esta habilitado, `read_file` devuelve el contenido con etiquetas de hash:
+
+```python
+from pydantic_ai_backends import format_hashline_output
+
+content = """function hello() {
+  return "world";
+}"""
+
+print(format_hashline_output(content))
+# 1:a3|function hello() {
+# 2:f1|  return "world";
+# 3:0e|}
+```
+
+### Edicion de archivos
+
+El modelo referencia lineas por su par `line:hash` en lugar de reproducir texto:
+
+```python
+from pydantic_ai_backends import apply_hashline_edit
+
+new_content, error = apply_hashline_edit(
+    content=original_file,
+    start_line=2,
+    start_hash="f1",
+    new_content='  return "hello world";',
+)
+```
+
+**Operaciones soportadas:**
+- **Reemplazar linea individual** — `start_line` + `start_hash` + `new_content`
+- **Reemplazar rango** — ademas `end_line` + `end_hash`
+- **Insertar despues** — establecer `insert_after=True`
+- **Eliminar** — establecer `new_content=""`
+
+### Validacion de hashes = proteccion contra archivos desactualizados
+
+Si el archivo cambio desde que el modelo lo leyo por ultima vez, el hash no coincidira:
+
+```
+Hash mismatch at line 2: expected 'f1', got 'a7'.
+File may have changed — re-read it first.
+```
+
+Esto es una funcionalidad, no un error. `str_replace` silenciosamente no hace nada cuando el texto no coincide. Hashline le dice explicitamente al modelo que salio mal y que hacer al respecto.
+
+### Activacion
+
+Un parametro:
+
+```python
+from pydantic_ai_backends.toolsets import create_console_toolset
+
+toolset = create_console_toolset(edit_format="hashline")
+```
+
+El toolset automaticamente intercambia `edit_file` por `hashline_edit` y ajusta `read_file` para incluir etiquetas de hash. El system prompt tambien se adapta.
+
+## Algoritmo de hash: MD5 vs CRC32
+
+Una nota sobre las diferencias de implementacion. Can Boluk usa CRC32 (zlib) mod 256 para el hash, eliminando espacios en blanco antes del hashing para que los formateadores de codigo no rompan los anclas.
+
+Nosotros usamos los primeros 2 caracteres hexadecimales de MD5. El mismo espacio de resultados (256 valores), perfil de colision ligeramente diferente. Elegimos MD5 porque ya esta en la biblioteca estandar de Python sin imports mas alla de `hashlib`, y la tasa de colisiones con 2 caracteres es identica en la practica.
+
+```python
+import hashlib
+
+def line_hash(content: str) -> str:
+    return hashlib.md5(content.encode("utf-8")).hexdigest()[:2]
+```
+
+Ambos enfoques te dan un ancla de 2 caracteres lo suficientemente bueno para cualquier archivo que un agente AI editaria. Necesitarias ~20 lineas con el mismo hash antes de que las colisiones importen — y en ese punto, el numero de linea resuelve la ambiguedad.
+
+## Por que esto importa mas alla de los benchmarks
+
+Hashline no se trata solo de numeros de precision. Cambia la economia de la edicion de archivos por AI:
+
+**1. Los modelos mas pequenos se vuelven viables.**
+Las mayores ganancias de precision fueron en modelos mas debiles. Si estas ejecutando un modelo local o un nivel de API mas economico, hashline cierra la brecha con los modelos frontier — no haciendo al modelo mas inteligente, sino eliminando un obstaculo de formato.
+
+**2. Los costos de tokens bajan.**
+Grok 4 Fast tuvo una reduccion del 61% en tokens de salida. Eso no es una optimizacion menor — es una estructura de costos fundamentalmente diferente para agentes que editan muchos archivos.
+
+**3. Los errores se vuelven explicitos.**
+Un `str_replace` que no coincide simplemente... no hace nada. Sin error, sin feedback. El modelo piensa que edito el archivo. Con hashline, un hash mismatch es una senal clara: "vuelve a leer el archivo e intentalo de nuevo."
+
+**4. Los flujos de trabajo de edicion multiple se vuelven mas seguros.**
+Al editar de abajo hacia arriba, los numeros de linea no se desplazan. Combinado con la validacion de hashes, puedes encadenar multiples ediciones con la confianza de que cada una apunta a la linea correcta.
+
+## Conclusiones clave
+
+- **El formato de edicion importa tanto como el modelo.** Can Boluk mostro de +5 a +64pp de mejora en precision cambiando solo el harness, no el modelo.
+- **Hashline reemplaza la coincidencia de texto con anclaje de hashes.** Hashes de contenido de 2 caracteres eliminan errores de espacios en blanco y reducen el desperdicio de tokens.
+- **Los modelos mas debiles ganan mas.** Si estas usando modelos locales o economicos, hashline es un impulso de precision casi gratuito.
+- **La validacion de hashes detecta archivos desactualizados.** A diferencia de los fallos silenciosos de str_replace, hashline rechaza explicitamente las ediciones cuando el archivo ha cambiado.
+- **Un parametro para activarlo.** `create_console_toolset(edit_format="hashline")` — eso es todo.
+
+## Pruebalo tu mismo
+
+[pydantic-ai-backend](https://github.com/vstorm-co/pydantic-ai-backend) — Docker sandbox, console toolset y abstracciones de backend para agentes de Pydantic AI
+
+```bash
+pip install pydantic-ai-backend
+```
+
+**Credito:** El concepto de hashline y los datos del benchmark provienen de [la investigacion de Can Boluk](https://blog.can.ac/2026/02/12/the-harness-problem/). Construimos una implementacion para agentes de Pydantic AI — el enfoque en si es su contribucion a la comunidad.

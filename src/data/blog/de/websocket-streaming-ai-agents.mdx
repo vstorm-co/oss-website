@@ -16,6 +16,14 @@ Das HTTP-Request-Response-Modell funktioniert gut bei schnellen API-Aufrufen, ab
 
 So implementiert man es richtig mit FastAPI.
 
+## TL;DR
+
+- **WebSockets schlagen HTTP fuer AI-Agenten** - Nutzer sehen Tokens in Echtzeit, statt 5-30 Sekunden auf einen Spinner zu starren.
+- **Connection Manager verwaltet mehrere Clients** - verfolgt aktive Verbindungen, broadcastet Events und raeumt Disconnects automatisch auf.
+- **Strukturierte Events fuers Frontend** - separate Event-Typen `text_delta`, `tool_call`, `tool_result` und `complete` ermoeglichen reichhaltiges UI-Rendering.
+- **Authentifizierung funktioniert ueber Query-Parameter** - WebSocket unterstuetzt keine Header, also werden JWT-Tokens als Query-Parameter uebergeben und beim Verbindungsaufbau validiert.
+- **Produktionsmuster sind wichtig** - Heartbeat-Pings, Reconnection-Logik, Nachrichten-Persistenz und Rate Limiting verhindern die Probleme, die WebSocket-Apps im grossen Massstab zerstoeren.
+
 ## Die Architektur
 
 ```text title="architecture"

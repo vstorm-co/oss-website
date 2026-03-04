@@ -1,0 +1,301 @@
+---
+title: "Your AI Agent Forgets Everything After 50 Messages. Here's the Fix."
+description: "SummarizationProcessor vs SlidingWindowProcessor - two strategies for keeping your agent's memory alive when the context window fills up."
+pubDate: 2026-02-16
+author: "Vstorm"
+lang: en
+translationKey: ai-agent-memory-management
+tags: ["ai-agents", "memory-management", "pydantic-ai", "python", "context-window"]
+category: guide
+draft: false
+---
+
+Run a Pydantic AI agent for 50 messages and ask it about something from message #3. It won't remember. Not because the model is bad - because the conversation got too long, the context window filled up, and the early messages fell off.
+
+This isn't a model problem. It's an infrastructure problem. And it gets worse with agents that use tools, because every tool call and response is a message. A 20-turn conversation with 3 tool calls per turn is actually 80+ messages. At ~4 characters per token, that's tens of thousands of tokens consumed before you know it.
+
+## TL;DR
+
+- **Context overflow is an infrastructure problem, not a model problem.** Every long-running agent needs a context management strategy.
+- **SummarizationProcessor** uses an LLM to intelligently compress old messages into a summary - higher quality, but costs an API call per trigger.
+- **SlidingWindowProcessor** simply trims old messages for zero cost - fast but loses context entirely.
+- **Tool call pair preservation is critical.** Both processors ensure tool calls and their responses are never split apart.
+- **Fraction-based triggers** (`("fraction", 0.8)`) are the most portable option - they adapt automatically to any model's context window.
+
+We hit this wall in every long-running agent deployment. Customer support bots that forget the customer's name. Code assistants that lose track of which files they've already modified. Research agents that re-investigate topics they covered 30 messages ago.
+
+So we built `summarization-pydantic-ai` - two processors that manage your agent's conversation history: one that summarizes intelligently using an LLM, and one that simply trims old messages for zero cost.
+
+## Two Processors, Two Trade-offs
+
+| Aspect | SummarizationProcessor | SlidingWindowProcessor |
+|--------|----------------------|----------------------|
+| **Cost** | LLM API call per trigger | Zero |
+| **Latency** | Depends on model | ~0ms |
+| **Context loss** | Minimal (intelligently summarized) | Complete (old messages gone) |
+| **Default trigger** | 170,000 tokens | 100 messages |
+| **Default keep** | 20 messages | 50 messages |
+| **Best for** | Quality-critical agents | Speed/cost-critical agents |
+
+Both work as Pydantic AI history processors - drop-in functions that transform the message history before each agent run.
+
+## SummarizationProcessor: Intelligent Compression
+
+```python
+from pydantic_ai import Agent
+from pydantic_ai_summarization import create_summarization_processor
+
+processor = create_summarization_processor(
+    model="openai:gpt-4.1",
+    trigger=("tokens", 100000),  # Trigger at 100k tokens
+    keep=("messages", 20),       # Keep last 20 messages
+)
+
+agent = Agent(
+    "openai:gpt-4.1",
+    history_processors=[processor],
+)
+```
+
+When the token count exceeds the trigger, the processor:
+1. Calculates a safe cutoff point (never splitting tool call pairs)
+2. Sends the older messages to an LLM for summarization
+3. Replaces the old messages with a compact summary
+4. Keeps the last 20 messages intact
+
+The result: your agent maintains context from early in the conversation without consuming the full token budget.
+
+## Three Trigger Types
+
+You can trigger summarization based on messages, tokens, or context fraction:
+
+**Message-based** - simple and predictable:
+```python
+processor = SummarizationProcessor(
+    model="openai:gpt-4.1",
+    trigger=("messages", 50),  # After 50 messages
+)
+```
+
+**Token-based** - accounts for message length:
+```python
+processor = SummarizationProcessor(
+    model="openai:gpt-4.1",
+    trigger=("tokens", 100000),  # After 100k tokens
+)
+```
+
+**Fraction-based** - adapts to any model's context:
+```python
+processor = SummarizationProcessor(
+    model="openai:gpt-4.1",
+    trigger=("fraction", 0.8),    # At 80% of context
+    max_input_tokens=128000,       # GPT-4o's context window
+)
+```
+
+**Multiple triggers** - OR logic, first one wins:
+```python
+processor = SummarizationProcessor(
+    model="openai:gpt-4.1",
+    trigger=[
+        ("messages", 50),     # OR
+        ("tokens", 100000),   # OR
+        ("fraction", 0.8),
+    ],
+    max_input_tokens=128000,
+)
+```
+
+Fraction-based triggers are the most robust for production - they adapt automatically when you switch between models with different context windows.
+
+## Tool Call Pair Preservation
+
+This is the detail most context management solutions get wrong. Consider this message sequence:
+
+```
+User: "Search for Python tutorials"
+Assistant: [tool_call: search("Python tutorials"), id=call_1]
+Tool: [tool_return: "Found 5 results...", id=call_1]
+Assistant: "Here are the top results..."
+User: "Tell me more about the first one"
+```
+
+If you cut between the tool call and its return, the model sees an orphaned tool call - and breaks. Our processors handle this:
+
+```python
+def _is_safe_cutoff_point(self, messages, cutoff_index):
+    """Check if cutting at index would separate tool call/response pairs."""
+    search_start = max(0, cutoff_index - 5)
+    search_end = min(len(messages), cutoff_index + 5)
+
+    for i in range(search_start, search_end):
+        msg = messages[i]
+        if not isinstance(msg, ModelResponse):
+            continue
+
+        tool_call_ids = set()
+        for part in msg.parts:
+            if isinstance(part, ToolCallPart) and part.tool_call_id:
+                tool_call_ids.add(part.tool_call_id)
+
+        if not tool_call_ids:
+            continue
+
+        # Check if cutoff separates this tool call from its response
+        for j in range(i + 1, len(messages)):
+            check_msg = messages[j]
+            if isinstance(check_msg, ModelRequest):
+                for part in check_msg.parts:
+                    if (isinstance(part, ToolReturnPart)
+                        and part.tool_call_id in tool_call_ids):
+                        tool_before = i < cutoff_index
+                        response_before = j < cutoff_index
+                        if tool_before != response_before:
+                            return False  # Unsafe - would split pair
+    return True
+```
+
+The processor searches 5 messages in either direction from the cutoff point, finds all tool call/return pairs, and ensures they stay on the same side of the cut.
+
+## SlidingWindowProcessor: Zero-Cost Trimming
+
+When you don't need intelligent summarization - when speed and cost matter more than context quality:
+
+```python
+from pydantic_ai_summarization import create_sliding_window_processor
+
+processor = create_sliding_window_processor(
+    trigger=("messages", 100),  # Trim at 100 messages
+    keep=("messages", 50),      # Keep last 50
+)
+
+agent = Agent(
+    "openai:gpt-4.1",
+    history_processors=[processor],
+)
+```
+
+No LLM call. No latency. Old messages are simply discarded. The same tool call pair preservation applies - the sliding window won't cut in the middle of a tool call sequence.
+
+## Token Counting: Approximate by Default
+
+The default token counter uses a simple heuristic - ~4 characters per token:
+
+```python
+def count_tokens_approximately(messages):
+    total_chars = 0
+    for msg in messages:
+        if isinstance(msg, ModelRequest):
+            for part in msg.parts:
+                if isinstance(part, UserPromptPart):
+                    if isinstance(part.content, str):
+                        total_chars += len(part.content)
+                elif isinstance(part, SystemPromptPart):
+                    total_chars += len(part.content)
+                elif isinstance(part, ToolReturnPart):
+                    total_chars += len(str(part.content))
+        elif isinstance(msg, ModelResponse):
+            for part in msg.parts:
+                if isinstance(part, TextPart):
+                    total_chars += len(part.content)
+                elif isinstance(part, ToolCallPart):
+                    total_chars += len(part.tool_name)
+                    total_chars += len(str(part.args))
+    return total_chars // 4
+```
+
+This is fast and good enough for most cases. For precision, plug in `tiktoken`:
+
+```python
+import tiktoken
+
+def accurate_counter(messages):
+    encoding = tiktoken.encoding_for_model("gpt-4")
+    total = 0
+    for msg in messages:
+        total += len(encoding.encode(str(msg)))
+    return total
+
+processor = create_summarization_processor(
+    token_counter=accurate_counter,
+    trigger=("tokens", 100000),
+)
+```
+
+## Custom Summary Prompts
+
+The default summary prompt extracts key context. You can customize it:
+
+```python
+processor = create_summarization_processor(
+    summary_prompt="""
+    You are summarizing an agent conversation. Extract:
+
+    1. **Key Decisions**: What was decided?
+    2. **Code Changes**: What code was written/modified?
+    3. **Pending Tasks**: What still needs to be done?
+    4. **Important Context**: What context is crucial to preserve?
+
+    Conversation to summarize:
+    {messages}
+
+    Provide a concise summary that preserves essential information.
+    """,
+)
+```
+
+The `{messages}` placeholder is replaced with the formatted message history. Customize this for your domain - a customer support agent might extract customer name and issue, while a code assistant might focus on file changes and test results.
+
+## Conversation Loop Pattern
+
+Here's the typical production pattern:
+
+```python
+from pydantic_ai import Agent
+from pydantic_ai_summarization import create_summarization_processor
+
+processor = create_summarization_processor(
+    trigger=("messages", 20),
+    keep=("messages", 5),
+)
+
+agent = Agent(
+    "openai:gpt-4.1",
+    history_processors=[processor],
+)
+
+async def chat():
+    message_history = []
+
+    while True:
+        user_input = input("You: ")
+        if user_input.lower() == "quit":
+            break
+
+        result = await agent.run(
+            user_input,
+            message_history=message_history,
+        )
+
+        print(f"Assistant: {result.output}")
+        message_history = result.all_messages()
+```
+
+The history processor runs automatically before each `agent.run()` call. You pass the full message history, the processor checks if summarization is needed, and returns a (possibly compressed) history. No manual token counting required.
+
+## Key Takeaways
+
+- **Context overflow is an infrastructure problem, not a model problem.** Every long-running agent needs a context management strategy. Choose between intelligent summarization (higher quality, LLM cost) and sliding window (zero cost, context loss).
+- **Tool call pair preservation is critical.** Never cut between a tool call and its response. Both our processors handle this automatically - search 5 messages in each direction for orphaned pairs.
+- **Fraction-based triggers are the most portable.** `("fraction", 0.8)` works regardless of which model you use or how long your messages are. Token and message counts are model- and content-specific.
+- **The ~4 chars/token heuristic is good enough.** For production precision, use `tiktoken`. For everything else, the default counter keeps things fast without adding a dependency.
+- **Customize the summary prompt for your domain.** The default extracts generic context. A domain-specific prompt ("extract customer name, issue ID, and resolution status") produces much better summaries.
+
+## Try It Yourself
+
+[summarization-pydantic-ai](https://github.com/vstorm-co/summarization-pydantic-ai) - Automatic conversation summarization and context management for Pydantic AI agents.
+
+```bash
+pip install summarization-pydantic-ai
+```

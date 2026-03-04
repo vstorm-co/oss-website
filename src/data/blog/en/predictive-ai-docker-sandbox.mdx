@@ -1,0 +1,239 @@
+---
+title: "Predictive AI: Give Your Agent a Docker Lab to Run Models"
+description: "How to build an AI agent that runs sklearn predictions inside an isolated Docker sandbox. Environment-as-a-tool pattern, sub-agent delegation, and structured chart output with Pydantic AI."
+pubDate: 2026-02-24
+author: "Vstorm"
+lang: en
+translationKey: predictive-ai-docker-sandbox
+tags: ["ai-agents", "docker", "sandbox", "pydantic-ai", "python", "machine-learning"]
+category: tutorial
+draft: false
+---
+
+Every AI agent demo shows the same thing: "ask your agent about your data." The agent queries a database, summarizes results, maybe makes a chart.
+
+But try asking it to *run a polynomial regression on 24 months of sales data and forecast the next 6 months.* Suddenly your chat-based agent hits a wall. It can't `import sklearn`. It can't execute Python. It can reason about what model to use, but it can't actually run one.
+
+The obvious fix: give it a Python environment. But here's the question nobody talks about - should that environment be the agent's *default runtime* (like Claude Code), or should it be *a tool the agent chooses to use*?
+
+We built a demo that answers this question.
+
+## TL;DR
+
+- The **"environment as a tool"** pattern lets your AI agent selectively use a Docker sandbox only when needed, avoiding overhead on simple queries.
+- A **sub-agent delegation** approach keeps the main agent clean - it describes *what* to predict, and the sub-agent figures out *how* to write the Python code.
+- **Structured Pydantic output** for charts beats image generation - send data, let the frontend render with Chart.js.
+- **WebSocket streaming** with `agent.iter()` gives real-time visibility into text, tool calls, and results.
+- The hardest part is **frontend integration** - merging chart series with different date ranges, intercepting tool outputs, and streaming over WebSocket.
+
+## The Demo: Predictive Analytics Agent
+
+We built a full-stack demo app - a chat-based analytics assistant that can:
+
+1. **Query data** - filter and aggregate monthly sales data (3 products, 3 regions, 24 months)
+2. **Run predictions** - a sub-agent writes and executes Python (sklearn, pandas) inside an isolated Docker container
+3. **Generate charts** - structured Pydantic output rendered as Chart.js line charts in the browser
+
+The main agent has three tools. Two are simple (query JSON, return chart data). The third is where it gets interesting - it spins up a sub-agent that has full access to a Docker sandbox.
+
+## The Architecture: Environment as a Tool
+
+Here's the key design decision: the Docker sandbox is **a tool**, not the agent's default environment.
+
+```python
+analytics_agent: Agent[AnalyticsDeps, str] = Agent(
+    "openai:gpt-4.1",
+    deps_type=AnalyticsDeps,
+)
+```
+
+The main agent is a regular Pydantic AI agent. It doesn't live inside Docker. It has three tools registered with `@analytics_agent.tool`:
+
+- `query_data` - reads a JSON file, filters records, returns results. No Docker needed.
+- `predict` - creates a sub-agent with Docker access, delegates the prediction task.
+- `generate_chart` - returns structured `LineChartData` (a Pydantic model) that the frontend renders as a Chart.js chart.
+
+The agent decides *when* to use Docker. If you ask "show me total sales by product," it calls `query_data` - fast, no overhead. If you ask "predict Widget Alpha sales for the next 6 months," it calls `predict` - which spins up a sub-agent inside Docker.
+
+## The Predict Tool: Sub-Agent with a Docker Lab
+
+This is the core pattern. The `predict` tool doesn't execute code itself - it delegates to a sub-agent that has full access to a Docker container:
+
+```python
+@analytics_agent.tool
+async def predict(
+    ctx: RunContext[AnalyticsDeps],
+    task_description: str,
+) -> str:
+    """Run a prediction using Python in a Docker sandbox."""
+    sandbox = ctx.deps.sandbox
+
+    # Write sales data into the Docker container
+    sandbox.write("/workspace/sales_data.json", data_content)
+
+    # Create a sub-agent with Docker tools
+    console_toolset = create_console_toolset(
+        include_execute=True,
+        require_write_approval=False,
+        require_execute_approval=False,
+    )
+
+    sub_agent: Agent[SandboxDeps, str] = Agent(
+        "openai:gpt-4.1",
+        system_prompt="You are a data science code executor...",
+        deps_type=SandboxDeps,
+        toolsets=[console_toolset],
+    )
+
+    result = await sub_agent.run(
+        f"Perform this prediction task:\n\n{task_description}",
+        deps=SandboxDeps(backend=sandbox),
+    )
+    return result.output
+```
+
+What happens step by step:
+
+1. Main agent receives: "Predict Widget Alpha sales for the next 6 months"
+2. Main agent calls `predict(task_description="...")`
+3. Sales data gets written into the Docker container at `/workspace/sales_data.json`
+4. A fresh sub-agent is created with `create_console_toolset()` - giving it `ls`, `read`, `write`, `execute`, and other file operations
+5. The sub-agent writes a Python script using pandas + sklearn
+6. The sub-agent executes the script inside Docker
+7. Results flow back to the main agent, which explains them to the user
+
+The sub-agent has **no idea** it's a sub-agent. It just sees a system prompt saying "you're a data science code executor" and tools to read/write/execute files. The Docker sandbox is completely transparent.
+
+## Structured Charts with Pydantic
+
+The third tool - `generate_chart` - demonstrates structured output. Instead of returning raw text, it returns a Pydantic model:
+
+```python
+class DataPoint(BaseModel):
+    x: str   # e.g. "2024-01"
+    y: float
+
+class ChartSeries(BaseModel):
+    name: str
+    data_points: list[DataPoint]
+
+class LineChartData(BaseModel):
+    title: str
+    x_label: str
+    y_label: str
+    series: list[ChartSeries]
+```
+
+The `generate_chart` tool takes chart parameters from the LLM and returns a serialized `LineChartData` with a special prefix (`CHART_DATA:`). The server intercepts this prefix in the WebSocket stream and sends it to the frontend as a `chart_data` message:
+
+```python
+if result_str.startswith(CHART_DATA_PREFIX):
+    chart_json = result_str[len(CHART_DATA_PREFIX):]
+    await websocket.send_json(
+        {"type": "chart_data", "data": json.loads(chart_json)}
+    )
+```
+
+The frontend picks it up and renders it with Chart.js. No images, no base64, no matplotlib - just structured data flowing from agent to browser.
+
+## The Environment Question: Tool vs. Default
+
+This is the design question I mentioned at the start. There are two ways to give an agent a code execution environment:
+
+**Option A: Environment as a Tool** (what we built)
+The agent lives outside Docker. It has a `predict` tool that delegates to a sub-agent inside Docker. The agent decides *when* to use it.
+
+**Option B: Default Environment** (like Claude Code)
+The agent lives *inside* Docker. Every command it runs, every file it reads - it's all in the sandbox. The environment is always there.
+
+Here's when each makes sense:
+
+| | Environment as Tool | Default Environment |
+|---|---|---|
+| **Best for** | Domain-specific tasks (predictions, data analysis, code review) | General-purpose coding agents |
+| **Agent control** | Agent decides when to use sandbox | Agent always runs in sandbox |
+| **Overhead** | Only pays Docker cost when needed | Always running |
+| **Flexibility** | Can mix tools freely | Everything goes through the sandbox |
+| **Complexity** | Needs sub-agent delegation pattern | Simpler - agent just has tools |
+
+For our predictive analytics demo, Option A is clearly right. The agent mostly answers questions about data (no Docker needed) and only runs Docker when it needs to execute sklearn code. Making Docker the default environment would add unnecessary latency to every interaction.
+
+But for a coding agent like Claude Code, Option B makes sense - the agent's entire job is reading, writing, and executing code. The environment *is* the product.
+
+## Real Results
+
+Here's what the demo actually produces. Ask it to "analyze Widget Beta's seasonal patterns and predict the next 12 months":
+
+The sub-agent chose Holt-Winters exponential smoothing (appropriate for seasonal data), ran it inside Docker, and returned structured predictions. The main agent then called `generate_chart` with both historical and forecast data as separate series.
+
+The entire flow - from user message to rendered chart - happens over a single WebSocket connection with real-time streaming of text, tool calls, and chart data.
+
+## The WebSocket Streaming Protocol
+
+The server uses Pydantic AI's `agent.iter()` for real-time streaming. Every model token, tool call, and tool result is streamed to the frontend:
+
+```python
+async with analytics_agent.iter(
+    user_message, deps=deps, message_history=message_history,
+) as run:
+    async for node in run:
+        if Agent.is_model_request_node(node):
+            # Stream text deltas and tool call deltas
+            async with node.stream(run.ctx) as stream:
+                async for event in stream:
+                    if isinstance(event, PartDeltaEvent):
+                        if isinstance(event.delta, TextPartDelta):
+                            await ws.send_json({
+                                "type": "text_delta",
+                                "content": event.delta.content_delta
+                            })
+        elif Agent.is_call_tools_node(node):
+            # Stream tool execution events
+            ...
+```
+
+The frontend shows tool cards that expand to show arguments and results, text streaming token by token, and charts rendered inline - all over one WebSocket.
+
+## One Gotcha: Chart.js Multi-Series with Different Ranges
+
+We hit an interesting bug during development. When charting "Historical" (2024-01 to 2025-12) alongside "Forecast" (2026-01 to 2026-06), Chart.js only used labels from the first series. Forecast points were mapped to historical dates.
+
+The fix: merge all unique x-labels across all series, then use a lookup map per series with `null` for missing dates:
+
+```javascript
+const allLabels = [...new Set(
+    chartData.series.flatMap((s) => s.data_points.map((dp) => dp.x))
+)].sort();
+
+const datasets = chartData.series.map((s, i) => {
+    const lookup = new Map(s.data_points.map((dp) => [dp.x, dp.y]));
+    return {
+        label: s.name,
+        data: allLabels.map((x) => lookup.get(x) ?? null),
+        spanGaps: false,
+        // ...styling
+    };
+});
+```
+
+Small thing, but it's the kind of bug that makes your forecast look completely wrong while the data is actually correct.
+
+## Key Takeaways
+
+- **"Environment as a tool"** is the right pattern when your agent only sometimes needs code execution. Don't pay Docker overhead on every interaction.
+- **Sub-agent delegation** keeps the main agent clean. The main agent describes *what* to predict. The sub-agent figures out *how* to write the Python code.
+- **Structured Pydantic output** for charts beats generating images. Send data, let the frontend render. Easier to style, interactive, and no base64 blobs.
+- **WebSocket streaming** with `agent.iter()` gives you real-time visibility into what the agent is doing - text, tool calls, and results.
+- The hardest part isn't the agent - it's the **frontend integration** (merging chart series with different date ranges, intercepting tool outputs, streaming over WebSocket).
+
+## Try It Yourself
+
+[pydantic-ai-backend](https://github.com/vstorm-co/pydantic-ai-backend) - Docker sandbox, console toolset, and backend abstractions for Pydantic AI agents
+
+The full demo is in `examples/predictive_analytics/`:
+
+```bash
+pip install pydantic-ai-backend[docker,console]
+export OPENAI_API_KEY=your-key
+uvicorn examples.predictive_analytics.server:app --port 8000
+```

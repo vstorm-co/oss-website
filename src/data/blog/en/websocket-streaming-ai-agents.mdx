@@ -16,6 +16,14 @@ HTTP request-response is fine for quick API calls, but AI agent responses can ta
 
 Here's how to implement it properly with FastAPI.
 
+## TL;DR
+
+- **WebSockets beat HTTP for AI agents** - users see tokens in real-time instead of staring at a spinner for 5-30 seconds.
+- **Connection manager handles multiple clients** - track active connections, broadcast events, and clean up disconnects automatically.
+- **Structured events for the frontend** - separate `text_delta`, `tool_call`, `tool_result`, and `complete` event types enable rich UI rendering.
+- **Authentication works via query params** - WebSocket doesn't support headers, so pass JWT tokens as query parameters and validate on connect.
+- **Production patterns matter** - heartbeat pings, reconnection logic, message history persistence, and rate limiting prevent the issues that kill WebSocket apps at scale.
+
 ## The Architecture
 
 ```text title="architecture"

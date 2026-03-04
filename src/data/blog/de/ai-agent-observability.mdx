@@ -1,0 +1,261 @@
+---
+title: "Observability fuer KI-Agenten ist kaputt. Das haben wir stattdessen gebaut."
+description: "Standard-Dashboards funktionieren nicht fuer LLM-Traces. Wir haben einen KI-Assistenten gebaut, der es ermoeglicht, Fragen zum Verhalten Ihres Agenten in natuerlicher Sprache zu stellen - natuerliche Sprache zu SQL-Abfragen gegen Logfire-Daten."
+pubDate: 2026-02-19
+author: "Vstorm"
+lang: de
+translationKey: ai-agent-observability
+tags: ["ai-agents", "observability", "logfire", "pydantic-ai", "python", "monitoring"]
+category: guide
+draft: false
+---
+
+Sie deployen einen KI-Agenten in die Produktion. Er beginnt, seltsame Entscheidungen zu treffen. Der Kunde sagt "der Agent hat mir den falschen Preis genannt." Sie oeffnen Ihr Observability-Dashboard und sehen... 50.000 Spans. Verschachtelte Traces. Tool-Aufrufe innerhalb von Tool-Aufrufen. Token-Zaehler. Latenzen. Ein Ozean von Daten ohne offensichtlichen Weg herauszufinden, was schiefgelaufen ist.
+
+## TL;DR
+
+- **Standard-Dashboards versagen bei KI-Agenten** - LLM-Traces sind verschachtelt, verzweigt und kontextabhaengig. HTTP-artige Observability reicht nicht aus.
+- **Natuerliche Sprache zu SQL ist die richtige Abstraktion** - fragen Sie "warum hat der Agent X gemacht" und erhalten Sie automatisch die SQL-Antwort ueber einen KI-gestuetzten Logfire-Assistenten.
+- **Eine Chrome-Erweiterung injiziert den Trace-Kontext** - kein Kopieren von Trace-IDs. Der Assistent weiss bereits, welchen Trace Sie betrachten.
+- **Multi-Span-Selektion ermoeglicht vergleichende Analyse** - waehlen Sie mehrere Spans und vergleichen Sie Token-Verbrauch, Latenz oder Tool-Aufrufmuster.
+- **Dateibasierter Speicher + strukturierte Abfragen schlagen Dashboards** - das Ziel ist die Beantwortung von "was ist schiefgelaufen?" in natuerlicher Sprache, nicht das Bauen weiterer Diagramme.
+
+## Der Stand der KI-Agenten-Observability
+
+So sieht die Observability von KI-Agenten im Jahr 2026 aus. Die Werkzeuge sind fuer Web-Services gebaut - Request/Response, HTTP-Statuscodes, Fehlerraten. Aber KI-Agenten folgen nicht den Request/Response-Mustern. Sie schleifen, sie verzweigen, sie rufen Tools auf, die andere Tools aufrufen. Eine einzelne Benutzernachricht kann 15 Spans ueber 3 Sub-Agenten erzeugen.
+
+Wir haben jeden Produktions-Agenten, den wir bei Vstorm gebaut haben, mit Pydantic Logfire instrumentiert. Logfire ist hervorragend beim Erfassen der Daten - jeder LLM-Aufruf, jeder Tool-Aufruf, jeder Token. Aber diese Daten mit SQL-Dashboards abzufragen ist wie Assembler-Code lesen. Man braucht eine Uebersetzungsschicht.
+
+Also haben wir eine gebaut: einen KI-gestuetzten Logfire-Assistenten, der natuerliche Sprachfragen in SQL-Abfragen gegen Ihre Logfire-Daten uebersetzt.
+
+## Das Problem: SQL ist nicht die Art, wie man Agenten debuggt
+
+Logfire speichert alles in einem SQL-abfragbaren Format. Sie *koennen* schreiben:
+
+```sql
+SELECT span_name, duration, attributes
+FROM records
+WHERE trace_id = '0af7651916cd43dd8448eb211c80319c'
+  AND span_name LIKE '%tool_call%'
+ORDER BY start_timestamp;
+```
+
+Aber wenn Sie debuggen "warum hat der Agent das falsche Produkt empfohlen", wollen Sie kein SQL schreiben. Sie wollen fragen: "Zeige mir alle Tool-Aufrufe der letzten Stunde, bei denen der Agent das Preistool mit falschen Parametern aufgerufen hat."
+
+Genau das macht unser Logfire-Assistent. Natuerliche Sprache rein, SQL-Abfragen raus, Ergebnisse formatiert als Tabellen oder Diagramme.
+
+## Architektur: NL zu SQL zu Diagrammen
+
+Der Assistent ist ein Pydantic AI Agent mit Zugriff auf Logfires Query-API:
+
+```python
+class LogfireAgent:
+    def __init__(self):
+        self.agent = Agent(
+            model=model,
+            system_prompt=self._build_system_prompt(),
+        )
+
+    def _build_system_prompt(self):
+        return f"""You are a Logfire data analyst.
+
+You have access to the Logfire database with these tables:
+{schema}
+
+Current environment: {environment}
+Time range: {time_range}
+
+When the user asks about their agent's behavior:
+1. Translate their question into SQL
+2. Execute the query against Logfire
+3. Format results clearly
+4. Generate chart specs if appropriate
+"""
+```
+
+Der System-Prompt wird dynamisch mit dem tatsaechlichen Datenbankschema, der aktuellen Umgebung und dem ausgewaehlten Zeitbereich erstellt. Dies stellt sicher, dass der Agent gueltiges SQL gegen die reale Tabellenstruktur schreibt.
+
+## Dynamische Kontextinjektion
+
+Der Schluessel zum Funktionieren ist Kontext. Der Agent muss wissen:
+
+- **Welches Schema verfuegbar ist** - abgerufen vom `/v1/schemas`-Endpunkt von Logfire
+- **Welche Umgebungen existieren** - abgefragt aus `deployment_environment` in der Records-Tabelle
+- **Welchen Zeitbereich abfragen** - konfigurierbar, mit intelligenten Standardwerten
+- **Welchen Trace der Benutzer betrachtet** - injiziert von der Browser-Erweiterung
+
+```python
+async def get_schema(self) -> str:
+    """Fetch database schema from Logfire API."""
+    async with AsyncLogfireQueryClient(
+        read_token=token,
+        base_url=self.base_url,
+    ) as client:
+        response = await client.client.get("/v1/schemas")
+        schema_data = response.json()
+        return schema_to_sql(schema_data)
+
+async def get_environments(self, days: int = 7) -> list[str]:
+    """Query distinct deployment environments."""
+    sql = f"""
+        SELECT DISTINCT deployment_environment
+        FROM records
+        WHERE start_timestamp >= now() - INTERVAL '{days} days'
+          AND deployment_environment IS NOT NULL
+        ORDER BY deployment_environment
+    """
+    # Execute and cache...
+```
+
+## SQL-Validierung: Sicherheit zuerst
+
+Jede vom Agenten generierte SQL-Abfrage durchlaeuft eine Validierung vor der Ausfuehrung. Der Validator stellt sicher:
+
+- Keine Schreiboperationen (INSERT, UPDATE, DELETE, DROP)
+- Keine gefaehrlichen Funktionen
+- Abfragen bleiben im Projektbereich des Benutzers
+- Zeitbereiche werden eingehalten
+
+Dies ist kritisch, da der Agent Lesezugriff auf Produktions-Observability-Daten hat. Eine halluzinierte `DELETE`-Abfrage koennte Trace-Daten loeschen.
+
+## Die Chrome-Erweiterung: Kontextbewusstes Debugging
+
+Das maechtigste Feature ist die Chrome-Erweiterung. Wenn Sie einen Trace in Logfires Web-UI betrachten, tut die Erweiterung folgendes:
+
+1. Erkennt, dass Sie auf einer Logfire-Seite sind
+2. Extrahiert die aktuelle Trace-ID und den Span-Kontext aus der URL
+3. Oeffnet ein Seitenpanel mit dem KI-Assistenten
+4. Injiziert den Trace-Kontext in den System-Prompt des Agenten
+
+```typescript
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  const isLogfirePage =
+    tab.url.includes('logfire.pydantic.dev') ||
+    tab.url.includes('logfire-us.pydantic.dev');
+
+  if (isLogfirePage && (changeInfo.url || changeInfo.status === 'complete')) {
+    const context = extractLogfireContext(tab.url);
+    if (context) {
+      await chrome.storage.local.set({
+        [`context_${tabId}`]: context,
+      });
+      chrome.runtime.sendMessage({
+        type: 'CONTEXT_UPDATED',
+        tabId,
+        context,
+      });
+    }
+  }
+});
+```
+
+Wenn Sie jetzt fragen "warum ist dieser Tool-Aufruf fehlgeschlagen?", weiss der Agent bereits, welchen Trace Sie betrachten. Kein Kopieren von Trace-IDs.
+
+## Multi-Span-Selektion
+
+Die Erweiterung unterstuetzt das Auswaehlen mehrerer Spans in der Logfire-UI fuer vergleichende Analyse:
+
+```typescript
+if (message.type === 'SPAN_CONTEXT_TOGGLED') {
+  const contexts = result[`spanContexts_${tabId}`] || [];
+  const spanContext = message.spanContext;
+
+  let newContexts;
+  if (message.selected) {
+    newContexts = [...contexts, spanContext];
+  } else {
+    newContexts = contexts.filter(c => c.spanId !== spanContext.spanId);
+  }
+
+  chrome.storage.local.set({ [`spanContexts_${tabId}`]: newContexts });
+}
+```
+
+Waehlen Sie 3 Spans, fragen Sie "vergleiche den Token-Verbrauch ueber diese drei Agenten-Laeufe" - der Assistent hat den gesamten Kontext.
+
+## WebSocket-Streaming mit Tool-Visualisierung
+
+Das Backend streamt Antworten ueber WebSocket, einschliesslich Tool-Aufruf-Events:
+
+```python
+async with logfire_agent.agent.iter(
+    user_message,
+    deps=deps,
+    message_history=model_history,
+) as agent_run:
+    async for node in agent_run:
+        if Agent.is_model_request_node(node):
+            async with node.stream(agent_run.ctx) as stream:
+                async for event in stream:
+                    if isinstance(event, PartDeltaEvent):
+                        await manager.send_event(
+                            websocket, "text_delta",
+                            {"content": event.delta.content_delta},
+                        )
+
+        elif Agent.is_call_tools_node(node):
+            async with node.stream(agent_run.ctx) as stream:
+                async for event in stream:
+                    if isinstance(event, FunctionToolCallEvent):
+                        await manager.send_event(
+                            websocket, "tool_call",
+                            {"tool_name": event.part.tool_name,
+                             "args": args_value},
+                        )
+                    elif isinstance(event, FunctionToolResultEvent):
+                        await manager.send_event(
+                            websocket, "tool_result",
+                            {"result": str(event.result.content)},
+                        )
+```
+
+Das Frontend zeigt: Text-Streaming Token fuer Token, SQL-Abfragen, die konstruiert werden, Abfrageergebnisse in formatierten Tabellen und Diagramm-Spezifikationen, die interaktiv gerendert werden.
+
+## Multi-Provider LLM-Unterstuetzung
+
+Der Assistent unterstuetzt mehrere LLM-Anbieter von Haus aus:
+
+```python
+class LLMProvider(str, Enum):
+    OPENAI = "openai"
+    OPENROUTER = "openrouter"
+    PYDANTIC_AI_GATEWAY = "pydantic_ai_gateway"
+
+def get_default_model(has_openai, has_openrouter, has_gateway) -> ModelInfo | None:
+    """Get default model. Priority: Gateway Claude > OpenRouter Claude > OpenAI GPT.
+    Returns a ModelInfo object with model ID, provider, and display name."""
+    if has_gateway:
+        return _MODEL_BY_ID.get(DEFAULT_GATEWAY_MODEL_ID)
+    if has_openrouter:
+        return _MODEL_BY_ID.get(DEFAULT_OPENROUTER_MODEL_ID)
+    if has_openai:
+        return _MODEL_BY_ID.get(DEFAULT_OPENAI_MODEL_ID)
+    return None
+```
+
+Benutzer konfigurieren ihre API-Schluessel im Einstellungspanel. Das System waehlt automatisch das beste verfuegbare Modell.
+
+## Welche Fragen koennen Sie stellen?
+
+Hier sind echte Fragen, die wir taeglich zum Debuggen unserer Produktions-Agenten verwenden:
+
+- "Zeige mir die langsamsten Agenten-Laeufe der letzten Stunde"
+- "Wie viele Tokens haben wir heute fuer Tool-Aufrufe vs. Completions ausgegeben?"
+- "Finde alle Laeufe, bei denen der Agent dasselbe Tool mehr als 5 Mal aufgerufen hat"
+- "Wie ist die Fehlerrate fuer das Preistool diese Woche?"
+- "Vergleiche die Latenz zwischen GPT-4o und Claude fuer denselben Aufgabentyp"
+- "Zeige mir alle Laeufe, bei denen der Agent 100k Tokens ueberschritten hat"
+
+Jede Frage wird in SQL uebersetzt, gegen Logfire ausgefuehrt und als formatierte Tabelle oder Diagramm zurueckgegeben.
+
+## Wichtigste Erkenntnisse
+
+- **Standard-Dashboards versagen bei KI-Agenten.** LLM-Traces sind verschachtelt, verzweigt und kontextabhaengig. Sie brauchen eine Abfrageschnittstelle, die Agentenmuster versteht, nicht nur HTTP-Statuscodes.
+- **Natuerliche Sprache zu SQL ist die richtige Abstraktion.** Ihre Logfire-Daten sind bereits SQL-abfragbar. Der KI-Assistent ueberbrueckt die Luecke zwischen "warum hat der Agent X gemacht" und dem SQL, das noetig ist, um das zu beantworten.
+- **Browser-Kontext macht Debugging muehelos.** Die Chrome-Erweiterung injiziert den aktuellen Trace in den Kontext des Assistenten. Kein Kopieren. Kein Kontextwechsel.
+- **Multi-Span-Selektion ermoeglicht vergleichende Analyse.** Waehlen Sie mehrere Spans und bitten Sie den Assistenten, sie zu vergleichen - Token-Verbrauch, Latenz, Tool-Aufrufmuster.
+- **Das ist Observability fuer Menschen, nicht fuer Dashboards.** Das Ziel sind nicht mehr Diagramme. Es ist die Beantwortung von "was ist schiefgelaufen?" in natuerlicher Sprache.
+
+## Probieren Sie es selbst aus
+
+[logfire-assistant](https://github.com/vstorm-co/logfire-assistant) - KI-gestuetzter Logfire-Assistent mit natuerlicher Sprache zu SQL-Abfragen, Chrome-Erweiterung und Multi-Span-Analyse.

@@ -1,0 +1,249 @@
+---
+title: "Warum Ihr AI-Agent zu viel erinnert (und wie Sie es beheben)"
+description: "Jedes Memory-System speichert Muell. So haben wir es mit dateibasiertem persistentem Speicher, Kontextfenster-Limits und einer Sofort-speichern-oder-verlieren-Philosophie geloest."
+pubDate: 2026-02-20
+author: "Vstorm"
+lang: de
+translationKey: ai-agent-selective-memory
+tags: ["ai-agents", "memory", "memv", "pydantic-ai", "python"]
+category: guide
+draft: false
+---
+
+Wir haben 4 verschiedene Memory-Systeme fuer unsere AI-Agenten ausprobiert. Alle haben zu viel Muell gespeichert.
+
+Vektordatenbanken haben jede Nachricht gespeichert - einschliesslich "ja," "ok," und "kannst du das wiederholen?" Konversationslogs wuchsen auf Megabytes an Rauschen. RAG-Retrieval lieferte 10 irrelevante Schnipsel fuer jeden nuetzlichen. Und die Token-Kosten fuer das Embedding von allem waren absurd.
+
+## TL;DR
+
+- **Weniger speichern, besser erinnern** - die meisten Memory-Systeme speichern alles und rufen schlecht ab. Selektives, bewusstes Erinnern schlaegt totale Erinnerung jedes Mal.
+- **Dem Agenten seine eigenen Grenzen beibringen** - der System-Prompt muss explizit sagen "dein Kontext umfasst 10 Nachrichten." Ohne das geht der Agent davon aus, dass er sich an alles erinnert.
+- **"Sofort speichern" ist die entscheidende Regel** - wenn der Agent Informationen nicht in dem Moment speichert, in dem er sie lernt, gehen sie verloren, wenn sich der Kontext verschiebt. Keine zweite Chance.
+- **Dateibasierter Speicher ist einfach und debugbar** - du kannst die Memory-Dateien des Agenten lesen, bearbeiten und mit git versionieren. Versuch das mal mit einer Vektordatenbank.
+- **Kurzzeitgedaechtnis und Langzeitgedaechtnis kombinieren** - Summarization behandelt den aktuellen Kontext, dateibasierter Speicher behandelt persistentes Wissen, Verlaufssuche behandelt seltene Abfragen.
+
+## Das Grundproblem
+
+Das grundlegende Problem: Die meisten AI-Memory-Systeme sind darauf ausgelegt, *sich an alles zu erinnern*. Aber das beste menschliche Gedaechtnis funktioniert, indem es *fast alles vergisst* und nur das Wichtige behaelt.
+
+Nach Jahren produktiver Arbeit mit Agenten bei Vstorm haben wir uns auf einen anderen Ansatz geeinigt. Anstatt jede Nachricht in einer Vektordatenbank zu speichern, geben wir dem Agenten ein strukturiertes Dateisystem fuer persistenten Speicher - und bringen ihm bei zu entscheiden, *was es wert ist, gespeichert zu werden*.
+
+## Das Problem: Kontextfenster sind endlich
+
+Hier ist eine Tatsache, die die meisten Agenten-Architekturen ignorieren: Dein Kontextfenster haelt nur die letzten ~10-20 Nachrichten. Alles davor ist weg - es sei denn, du speicherst es explizit irgendwo.
+
+Ein typisches Produktions-Setup:
+- Kontextfenster: 128k Tokens (GPT-4o) oder 200k Tokens (Claude)
+- Durchschnittliche Nachricht: ~500 Tokens (mit Tool-Aufrufen)
+- Effektive Kapazitaet: ~50-100 Nachrichten, bevor Kontextmanagement einsetzt
+- Mit Summarization: ~20 aktuelle Nachrichten + eine komprimierte Zusammenfassung
+
+Nach 50 Austauschen erinnert sich dein Agent nicht mehr an den Namen des Benutzers aus Nachricht #3. Nicht weil er dumm ist - weil die Information buchstaeblich nicht mehr im Kontext ist.
+
+## Die Loesung: Strukturierter dateibasierter Speicher
+
+Anstatt alles in eine Vektordatenbank zu kippen, geben wir dem Agenten ein nach Zweck organisiertes Dateisystem:
+
+```
+/memory/
+├── AGENTS.md              # Core instructions, learned behaviors
+├── knowledge/
+│   ├── user.md            # User's name, preferences, timezone
+│   ├── projects/
+│   │   └── api-project.md # Project-specific context
+│   └── tech-stack.md      # Preferred technologies
+├── skills/
+│   ├── task-planning.md   # How to plan complex tasks
+│   └── code-review.md     # How to review code
+└── conversations/
+    └── summaries/         # Summaries of important past conversations
+```
+
+Der Agent liest diese Dateien zu Beginn jeder Konversation und aktualisiert sie, wenn er etwas Neues lernt. Es ist keine automatische Speicherung - es ist bewusstes Memory-Management.
+
+## Die "Sofort speichern"-Regel
+
+Die entscheidende Anweisung im System-Prompt des Agenten:
+
+```python
+system_prompt = f"""
+## CRITICAL: Context Window Limitations
+
+**Your context window only holds the last 10 messages.** This means:
+- Information shared earlier in the conversation WILL BE LOST
+- User preferences, names, project details - all forgotten after ~10 exchanges
+- You MUST proactively save important information to your persistent memory
+
+**When to save to memory (DO THIS IMMEDIATELY):**
+- User tells you their name → Save to knowledge/user.md
+- User shares preferences → Save to AGENTS.md under "User Preferences"
+- User describes a project → Save to knowledge/projects/
+- User corrects you → Update relevant memory file
+- Important facts → Save to knowledge/
+
+**Example:** If user says "My name is Kacper", IMMEDIATELY:
+1. Acknowledge: "Nice to meet you, Kacper!"
+2. Save to memory: edit_file("knowledge/user.md", ...)
+"""
+```
+
+Die zentrale Erkenntnis: Speichere nicht alles. Speichere nur das, was du brauchen wuerdest, wenn du die gesamte Konversation verlieren wuerdest. Der Agent trifft diese Entscheidung - keine Heuristik, kein Embedding, kein Vektor-Aehnlichkeits-Schwellenwert. Das LLM selbst entscheidet, was es wert ist, erinnert zu werden.
+
+## Startup-Routine: Lesen vor dem Antworten
+
+Jede Konversation beginnt mit einem Memory-Load:
+
+```python
+# Agent's startup routine (from system prompt):
+# 1. Read AGENTS.md to recall your instructions
+# 2. Read knowledge/user.md to remember the user
+# 3. Check if skills/ has relevant skills for this topic
+```
+
+Das ist guenstig - 3-4 kleine Markdown-Dateien zu lesen kostet ein paar hundert Tokens. Aber es bedeutet, dass der Agent weiss, mit wem er spricht, an welchen Projekten sie arbeiten und wie sie bevorzugt kommunizieren.
+
+## AGENTS.md: Das Kern-Gedaechtnis des Agenten
+
+Die Datei `AGENTS.md` dient als Identitaet und erlernte Verhaltensweisen des Agenten:
+
+```markdown
+# Winston - Core Instructions
+
+## Identity
+You are Winston, an autonomous AI assistant.
+
+## Critical Behaviors
+
+### Memory Management
+- Your context window is LIMITED to ~10 messages
+- Important information WILL BE LOST if not saved
+- When user shares personal info → SAVE IMMEDIATELY
+
+### Proactive Learning
+When you learn something new about the user:
+1. Acknowledge what you learned
+2. Save to appropriate memory file
+3. Confirm: "I've noted that for future reference."
+
+## User Preferences
+- Language: User may speak Polish or English - match their language
+- Code style: Prefers explicit over clever
+```
+
+Diese Datei waechst organisch. Wenn der Agent lernt, dass der Benutzer TypeScript gegenueber JavaScript bevorzugt, aktualisiert er den Abschnitt User Preferences. Wenn er einen Fehler macht und korrigiert wird, fuegt er einen Eintrag unter "Learned Behaviors" hinzu.
+
+## Skills: Wiederverwendbare Workflows
+
+Skills sind Markdown-Dateien, die dem Agenten bestimmte Muster beibringen:
+
+```markdown
+# Task Planning Skill
+
+**Trigger**: User gives a complex task or asks to "implement", "build", "create"
+
+## Before Starting ANY Complex Task
+
+### 1. Understand the Goal
+- What is the desired end state?
+- What problem does this solve?
+- What are the constraints?
+
+### 2. Break Down the Task
+**Bad**: "Build a login system"
+**Good**:
+1. Create user model with email/password
+2. Implement password hashing
+3. Create login endpoint
+4. Add JWT token generation
+5. Write tests for each component
+
+### 3. Create a Todo List
+Use write_todos to track the plan...
+```
+
+Skills werden in den System-Prompt geladen, wenn sie relevant sind. Der Agent prueft das `skills/`-Verzeichnis und laedt Skills, die zum aktuellen Gespraechsthema passen.
+
+## Kontextmanagement: Summarization + Persistenz
+
+Die Architektur kombiniert zwei Strategien:
+
+**Kurzzeit: Summarization-Prozessor** - komprimiert automatisch aeltere Nachrichten, wenn der Kontext voll wird:
+
+```python
+from pydantic_ai_summarization import create_summarization_processor
+
+summarization_processor = create_summarization_processor(
+    trigger=("fraction", 0.8),  # At 80% of context
+    keep=("messages", 20),       # Keep last 20 messages
+    max_input_tokens=128000,
+)
+```
+
+**Langzeit: Dateibasierter Speicher** - der Agent schreibt wichtige Fakten in Markdown-Dateien:
+
+```python
+# When user says "My name is Kacper"
+# Agent immediately calls:
+edit_file("knowledge/user.md", old_string="", new_string="Name: Kacper\n")
+```
+
+Der Kurzzeit-Kontext (aktuelle Nachrichten) wird automatisch verwaltet. Das Langzeitgedaechtnis (Benutzerpraeferenzen, Projektdetails) wird vom Agenten bewusst verwaltet.
+
+## Verlaufssuche: Finden ohne Laden
+
+Fuer Konversationen, die Hunderte von Nachrichten umfassen, bieten wir ein Such-Tool, das die Datenbank abfragt, ohne alles in den Kontext zu laden:
+
+```python
+@toolset.tool
+async def search_history(query: str, limit: int = 10, role: str = None) -> str:
+    """Search conversation history for past messages.
+
+    The most recent 10 messages are already in your context.
+    Use this for older messages or specific searches.
+    """
+    messages = await conversation_repo.search_messages(
+        db, conversation_id, query,
+        limit=min(max(1, limit), 50),
+        role=role,
+    )
+
+    if not messages:
+        return f"No messages found matching '{query}'"
+
+    results = []
+    for msg in messages:
+        timestamp = msg.created_at.strftime("%Y-%m-%d %H:%M")
+        content = msg.content[:500] + "..." if len(msg.content) > 500 else msg.content
+        results.append(f"[{timestamp}] {msg.role.capitalize()}: {content}")
+
+    return f"Found {len(messages)} message(s):\n\n" + "\n\n".join(results)
+```
+
+Der Agent kann nach "Python tutorials" in alten Nachrichten suchen, ohne den gesamten Konversationsverlauf zu laden. Ergebnisse werden auf 500 Zeichen gekuerzt, um Kontext-Aufblaehung zu vermeiden.
+
+## Das Muster: Selektives Erinnern > Totale Erinnerung
+
+Hier ist das Framework:
+
+1. **Kontextfenster** (10-20 Nachrichten): Aktuelle Konversation, automatisch durch Summarization verwaltet
+2. **Persistenter Speicher** (Dateien): Wichtige Fakten, bewusst vom Agenten gespeichert
+3. **Verlaufssuche** (Datenbank): Durchsuchbares Archiv fuer seltene Abfragen
+4. **Skills** (Dateien): Erlernte Workflows, bei Bedarf geladen
+
+Jede Schicht behandelt unterschiedliche Aufbewahrungsbeduerfnisse. Du bettest nicht jede Nachricht in eine Vektordatenbank ein. Du speicherst nicht jeden Fakt in einem Knowledge-Graph. Du laesst den Agenten entscheiden, was wichtig ist - genau wie das menschliche Gedaechtnis.
+
+## Wichtigste Erkenntnisse
+
+- **Weniger speichern, besser erinnern.** Die meisten Memory-Systeme speichern alles und rufen schlecht ab. Selektives, bewusstes Erinnern schlaegt totale Erinnerung jedes Mal.
+- **Dem Agenten seine eigenen Grenzen beibringen.** Der System-Prompt muss explizit sagen "dein Kontext umfasst 10 Nachrichten." Ohne das geht der Agent davon aus, dass er sich an alles erinnert.
+- **"Sofort speichern" ist die entscheidende Regel.** Wenn der Agent Informationen nicht in dem Moment speichert, in dem er sie lernt, gehen die Informationen verloren, wenn sich der Kontext verschiebt. Es gibt keine zweite Chance.
+- **Dateibasierter Speicher ist einfach und debugbar.** Du kannst die Memory-Dateien des Agenten lesen. Du kannst sie bearbeiten. Du kannst sie mit git versionieren. Versuch das mal mit einer Vektordatenbank.
+- **Kurzzeitgedaechtnis und Langzeitgedaechtnis kombinieren.** Summarization behandelt den aktuellen Kontext. Dateibasierter Speicher behandelt persistentes Wissen. Verlaufssuche behandelt seltene Abfragen. Jede Schicht dient einem anderen Zweck.
+
+## Probiere es selbst aus
+
+[memv](https://github.com/vstorm-co/memv) - Persistentes Memory-System fuer AI-Agenten mit strukturiertem Dateispeicher und selektiver Aufbewahrung.
+
+```
+pip install memvee
+```

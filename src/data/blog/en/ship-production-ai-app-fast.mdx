@@ -1,0 +1,299 @@
+---
+title: "Ship a Production AI App in 5 Minutes: FastAPI + Next.js + 20 Integrations"
+description: "One CLI command, one production-ready stack: JWT auth, WebSocket streaming, Pydantic AI agents, PostgreSQL, Redis, Docker, and 20+ more integrations out of the box."
+pubDate: 2026-02-18
+author: "Vstorm"
+lang: en
+translationKey: ship-production-ai-app-fast
+tags: ["fastapi", "nextjs", "pydantic-ai", "python", "ai-template", "docker"]
+category: tutorial
+draft: false
+---
+
+You're starting a new AI project. You need a FastAPI backend with auth, a Next.js frontend with streaming chat, WebSocket support, database migrations, Redis caching, Docker deployment, and a Pydantic AI agent with tool support.
+
+You open a blank directory. Two weeks later, you've wired up 15 libraries, fixed 30 configuration issues, and written zero business logic.
+
+## TL;DR
+
+- **`fastapi-fullstack create my_app`** generates a complete production stack -- FastAPI backend, Next.js frontend, Docker, CI/CD -- in one command.
+- **20+ integrations out of the box:** Pydantic AI, LangChain, JWT auth, PostgreSQL, Redis, WebSocket streaming, Logfire, Sentry, Celery, Kubernetes, and more.
+- **Presets match common architectures:** `--preset ai-agent` for AI chat apps, `--preset production` for enterprise deployments, or pick individual options.
+- **The CLI generates complete, runnable projects** -- not empty files with TODO comments. Tests pass, Docker builds, the server starts.
+- **Everything is swappable.** Start with SQLite, switch to PostgreSQL. Start with Pydantic AI, add LangChain. The architecture supports incremental migration.
+
+We've done this dance too many times. After the tenth project where we copied the same auth system, the same WebSocket handler, the same Docker Compose setup, and the same CI pipeline, we built a template. Then we turned it into a CLI tool.
+
+`fastapi-fullstack create my_app` -- and you get the entire stack, configured, tested, and ready to deploy.
+
+## The CLI: One Command, Full Stack
+
+```bash
+pip install fastapi-fullstack
+fastapi-fullstack create my_app --preset ai-agent
+```
+
+That generates a complete project with:
+
+**Backend:** FastAPI + Pydantic AI agent + WebSocket streaming + JWT auth + PostgreSQL + Redis + Alembic migrations + rate limiting + admin panel + Logfire observability
+
+**Frontend:** Next.js 15 + React 19 + TypeScript + Tailwind CSS v4 + Zustand + TanStack Query + WebSocket chat UI + dark mode
+
+**DevOps:** Docker + Docker Compose + multi-stage builds + health checks + Makefile
+
+## What's in the Box: 20+ Integrations
+
+| Category             | Integration        | Out-of-Box? |
+| -------------------- | ------------------ | ----------- |
+| **AI Frameworks**    | Pydantic AI        | Yes         |
+|                      | LangChain          | Yes         |
+|                      | LangGraph          | Yes         |
+|                      | DeepAgents         | Yes         |
+| **LLM Providers**    | OpenAI             | Yes         |
+|                      | Anthropic          | Yes         |
+|                      | OpenRouter         | Yes         |
+| **Auth**             | JWT                | Yes         |
+|                      | API Keys           | Yes         |
+|                      | OAuth2 (Google)    | Optional    |
+| **Database**         | PostgreSQL (async) | Yes         |
+|                      | SQLite             | Yes         |
+| **Caching**          | Redis              | Optional    |
+|                      | fastapi-cache2     | Optional    |
+| **Rate Limiting**    | slowapi            | Optional    |
+| **Admin**            | SQLAdmin           | Optional    |
+| **Observability**    | Logfire            | Yes         |
+|                      | Sentry             | Optional    |
+|                      | Prometheus         | Optional    |
+| **Background Tasks** | Celery             | Optional    |
+|                      | Taskiq             | Optional    |
+| **WebSockets**       | Streaming chat     | Optional    |
+| **DevOps**           | Docker             | Yes         |
+|                      | Kubernetes         | Optional    |
+|                      | GitHub Actions     | Optional    |
+
+## Presets: Pick Your Stack
+
+```bash
+# Production -- everything you need
+fastapi-fullstack create my_app --preset production
+
+# AI Agent -- optimized for agent apps
+fastapi-fullstack create my_app --preset ai-agent
+
+# Custom -- pick exactly what you want
+fastapi-fullstack create my_app \
+  --database postgresql \
+  --auth jwt \
+  --ai-framework pydantic_ai \
+  --llm-provider openai \
+  --redis \
+  --websockets \
+  --admin-panel \
+  --sentry
+```
+
+The `ai-agent` preset gives you PostgreSQL, WebSocket streaming, conversation persistence, and a fully configured Pydantic AI agent with tool support.
+
+## The AI Agent: Pydantic AI with Streaming
+
+The generated agent is production-ready with dependency injection and tool support:
+
+```python
+@dataclass
+class Deps:
+    user_id: str | None = None
+    user_name: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
+
+
+class AssistantAgent:
+    def __init__(self, model_name=None, temperature=None, system_prompt=None):
+        self.model_name = model_name or settings.AI_MODEL
+        self.temperature = temperature or settings.AI_TEMPERATURE
+        self.system_prompt = system_prompt or DEFAULT_SYSTEM_PROMPT
+
+    def _create_agent(self) -> Agent[Deps, str]:
+        model = OpenAIChatModel(
+            self.model_name,
+            provider=OpenAIProvider(api_key=settings.OPENAI_API_KEY),
+        )
+
+        agent = Agent[Deps, str](
+            model=model,
+            model_settings=ModelSettings(temperature=self.temperature),
+            system_prompt=self.system_prompt,
+        )
+        self._register_tools(agent)
+        return agent
+
+    def _register_tools(self, agent):
+        @agent.tool
+        async def current_datetime(ctx: RunContext[Deps]) -> str:
+            """Get the current date and time."""
+            return get_current_datetime()
+
+```
+
+Add your own tools by extending `_register_tools()`. The agent uses the deps pattern -- user context flows through `RunContext[Deps]` to every tool call.
+
+## WebSocket Streaming: Token by Token
+
+The WebSocket endpoint streams agent responses in real-time:
+
+```python
+@router.websocket("/ws/chat")
+async def chat_websocket(websocket: WebSocket, user = Depends(get_current_user_ws)):
+    await manager.connect(websocket)
+    conversation_history = []
+
+    try:
+        while True:
+            data = await websocket.receive_json()
+            user_message = data.get("message", "")
+
+            async with agent.iter(
+                user_message,
+                deps=deps,
+                message_history=model_history,
+            ) as agent_run:
+                async for node in agent_run:
+                    if Agent.is_model_request_node(node):
+                        async with node.stream(agent_run.ctx) as stream:
+                            async for event in stream:
+                                if isinstance(event, PartDeltaEvent):
+                                    await manager.send_event(
+                                        websocket, "text_delta",
+                                        {"content": event.delta.content_delta},
+                                    )
+
+                    elif Agent.is_call_tools_node(node):
+                        async with node.stream(agent_run.ctx) as stream:
+                            async for event in stream:
+                                if isinstance(event, FunctionToolCallEvent):
+                                    await manager.send_event(
+                                        websocket, "tool_call",
+                                        {"tool_name": event.part.tool_name},
+                                    )
+
+            await manager.send_event(websocket, "complete", {})
+
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+```
+
+The frontend receives `text_delta`, `tool_call`, `tool_result`, and `complete` events. Text deltas are rendered token-by-token. Tool calls show a visual indicator. It's the same streaming UX you see in ChatGPT.
+
+## JWT Authentication: Login, Register, Refresh
+
+The auth system is complete -- not a stub:
+
+```python
+@router.post("/login", response_model=Token)
+async def login(
+    form_data: OAuth2PasswordRequestForm,
+    user_service: UserSvc,
+    session_service: SessionSvc,
+):
+    user = await user_service.authenticate(
+        form_data.username, form_data.password
+    )
+    access_token = create_access_token(subject=str(user.id))
+    refresh_token = create_refresh_token(subject=str(user.id))
+
+    await session_service.create_session(
+        user_id=user.id,
+        refresh_token=refresh_token,
+    )
+    return Token(
+        access_token=access_token,
+        refresh_token=refresh_token,
+    )
+```
+
+Bcrypt password hashing. JWT access tokens (30 min). Refresh tokens (7 days). Session tracking. The frontend handles auto-refresh transparently.
+
+## Django-Style CLI Commands
+
+The generated project includes a management CLI:
+
+```bash
+# Server
+uv run my_app server run --reload
+uv run my_app server routes
+
+# Database
+uv run my_app db migrate -m "Add users table"
+uv run my_app db upgrade
+
+# Users
+uv run my_app user create-admin --email admin@example.com
+
+# Celery
+uv run my_app celery worker
+uv run my_app celery beat
+```
+
+Plus a Makefile for common operations:
+
+```bash
+make install       # Install dependencies
+make run           # Start dev server
+make db-migrate    # Create migration
+make db-upgrade    # Apply migrations
+make docker-up     # Start all services
+make test          # Run tests
+```
+
+## Docker: Multi-Stage Production Builds
+
+The generated Dockerfile uses multi-stage builds for minimal image size:
+
+```dockerfile
+# Build stage
+FROM python:3.12-slim AS builder
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-project --no-dev
+
+# Runtime stage
+FROM python:3.12-slim
+COPY --from=builder /app/.venv /app/.venv
+RUN adduser --disabled-password appuser
+USER appuser
+
+HEALTHCHECK --interval=30s --timeout=10s \
+    CMD python -c "import httpx; httpx.get('http://localhost:8000/api/v1/health')"
+```
+
+Non-root user. Health checks. Build cache for fast rebuilds. The Docker Compose file wires up PostgreSQL, Redis, Celery worker, Celery beat, and Flower monitoring.
+
+## Frontend: Next.js 15 + React 19
+
+The frontend is a modern Next.js setup:
+
+- **Zustand** for state management
+- **TanStack Query** for API data fetching
+- **WebSocket chat UI** with token-by-token streaming
+- **JWT auth** with auto-refresh
+- **Dark mode** out of the box
+- **Tailwind CSS v4** for styling
+- **Playwright** for e2e tests
+
+## Key Takeaways
+
+- **Don't build boilerplate.** JWT auth, WebSocket streaming, Docker configs, CI pipelines -- these are solved problems. Use a template that gets them right so you can focus on business logic.
+- **Presets match common architectures.** `--preset ai-agent` gives you exactly what AI chat apps need. `--preset production` adds enterprise integrations.
+- **The CLI generates, not scaffolds.** You get a complete, runnable project -- not empty files with TODO comments. Tests pass. Docker builds. The server starts.
+- **Everything is swappable.** Start with SQLite, switch to PostgreSQL. Start with Pydantic AI, add LangChain. The architecture supports incremental migration.
+- **Real projects taught us what's needed.** This template isn't theoretical -- it's extracted from production deployments. Every integration is there because a client needed it.
+
+## Try It Yourself
+
+[full-stack-fastapi-nextjs-llm-template](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template) -- Production-ready project generator for AI/LLM applications with FastAPI + Next.js + 20+ integrations.
+
+```bash
+pip install fastapi-fullstack
+fastapi-fullstack create my_app --preset ai-agent
+```

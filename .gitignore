@@ -7,7 +7,6 @@ dist/
 
 # Environment
 .env
-.env.*
 
 # OS
 .DS_Store

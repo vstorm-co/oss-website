@@ -11,6 +11,7 @@ interface Alternate {
 interface Props {
   title: string;
   description?: string;
+  keywords?: string;
   lang?: string;
   alternates?: Alternate[];
   jsonLd?: Record<string, unknown>;
@@ -18,7 +19,8 @@ interface Props {
 
 const {
   title,
-  description = "Open-source tools for building production AI agents with Python. 13 packages for the Pydantic AI ecosystem. By Vstorm.",
+  description = "Open-source tools for building production AI agents with Python. 20 repos, 1,270+ stars, 285K+ PyPI downloads. By Vstorm.",
+  keywords: keywordsOverride,
   lang = "en",
   alternates = [],
   jsonLd: jsonLdOverride,
@@ -30,7 +32,7 @@ const siteUrl = Astro.site?.origin ?? "https://oss.vstorm.co";
 const canonicalURL = new URL(Astro.url.pathname, siteUrl).href;
 const ogImageURL = new URL(`${base}og-image.png`, siteUrl).href;
 
-const keywords = "pydantic ai, ai agents, python, fastapi, langchain, langgraph, crewai, deepagents, llm, open source, vstorm, template, middleware, subagents";
+const keywords = keywordsOverride ?? "pydantic ai, ai agents, python, fastapi, langchain, langgraph, crewai, deepagents, llm, open source, vstorm, template, middleware, subagents";
 
 const defaultJsonLd = {
   "@context": "https://schema.org",

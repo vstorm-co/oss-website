@@ -14,6 +14,14 @@ draft: false
 
 Elegir un framework de agentes de IA no es solo una decisión técnica — determina tu velocidad de desarrollo, experiencia de depuración y fiabilidad en producción durante meses. Después de construir más de 30 sistemas de agentes de IA en producción, hemos utilizado tanto Pydantic AI como LangChain ampliamente. Esto es lo que hemos aprendido.
 
+## TL;DR
+
+- **Pydantic AI gana en seguridad de tipos y developer experience.** Validacion completa con Pydantic v2, streaming async nativo y dependency injection integrado - se siente como escribir Python normal.
+- **LangChain gana en amplitud del ecosistema.** 70+ proveedores LLM, cientos de integraciones y una comunidad masiva - dificil de superar para prototipado rapido.
+- **Para agentes en produccion, Pydantic AI tiene menos trampas.** Los outputs estructurados se validan en tiempo de compilacion, no en runtime. Dependency injection reemplaza el estado global.
+- **Las capas de abstraccion de LangChain anaden complejidad.** Chains, runnables, LCEL - la curva de aprendizaje es pronunciada y debuggear a traves de las capas es doloroso.
+- **Nuestra recomendacion: Pydantic AI para proyectos nuevos, LangChain si necesitas una integracion especifica** que Pydantic AI aun no soporta.
+
 ## Resumen rápido
 
 | Característica | Pydantic AI | LangChain |

@@ -1,0 +1,261 @@
+---
+title: "Observability for AI Agents Is Broken. Here's What We Built Instead."
+description: "Standard dashboards don't work for LLM traces. We built an AI assistant that lets you ask questions about your agent's behavior in plain English - natural language to SQL queries against Logfire data."
+pubDate: 2026-02-19
+author: "Vstorm"
+lang: en
+translationKey: ai-agent-observability
+tags: ["ai-agents", "observability", "logfire", "pydantic-ai", "python", "monitoring"]
+category: guide
+draft: false
+---
+
+You deploy an AI agent to production. It starts making weird decisions. Customer says "the agent told me the wrong price." You open your observability dashboard and see... 50,000 spans. Nested traces. Tool calls inside tool calls. Token counts. Latencies. An ocean of data with no obvious way to find what went wrong.
+
+## TL;DR
+
+- **Standard dashboards fail for AI agents** - LLM traces are nested, branching, and context-dependent. HTTP-style observability doesn't cut it.
+- **Natural language to SQL is the right abstraction** - ask "why did the agent do X" and get the SQL answer automatically via an AI-powered Logfire assistant.
+- **A Chrome extension injects trace context** - no copy-pasting trace IDs. The assistant already knows which trace you're looking at.
+- **Multi-span selection enables comparative analysis** - select multiple spans and compare token usage, latency, or tool call patterns.
+- **File-based memory + structured queries beat dashboards** - the goal is answering "what went wrong?" in natural language, not building more charts.
+
+## The State of AI Agent Observability
+
+This is the state of AI agent observability in 2026. The tools are built for web services - request/response, HTTP status codes, error rates. But AI agents don't follow request/response patterns. They loop, they branch, they call tools that call other tools. A single user message can spawn 15 spans across 3 sub-agents.
+
+We've instrumented every production agent we've built at Vstorm using Pydantic Logfire. Logfire is excellent at capturing the data - every LLM call, every tool invocation, every token. But querying that data with SQL dashboards is like reading assembly code. You need a translation layer.
+
+So we built one: an AI-powered Logfire assistant that translates natural language questions into SQL queries against your Logfire data.
+
+## The Problem: SQL Is Not How You Debug Agents
+
+Logfire stores everything in a SQL-queryable format. You *can* write:
+
+```sql
+SELECT span_name, duration, attributes
+FROM records
+WHERE trace_id = '0af7651916cd43dd8448eb211c80319c'
+  AND span_name LIKE '%tool_call%'
+ORDER BY start_timestamp;
+```
+
+But when you're debugging "why did the agent recommend the wrong product," you don't want to write SQL. You want to ask: "Show me all tool calls in the last hour where the agent called the pricing tool with incorrect parameters."
+
+That's exactly what our Logfire assistant does. Natural language in, SQL queries out, results formatted as tables or charts.
+
+## Architecture: NL to SQL to Charts
+
+The assistant is a Pydantic AI agent with access to Logfire's query API:
+
+```python
+class LogfireAgent:
+    def __init__(self):
+        self.agent = Agent(
+            model=model,
+            system_prompt=self._build_system_prompt(),
+        )
+
+    def _build_system_prompt(self):
+        return f"""You are a Logfire data analyst.
+
+You have access to the Logfire database with these tables:
+{schema}
+
+Current environment: {environment}
+Time range: {time_range}
+
+When the user asks about their agent's behavior:
+1. Translate their question into SQL
+2. Execute the query against Logfire
+3. Format results clearly
+4. Generate chart specs if appropriate
+"""
+```
+
+The system prompt is dynamically built with the actual database schema, current environment, and selected time range. This ensures the agent writes valid SQL against the real table structure.
+
+## Dynamic Context Injection
+
+The key to making this work is context. The agent needs to know:
+
+- **What schema is available** - fetched from Logfire's `/v1/schemas` endpoint
+- **What environments exist** - queried from `deployment_environment` in the records table
+- **What time range to query** - configurable, with smart defaults
+- **What trace the user is looking at** - injected from the browser extension
+
+```python
+async def get_schema(self) -> str:
+    """Fetch database schema from Logfire API."""
+    async with AsyncLogfireQueryClient(
+        read_token=token,
+        base_url=self.base_url,
+    ) as client:
+        response = await client.client.get("/v1/schemas")
+        schema_data = response.json()
+        return schema_to_sql(schema_data)
+
+async def get_environments(self, days: int = 7) -> list[str]:
+    """Query distinct deployment environments."""
+    sql = f"""
+        SELECT DISTINCT deployment_environment
+        FROM records
+        WHERE start_timestamp >= now() - INTERVAL '{days} days'
+          AND deployment_environment IS NOT NULL
+        ORDER BY deployment_environment
+    """
+    # Execute and cache...
+```
+
+## SQL Validation: Safety First
+
+Every SQL query the agent generates goes through validation before execution. The validator ensures:
+
+- No write operations (INSERT, UPDATE, DELETE, DROP)
+- No dangerous functions
+- Queries stay within the user's project scope
+- Time ranges are respected
+
+This is critical because the agent has read access to production observability data. A hallucinated `DELETE` query could wipe trace data.
+
+## The Chrome Extension: Context-Aware Debugging
+
+The most powerful feature is the Chrome extension. When you're viewing a trace in Logfire's web UI, the extension:
+
+1. Detects you're on a Logfire page
+2. Extracts the current trace ID and span context from the URL
+3. Opens a sidebar panel with the AI assistant
+4. Injects the trace context into the agent's system prompt
+
+```typescript
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  const isLogfirePage =
+    tab.url.includes('logfire.pydantic.dev') ||
+    tab.url.includes('logfire-us.pydantic.dev');
+
+  if (isLogfirePage && (changeInfo.url || changeInfo.status === 'complete')) {
+    const context = extractLogfireContext(tab.url);
+    if (context) {
+      await chrome.storage.local.set({
+        [`context_${tabId}`]: context,
+      });
+      chrome.runtime.sendMessage({
+        type: 'CONTEXT_UPDATED',
+        tabId,
+        context,
+      });
+    }
+  }
+});
+```
+
+Now when you ask "why did this tool call fail?", the agent already knows which trace you're looking at. No copy-pasting trace IDs.
+
+## Multi-Span Selection
+
+The extension supports selecting multiple spans in the Logfire UI for comparative analysis:
+
+```typescript
+if (message.type === 'SPAN_CONTEXT_TOGGLED') {
+  const contexts = result[`spanContexts_${tabId}`] || [];
+  const spanContext = message.spanContext;
+
+  let newContexts;
+  if (message.selected) {
+    newContexts = [...contexts, spanContext];
+  } else {
+    newContexts = contexts.filter(c => c.spanId !== spanContext.spanId);
+  }
+
+  chrome.storage.local.set({ [`spanContexts_${tabId}`]: newContexts });
+}
+```
+
+Select 3 spans, ask "compare the token usage across these three agent runs" - the assistant has all the context.
+
+## WebSocket Streaming with Tool Visualization
+
+The backend streams responses via WebSocket, including tool call events:
+
+```python
+async with logfire_agent.agent.iter(
+    user_message,
+    deps=deps,
+    message_history=model_history,
+) as agent_run:
+    async for node in agent_run:
+        if Agent.is_model_request_node(node):
+            async with node.stream(agent_run.ctx) as stream:
+                async for event in stream:
+                    if isinstance(event, PartDeltaEvent):
+                        await manager.send_event(
+                            websocket, "text_delta",
+                            {"content": event.delta.content_delta},
+                        )
+
+        elif Agent.is_call_tools_node(node):
+            async with node.stream(agent_run.ctx) as stream:
+                async for event in stream:
+                    if isinstance(event, FunctionToolCallEvent):
+                        await manager.send_event(
+                            websocket, "tool_call",
+                            {"tool_name": event.part.tool_name,
+                             "args": args_value},
+                        )
+                    elif isinstance(event, FunctionToolResultEvent):
+                        await manager.send_event(
+                            websocket, "tool_result",
+                            {"result": str(event.result.content)},
+                        )
+```
+
+The frontend shows: text streaming token-by-token, SQL queries being constructed, query results in formatted tables, and chart specifications that render interactively.
+
+## Multi-Provider LLM Support
+
+The assistant supports multiple LLM providers out of the box:
+
+```python
+class LLMProvider(str, Enum):
+    OPENAI = "openai"
+    OPENROUTER = "openrouter"
+    PYDANTIC_AI_GATEWAY = "pydantic_ai_gateway"
+
+def get_default_model(has_openai, has_openrouter, has_gateway) -> ModelInfo | None:
+    """Get default model. Priority: Gateway Claude > OpenRouter Claude > OpenAI GPT.
+    Returns a ModelInfo object with model ID, provider, and display name."""
+    if has_gateway:
+        return _MODEL_BY_ID.get(DEFAULT_GATEWAY_MODEL_ID)
+    if has_openrouter:
+        return _MODEL_BY_ID.get(DEFAULT_OPENROUTER_MODEL_ID)
+    if has_openai:
+        return _MODEL_BY_ID.get(DEFAULT_OPENAI_MODEL_ID)
+    return None
+```
+
+Users configure their API keys in the settings panel. The system auto-selects the best available model.
+
+## What Questions Can You Ask?
+
+Here are real questions we use daily to debug our production agents:
+
+- "Show me the slowest agent runs in the last hour"
+- "How many tokens did we spend on tool calls vs. completions today?"
+- "Find all runs where the agent called the same tool more than 5 times"
+- "What's the error rate for the pricing tool this week?"
+- "Compare latency between GPT-4o and Claude for the same task type"
+- "Show me all runs where the agent exceeded 100k tokens"
+
+Each question gets translated to SQL, executed against Logfire, and returned as a formatted table or chart.
+
+## Key Takeaways
+
+- **Standard dashboards fail for AI agents.** LLM traces are nested, branching, and context-dependent. You need a query interface that understands agent patterns, not just HTTP status codes.
+- **Natural language to SQL is the right abstraction.** Your Logfire data is already SQL-queryable. The AI assistant bridges the gap between "why did the agent do X" and the SQL needed to answer that.
+- **Browser context makes debugging effortless.** The Chrome extension injects the current trace into the assistant's context. No copy-pasting. No context switching.
+- **Multi-span selection enables comparative analysis.** Select multiple spans and ask the assistant to compare them - token usage, latency, tool call patterns.
+- **This is observability for humans, not dashboards.** The goal isn't more charts. It's answering "what went wrong?" in natural language.
+
+## Try It Yourself
+
+[logfire-assistant](https://github.com/vstorm-co/logfire-assistant) - AI-powered Logfire assistant with natural language to SQL queries, Chrome extension, and multi-span analysis.

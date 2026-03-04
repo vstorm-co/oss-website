@@ -1,0 +1,249 @@
+---
+title: "Why Your AI Agent Remembers Too Much (And How to Fix It)"
+description: "Every memory system stores garbage. Here's how we solved it with file-based persistent memory, context window limits, and a save immediately or lose it philosophy."
+pubDate: 2026-02-20
+author: "Vstorm"
+lang: en
+translationKey: ai-agent-selective-memory
+tags: ["ai-agents", "memory", "memv", "pydantic-ai", "python"]
+category: guide
+draft: false
+---
+
+We tried 4 different memory systems for our AI agents. All of them stored too much garbage.
+
+Vector databases saved every message - including "yes," "ok," and "can you repeat that?" Conversation logs grew to megabytes of noise. RAG retrieval returned 10 irrelevant snippets for every useful one. And the token cost of embedding everything was absurd.
+
+## TL;DR
+
+- **Store less, remember better** - most memory systems store everything and retrieve badly. Selective, intentional memory beats total recall every time.
+- **Teach the agent about its own limitations** - the system prompt must explicitly say "your context holds 10 messages." Without this, the agent assumes it remembers everything.
+- **"Save immediately" is the critical rule** - if the agent doesn't save information the moment it learns it, the information is lost when context shifts. No second chance.
+- **File-based memory is simple and debuggable** - you can read, edit, and version the agent's memory files with git. Try doing that with a vector database.
+- **Combine short-term and long-term strategies** - summarization handles recent context, file-based memory handles persistent knowledge, history search handles rare lookups.
+
+## The Fundamental Problem
+
+The fundamental problem: most AI memory systems are designed to *remember everything*. But the best human memory works by *forgetting almost everything* and keeping only what matters.
+
+After years of production agent work at Vstorm, we converged on a different approach. Instead of storing every message in a vector database, we give the agent a structured file system for persistent memory - and teach it to decide *what's worth saving*.
+
+## The Problem: Context Windows Are Finite
+
+Here's a fact that most agent architectures ignore: your context window only holds the last ~10-20 messages. Everything before that is gone - unless you explicitly save it somewhere.
+
+A typical production setup:
+- Context window: 128k tokens (GPT-4o) or 200k tokens (Claude)
+- Average message: ~500 tokens (with tool calls)
+- Effective capacity: ~50-100 messages before context management kicks in
+- With summarization: ~20 recent messages + a compressed summary
+
+After 50 exchanges, your agent doesn't remember the user's name from message #3. Not because it's dumb - because the information literally isn't in the context anymore.
+
+## The Solution: Structured File-Based Memory
+
+Instead of dumping everything into a vector database, we give the agent a file system organized by purpose:
+
+```
+/memory/
+├── AGENTS.md              # Core instructions, learned behaviors
+├── knowledge/
+│   ├── user.md            # User's name, preferences, timezone
+│   ├── projects/
+│   │   └── api-project.md # Project-specific context
+│   └── tech-stack.md      # Preferred technologies
+├── skills/
+│   ├── task-planning.md   # How to plan complex tasks
+│   └── code-review.md     # How to review code
+└── conversations/
+    └── summaries/         # Summaries of important past conversations
+```
+
+The agent reads these files at the start of each conversation and updates them when it learns something new. It's not automatic storage - it's intentional memory management.
+
+## The "Save Immediately" Rule
+
+The critical instruction in the agent's system prompt:
+
+```python
+system_prompt = f"""
+## CRITICAL: Context Window Limitations
+
+**Your context window only holds the last 10 messages.** This means:
+- Information shared earlier in the conversation WILL BE LOST
+- User preferences, names, project details - all forgotten after ~10 exchanges
+- You MUST proactively save important information to your persistent memory
+
+**When to save to memory (DO THIS IMMEDIATELY):**
+- User tells you their name → Save to knowledge/user.md
+- User shares preferences → Save to AGENTS.md under "User Preferences"
+- User describes a project → Save to knowledge/projects/
+- User corrects you → Update relevant memory file
+- Important facts → Save to knowledge/
+
+**Example:** If user says "My name is Kacper", IMMEDIATELY:
+1. Acknowledge: "Nice to meet you, Kacper!"
+2. Save to memory: edit_file("knowledge/user.md", ...)
+"""
+```
+
+The key insight: don't save everything. Save only what you'd need if you lost the entire conversation. The agent makes this decision - not a heuristic, not an embedding, not a vector similarity threshold. The LLM itself decides what's worth remembering.
+
+## Startup Routine: Read Before You Respond
+
+Every conversation starts with a memory load:
+
+```python
+# Agent's startup routine (from system prompt):
+# 1. Read AGENTS.md to recall your instructions
+# 2. Read knowledge/user.md to remember the user
+# 3. Check if skills/ has relevant skills for this topic
+```
+
+This is cheap - reading 3-4 small markdown files costs a few hundred tokens. But it means the agent knows who it's talking to, what projects they're working on, and how they prefer to communicate.
+
+## AGENTS.md: The Agent's Core Memory
+
+The `AGENTS.md` file serves as the agent's identity and learned behaviors:
+
+```markdown
+# Winston - Core Instructions
+
+## Identity
+You are Winston, an autonomous AI assistant.
+
+## Critical Behaviors
+
+### Memory Management
+- Your context window is LIMITED to ~10 messages
+- Important information WILL BE LOST if not saved
+- When user shares personal info → SAVE IMMEDIATELY
+
+### Proactive Learning
+When you learn something new about the user:
+1. Acknowledge what you learned
+2. Save to appropriate memory file
+3. Confirm: "I've noted that for future reference."
+
+## User Preferences
+- Language: User may speak Polish or English - match their language
+- Code style: Prefers explicit over clever
+```
+
+This file grows organically. When the agent learns that the user prefers TypeScript over JavaScript, it updates the User Preferences section. When it makes a mistake and gets corrected, it adds a "Learned Behaviors" entry.
+
+## Skills: Reusable Workflows
+
+Skills are markdown files that teach the agent specific patterns:
+
+```markdown
+# Task Planning Skill
+
+**Trigger**: User gives a complex task or asks to "implement", "build", "create"
+
+## Before Starting ANY Complex Task
+
+### 1. Understand the Goal
+- What is the desired end state?
+- What problem does this solve?
+- What are the constraints?
+
+### 2. Break Down the Task
+**Bad**: "Build a login system"
+**Good**:
+1. Create user model with email/password
+2. Implement password hashing
+3. Create login endpoint
+4. Add JWT token generation
+5. Write tests for each component
+
+### 3. Create a Todo List
+Use write_todos to track the plan...
+```
+
+Skills are loaded into the system prompt when relevant. The agent checks the `skills/` directory and loads skills that match the current conversation topic.
+
+## Context Management: Summarization + Persistence
+
+The architecture combines two strategies:
+
+**Short-term: Summarization processor** - automatically compresses older messages when context fills up:
+
+```python
+from pydantic_ai_summarization import create_summarization_processor
+
+summarization_processor = create_summarization_processor(
+    trigger=("fraction", 0.8),  # At 80% of context
+    keep=("messages", 20),       # Keep last 20 messages
+    max_input_tokens=128000,
+)
+```
+
+**Long-term: File-based memory** - the agent writes important facts to markdown files:
+
+```python
+# When user says "My name is Kacper"
+# Agent immediately calls:
+edit_file("knowledge/user.md", old_string="", new_string="Name: Kacper\n")
+```
+
+Short-term context (recent messages) is managed automatically. Long-term memory (user preferences, project details) is managed intentionally by the agent.
+
+## History Search: Find Without Loading
+
+For conversations that span hundreds of messages, we provide a search tool that queries the database without loading everything into context:
+
+```python
+@toolset.tool
+async def search_history(query: str, limit: int = 10, role: str = None) -> str:
+    """Search conversation history for past messages.
+
+    The most recent 10 messages are already in your context.
+    Use this for older messages or specific searches.
+    """
+    messages = await conversation_repo.search_messages(
+        db, conversation_id, query,
+        limit=min(max(1, limit), 50),
+        role=role,
+    )
+
+    if not messages:
+        return f"No messages found matching '{query}'"
+
+    results = []
+    for msg in messages:
+        timestamp = msg.created_at.strftime("%Y-%m-%d %H:%M")
+        content = msg.content[:500] + "..." if len(msg.content) > 500 else msg.content
+        results.append(f"[{timestamp}] {msg.role.capitalize()}: {content}")
+
+    return f"Found {len(messages)} message(s):\n\n" + "\n\n".join(results)
+```
+
+The agent can search for "Python tutorials" in old messages without loading the entire conversation history. Results are truncated to 500 characters to avoid context bloat.
+
+## The Pattern: Selective Memory > Total Recall
+
+Here's the framework:
+
+1. **Context Window** (10-20 messages): Recent conversation, managed automatically by summarization
+2. **Persistent Memory** (files): Important facts saved intentionally by the agent
+3. **History Search** (database): Searchable archive for rare lookups
+4. **Skills** (files): Learned workflows loaded on-demand
+
+Each layer handles different retention needs. You don't embed every message into a vector database. You don't store every fact in a knowledge graph. You let the agent decide what matters - just like human memory.
+
+## Key Takeaways
+
+- **Store less, remember better.** Most memory systems store everything and retrieve badly. Selective, intentional memory beats total recall every time.
+- **Teach the agent about its own limitations.** The system prompt must explicitly say "your context holds 10 messages." Without this, the agent assumes it remembers everything.
+- **"Save immediately" is the critical rule.** If the agent doesn't save information the moment it learns it, the information will be lost when context shifts. There's no second chance.
+- **File-based memory is simple and debuggable.** You can read the agent's memory files. You can edit them. You can version them with git. Try doing that with a vector database.
+- **Combine short-term and long-term strategies.** Summarization handles recent context. File-based memory handles persistent knowledge. History search handles rare lookups. Each layer serves a different purpose.
+
+## Try It Yourself
+
+[memv](https://github.com/vstorm-co/memv) - Persistent memory system for AI agents with structured file storage and selective retention.
+
+```
+pip install memvee
+```

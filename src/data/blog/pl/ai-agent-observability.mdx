@@ -1,0 +1,261 @@
+---
+title: "Obserwowalnosc agentow AI jest zepsuta. Oto co zbudowalismy zamiast tego."
+description: "Standardowe dashboardy nie dzialaja dla sladow LLM. Zbudowalismy asystenta AI, ktory pozwala zadawac pytania o zachowanie agenta w jezyku naturalnym - zapytania w jezyku naturalnym do SQL na danych Logfire."
+pubDate: 2026-02-19
+author: "Vstorm"
+lang: pl
+translationKey: ai-agent-observability
+tags: ["ai-agents", "observability", "logfire", "pydantic-ai", "python", "monitoring"]
+category: guide
+draft: false
+---
+
+Wdrazasz agenta AI na produkcje. Zaczyna podejmowac dziwne decyzje. Klient mowi "agent podal mi zla cene." Otwierasz dashboard obserwowalnosci i widzisz... 50 000 spanow. Zagniezdzone slady. Wywolania narzedzi wewnatrz wywolan narzedzi. Liczniki tokenow. Opoznienia. Ocean danych bez oczywistego sposobu na znalezienie tego, co poszlo nie tak.
+
+## TL;DR
+
+- **Standardowe dashboardy nie dzialaja dla agentow AI** - slady LLM sa zagniezdzone, rozgaleziane i zalezne od kontekstu. Obserwowalnosc w stylu HTTP nie wystarczy.
+- **Jezyk naturalny do SQL to wlasciwa abstrakcja** - zapytaj "dlaczego agent zrobil X" i otrzymaj automatycznie odpowiedz SQL za pomoca asystenta Logfire napedzanego AI.
+- **Rozszerzenie Chrome wstrzykuje kontekst sladu** - bez kopiowania ID sladow. Asystent juz wie, na ktory slad patrzysz.
+- **Selekcja wielu spanow umozliwia analize porownawcza** - wybierz kilka spanow i porownaj zuzycie tokenow, opoznienia lub wzorce wywolan narzedzi.
+- **Pamiec plikowa + ustrukturyzowane zapytania pokonuja dashboardy** - celem jest odpowiadanie na pytanie "co poszlo nie tak?" w jezyku naturalnym, a nie budowanie kolejnych wykresow.
+
+## Stan obserwowalnosci agentow AI
+
+Tak wyglada obserwowalnosc agentow AI w 2026 roku. Narzedzia sa zbudowane dla uslug webowych - zadanie/odpowiedz, kody statusu HTTP, wskazniki bledow. Ale agenty AI nie podazaja za wzorcami zadanie/odpowiedz. Petla sie, rozgaleziaja, wywoluja narzedzia, ktore wywoluja inne narzedzia. Pojedyncza wiadomosc uzytkownika moze wygenerowac 15 spanow w 3 pod-agentach.
+
+Zinstrumentowalismy kazdego agenta produkcyjnego zbudowanego w Vstorm za pomoca Pydantic Logfire. Logfire doskonale zbiera dane - kazde wywolanie LLM, kazde wywolanie narzedzia, kazdy token. Ale odpytywanie tych danych za pomoca dashboardow SQL jest jak czytanie kodu assemblera. Potrzebujesz warstwy translacji.
+
+Wiec ja zbudowalismy: asystenta Logfire napedzanego AI, ktory tlumaczy pytania w jezyku naturalnym na zapytania SQL do danych Logfire.
+
+## Problem: SQL to nie sposob na debugowanie agentow
+
+Logfire przechowuje wszystko w formacie pozwalajacym na zapytania SQL. *Mozesz* napisac:
+
+```sql
+SELECT span_name, duration, attributes
+FROM records
+WHERE trace_id = '0af7651916cd43dd8448eb211c80319c'
+  AND span_name LIKE '%tool_call%'
+ORDER BY start_timestamp;
+```
+
+Ale kiedy debugujesz "dlaczego agent polecil zly produkt", nie chcesz pisac SQL. Chcesz zapytac: "Pokaz mi wszystkie wywolania narzedzi z ostatniej godziny, gdzie agent wywolal narzedzie cenowe z niepoprawnymi parametrami."
+
+Dokladnie to robi nasz asystent Logfire. Jezyk naturalny na wejsciu, zapytania SQL na wyjsciu, wyniki sformatowane jako tabele lub wykresy.
+
+## Architektura: NL do SQL do wykresow
+
+Asystent to agent Pydantic AI z dostepem do API zapytan Logfire:
+
+```python
+class LogfireAgent:
+    def __init__(self):
+        self.agent = Agent(
+            model=model,
+            system_prompt=self._build_system_prompt(),
+        )
+
+    def _build_system_prompt(self):
+        return f"""You are a Logfire data analyst.
+
+You have access to the Logfire database with these tables:
+{schema}
+
+Current environment: {environment}
+Time range: {time_range}
+
+When the user asks about their agent's behavior:
+1. Translate their question into SQL
+2. Execute the query against Logfire
+3. Format results clearly
+4. Generate chart specs if appropriate
+"""
+```
+
+Prompt systemowy jest dynamicznie budowany z rzeczywistym schematem bazy danych, biezacym srodowiskiem i wybranym zakresem czasu. Zapewnia to, ze agent pisze prawidlowy SQL na rzeczywistej strukturze tabel.
+
+## Dynamiczne wstrzykiwanie kontekstu
+
+Kluczem do dzialania jest kontekst. Agent musi wiedziec:
+
+- **Jaki schemat jest dostepny** - pobierany z endpointu `/v1/schemas` Logfire
+- **Jakie srodowiska istnieja** - zapytanie z `deployment_environment` w tabeli rekordow
+- **Jaki zakres czasu odpytywac** - konfigurowalne, z inteligentnymi domyslnymi
+- **Na ktory slad patrzy uzytkownik** - wstrzykiwany z rozszerzenia przegladarki
+
+```python
+async def get_schema(self) -> str:
+    """Fetch database schema from Logfire API."""
+    async with AsyncLogfireQueryClient(
+        read_token=token,
+        base_url=self.base_url,
+    ) as client:
+        response = await client.client.get("/v1/schemas")
+        schema_data = response.json()
+        return schema_to_sql(schema_data)
+
+async def get_environments(self, days: int = 7) -> list[str]:
+    """Query distinct deployment environments."""
+    sql = f"""
+        SELECT DISTINCT deployment_environment
+        FROM records
+        WHERE start_timestamp >= now() - INTERVAL '{days} days'
+          AND deployment_environment IS NOT NULL
+        ORDER BY deployment_environment
+    """
+    # Execute and cache...
+```
+
+## Walidacja SQL: bezpieczenstwo przede wszystkim
+
+Kazde zapytanie SQL generowane przez agenta przechodzi walidacje przed wykonaniem. Walidator zapewnia:
+
+- Brak operacji zapisu (INSERT, UPDATE, DELETE, DROP)
+- Brak niebezpiecznych funkcji
+- Zapytania pozostaja w zakresie projektu uzytkownika
+- Zakresy czasu sa respektowane
+
+To krytyczne, poniewaz agent ma dostep do odczytu produkcyjnych danych obserwowalnosci. Zhallucynowane zapytanie `DELETE` mogloby usunac dane sladow.
+
+## Rozszerzenie Chrome: debugowanie swiadome kontekstu
+
+Najpotezniejsza funkcja to rozszerzenie Chrome. Kiedy przegladasz slad w webowym interfejsie Logfire, rozszerzenie:
+
+1. Wykrywa, ze jestes na stronie Logfire
+2. Wyciaga biezacy ID sladu i kontekst spanu z URL
+3. Otwiera panel boczny z asystentem AI
+4. Wstrzykuje kontekst sladu do promptu systemowego agenta
+
+```typescript
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  const isLogfirePage =
+    tab.url.includes('logfire.pydantic.dev') ||
+    tab.url.includes('logfire-us.pydantic.dev');
+
+  if (isLogfirePage && (changeInfo.url || changeInfo.status === 'complete')) {
+    const context = extractLogfireContext(tab.url);
+    if (context) {
+      await chrome.storage.local.set({
+        [`context_${tabId}`]: context,
+      });
+      chrome.runtime.sendMessage({
+        type: 'CONTEXT_UPDATED',
+        tabId,
+        context,
+      });
+    }
+  }
+});
+```
+
+Teraz kiedy pytasz "dlaczego to wywolanie narzedzia sie nie powiodlo?", agent juz wie, na ktory slad patrzysz. Bez kopiowania ID sladow.
+
+## Selekcja wielu spanow
+
+Rozszerzenie obsluguje wybieranie wielu spanow w interfejsie Logfire do analizy porownawczej:
+
+```typescript
+if (message.type === 'SPAN_CONTEXT_TOGGLED') {
+  const contexts = result[`spanContexts_${tabId}`] || [];
+  const spanContext = message.spanContext;
+
+  let newContexts;
+  if (message.selected) {
+    newContexts = [...contexts, spanContext];
+  } else {
+    newContexts = contexts.filter(c => c.spanId !== spanContext.spanId);
+  }
+
+  chrome.storage.local.set({ [`spanContexts_${tabId}`]: newContexts });
+}
+```
+
+Wybierz 3 spany, zapytaj "porownaj zuzycie tokenow w tych trzech uruchomieniach agenta" - asystent ma caly kontekst.
+
+## Strumieniowanie WebSocket z wizualizacja narzedzi
+
+Backend strumieniuje odpowiedzi przez WebSocket, wlaczajac zdarzenia wywolan narzedzi:
+
+```python
+async with logfire_agent.agent.iter(
+    user_message,
+    deps=deps,
+    message_history=model_history,
+) as agent_run:
+    async for node in agent_run:
+        if Agent.is_model_request_node(node):
+            async with node.stream(agent_run.ctx) as stream:
+                async for event in stream:
+                    if isinstance(event, PartDeltaEvent):
+                        await manager.send_event(
+                            websocket, "text_delta",
+                            {"content": event.delta.content_delta},
+                        )
+
+        elif Agent.is_call_tools_node(node):
+            async with node.stream(agent_run.ctx) as stream:
+                async for event in stream:
+                    if isinstance(event, FunctionToolCallEvent):
+                        await manager.send_event(
+                            websocket, "tool_call",
+                            {"tool_name": event.part.tool_name,
+                             "args": args_value},
+                        )
+                    elif isinstance(event, FunctionToolResultEvent):
+                        await manager.send_event(
+                            websocket, "tool_result",
+                            {"result": str(event.result.content)},
+                        )
+```
+
+Frontend wyswietla: strumieniowanie tekstu token po tokenie, budowane zapytania SQL, wyniki zapytan w sformatowanych tabelach i specyfikacje wykresow renderowane interaktywnie.
+
+## Obsluga wielu dostawcow LLM
+
+Asystent obsluguje wielu dostawcow LLM od razu:
+
+```python
+class LLMProvider(str, Enum):
+    OPENAI = "openai"
+    OPENROUTER = "openrouter"
+    PYDANTIC_AI_GATEWAY = "pydantic_ai_gateway"
+
+def get_default_model(has_openai, has_openrouter, has_gateway) -> ModelInfo | None:
+    """Get default model. Priority: Gateway Claude > OpenRouter Claude > OpenAI GPT.
+    Returns a ModelInfo object with model ID, provider, and display name."""
+    if has_gateway:
+        return _MODEL_BY_ID.get(DEFAULT_GATEWAY_MODEL_ID)
+    if has_openrouter:
+        return _MODEL_BY_ID.get(DEFAULT_OPENROUTER_MODEL_ID)
+    if has_openai:
+        return _MODEL_BY_ID.get(DEFAULT_OPENAI_MODEL_ID)
+    return None
+```
+
+Uzytkownicy konfiguruja klucze API w panelu ustawien. System automatycznie wybiera najlepszy dostepny model.
+
+## Jakie pytania mozesz zadac?
+
+Oto prawdziwe pytania, ktorych uzywamy codziennie do debugowania naszych produkcyjnych agentow:
+
+- "Pokaz mi najwolniejsze uruchomienia agenta z ostatniej godziny"
+- "Ile tokenow wydalismy na wywolania narzedzi vs. uzupelnienia dzisiaj?"
+- "Znajdz wszystkie uruchomienia, gdzie agent wywolal to samo narzedzie wiecej niz 5 razy"
+- "Jaki jest wskaznik bledow dla narzedzia cenowego w tym tygodniu?"
+- "Porownaj opoznienia miedzy GPT-4o a Claude dla tego samego typu zadania"
+- "Pokaz mi wszystkie uruchomienia, gdzie agent przekroczyl 100k tokenow"
+
+Kazde pytanie jest tlumaczone na SQL, wykonywane na Logfire i zwracane jako sformatowana tabela lub wykres.
+
+## Kluczowe wnioski
+
+- **Standardowe dashboardy nie dzialaja dla agentow AI.** Slady LLM sa zagniezdzone, rozgaleziane i zalezne od kontekstu. Potrzebujesz interfejsu zapytan, ktory rozumie wzorce agentow, a nie tylko kody statusu HTTP.
+- **Jezyk naturalny do SQL to wlasciwa abstrakcja.** Twoje dane Logfire sa juz odpytywalne przez SQL. Asystent AI laczy leke miedzy "dlaczego agent zrobil X" a SQL potrzebnym do odpowiedzi.
+- **Kontekst przegladarki sprawia, ze debugowanie jest bezwysilkowe.** Rozszerzenie Chrome wstrzykuje biezacy slad do kontekstu asystenta. Bez kopiowania. Bez przelaczania kontekstu.
+- **Selekcja wielu spanow umozliwia analize porownawcza.** Wybierz kilka spanow i popros asystenta o porownanie - zuzycie tokenow, opoznienia, wzorce wywolan narzedzi.
+- **To obserwowalnosc dla ludzi, nie dla dashboardow.** Celem nie sa kolejne wykresy. Celem jest odpowiedz na "co poszlo nie tak?" w jezyku naturalnym.
+
+## Wyprobuj sam
+
+[logfire-assistant](https://github.com/vstorm-co/logfire-assistant) - asystent Logfire napedzany AI z zapytaniami w jezyku naturalnym do SQL, rozszerzeniem Chrome i analiza wielu spanow.

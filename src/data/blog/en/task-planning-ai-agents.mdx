@@ -1,0 +1,286 @@
+---
+title: "Task Planning for AI Agents: Dependencies, Events, and Hierarchical Todos"
+description: "Why agents need structured planning, how subtasks and cycle detection work, and a PostgreSQL backend for multi-tenant production deployments."
+pubDate: 2026-02-17
+author: "Vstorm"
+lang: en
+translationKey: task-planning-ai-agents
+tags: ["ai-agents", "task-planning", "pydantic-ai", "python", "todo-management"]
+category: guide
+draft: false
+---
+
+Ask an AI agent to "build a REST API with authentication" and watch what happens. Without structured planning, it'll jump straight to writing code - skipping database design, forgetting to create migrations, and implementing the auth middleware before the user model exists.
+
+The problem isn't intelligence. It's that the agent has no way to break complex tasks into steps, track progress, or understand dependencies. It just executes whatever seems right in the moment.
+
+## TL;DR
+
+- **Without a todo list, agents skip steps, repeat work, and lose track of progress.** Giving agents structured task planning dramatically improves reliability.
+- **`pydantic-ai-todo`** is a standalone task planning toolset for Pydantic AI with in-memory, async memory, and PostgreSQL backends.
+- **Subtasks and dependencies** let agents plan hierarchically and respect execution order - "auth system needs user model" becomes a hard constraint, not a suggestion.
+- **Cycle detection** via depth-first search prevents deadlocks when the agent creates circular dependencies.
+- **PostgreSQL multi-tenancy** with session-scoped storage makes it production-ready for web applications with concurrent users.
+
+We've seen this pattern kill agent reliability at Vstorm. The fix is surprisingly simple: give the agent a todo list. Not a metaphorical one - an actual tool that creates, tracks, and manages structured tasks with statuses, subtasks, and dependencies.
+
+That's what `pydantic-ai-todo` does. It's a standalone task planning toolset for Pydantic AI with in-memory, async memory, and PostgreSQL backends.
+
+## Basic Setup: One Line, Full Planning
+
+```python
+from pydantic_ai import Agent
+from pydantic_ai_todo import create_todo_toolset
+
+agent = Agent(
+    "openai:gpt-4o",
+    toolsets=[create_todo_toolset()],
+)
+
+result = await agent.run(
+    "Create a todo list for building a REST API with user authentication"
+)
+```
+
+The agent now has planning tools: `read_todos`, `write_todos`, `add_todo`, `update_todo_status`, and `remove_todo`. The core pair - `read_todos` and `write_todos` - handles most use cases. The agent creates structured task lists, updates statuses as it works, and keeps track of what's done and what's pending.
+
+## The Todo Model
+
+Each todo item has a clear structure:
+
+```python
+class Todo(BaseModel):
+    id: str              # 8-char random ID
+    content: str         # "Implement JWT token generation"
+    status: str          # pending | in_progress | completed | blocked
+    active_form: str     # "Implementing JWT token generation"
+    parent_id: str | None  # Link to parent task
+    depends_on: list[str]  # IDs of blocking tasks
+```
+
+The `active_form` field is present continuous - "Implementing JWT tokens" instead of "Implement JWT tokens." This is used for status spinners and progress displays that show what the agent is currently doing.
+
+## Accessing Todos After Agent Runs
+
+Pass a storage instance to access todos outside the agent:
+
+```python
+from pydantic_ai_todo import create_todo_toolset, TodoStorage
+
+storage = TodoStorage()
+toolset = create_todo_toolset(storage=storage)
+
+agent = Agent(
+    "openai:gpt-4o",
+    toolsets=[toolset],
+    system_prompt="""When asked to plan something:
+1. Break it down into specific tasks
+2. Use write_todos to create each task
+3. Summarize the plan""",
+)
+
+result = await agent.run("Plan the implementation of a blog application")
+
+# Access tasks directly
+for todo in storage.todos:
+    status_icon = "done" if todo.status == "completed" else "pending"
+    print(f"  [{status_icon}] {todo.content}")
+```
+
+## Subtasks and Dependencies
+
+Enable hierarchical planning with `enable_subtasks=True`:
+
+```python
+from pydantic_ai_todo import create_todo_toolset, AsyncMemoryStorage
+
+storage = AsyncMemoryStorage()
+toolset = create_todo_toolset(
+    async_storage=storage,
+    enable_subtasks=True,
+)
+
+agent = Agent(
+    "openai:gpt-4o",
+    toolsets=[toolset],
+    system_prompt="""When planning projects:
+1. Create main tasks with write_todos
+2. Break them into subtasks with add_subtask
+3. Set dependencies where tasks must wait for others
+4. Use get_available_tasks to see what can start now""",
+)
+
+result = await agent.run("""
+Plan building a REST API with:
+- Database design (must be done first)
+- User model (needs database)
+- Auth system (needs user model)
+- API endpoints (needs auth)
+""")
+```
+
+With subtasks enabled, the agent gets three additional tools:
+- `add_subtask` - create a task linked to a parent
+- `set_dependency` - declare that task B depends on task A
+- `get_available_tasks` - list tasks with no blocking dependencies
+
+## Cycle Detection
+
+When the agent sets dependencies, cycles are detected automatically using depth-first search:
+
+```python
+def _has_cycle(todo_id: str, dependency_id: str, todos: list[Todo]) -> bool:
+    """Check if adding dependency would create a cycle."""
+    visited: set[str] = set()
+
+    def visit(current_id: str) -> bool:
+        if current_id == todo_id:
+            return True  # Cycle found
+        if current_id in visited:
+            return False
+        visited.add(current_id)
+        todo = _get_todo_by_id(current_id)
+        if todo:
+            for dep_id in todo.depends_on:
+                if visit(dep_id):
+                    return True
+        return False
+
+    return visit(dependency_id)
+```
+
+If Task A depends on Task B, and the agent tries to make Task B depend on Task A, it gets an error message explaining the circular dependency. No deadlocks.
+
+## The Event System
+
+For production integrations, the event emitter notifies you about todo changes:
+
+```python
+from pydantic_ai_todo import create_storage, TodoEventEmitter
+
+emitter = TodoEventEmitter()
+
+@emitter.on_completed
+async def notify_completion(event):
+    # Send notification, update dashboard, etc.
+    print(f"Task completed: {event.todo.content}")
+
+storage = create_storage(
+    "postgres",
+    connection_string="postgresql://user:pass@localhost/db",
+    session_id="user-123",
+    event_emitter=emitter,
+)
+```
+
+Events fire for: `CREATED`, `UPDATED`, `STATUS_CHANGED`, `COMPLETED`, `DELETED`. You can hook into these for dashboards, notifications, webhooks, or audit logging.
+
+## PostgreSQL Multi-Tenant Backend
+
+For web applications where multiple users run agents concurrently, the PostgreSQL backend provides session-scoped persistence:
+
+```python
+from pydantic_ai_todo import create_storage, create_todo_toolset
+
+# User A's session
+storage_a = create_storage(
+    "postgres",
+    connection_string="postgresql://user:pass@localhost/mydb",
+    session_id="user-alice",
+)
+await storage_a.initialize()
+
+# User B's session
+storage_b = create_storage(
+    "postgres",
+    connection_string=connection_string,
+    session_id="user-bob",
+)
+await storage_b.initialize()
+
+# Each user has separate todos
+toolset_a = create_todo_toolset(async_storage=storage_a)
+toolset_b = create_todo_toolset(async_storage=storage_b)
+```
+
+All operations are scoped by `session_id`. Alice never sees Bob's tasks, and vice versa. The schema auto-creates on `initialize()`:
+
+```sql
+CREATE TABLE IF NOT EXISTS todos (
+    id VARCHAR(8) PRIMARY KEY,
+    session_id VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    active_form TEXT NOT NULL,
+    parent_id VARCHAR(8),
+    depends_on TEXT[] DEFAULT '{}',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_todos_session_id ON todos(session_id);
+```
+
+The index on `session_id` ensures fast per-user queries even with millions of todos across all users.
+
+## Storage Factory
+
+The `create_storage()` factory gives you a clean API for picking backends:
+
+```python
+from pydantic_ai_todo import create_storage
+
+# In-memory (development, testing)
+storage = create_storage("memory")
+
+# PostgreSQL (production)
+storage = create_storage(
+    "postgres",
+    connection_string="postgresql://...",
+    session_id="user-123",
+)
+await storage.initialize()
+
+# With existing connection pool
+import asyncpg
+pool = await asyncpg.create_pool("postgresql://...")
+storage = create_storage(
+    "postgres",
+    pool=pool,
+    session_id="user-123",
+)
+```
+
+The PostgreSQL backend supports both `connection_string` (creates its own pool) and `pool` (reuses an existing one). When you pass an external pool, `close()` won't close it - only pools created internally are cleaned up.
+
+## System Prompt Integration
+
+Generate a dynamic system prompt that includes current todo state:
+
+```python
+from pydantic_ai_todo import get_todo_system_prompt
+
+prompt = get_todo_system_prompt(storage)
+# Returns base todo instructions + current todo list
+
+# For async storage:
+from pydantic_ai_todo import get_todo_system_prompt_async
+prompt = await get_todo_system_prompt_async(async_storage)
+```
+
+This injects the current todo list into the agent's system prompt, so it knows what's already planned and what's in progress - even across conversation restarts.
+
+## Key Takeaways
+
+- **Structured planning reduces hallucinated steps.** Without a todo list, agents skip steps, repeat work, and lose track of progress. With one, they plan systematically and execute in order.
+- **Dependencies prevent ordering errors.** "Auth system needs user model" is a dependency, not a suggestion. The agent sees `blocked` status and works on available tasks first.
+- **Cycle detection is automatic.** DFS-based cycle detection prevents deadlocks when the agent creates circular dependencies. The error message explains what went wrong.
+- **PostgreSQL multi-tenancy is production-ready.** Session-scoped storage, connection pooling, auto-schema creation, and external pool support - the boring infrastructure that web applications need.
+- **Events enable integrations.** Hook into `CREATED`, `COMPLETED`, `STATUS_CHANGED` events for dashboards, notifications, and audit trails.
+
+## Try It Yourself
+
+[pydantic-ai-todo](https://github.com/vstorm-co/pydantic-ai-todo) - Task planning toolset for Pydantic AI agents with subtasks, dependencies, events, and PostgreSQL multi-tenant support.
+
+```bash
+pip install pydantic-ai-todo
+```
