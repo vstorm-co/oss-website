@@ -1,7 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
-import GitHubStars from '../components/oss/GitHubStars.astro';
 import OssHero from '../components/oss/OssHero.astro';
 import ProjectGrid from '../components/oss/ProjectGrid.astro';
 import OssFooter from '../components/oss/OssFooter.astro';
@@ -31,7 +30,6 @@ const alternates = [
   lang={lang}
   alternates={alternates}
 >
-  <GitHubStars t={t} />
   <Navbar currentLang={lang} />
   <OssHero t={t} />
   <TrustedBy t={t} />
