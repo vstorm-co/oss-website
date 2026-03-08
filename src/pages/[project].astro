@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 import ProjectPage from '../components/project/ProjectPage.astro';
 import OssFooter from '../components/oss/OssFooter.astro';
+import Breadcrumbs from '../components/shared/Breadcrumbs.astro';
 import { translations, languages, defaultLang } from '../i18n/translations';
 import { getGenericProjects } from '../data/projects';
 
@@ -48,6 +49,10 @@ const jsonLd = project.status === "released" ? {
   jsonLd={jsonLd}
 >
   <Navbar currentLang={lang} project={project} pathSuffix={`${project.slug}/`} />
+  <Breadcrumbs items={[
+    { label: "Home", href: "/" },
+    { label: project.name },
+  ]} />
   <ProjectPage project={project} lang={lang} t={t} />
   <OssFooter t={t} />
 </Layout>

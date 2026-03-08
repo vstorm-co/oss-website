@@ -17,7 +17,7 @@ const PRESETS: { name: PresetName; label: string; desc: string; icon: typeof Zap
   },
   {
     name: "ai-agent",
-    label: "AI Agent",
+    label: "AI",
     desc: "WebSocket + persistence",
     icon: Bot,
   },

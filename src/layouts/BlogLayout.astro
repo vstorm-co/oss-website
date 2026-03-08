@@ -7,6 +7,7 @@ import TranslationLinks from '../components/blog/TranslationLinks.astro';
 import ShareButtons from '../components/blog/ShareButtons.astro';
 import RelatedPosts from '../components/blog/RelatedPosts.astro';
 import StickyCTA from '../components/blog/StickyCTA.astro';
+import Breadcrumbs from '../components/shared/Breadcrumbs.astro';
 import type { Lang } from '../i18n/translations';
 import { translations, languages, defaultLang } from '../i18n/translations';
 import '../styles/prose.css';
@@ -104,6 +105,11 @@ const ogImage = new URL(`/og/${ogSlug}.svg`, siteUrl).href;
   <div id="scroll-progress" class="fixed top-0 left-0 h-0.5 bg-accent z-50 transition-none" style="width: 0%"></div>
 
   <Navbar currentLang={lang} />
+  <Breadcrumbs items={[
+    { label: "Home", href: lang === defaultLang ? "/" : `/${lang}/` },
+    { label: t["nav.blog"], href: blogHref },
+    { label: title },
+  ]} />
 
   <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
   {howToSchema && (

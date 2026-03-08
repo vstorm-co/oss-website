@@ -88,7 +88,7 @@ function winnerBg(winner: string) {
   <!-- Hero -->
   <section class="relative mx-auto max-w-4xl px-4 pt-28 pb-12 sm:px-6 sm:pt-36 sm:pb-16 lg:px-8 text-center">
     <div class="pointer-events-none absolute inset-0 -top-24 flex items-center justify-center" aria-hidden="true">
-      <div class="h-[340px] w-[540px] rounded-full bg-accent/[0.07] blur-[100px]"></div>
+      <div class="h-[200px] w-[300px] sm:h-[340px] sm:w-[540px] rounded-full bg-accent/[0.07] blur-[60px] sm:blur-[100px]"></div>
     </div>
     <div class="reveal relative">
       <span class="inline-flex items-center rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-text-secondary mb-6">
@@ -111,18 +111,18 @@ function winnerBg(winner: string) {
           {t["compare.highlights"] ?? "Key Differences"}
         </h2>
       </div>
-      <div class="grid gap-6 sm:grid-cols-3 reveal-group">
+      <div class="grid gap-4 sm:gap-6 sm:grid-cols-3 reveal-group">
         {comparison.highlights.map((h) => (
-          <div class={`glass-card rounded-2xl p-7 sm:p-8 border ${winnerBorder(h.winner)} ${winnerBg(h.winner)} reveal`}>
+          <div class={`glass-card rounded-2xl p-5 sm:p-7 lg:p-8 border ${winnerBorder(h.winner)} ${winnerBg(h.winner)} reveal`}>
             <div class="flex items-center gap-2 mb-3">
               {h.winner === "ours" ? (
-                <svg class="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
               ) : h.winner === "theirs" ? (
-                <svg class="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-blue-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
               ) : (
-                <svg class="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" /></svg>
+                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" /></svg>
               )}
-              <span class={`text-xs font-semibold uppercase tracking-wider ${winnerColor(h.winner)}`}>
+              <span class={`text-[10px] sm:text-xs font-semibold uppercase tracking-wider ${winnerColor(h.winner)}`}>
                 {h.winner === "ours"
                   ? (t["compare.winner.ours"] ?? "Advantage: {product}").replace("{product}", comparison.product)
                   : h.winner === "theirs"
@@ -151,9 +151,9 @@ function winnerBg(winner: string) {
         <table class="w-full text-sm">
           <thead>
             <tr class="border-b border-border bg-surface">
-              <th class="px-4 py-3.5 text-left text-[15px] font-medium text-text-secondary">Feature</th>
+              <th class="px-3 py-3 sm:px-4 sm:py-3.5 text-left text-xs sm:text-[15px] font-medium text-text-secondary">Feature</th>
               {comparison.tableColumns.map((col, i) => (
-                <th class={`px-4 py-3.5 text-center text-[15px] font-semibold ${i === comparison.tableHighlight ? "bg-green-400/[0.08] text-green-400" : "text-text"}`}>
+                <th class={`px-3 py-3 sm:px-4 sm:py-3.5 text-center text-xs sm:text-[15px] font-semibold ${i === comparison.tableHighlight ? "bg-green-400/[0.08] text-green-400" : "text-text"}`}>
                   {col}
                 </th>
               ))}
@@ -162,9 +162,9 @@ function winnerBg(winner: string) {
           <tbody>
             {comparison.tableRows.map((row, ri) => (
               <tr class={`border-b border-border last:border-0 ${ri % 2 === 0 ? "" : "bg-surface/50"}`}>
-                <td class="px-4 py-3.5 font-medium">{row.feature[lang]}</td>
+                <td class="px-3 py-3 sm:px-4 sm:py-3.5 text-xs sm:text-sm font-medium">{row.feature[lang]}</td>
                 {row.values.map((val, i) => (
-                  <td class={`px-4 py-3.5 text-center ${i === comparison.tableHighlight ? "bg-green-400/[0.04]" : ""}`}>
+                  <td class={`px-3 py-3 sm:px-4 sm:py-3.5 text-center text-xs sm:text-sm ${i === comparison.tableHighlight ? "bg-green-400/[0.04]" : ""}`}>
                     {val === true ? (
                       <span class="text-green-400 font-bold">&#10003;</span>
                     ) : val === false ? (
@@ -222,7 +222,7 @@ function winnerBg(winner: string) {
       </div>
 
       <div class="grid gap-6 sm:grid-cols-2 reveal">
-        <div class="glass-card rounded-2xl p-7 sm:p-8 border-l-4 border-green-400/40">
+        <div class="glass-card rounded-2xl p-5 sm:p-7 lg:p-8 border-l-4 border-green-400/40">
           <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
             <svg class="w-5 h-5 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
             {(t["compare.whenToUse.ours"] ?? "Choose {product} when:").replace("{product}", comparison.product)}
@@ -236,7 +236,7 @@ function winnerBg(winner: string) {
             ))}
           </ul>
         </div>
-        <div class="glass-card rounded-2xl p-7 sm:p-8 border-l-4 border-blue-400/40">
+        <div class="glass-card rounded-2xl p-5 sm:p-7 lg:p-8 border-l-4 border-blue-400/40">
           <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
             <svg class="w-5 h-5 text-blue-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
             {(t["compare.whenToUse.theirs"] ?? "Choose {competitor} when:").replace("{competitor}", comparison.competitor)}
@@ -267,7 +267,7 @@ function winnerBg(winner: string) {
         <div class="space-y-3 reveal-group">
           {comparison.faq.map((item) => (
             <details class="reveal group rounded-2xl border border-border border-l-2 border-l-accent/30 bg-surface transition-colors hover:border-accent/30">
-              <summary class="flex cursor-pointer items-center justify-between px-6 py-4 font-semibold select-none">
+              <summary class="flex cursor-pointer items-center justify-between px-4 py-3 sm:px-6 sm:py-4 text-sm sm:text-base font-semibold select-none">
                 <span>{item.question[lang]}</span>
                 <svg
                   class="h-5 w-5 shrink-0 text-text-tertiary transition-transform group-open:rotate-180"
@@ -279,7 +279,7 @@ function winnerBg(winner: string) {
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                 </svg>
               </summary>
-              <div class="px-6 pb-4 text-text-secondary leading-relaxed">
+              <div class="px-4 pb-3 sm:px-6 sm:pb-4 text-sm text-text-secondary leading-relaxed">
                 {item.answer[lang]}
               </div>
             </details>
@@ -324,16 +324,16 @@ function winnerBg(winner: string) {
   <!-- CTA -->
   <section class="relative section-stack px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
     <div class="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden="true">
-      <div class="h-[280px] w-[480px] rounded-full bg-accent/[0.06] blur-[90px]"></div>
+      <div class="h-[180px] w-[300px] sm:h-[280px] sm:w-[480px] rounded-full bg-accent/[0.06] blur-[60px] sm:blur-[90px]"></div>
     </div>
     <div class="mx-auto max-w-3xl text-center reveal relative">
-      <div class="glass-card glow-card rounded-2xl p-10 sm:p-14">
+      <div class="glass-card glow-card rounded-2xl p-6 sm:p-10 lg:p-14">
         <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
           {(t["compare.cta.title"] ?? "Ready to try {product}?").replace("{product}", comparison.product)}
         </h2>
         <a
           href={productHref}
-          class="mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-8 py-3 text-base font-semibold text-white transition-colors hover:bg-accent-hover"
+          class="mt-6 sm:mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-base font-semibold text-white transition-colors hover:bg-accent-hover"
         >
           {t["compare.cta.button"] ?? "Get Started"}
           <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

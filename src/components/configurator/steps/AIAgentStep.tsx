@@ -23,13 +23,13 @@ export function AIAgentStep() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-text tracking-tight">AI Agent</h2>
+        <h2 className="text-xl font-semibold text-text tracking-tight">AI</h2>
         <p className="text-sm text-text-tertiary mt-1">Configure AI framework and LLM provider</p>
       </div>
 
       <div className="grid gap-5">
         <Toggle
-          label="Enable AI Agent"
+          label="Enable AI"
           desc="Add AI agent with WebSocket streaming and tool integration"
           checked={config.enable_ai_agent}
           register={register("enable_ai_agent")}

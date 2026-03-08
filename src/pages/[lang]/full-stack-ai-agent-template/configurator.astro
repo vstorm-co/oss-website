@@ -2,7 +2,8 @@
 import Layout from '../../../layouts/Layout.astro';
 import Navbar from '../../../components/Navbar.astro';
 import ConfiguratorApp from '../../../components/configurator/ConfiguratorApp';
-import { languages, defaultLang } from '../../../i18n/translations';
+import Breadcrumbs from '../../../components/shared/Breadcrumbs.astro';
+import { languages, defaultLang, type Lang } from '../../../i18n/translations';
 import { getProjectBySlug } from '../../../data/projects';
 
 export function getStaticPaths() {
@@ -11,6 +12,7 @@ export function getStaticPaths() {
     .map((lang) => ({ params: { lang } }));
 }
 
+const lang = Astro.params.lang as Lang;
 const url = new URL(Astro.request.url);
 const preset = url.searchParams.get('preset') || undefined;
 const project = getProjectBySlug("full-stack-ai-agent-template")!;
@@ -21,6 +23,11 @@ const project = getProjectBySlug("full-stack-ai-agent-template")!;
   description="Configure and download a production-ready FastAPI + Next.js AI project. Choose from 5 AI frameworks, databases, auth, and 75+ options."
 >
   <Navbar showLang={false} project={project} pathSuffix="full-stack-ai-agent-template/" />
+  <Breadcrumbs items={[
+    { label: "Home", href: `/${lang}/` },
+    { label: "Full-Stack AI Agent Template", href: `/${lang}/full-stack-ai-agent-template/` },
+    { label: "Configurator" },
+  ]} />
   <div class="mx-auto max-w-7xl px-4 py-8">
     <ConfiguratorApp client:only="react" initialPreset={preset} />
   </div>

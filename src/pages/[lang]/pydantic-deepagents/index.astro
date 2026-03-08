@@ -12,6 +12,7 @@ import BeforeAfter from '../../../components/shared/BeforeAfter.astro';
 import ComparisonTable from '../../../components/shared/ComparisonTable.astro';
 import StarsBadge from '../../../components/shared/StarsBadge.astro';
 import FaqPreview from '../../../components/landing/FaqPreview.astro';
+import Breadcrumbs from '../../../components/shared/Breadcrumbs.astro';
 import { translations, languages, defaultLang, type Lang } from '../../../i18n/translations';
 import { getProjectBySlug } from '../../../data/projects';
 import { getDeepagentsComparison } from '../../../data/comparisons';
@@ -56,6 +57,10 @@ const jsonLd = {
   jsonLd={jsonLd}
 >
   <Navbar currentLang={lang} project={project} pathSuffix="pydantic-deepagents/" />
+  <Breadcrumbs items={[
+    { label: "Home", href: `/${lang}/` },
+    { label: "Pydantic DeepAgents" },
+  ]} />
   <DeepAgentsHero t={t} />
   <BeforeAfter
     title={t["beforeafter.title"]}

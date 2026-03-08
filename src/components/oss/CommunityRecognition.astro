@@ -165,13 +165,13 @@ const stats = [
     <!-- Carousel -->
     <div class="reveal relative overflow-hidden" id="testimonial-carousel">
       <!-- Gradient masks -->
-      <div class="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-bg to-transparent"></div>
-      <div class="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-bg to-transparent"></div>
+      <div class="pointer-events-none absolute inset-y-0 left-0 z-10 w-6 sm:w-16 bg-gradient-to-r from-bg to-transparent"></div>
+      <div class="pointer-events-none absolute inset-y-0 right-0 z-10 w-6 sm:w-16 bg-gradient-to-l from-bg to-transparent"></div>
 
       <!-- Scrolling track -->
       <div class="carousel-track flex gap-4" id="carousel-track">
         {allQuotes.map((quote) => (
-          <div class="carousel-card shrink-0 w-[320px] rounded-xl border border-border bg-surface p-5 transition-colors hover:border-accent/40 shadow-sm flex flex-col">
+          <div class="carousel-card shrink-0 w-[280px] sm:w-[320px] rounded-xl border border-border bg-surface p-5 transition-colors hover:border-accent/40 shadow-sm flex flex-col">
             <!-- Quote icon -->
             <svg class="h-5 w-5 text-accent/40 mb-2 shrink-0" fill="currentColor" viewBox="0 0 24 24">
               <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983z" />
