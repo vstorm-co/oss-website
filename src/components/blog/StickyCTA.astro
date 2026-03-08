@@ -1,0 +1,73 @@
+---
+interface Props {
+  t: Record<string, string>;
+}
+
+const { t } = Astro.props;
+---
+
+<div
+  id="sticky-cta"
+  class="fixed inset-x-0 bottom-0 z-40 bg-bg/60 backdrop-blur-2xl border-t border-white/[0.08] opacity-0 translate-y-full pointer-events-none transition-all duration-300"
+>
+  <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3">
+    <p class="text-sm text-text-secondary">{t["blog.stickyCta.text"]}</p>
+    <div class="flex items-center gap-3">
+      <a
+        href="https://vstorm.co/contact-us/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="shrink-0 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"
+      >
+        {t["blog.stickyCta.button"]}
+      </a>
+      <button
+        id="sticky-cta-close"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-text-tertiary hover:text-text transition-colors"
+        aria-label="Close"
+      >
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6 6 18" />
+          <path d="m6 6 12 12" />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    var bar = document.getElementById('sticky-cta');
+    var closeBtn = document.getElementById('sticky-cta-close');
+    if (!bar || !closeBtn) return;
+
+    var dismissed = false;
+    var visible = false;
+
+    closeBtn.addEventListener('click', function () {
+      dismissed = true;
+      bar.style.opacity = '0';
+      bar.style.transform = 'translateY(100%)';
+      bar.style.pointerEvents = 'none';
+      visible = false;
+    });
+
+    window.addEventListener('scroll', function () {
+      if (dismissed) return;
+
+      var shouldShow = window.scrollY > 800;
+      if (shouldShow !== visible) {
+        visible = shouldShow;
+        if (shouldShow) {
+          bar.style.opacity = '1';
+          bar.style.transform = 'translateY(0)';
+          bar.style.pointerEvents = 'auto';
+        } else {
+          bar.style.opacity = '0';
+          bar.style.transform = 'translateY(100%)';
+          bar.style.pointerEvents = 'none';
+        }
+      }
+    }, { passive: true });
+  })();
+</script>

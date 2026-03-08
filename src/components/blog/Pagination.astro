@@ -1,0 +1,71 @@
+---
+interface Props {
+  currentPage: number;
+  lastPage: number;
+  basePath: string;
+  t: Record<string, string>;
+}
+
+const { currentPage, lastPage, basePath, t } = Astro.props;
+
+if (lastPage <= 1) return;
+
+function pageHref(page: number) {
+  return page === 1 ? `${basePath}/` : `${basePath}/${page}/`;
+}
+
+// Build page numbers with ellipsis
+const pages: (number | "...")[] = [];
+for (let i = 1; i <= lastPage; i++) {
+  if (i === 1 || i === lastPage || Math.abs(i - currentPage) <= 1) {
+    pages.push(i);
+  } else if (pages[pages.length - 1] !== "...") {
+    pages.push("...");
+  }
+}
+---
+
+<nav class="pagination-nav mt-12 flex items-center justify-center gap-2" aria-label="Blog pagination">
+  {currentPage > 1 && (
+    <a
+      href={pageHref(currentPage - 1)}
+      class="flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-sm text-text-secondary hover:text-text hover:border-border-hover transition-colors"
+    >
+      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+      </svg>
+      {t["blog.pagination.prev"]}
+    </a>
+  )}
+
+  <div class="flex items-center gap-1">
+    {pages.map((p) =>
+      p === "..." ? (
+        <span class="px-2 text-text-tertiary">...</span>
+      ) : p === currentPage ? (
+        <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-white text-sm font-medium">
+          {p}
+        </span>
+      ) : (
+        <a
+          href={pageHref(p)}
+          class="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-sm text-text-secondary hover:text-text hover:border-border-hover transition-colors"
+        >
+          {p}
+        </a>
+      )
+    )}
+  </div>
+
+  {currentPage < lastPage && (
+    <a
+      href={pageHref(currentPage + 1)}
+      class="flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-sm text-text-secondary hover:text-text hover:border-border-hover transition-colors"
+    >
+      {t["blog.pagination.next"]}
+      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+      </svg>
+    </a>
+  )}
+</nav>

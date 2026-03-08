@@ -1,0 +1,226 @@
+---
+interface Props {
+  t: Record<string, string>;
+}
+
+const { t } = Astro.props;
+
+const quotes = [
+  {
+    text: "Huge respect to the team at Vstorm for pushing this forward. That's the kind of runtime thinking we need if we want agents in production, not just demos.",
+    author: "Enes KOSAR",
+    role: "AI Consultant",
+    source: "LinkedIn",
+    url: "https://www.linkedin.com/in/eneskosar/",
+  },
+  {
+    text: "The CLI angle is underrated. The hard part isn't generating code — it's standardizing how teams spin things up so auth, streaming, and observability aren't afterthoughts. Tooling like this matters because it encodes good defaults before entropy shows up.",
+    author: "Chris Hobbick",
+    role: "Senior IT Operations Lead",
+    source: "LinkedIn",
+  },
+  {
+    text: "Great overview on Pydantic Deep Agents. Thanks Vstorm!",
+    author: "Pydantic",
+    role: "22K+ followers",
+    source: "LinkedIn reshare",
+    url: "https://www.linkedin.com/company/pydantic/",
+  },
+  {
+    text: "Setting up the production plumbing often eats up time before you even touch the AI logic. I've seen teams lose momentum getting stuck on this infrastructure glue. This CLI Generator looks like a solid way to fast-track deployment.",
+    author: "Srish Sriram",
+    role: "AI Solutions Engineer",
+    source: "LinkedIn",
+  },
+  {
+    text: "Our team hasn't tried the full library yet but have been finding a lot of value in a couple of the sub-libraries, many thanks!",
+    author: "Sarth Frey",
+    role: "Engineer",
+    source: "Pydantic AI Slack",
+  },
+  {
+    text: "This is how agents move from demos to products. The scaffolding matters.",
+    author: "Nexus Void AI",
+    role: "Autonomous CISO",
+    source: "LinkedIn",
+  },
+  {
+    text: "I saw your post regarding deep agents and I'm super interested! I was working on history processor and summarization, enabling the agent to self-compress when we give it a warning about its own context window size.",
+    author: "Gabriel Marquet",
+    role: "escape.tech",
+    source: "Pydantic AI Slack",
+    url: "https://escape.tech/",
+  },
+  {
+    text: "Really appreciate the work done here: it was thoughtful of you to include the admin panel — that's been a big hurdle whenever I work with FastAPI.",
+    author: "Baguma Martin",
+    role: "Software Developer",
+    source: "LinkedIn",
+  },
+  {
+    text: "We're looking to expand our agentic capabilities, and your team's work seems very aligned with where we're headed. We could leverage the existing pydantic-ai-backend and extend it to other remote execution environments.",
+    author: "Prospective Client",
+    role: "VLM / Computer-Vision Company",
+    source: "Direct message",
+  },
+  {
+    text: "Perfect. Makes scaffolding e2e agent projects that much easier.",
+    author: "Jeremiah Chienda",
+    role: "Building AI Agents",
+    source: "LinkedIn",
+  },
+  {
+    text: "Excellent end to end Template for AI/LLM Applications.",
+    author: "Ravi Kakani",
+    role: "Principal Architect at VisionStream",
+    source: "LinkedIn",
+  },
+  {
+    text: "I made a PR for pydantic todos — some instruction fixes, also make todo ids show in the prompt so you can make one less tool call. I will take care of the subagents one in a bit.",
+    author: "Pedro Lopes",
+    role: "Community Contributor",
+    source: "Pydantic AI Slack",
+  },
+];
+
+// Duplicate for infinite scroll effect
+const allQuotes = [...quotes, ...quotes];
+
+const stats = [
+  { value: "600+", label: t["oss.community.stats.langchain"] },
+  { value: "16+", label: t["oss.community.stats.references"] },
+  { value: "2", label: t["oss.community.stats.docs"] },
+  { value: "5+", label: t["oss.community.stats.contributors"] },
+];
+---
+
+<section class="section-light section-stack min-h-screen flex items-center px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
+  <div class="mx-auto w-full max-w-6xl">
+    <div class="reveal text-center mb-12">
+      <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl text-text heading-accent">{t["oss.community.title"]}</h2>
+      <p class="mt-4 text-lg text-text-secondary">{t["oss.community.subtitle"]}</p>
+    </div>
+
+    <!-- Stats row -->
+    <div class="reveal grid grid-cols-2 gap-4 sm:grid-cols-4 mb-12">
+      {stats.map((stat) => (
+        <div class="rounded-xl border border-border bg-surface p-5 text-center shadow-sm">
+          <div class="text-2xl font-bold text-accent sm:text-3xl" data-count-up>{stat.value}</div>
+          <div class="mt-1 text-sm text-text-secondary leading-tight">{stat.label}</div>
+        </div>
+      ))}
+    </div>
+
+    <!-- LangChain Featured Banner -->
+    <div class="reveal mb-12">
+      <a
+        href="https://www.linkedin.com/posts/langchain_fastapi-fullstack-cli-generator-made-by-activity-7413625275617468416-aKzQ"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="group block rounded-2xl border border-accent/20 bg-gradient-to-r from-accent/[0.06] to-orange-500/[0.04] p-6 sm:p-8 transition-all hover:border-accent/40 hover:from-accent/[0.10] hover:to-orange-500/[0.08]"
+      >
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+          <!-- LangChain logo area -->
+          <div class="flex items-center gap-3 shrink-0">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10 border border-accent/20">
+              <svg class="h-6 w-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
+              </svg>
+            </div>
+            <div>
+              <span class="text-xs font-semibold uppercase tracking-wider text-accent">Content Spotlight</span>
+              <p class="text-sm font-semibold text-text">LangChain <span class="text-text-tertiary font-normal">492K followers</span></p>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="flex-1 min-w-0">
+            <p class="text-sm sm:text-base text-text-secondary leading-relaxed">
+              {t["oss.community.langchain.description"]}
+            </p>
+          </div>
+
+          <!-- Stats -->
+          <div class="flex items-center gap-5 shrink-0 text-text-tertiary">
+            <div class="text-center">
+              <div class="text-lg font-bold text-text" data-count-up>612</div>
+              <div class="text-xs">likes</div>
+            </div>
+            <div class="text-center">
+              <div class="text-lg font-bold text-text" data-count-up>26</div>
+              <div class="text-xs">comments</div>
+            </div>
+            <div class="text-center">
+              <div class="text-lg font-bold text-text" data-count-up>71</div>
+              <div class="text-xs">reshares</div>
+            </div>
+            <svg class="h-5 w-5 text-text-tertiary group-hover:text-accent transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+            </svg>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <!-- Carousel -->
+    <div class="reveal relative overflow-hidden" id="testimonial-carousel">
+      <!-- Gradient masks -->
+      <div class="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-bg to-transparent"></div>
+      <div class="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-bg to-transparent"></div>
+
+      <!-- Scrolling track -->
+      <div class="carousel-track flex gap-4" id="carousel-track">
+        {allQuotes.map((quote) => (
+          <div class="carousel-card shrink-0 w-[320px] rounded-xl border border-border bg-surface p-5 transition-colors hover:border-accent/40 shadow-sm flex flex-col">
+            <!-- Quote icon -->
+            <svg class="h-5 w-5 text-accent/40 mb-2 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983z" />
+            </svg>
+
+            <!-- Quote text -->
+            <p class="text-sm text-text-secondary leading-relaxed flex-1 line-clamp-4">
+              {quote.text}
+            </p>
+
+            <!-- Author -->
+            <div class="mt-3 flex items-center justify-between border-t border-border pt-3">
+              <div>
+                {quote.url ? (
+                  <a href={quote.url} target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-text hover:text-red-500 transition-colors">
+                    {quote.author}
+                  </a>
+                ) : (
+                  <span class="text-sm font-semibold text-text">{quote.author}</span>
+                )}
+                <p class="text-xs text-text-tertiary">{quote.role}</p>
+              </div>
+              <span class="rounded-full border border-red-200 bg-red-50 px-2.5 py-0.5 text-[11px] text-red-500">
+                {quote.source}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .carousel-track {
+    animation: scroll-carousel 30s linear infinite;
+    will-change: transform;
+  }
+
+  .carousel-track:hover {
+    animation-play-state: paused;
+  }
+
+  @keyframes scroll-carousel {
+    0% {
+      transform: translate3d(0, 0, 0);
+    }
+    100% {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+</style>

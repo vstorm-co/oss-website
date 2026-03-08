@@ -1,0 +1,149 @@
+---
+title: "We Built a Web Configurator for AI Agent Apps — 75+ Options, Download as ZIP"
+description: "246 template files, 5 AI frameworks, client-side rendering with Nunjucks — zero server, everything in your browser."
+pubDate: 2026-03-06
+author: "Vstorm"
+lang: en
+translationKey: web-configurator-ai-agent-template
+tags: ["pydantic-ai", "fastapi", "ai-agents", "python", "template"]
+category: open-source
+draft: false
+---
+
+CLIs are powerful. But they're also intimidating.
+
+Our [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-ai-agent-template) has 75+ configuration options. Database, auth, AI framework, background tasks, caching, rate limiting, observability, Docker, Kubernetes, CI/CD, frontend, i18n — the list goes on. The CLI works great for developers who already know what they want. For everyone else, it's a wall of flags and prompts.
+
+So we built a web configurator. A 9-step visual wizard that walks you through every option, validates dependencies in real-time, and generates a production-ready project as a ZIP file — downloaded directly from your browser.
+
+The interesting part: there's no server. Everything — template rendering, dependency validation, ZIP generation — happens client-side.
+
+## The 9-Step Wizard
+
+The configurator walks through project setup in logical groups:
+
+1. **Project Info** — name, description, author, Python version
+2. **Database** — PostgreSQL, MongoDB, SQLite, or None + ORM choice
+3. **Authentication** — JWT, API Key, Both, or None + OAuth
+4. **AI Agent** — framework selection ([Pydantic AI](https://ai.pydantic.dev/), [LangChain](https://python.langchain.com/), [LangGraph](https://langchain-ai.github.io/langgraph/), [CrewAI](https://docs.crewai.com/), DeepAgents), LLM provider, WebSocket streaming, conversation persistence
+5. **Infrastructure** — background tasks (Celery, TaskIQ, ARQ), Redis, caching, rate limiting, [Logfire](https://logfire.pydantic.dev/), Sentry, Prometheus
+6. **Integrations** — WebSockets, file storage, webhooks, CORS, admin panel
+7. **DevTools** — [Docker](https://docs.docker.com/), Kubernetes, pytest, pre-commit, CI/CD (GitHub Actions, GitLab CI)
+8. **Frontend** — [Next.js](https://nextjs.org/) or None, i18n
+9. **Review** — summary cards, feature badges, download actions
+
+Each step validates in real-time. Select PostgreSQL in step 2 → ORM options appear. Enable Logfire in step 5 → sub-features for database, Redis, and Celery instrumentation become available.
+
+## 3 Presets: From Zero to Download in 10 Seconds
+
+Most users don't want to configure 75 options. They want a starting point:
+
+| Preset | What you get | Use case |
+|--------|-------------|----------|
+| **Minimal** | No database, no auth, no Docker, no CI | Quick prototypes, learning [FastAPI](https://fastapi.tiangolo.com/) |
+| **Production** | PostgreSQL, JWT, Redis, caching, rate limiting, Sentry, Prometheus, Docker, K8s, GitHub Actions | Deploy-ready backend |
+| **AI Agent** | PostgreSQL, JWT, Redis, Pydantic AI, WebSockets, conversation persistence, Docker, GitHub Actions | AI chatbot/agent apps |
+
+Click a preset → all 75+ fields pre-fill → jump to Review → Download ZIP. Under 10 seconds from landing page to downloaded project.
+
+## The Technical Challenge: Client-Side Template Rendering
+
+This is where it got interesting. Our templates use Jinja2 syntax (via Python's cookiecutter). We needed to render them in the browser without a server.
+
+### Step 1: Bundle 246 Templates at Build Time
+
+A build script walks the template directory and serializes every file into a single JSON:
+
+```typescript
+// scripts/bundle-templates.ts
+const SLUG_DIR = join(TEMPLATE_ROOT, "{{cookiecutter.project_slug}}");
+// Walks all files, skips binaries (.png, .pyc, .so)
+// Output: public/templates.json (~1.1 MB)
+```
+
+Result: `templates.json` — a dictionary where keys are relative file paths and values are template content strings. Fetched once per session, cached in memory.
+
+### Step 2: Nunjucks as Browser-Side Jinja2
+
+[Nunjucks](https://mozilla.github.io/nunjucks/) is a JavaScript template engine with Jinja2-compatible syntax. Same `{% if %}`, `{% for %}`, `{{ variable }}` — our Python templates render identically in the browser.
+
+```javascript
+const env = new nunjucks.Environment(undefined, {
+  autoescape: false,
+  throwOnUndefined: false,
+  trimBlocks: true,
+  lstripBlocks: true,
+});
+
+const rendered = env.renderString(templateContent, { cookiecutter: ctx });
+```
+
+### Step 3: Smart Exclusion Logic
+
+Not every file belongs in every project. If you disable the AI agent, all agent framework files get excluded. If you choose Pydantic AI, LangChain files get removed. The exclusion logic mirrors our Python `post_gen_project.py`.
+
+### Step 4: JSZip Generation
+
+After rendering and filtering, JSZip packages everything with DEFLATE compression:
+
+```javascript
+const blob = await zip.generateAsync({
+  type: "blob",
+  compression: "DEFLATE",
+});
+downloadBlob(blob, `${projectName}.zip`);
+```
+
+The full pipeline — fetch bundle, render 246 templates, exclude unused files, generate ZIP — takes 1-2 seconds.
+
+## Auto-Fix Dependencies
+
+Certain options have dependencies. Instead of showing validation errors, the configurator auto-fixes:
+
+```typescript
+const needsRedis =
+  cur.enable_caching ||
+  (cur.enable_rate_limiting && cur.rate_limit_storage === "redis") ||
+  (cur.background_tasks !== "none") ||
+  (cur.enable_logfire && cur.logfire_features.redis);
+
+if (needsRedis && !cur.enable_redis) {
+  form.setValue("enable_redis", true);
+}
+```
+
+Turn on caching → Redis silently enables. Turn off the database → Logfire database instrumentation silently disables. The user never sees an invalid state.
+
+## Zod Validation: Same Schema, Different Runtime
+
+The CLI uses Python's [Pydantic](https://docs.pydantic.dev/) models for validation. The web uses Zod. Both enforce the same constraints:
+
+- Project name: `^[a-z][a-z0-9_]*$`
+- Ports: 1024-65535
+- 14 enum types (database, auth method, AI framework, etc.)
+- 28 boolean feature toggles
+- Cross-field conditional visibility (12 visibility functions)
+
+## The Download Options
+
+The Review step offers three ways to get your project:
+
+1. **ZIP file** — full project download (primary CTA)
+2. **JSON** — `cookiecutter.json` you can import into the CLI
+3. **CLI command** — single-line command copied to clipboard
+
+This means the web configurator and CLI are interoperable. Configure visually, export as JSON, use it with the CLI. Or vice versa.
+
+## Key Takeaways
+
+- **Client-side rendering eliminates server costs** — no backend to host, no API to maintain, scales to infinite users for free
+- **Nunjucks is Jinja2 for the browser** — if your templates use Jinja2 syntax, you can render them client-side with near-zero porting effort
+- **Auto-fix > validation errors** — silently enabling Redis when caching is turned on is better UX than showing "Redis is required for caching"
+- **Presets + progressive disclosure** — 3 presets cover 80% of users, the 9-step wizard serves the other 20%
+- **Build-time bundling** — serializing 246 files into a single JSON avoids 246 HTTP requests
+
+---
+
+**Try it:** [Web configurator](https://oss.vstorm.co/configurator/) — or install via CLI: `pip install fastapi-fullstack`
+
+[full-stack-ai-agent-template on GitHub](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template)

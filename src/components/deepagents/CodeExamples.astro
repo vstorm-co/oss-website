@@ -57,16 +57,16 @@ result = await agent.run(
 };
 ---
 
-<section class="reveal px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
+<section class="section-light section-stack reveal px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
   <div class="mx-auto max-w-2xl">
     <div class="text-center">
       <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl">{t["deepagents.code.title"]}</h2>
       <p class="mt-4 text-lg text-text-secondary">{t["deepagents.code.subtitle"]}</p>
     </div>
 
-    <div class="mt-16">
+    <div class="mt-16 force-dark rounded-xl overflow-hidden">
       <!-- Tab buttons -->
-      <div class="flex gap-1 border-b border-border" role="tablist">
+      <div class="flex gap-1 border-b border-border bg-surface" role="tablist">
         {tabs.map((tab, i) => (
           <button
             role="tab"

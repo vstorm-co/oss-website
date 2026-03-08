@@ -6,7 +6,7 @@ author: "Vstorm"
 lang: en
 translationKey: websocket-streaming-ai-agents
 tags: ["websockets", "fastapi", "streaming", "python", "ai-agents"]
-category: guide
+category: open-source
 draft: false
 ---
 
@@ -14,7 +14,7 @@ draft: false
 
 HTTP request-response is fine for quick API calls, but AI agent responses can take 5-30 seconds. Without streaming, users stare at a loading spinner. With WebSocket streaming, they see tokens appear in real-time — the same experience as ChatGPT or Claude.
 
-Here's how to implement it properly with FastAPI.
+Here's how to implement it properly with [FastAPI](https://fastapi.tiangolo.com/).
 
 ## TL;DR
 
@@ -237,7 +237,7 @@ class ConnectionManager:
 2. **Batch small chunks** — if tokens arrive faster than the WebSocket can send, buffer them
 3. **Set timeouts** — disconnect idle connections after 5-10 minutes
 4. **Use connection pooling** — reuse LLM provider connections across requests
-5. **Monitor with Logfire** — trace every WebSocket message for debugging
+5. **Monitor with [Logfire](https://logfire.pydantic.dev/)** — trace every WebSocket message for debugging
 
 ## Skip the Boilerplate
 

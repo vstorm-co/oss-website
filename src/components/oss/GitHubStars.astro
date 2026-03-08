@@ -1,0 +1,25 @@
+---
+import type { translations } from '../../i18n/translations';
+
+interface Props {
+  t: typeof translations.en;
+}
+
+const { t } = Astro.props;
+---
+
+<div class="w-full glass-card py-2">
+  <div class="mx-auto flex max-w-7xl items-center justify-center gap-2 px-4 text-sm">
+    <svg class="h-4 w-4 text-accent" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+    </svg>
+    <a
+      href="https://github.com/vstorm-co"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="text-text-secondary hover:text-accent transition-colors"
+    >
+      1,270+ {t["oss.githubStars"]}
+    </a>
+  </div>
+</div>

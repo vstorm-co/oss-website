@@ -1,5 +1,4 @@
 ---
-import ThemeToggle from './ThemeToggle.astro';
 import LanguageSwitcher from './LanguageSwitcher.astro';
 import { translations, type Lang } from '../i18n/translations';
 import type { Project } from '../data/projects';
@@ -18,69 +17,84 @@ const base = rawBase.endsWith("/") ? rawBase : rawBase + "/";
 
 const homeHref = currentLang === "en" ? "/" : `/${currentLang}/`;
 const blogHref = currentLang === "en" ? "/blog/" : `/${currentLang}/blog/`;
+const compareHref = currentLang === "en" ? "/compare/" : `/${currentLang}/compare/`;
 const aboutHref = currentLang === "en" ? "/about/" : `/${currentLang}/about/`;
+
+const pathname = Astro.url.pathname;
+const isProjects = pathname === '/' || /^\/[a-z]{2}\/?$/.test(pathname);
+const isBlog = pathname.includes('/blog');
+const isCompare = pathname.includes('/compare');
+const isAbout = pathname.includes('/about');
+
 const githubHref = project?.github
   ? `https://github.com/${project.github}`
   : "https://github.com/vstorm-co";
 const siteName = project ? project.name : "Vstorm OSS";
 ---
 
-<nav class="fixed top-0 left-0 right-0 z-40 border-b border-border/50 bg-bg/80 backdrop-blur-lg">
-  <div class="mx-auto max-w-7xl flex items-center justify-between px-4 sm:px-6 h-14">
+<nav class="fixed top-3 left-3 right-3 sm:left-4 sm:right-4 z-40 mx-auto max-w-5xl rounded-2xl border border-white/[0.08] bg-bg/60 backdrop-blur-2xl shadow-xl shadow-black/20">
+  <div class="flex items-center justify-between px-4 sm:px-6 h-14">
     <!-- Left: Logo -->
-    <div class="flex flex-1 items-center gap-1.5 min-w-0">
-      <a href={homeHref} class="flex items-center gap-2 text-text hover:text-accent transition-colors shrink-0" aria-label="Vstorm OSS Home">
-        <img src={`${base}favicon.png`} alt="Vstorm OSS" class="w-6 h-6" width="24" height="24" />
-        <span class="text-sm font-semibold tracking-tight hidden sm:inline" aria-hidden="true">Vstorm OSS</span>
+    <div class="flex items-center gap-2 min-w-0">
+      <a href={homeHref} class="flex items-center gap-2.5 text-text hover:text-accent transition-colors shrink-0" aria-label="Vstorm OSS Home">
+        <img src={`${base}favicon.png`} alt="Vstorm OSS" class="w-7 h-7" width="28" height="28" />
+        <span class="text-[15px] font-bold tracking-tight hidden sm:inline" aria-hidden="true">Vstorm OSS</span>
       </a>
-      {project && (
-        <>
-          <span class="text-text-tertiary hidden sm:inline">/</span>
-          <span class="text-sm font-medium text-text-secondary hidden sm:inline truncate max-w-[200px]">{project.name}</span>
-        </>
-      )}
     </div>
 
     <!-- Center: Links (hidden on mobile) -->
-    <div class="hidden sm:flex items-center gap-1">
+    <div class="hidden md:flex items-center gap-0.5">
       <a
         href={homeHref}
         aria-label={t["nav.projects"]}
-        class="flex items-center gap-1.5 px-3 py-1.5 text-sm text-text-secondary hover:text-text transition-colors rounded-lg hover:bg-surface-hover"
+        class:list={["px-3.5 py-2 text-[13px] font-medium transition-colors rounded-xl hover:bg-white/[0.06]", isProjects ? "text-accent" : "text-text-secondary hover:text-text"]}
       >
-        <svg class="w-4 h-4" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25a2.25 2.25 0 0 1-2.25-2.25v-2.25Z"/>
-        </svg>
-        <span>{t["nav.projects"]}</span>
+        {t["nav.projects"]}
       </a>
       <a
         href={blogHref}
-        class="flex items-center gap-1.5 px-3 py-1.5 text-sm text-text-secondary hover:text-text transition-colors rounded-lg hover:bg-surface-hover"
+        class:list={["px-3.5 py-2 text-[13px] font-medium transition-colors rounded-xl hover:bg-white/[0.06]", isBlog ? "text-accent" : "text-text-secondary hover:text-text"]}
       >
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
-        </svg>
         {t["nav.blog"]}
       </a>
       <a
-        href={aboutHref}
-        class="flex items-center gap-1.5 px-3 py-1.5 text-sm text-text-secondary hover:text-text transition-colors rounded-lg hover:bg-surface-hover"
+        href={compareHref}
+        class:list={["px-3.5 py-2 text-[13px] font-medium transition-colors rounded-xl hover:bg-white/[0.06]", isCompare ? "text-accent" : "text-text-secondary hover:text-text"]}
       >
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/>
-        </svg>
+        {t["nav.compare"] ?? "Compare"}
+      </a>
+      <a
+        href={aboutHref}
+        class:list={["px-3.5 py-2 text-[13px] font-medium transition-colors rounded-xl hover:bg-white/[0.06]", isAbout ? "text-accent" : "text-text-secondary hover:text-text"]}
+      >
         {t["nav.about"]}
       </a>
     </div>
 
-    <!-- Right: Language + Theme + Hamburger -->
-    <div class="flex flex-1 items-center justify-end gap-2">
-      {showLang && <LanguageSwitcher currentLang={currentLang} pathSuffix={pathSuffix} />}
-      <ThemeToggle />
+    <!-- Right: GitHub + Contact CTA + Language + Hamburger -->
+    <div class="flex items-center gap-2">
+      <a
+        href={githubHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="hidden md:flex items-center justify-center w-9 h-9 rounded-xl text-text-secondary hover:text-text hover:bg-white/[0.06] transition-colors"
+        aria-label="GitHub"
+      >
+        <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      </a>
+      <a
+        href="https://vstorm.co/contact-us/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="hidden md:inline-flex items-center rounded-full bg-accent px-4 py-1.5 text-[13px] font-semibold text-white transition-all hover:bg-accent-hover hover:shadow-lg hover:shadow-accent/20"
+      >
+        {t["footer.cta.button"]}
+      </a>
+      {showLang && <div class="hidden md:block"><LanguageSwitcher currentLang={currentLang} pathSuffix={pathSuffix} /></div>}
       <!-- Hamburger (mobile only) -->
       <button
         id="mobile-menu-btn"
-        class="sm:hidden flex items-center justify-center w-8 h-8 rounded-lg text-text-secondary hover:text-text hover:bg-surface-hover transition-colors"
+        class="md:hidden flex items-center justify-center w-9 h-9 rounded-xl text-text-secondary hover:text-text hover:bg-white/[0.06] transition-colors"
         aria-label="Open menu"
       >
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -92,8 +106,8 @@ const siteName = project ? project.name : "Vstorm OSS";
 </nav>
 
 <!-- Mobile Sidebar -->
-<div id="mobile-sidebar-overlay" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden" aria-hidden="true">
-  <div id="mobile-sidebar" class="fixed top-0 right-0 h-full w-64 bg-bg border-l border-border shadow-2xl translate-x-full transition-transform duration-200 ease-out">
+<div id="mobile-sidebar-overlay" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-md hidden" aria-hidden="true">
+  <div id="mobile-sidebar" class="fixed top-0 right-0 h-full w-72 bg-bg/80 backdrop-blur-2xl border-l border-white/[0.08] shadow-2xl translate-x-full transition-transform duration-200 ease-out">
     <!-- Header -->
     <div class="flex items-center justify-between px-4 h-14 border-b border-border/50">
       <span class="text-sm font-semibold tracking-tight">Menu</span>
@@ -111,7 +125,7 @@ const siteName = project ? project.name : "Vstorm OSS";
     <div class="flex flex-col p-4 gap-1">
       <a
         href={homeHref}
-        class="flex items-center gap-3 px-3 py-2.5 text-sm text-text-secondary hover:text-text transition-colors rounded-lg hover:bg-surface-hover"
+        class:list={["flex items-center gap-3 px-3 py-2.5 text-sm transition-colors rounded-lg hover:bg-surface-hover", isProjects ? "text-accent" : "text-text-secondary hover:text-text"]}
       >
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25a2.25 2.25 0 0 1-2.25-2.25v-2.25Z"/>
@@ -120,7 +134,7 @@ const siteName = project ? project.name : "Vstorm OSS";
       </a>
       <a
         href={blogHref}
-        class="flex items-center gap-3 px-3 py-2.5 text-sm text-text-secondary hover:text-text transition-colors rounded-lg hover:bg-surface-hover"
+        class:list={["flex items-center gap-3 px-3 py-2.5 text-sm transition-colors rounded-lg hover:bg-surface-hover", isBlog ? "text-accent" : "text-text-secondary hover:text-text"]}
       >
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
@@ -128,8 +142,17 @@ const siteName = project ? project.name : "Vstorm OSS";
         {t["nav.blog"]}
       </a>
       <a
+        href={compareHref}
+        class:list={["flex items-center gap-3 px-3 py-2.5 text-sm transition-colors rounded-lg hover:bg-surface-hover", isCompare ? "text-accent" : "text-text-secondary hover:text-text"]}
+      >
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/>
+        </svg>
+        {t["nav.compare"] ?? "Compare"}
+      </a>
+      <a
         href={aboutHref}
-        class="flex items-center gap-3 px-3 py-2.5 text-sm text-text-secondary hover:text-text transition-colors rounded-lg hover:bg-surface-hover"
+        class:list={["flex items-center gap-3 px-3 py-2.5 text-sm transition-colors rounded-lg hover:bg-surface-hover", isAbout ? "text-accent" : "text-text-secondary hover:text-text"]}
       >
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/>
@@ -148,12 +171,17 @@ const siteName = project ? project.name : "Vstorm OSS";
         </svg>
         GitHub
       </a>
+      {showLang && (
+        <div class="px-3 pt-2">
+          <LanguageSwitcher currentLang={currentLang} pathSuffix={pathSuffix} />
+        </div>
+      )}
     </div>
   </div>
 </div>
 
 <!-- Spacer so content isn't hidden behind fixed navbar -->
-<div class="h-14"></div>
+<div class="h-[5rem]"></div>
 
 <script>
   const btn = document.getElementById('mobile-menu-btn');

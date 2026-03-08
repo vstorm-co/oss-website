@@ -6,7 +6,7 @@ author: "Vstorm"
 lang: en
 translationKey: choosing-ai-framework
 tags: ["pydantic-ai", "langchain", "langgraph", "crewai", "deepagents", "comparison"]
-category: comparison
+category: open-source
 draft: false
 ---
 
@@ -16,11 +16,11 @@ The Python AI agent ecosystem has matured significantly. Instead of "which frame
 
 ## TL;DR
 
-- **Pydantic AI for type-safe production agents.** Best developer experience, minimal dependencies, native async. Pick this for new projects.
-- **LangChain for rapid prototyping with many integrations.** 70+ LLM providers and a massive ecosystem. Pay the complexity tax later.
-- **LangGraph for complex multi-step workflows.** State machines with cycles, checkpoints, and human-in-the-loop. Overkill for simple agents.
-- **CrewAI for role-based multi-agent teams.** Easy to set up, but limited customization and weaker type safety.
-- **DeepAgents for modular agent systems.** Claude Code-inspired architecture with standalone packages. Growing fast, best for teams that want fine-grained control.
+- **[Pydantic AI](https://ai.pydantic.dev/) for type-safe production agents.** Best developer experience, minimal dependencies, native async. Pick this for new projects.
+- **[LangChain](https://python.langchain.com/) for rapid prototyping with many integrations.** 70+ LLM providers and a massive ecosystem. Pay the complexity tax later.
+- **[LangGraph](https://langchain-ai.github.io/langgraph/) for complex multi-step workflows.** State machines with cycles, checkpoints, and human-in-the-loop. Overkill for simple agents.
+- **[CrewAI](https://docs.crewai.com/) for role-based multi-agent teams.** Easy to set up, but limited customization and weaker type safety.
+- **[DeepAgents](https://github.com/vstorm-co/pydantic-deepagents) for modular agent systems.** Claude Code-inspired architecture with standalone packages. Growing fast, best for teams that want fine-grained control.
 
 ## Framework Comparison
 
@@ -37,9 +37,9 @@ The Python AI agent ecosystem has matured significantly. Instead of "which frame
 
 ## Pydantic AI — Type-Safe Production Agents
 
-**Choose when:** You're building a FastAPI app, need type safety, or want clean dependency injection.
+**Choose when:** You're building a [FastAPI](https://fastapi.tiangolo.com/) app, need type safety, or want clean dependency injection.
 
-Pydantic AI treats AI agents like well-typed functions. You define inputs, outputs, and dependencies with Pydantic models, and the framework handles validation, retries, and streaming.
+Pydantic AI treats AI agents like well-typed functions. You define inputs, outputs, and dependencies with [Pydantic](https://docs.pydantic.dev/) models, and the framework handles validation, retries, and streaming.
 
 ```python title="pydantic_ai_agent.py"
 from pydantic import BaseModel
@@ -60,7 +60,7 @@ result = await agent.run("What is retrieval augmented generation?")
 # result.output.confidence -> 0.95
 ```
 
-**Strengths:** Type validation on every response, dependency injection for testing, minimal overhead, Logfire observability.
+**Strengths:** Type validation on every response, dependency injection for testing, minimal overhead, [Logfire](https://logfire.pydantic.dev/) observability.
 
 **Limitations:** Smaller ecosystem than LangChain, no built-in multi-agent orchestration (you wire it yourself).
 
@@ -87,7 +87,7 @@ executor = AgentExecutor(agent=agent, tools=tools)
 result = await executor.ainvoke({"input": "Search for recent AI news"})
 ```
 
-**Strengths:** Massive ecosystem, 70+ LLM providers, LangSmith for enterprise tracing, excellent documentation.
+**Strengths:** Massive ecosystem, 70+ LLM providers, [LangSmith](https://smith.langchain.com/) for enterprise tracing, excellent documentation.
 
 **Limitations:** Heavy dependencies, abstraction layers can obscure what's happening, LCEL has a learning curve.
 

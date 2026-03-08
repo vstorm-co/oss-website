@@ -1,0 +1,53 @@
+---
+import { getCollection } from 'astro:content';
+
+interface Props {
+  t: Record<string, string>;
+  lang: string;
+}
+
+const { t, lang } = Astro.props;
+const blogHref = lang === 'en' ? '/blog/' : `/${lang}/blog/`;
+
+const posts = (
+  await getCollection('blog', ({ data }) => data.lang === lang && !data.draft)
+).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()).slice(0, 3);
+
+const formatDate = (date: Date) =>
+  date.toLocaleDateString(lang, { year: "numeric", month: "short", day: "numeric" });
+
+const postHref = (postId: string) => {
+  const slug = postId.split('/').slice(1).join('/');
+  return lang === 'en' ? `/blog/${slug}/` : `/${lang}/blog/${slug}/`;
+};
+---
+
+<section class="section-stack px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
+  <div class="mx-auto max-w-4xl">
+    <div class="reveal text-center mb-12">
+      <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl heading-accent">{t["oss.recentPosts.title"]}</h2>
+      <p class="mt-4 text-lg text-text-secondary">{t["oss.recentPosts.subtitle"]}</p>
+    </div>
+
+    {posts.length > 0 && (
+      <div class="reveal grid gap-5 sm:grid-cols-3">
+        {posts.map((post) => (
+          <a href={postHref(post.id)} class="glass-card rounded-xl p-5 transition-colors hover:border-accent block">
+            <time class="text-xs font-mono text-text-tertiary">{formatDate(post.data.pubDate)}</time>
+            <h3 class="mt-2 font-semibold text-sm sm:text-base leading-snug">{post.data.title}</h3>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed line-clamp-2">{post.data.description}</p>
+          </a>
+        ))}
+      </div>
+    )}
+
+    <div class="reveal mt-8 text-center">
+      <a
+        href={blogHref}
+        class="inline-flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-accent transition-colors"
+      >
+        {t["oss.recentPosts.viewAll"]}
+      </a>
+    </div>
+  </div>
+</section>

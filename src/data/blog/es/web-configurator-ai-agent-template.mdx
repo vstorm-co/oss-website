@@ -1,0 +1,149 @@
+---
+title: "Creamos un Configurador Web para Apps de Agentes IA — Más de 75 Opciones, Descarga como ZIP"
+description: "246 archivos de plantilla, 5 frameworks de IA, renderizado del lado del cliente con Nunjucks — sin servidor, todo en tu navegador."
+pubDate: 2026-03-06
+author: "Vstorm"
+lang: es
+translationKey: web-configurator-ai-agent-template
+tags: ["pydantic-ai", "fastapi", "ai-agents", "python", "template"]
+category: open-source
+draft: false
+---
+
+Los CLIs son poderosos. Pero también intimidantes.
+
+Nuestro full-stack-ai-agent-template tiene más de 75 opciones de configuración. Base de datos, autenticación, framework de IA, tareas en segundo plano, caché, limitación de tasa, observabilidad, Docker, Kubernetes, CI/CD, frontend, i18n — la lista continúa. El CLI funciona muy bien para desarrolladores que ya saben lo que quieren. Para todos los demás, es un muro de flags y prompts.
+
+Así que construimos un configurador web. Un asistente visual de 9 pasos que te guía a través de cada opción, valida dependencias en tiempo real y genera un proyecto listo para producción como archivo ZIP — descargado directamente desde tu navegador.
+
+La parte interesante: no hay servidor. Todo — renderizado de plantillas, validación de dependencias, generación del ZIP — sucede del lado del cliente.
+
+## El Asistente de 9 Pasos
+
+El configurador recorre la configuración del proyecto en grupos lógicos:
+
+1. **Información del Proyecto** — nombre, descripción, autor, versión de Python
+2. **Base de Datos** — PostgreSQL, MongoDB, SQLite o Ninguna + elección de ORM
+3. **Autenticación** — JWT, API Key, Ambos o Ninguna + OAuth
+4. **Agente IA** — selección de framework (Pydantic AI, LangChain, LangGraph, CrewAI, DeepAgents), proveedor de LLM, streaming por WebSocket, persistencia de conversaciones
+5. **Infraestructura** — tareas en segundo plano (Celery, TaskIQ, ARQ), Redis, caché, limitación de tasa, Logfire, Sentry, Prometheus
+6. **Integraciones** — WebSockets, almacenamiento de archivos, webhooks, CORS, panel de administración
+7. **DevTools** — Docker, Kubernetes, pytest, pre-commit, CI/CD (GitHub Actions, GitLab CI)
+8. **Frontend** — Next.js o Ninguno, i18n
+9. **Revisión** — tarjetas de resumen, insignias de funcionalidades, acciones de descarga
+
+Cada paso valida en tiempo real. Selecciona PostgreSQL en el paso 2 → aparecen las opciones de ORM. Activa Logfire en el paso 5 → las sub-funcionalidades para instrumentación de base de datos, Redis y Celery se habilitan.
+
+## 3 Presets: De Cero a Descarga en 10 Segundos
+
+La mayoría de los usuarios no quieren configurar 75 opciones. Quieren un punto de partida:
+
+| Preset | Lo que obtienes | Caso de uso |
+|--------|----------------|-------------|
+| **Minimal** | Sin base de datos, sin auth, sin Docker, sin CI | Prototipos rápidos, aprender FastAPI |
+| **Production** | PostgreSQL, JWT, Redis, caché, limitación de tasa, Sentry, Prometheus, Docker, K8s, GitHub Actions | Backend listo para desplegar |
+| **AI Agent** | PostgreSQL, JWT, Redis, Pydantic AI, WebSockets, persistencia de conversaciones, Docker, GitHub Actions | Apps de chatbot/agente IA |
+
+Haz clic en un preset → los más de 75 campos se rellenan automáticamente → salta a Revisión → Descarga ZIP. Menos de 10 segundos desde la página de inicio hasta el proyecto descargado.
+
+## El Desafío Técnico: Renderizado de Plantillas del Lado del Cliente
+
+Aquí es donde se puso interesante. Nuestras plantillas usan sintaxis Jinja2 (a través de cookiecutter de Python). Necesitábamos renderizarlas en el navegador sin un servidor.
+
+### Paso 1: Empaquetar 246 Plantillas en Tiempo de Build
+
+Un script de build recorre el directorio de plantillas y serializa cada archivo en un solo JSON:
+
+```typescript
+// scripts/bundle-templates.ts
+const SLUG_DIR = join(TEMPLATE_ROOT, "{{cookiecutter.project_slug}}");
+// Walks all files, skips binaries (.png, .pyc, .so)
+// Output: public/templates.json (~1.1 MB)
+```
+
+Resultado: `templates.json` — un diccionario donde las claves son rutas de archivo relativas y los valores son cadenas de contenido de plantilla. Se obtiene una vez por sesión y se almacena en caché en memoria.
+
+### Paso 2: Nunjucks como Jinja2 del Lado del Navegador
+
+[Nunjucks](https://mozilla.github.io/nunjucks/) es un motor de plantillas de JavaScript con sintaxis compatible con Jinja2. Los mismos `{% if %}`, `{% for %}`, `{{ variable }}` — nuestras plantillas de Python se renderizan de forma idéntica en el navegador.
+
+```javascript
+const env = new nunjucks.Environment(undefined, {
+  autoescape: false,
+  throwOnUndefined: false,
+  trimBlocks: true,
+  lstripBlocks: true,
+});
+
+const rendered = env.renderString(templateContent, { cookiecutter: ctx });
+```
+
+### Paso 3: Lógica de Exclusión Inteligente
+
+No todos los archivos pertenecen a cada proyecto. Si desactivas el agente IA, todos los archivos del framework de agentes se excluyen. Si eliges Pydantic AI, los archivos de LangChain se eliminan. La lógica de exclusión replica nuestro `post_gen_project.py` de Python.
+
+### Paso 4: Generación con JSZip
+
+Después de renderizar y filtrar, JSZip empaqueta todo con compresión DEFLATE:
+
+```javascript
+const blob = await zip.generateAsync({
+  type: "blob",
+  compression: "DEFLATE",
+});
+downloadBlob(blob, `${projectName}.zip`);
+```
+
+El pipeline completo — obtener el bundle, renderizar 246 plantillas, excluir archivos no utilizados, generar ZIP — toma 1-2 segundos.
+
+## Auto-Corrección de Dependencias
+
+Ciertas opciones tienen dependencias. En lugar de mostrar errores de validación, el configurador auto-corrige:
+
+```typescript
+const needsRedis =
+  cur.enable_caching ||
+  (cur.enable_rate_limiting && cur.rate_limit_storage === "redis") ||
+  (cur.background_tasks !== "none") ||
+  (cur.enable_logfire && cur.logfire_features.redis);
+
+if (needsRedis && !cur.enable_redis) {
+  form.setValue("enable_redis", true);
+}
+```
+
+Activa el caché → Redis se habilita silenciosamente. Desactiva la base de datos → la instrumentación de base de datos de Logfire se desactiva silenciosamente. El usuario nunca ve un estado inválido.
+
+## Validación con Zod: Mismo Esquema, Diferente Runtime
+
+El CLI usa modelos Pydantic de Python para la validación. La web usa Zod. Ambos aplican las mismas restricciones:
+
+- Nombre del proyecto: `^[a-z][a-z0-9_]*$`
+- Puertos: 1024-65535
+- 14 tipos enum (base de datos, método de auth, framework de IA, etc.)
+- 28 toggles booleanos de funcionalidades
+- Visibilidad condicional entre campos (12 funciones de visibilidad)
+
+## Las Opciones de Descarga
+
+El paso de Revisión ofrece tres formas de obtener tu proyecto:
+
+1. **Archivo ZIP** — descarga completa del proyecto (CTA principal)
+2. **JSON** — `cookiecutter.json` que puedes importar en el CLI
+3. **Comando CLI** — comando de una sola línea copiado al portapapeles
+
+Esto significa que el configurador web y el CLI son interoperables. Configura visualmente, exporta como JSON, úsalo con el CLI. O viceversa.
+
+## Conclusiones Clave
+
+- **El renderizado del lado del cliente elimina costos de servidor** — sin backend que alojar, sin API que mantener, escala a usuarios infinitos de forma gratuita
+- **Nunjucks es Jinja2 para el navegador** — si tus plantillas usan sintaxis Jinja2, puedes renderizarlas del lado del cliente con casi cero esfuerzo de portabilidad
+- **Auto-corrección > errores de validación** — habilitar Redis silenciosamente cuando se activa el caché es mejor UX que mostrar "Redis es necesario para el caché"
+- **Presets + divulgación progresiva** — 3 presets cubren el 80% de los usuarios, el asistente de 9 pasos sirve al otro 20%
+- **Empaquetado en tiempo de build** — serializar 246 archivos en un solo JSON evita 246 peticiones HTTP
+
+---
+
+**Pruébalo:** [Configurador web](https://oss.vstorm.co/configurator/) — o instala vía CLI: `pip install fastapi-fullstack`
+
+[full-stack-ai-agent-template en GitHub](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template)

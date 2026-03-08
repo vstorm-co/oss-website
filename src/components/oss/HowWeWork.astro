@@ -1,0 +1,54 @@
+---
+interface Props {
+  t: Record<string, string>;
+}
+
+const { t } = Astro.props;
+
+const steps = [
+  {
+    number: "01",
+    icon: `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/></svg>`,
+    title: t["oss.howwework.step1.title"],
+    description: t["oss.howwework.step1.desc"],
+  },
+  {
+    number: "02",
+    icon: `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085"/></svg>`,
+    title: t["oss.howwework.step2.title"],
+    description: t["oss.howwework.step2.desc"],
+  },
+  {
+    number: "03",
+    icon: `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 0 0 6.16-12.12A14.98 14.98 0 0 0 9.631 8.41m5.96 5.96a14.926 14.926 0 0 1-5.841 2.58m-.119-8.54a6 6 0 0 0-7.381 5.84h4.8m2.58-5.84a14.927 14.927 0 0 1-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 0 1-2.448-2.448 14.9 14.9 0 0 1 .06-.312m-2.24 2.39a4.493 4.493 0 0 0-1.757 4.306 4.493 4.493 0 0 0 4.306-1.758M16.5 9a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/></svg>`,
+    title: t["oss.howwework.step3.title"],
+    description: t["oss.howwework.step3.desc"],
+  },
+];
+---
+
+<section class="section-stack px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
+  <div class="mx-auto max-w-5xl">
+    <div class="reveal text-center mb-16">
+      <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl heading-accent">{t["oss.howwework.title"]}</h2>
+      <p class="mt-4 text-lg text-text-secondary">{t["oss.howwework.subtitle"]}</p>
+    </div>
+
+    <div class="reveal-group grid gap-6 sm:grid-cols-3">
+      {steps.map((step) => (
+        <div class="reveal glass-card rounded-2xl p-6 sm:p-8 text-center group hover:border-accent/30 transition-all">
+          <!-- Step number -->
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-accent/10 border border-accent/20 text-accent mb-5 group-hover:bg-accent/20 transition-colors">
+            <Fragment set:html={step.icon} />
+          </div>
+
+          <!-- Number badge -->
+          <div class="text-xs font-bold text-accent/60 uppercase tracking-widest mb-2">Step {step.number}</div>
+
+          <h3 class="text-lg font-semibold mb-2">{step.title}</h3>
+          <p class="text-sm text-text-secondary leading-relaxed">{step.description}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

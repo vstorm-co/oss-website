@@ -6,17 +6,17 @@ author: "Vstorm"
 lang: en
 translationKey: pydantic-ai-vs-langchain
 tags: ["pydantic-ai", "langchain", "ai-agents", "python", "comparison"]
-category: comparison
+category: open-source
 draft: false
 ---
 
 ## Why This Comparison Matters
 
-Choosing an AI agent framework isn't just a technical decision — it shapes your development velocity, debugging experience, and production reliability for months. After building 30+ production AI agent systems, we've used both Pydantic AI and LangChain extensively. Here's what we've learned.
+Choosing an AI agent framework isn't just a technical decision — it shapes your development velocity, debugging experience, and production reliability for months. After building 30+ production AI agent systems, we've used both [Pydantic AI](https://ai.pydantic.dev/) and [LangChain](https://python.langchain.com/) extensively. Here's what we've learned.
 
 ## TL;DR
 
-- **Pydantic AI wins on type safety and developer experience.** Full Pydantic v2 validation, native async streaming, and built-in dependency injection make it feel like writing normal Python.
+- **Pydantic AI wins on type safety and developer experience.** Full [Pydantic](https://docs.pydantic.dev/) v2 validation, native async streaming, and built-in dependency injection make it feel like writing normal Python.
 - **LangChain wins on ecosystem breadth.** 70+ LLM providers, hundreds of integrations, and massive community - hard to beat for rapid prototyping.
 - **For production agents, Pydantic AI has fewer footguns.** Structured outputs are validated at compile time, not runtime. Dependency injection replaces global state.
 - **LangChain's abstraction layers add complexity.** Chains, runnables, LCEL - the learning curve is steep and debugging through layers is painful.
@@ -32,7 +32,7 @@ Choosing an AI agent framework isn't just a technical decision — it shapes you
 | **LLM Providers** | OpenAI, Anthropic, Gemini, Groq, Mistral | 70+ providers |
 | **Learning Curve** | Low (if you know Pydantic) | Steep (large API surface) |
 | **Bundle Size** | Minimal | Heavy (many dependencies) |
-| **Observability** | Logfire integration | LangSmith |
+| **Observability** | [Logfire](https://logfire.pydantic.dev/) integration | [LangSmith](https://smith.langchain.com/) |
 
 ## Type Safety: The Biggest Differentiator
 
@@ -112,7 +112,7 @@ async with agent.run_stream("Explain WebSocket streaming") as response:
         print(chunk, end="", flush=True)
 ```
 
-Pydantic AI's streaming is async-native and integrates directly with FastAPI's `StreamingResponse`. In our template, WebSocket streaming with Pydantic AI required about 40 lines of code. The equivalent LangChain setup with LCEL streaming needed roughly 80 lines.
+Pydantic AI's streaming is async-native and integrates directly with [FastAPI](https://fastapi.tiangolo.com/)'s `StreamingResponse`. In our template, WebSocket streaming with Pydantic AI required about 40 lines of code. The equivalent LangChain setup with LCEL streaming needed roughly 80 lines.
 
 ## When to Choose Pydantic AI
 
@@ -125,7 +125,7 @@ Pydantic AI's streaming is async-native and integrates directly with FastAPI's `
 ## When to Choose LangChain
 
 - **You need 70+ LLM providers** — LangChain has the widest provider support
-- **You're using LangGraph** — for complex multi-agent orchestration
+- **You're using [LangGraph](https://langchain-ai.github.io/langgraph/)** — for complex multi-agent orchestration
 - **You need LangSmith** — enterprise-grade tracing and evaluation
 - **Your team already knows it** — switching cost is real
 - **You need pre-built chains** — RAG, summarization, etc. out of the box
@@ -134,7 +134,7 @@ Pydantic AI's streaming is async-native and integrates directly with FastAPI's `
 
 For new production AI agent projects in 2026, we default to **Pydantic AI**. The type safety, dependency injection, and FastAPI integration create a development experience that's hard to match. LangChain remains the right choice when you need its ecosystem breadth — especially LangGraph for complex agent workflows.
 
-Our [Full-Stack AI Agent Template](https://template.vstorm.co/) supports both frameworks (plus LangGraph, CrewAI, and DeepAgents), so you can start with either and switch later without rewriting your infrastructure.
+Our [Full-Stack AI Agent Template](https://template.vstorm.co/) supports both frameworks (plus LangGraph, [CrewAI](https://docs.crewai.com/), and DeepAgents), so you can start with either and switch later without rewriting your infrastructure.
 
 ## Key Takeaways
 

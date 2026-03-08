@@ -1,0 +1,88 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import Navbar from '../../../../components/Navbar.astro';
+import Footer from '../../../../components/landing/Footer.astro';
+import BlogCard from '../../../../components/blog/BlogCard.astro';
+import Breadcrumbs from '../../../../components/shared/Breadcrumbs.astro';
+import { getCollection } from 'astro:content';
+import { translations, languages, defaultLang, type Lang } from '../../../../i18n/translations';
+
+export async function getStaticPaths() {
+  const nonDefaultLocales = Object.keys(languages).filter((l) => l !== defaultLang);
+  const paths = [];
+
+  for (const locale of nonDefaultLocales) {
+    const posts = await getCollection('blog', ({ data }) => data.lang === locale && !data.draft);
+
+    const tagMap = new Map<string, typeof posts>();
+    for (const post of posts) {
+      for (const tag of post.data.tags ?? []) {
+        if (!tagMap.has(tag)) tagMap.set(tag, []);
+        tagMap.get(tag)!.push(post);
+      }
+    }
+
+    for (const [tag, tagPosts] of tagMap) {
+      paths.push({
+        params: { lang: locale, tag },
+        props: {
+          tag,
+          posts: tagPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()),
+        },
+      });
+    }
+  }
+
+  return paths;
+}
+
+const { tag, posts } = Astro.props;
+const lang = Astro.params.lang as Lang;
+const t = translations[lang];
+
+const pageTitle = t["blog.tag.title"].replace("{tag}", tag);
+const postCount = t["blog.tag.postCount"].replace("{count}", String(posts.length));
+---
+
+<Layout
+  title={`${pageTitle} — Vstorm OSS`}
+  description={`${postCount} tagged "${tag}"`}
+  lang={lang}
+>
+  <Navbar currentLang={lang} />
+  <Breadcrumbs items={[
+    { label: "Home", href: `/${lang}/` },
+    { label: t["nav.blog"], href: `/${lang}/blog/` },
+    { label: pageTitle },
+  ]} />
+
+  <main class="mx-auto max-w-3xl px-4 py-16 sm:py-24">
+    <div class="mb-12 text-center">
+      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">{pageTitle}</h1>
+      <p class="mt-4 text-text-secondary">{postCount}</p>
+    </div>
+
+    {posts.length === 0 ? (
+      <p class="text-center text-text-secondary">{t["blog.noPosts"]}</p>
+    ) : (
+      <div class="space-y-4">
+        {posts.map((post) => {
+          const slug = post.id.split('/').slice(1).join('/');
+          return (
+            <BlogCard
+              title={post.data.title}
+              description={post.data.description}
+              pubDate={post.data.pubDate}
+              href={`/${lang}/blog/${slug}/`}
+              tags={post.data.tags}
+              lang={lang}
+              category={post.data.category}
+            />
+          );
+        })}
+      </div>
+    )}
+  </main>
+
+  <Footer t={t} />
+</Layout>

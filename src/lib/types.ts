@@ -82,6 +82,7 @@ export interface ProjectConfig {
   ai_framework: AIFrameworkType;
   llm_provider: LLMProviderType;
   enable_conversation_persistence: boolean;
+  enable_langsmith: boolean;
   enable_webhooks: boolean;
   websocket_auth: WebSocketAuthType;
   enable_cors: boolean;

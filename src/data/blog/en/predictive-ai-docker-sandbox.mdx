@@ -1,12 +1,12 @@
 ---
 title: "Predictive AI: Give Your Agent a Docker Lab to Run Models"
-description: "How to build an AI agent that runs sklearn predictions inside an isolated Docker sandbox. Environment-as-a-tool pattern, sub-agent delegation, and structured chart output with Pydantic AI."
+description: "How to build an AI agent that runs sklearn predictions inside an isolated [Docker](https://docs.docker.com/) sandbox. Environment-as-a-tool pattern, sub-agent delegation, and structured chart output with Pydantic AI."
 pubDate: 2026-02-24
 author: "Vstorm"
 lang: en
 translationKey: predictive-ai-docker-sandbox
 tags: ["ai-agents", "docker", "sandbox", "pydantic-ai", "python", "machine-learning"]
-category: tutorial
+category: open-source
 draft: false
 ---
 
@@ -22,7 +22,7 @@ We built a demo that answers this question.
 
 - The **"environment as a tool"** pattern lets your AI agent selectively use a Docker sandbox only when needed, avoiding overhead on simple queries.
 - A **sub-agent delegation** approach keeps the main agent clean - it describes *what* to predict, and the sub-agent figures out *how* to write the Python code.
-- **Structured Pydantic output** for charts beats image generation - send data, let the frontend render with Chart.js.
+- **Structured [Pydantic](https://docs.pydantic.dev/) output** for charts beats image generation - send data, let the frontend render with Chart.js.
 - **WebSocket streaming** with `agent.iter()` gives real-time visibility into text, tool calls, and results.
 - The hardest part is **frontend integration** - merging chart series with different date ranges, intercepting tool outputs, and streaming over WebSocket.
 
@@ -47,7 +47,7 @@ analytics_agent: Agent[AnalyticsDeps, str] = Agent(
 )
 ```
 
-The main agent is a regular Pydantic AI agent. It doesn't live inside Docker. It has three tools registered with `@analytics_agent.tool`:
+The main agent is a regular [Pydantic AI](https://ai.pydantic.dev/) agent. It doesn't live inside Docker. It has three tools registered with `@analytics_agent.tool`:
 
 - `query_data` - reads a JSON file, filters records, returns results. No Docker needed.
 - `predict` - creates a sub-agent with Docker access, delegates the prediction task.

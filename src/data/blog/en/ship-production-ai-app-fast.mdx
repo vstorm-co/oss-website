@@ -6,18 +6,18 @@ author: "Vstorm"
 lang: en
 translationKey: ship-production-ai-app-fast
 tags: ["fastapi", "nextjs", "pydantic-ai", "python", "ai-template", "docker"]
-category: tutorial
+category: open-source
 draft: false
 ---
 
-You're starting a new AI project. You need a FastAPI backend with auth, a Next.js frontend with streaming chat, WebSocket support, database migrations, Redis caching, Docker deployment, and a Pydantic AI agent with tool support.
+You're starting a new AI project. You need a [FastAPI](https://fastapi.tiangolo.com/) backend with auth, a [Next.js](https://nextjs.org/) frontend with streaming chat, WebSocket support, database migrations, Redis caching, [Docker](https://docs.docker.com/) deployment, and a [Pydantic AI](https://ai.pydantic.dev/) agent with tool support.
 
 You open a blank directory. Two weeks later, you've wired up 15 libraries, fixed 30 configuration issues, and written zero business logic.
 
 ## TL;DR
 
 - **`fastapi-fullstack create my_app`** generates a complete production stack -- FastAPI backend, Next.js frontend, Docker, CI/CD -- in one command.
-- **20+ integrations out of the box:** Pydantic AI, LangChain, JWT auth, PostgreSQL, Redis, WebSocket streaming, Logfire, Sentry, Celery, Kubernetes, and more.
+- **20+ integrations out of the box:** Pydantic AI, [LangChain](https://python.langchain.com/), JWT auth, PostgreSQL, Redis, WebSocket streaming, [Logfire](https://logfire.pydantic.dev/), Sentry, Celery, Kubernetes, and more.
 - **Presets match common architectures:** `--preset ai-agent` for AI chat apps, `--preset production` for enterprise deployments, or pick individual options.
 - **The CLI generates complete, runnable projects** -- not empty files with TODO comments. Tests pass, Docker builds, the server starts.
 - **Everything is swappable.** Start with SQLite, switch to PostgreSQL. Start with Pydantic AI, add LangChain. The architecture supports incremental migration.
@@ -45,10 +45,10 @@ That generates a complete project with:
 
 | Category             | Integration        | Out-of-Box? |
 | -------------------- | ------------------ | ----------- |
-| **AI Frameworks**    | Pydantic AI        | Yes         |
-|                      | LangChain          | Yes         |
-|                      | LangGraph          | Yes         |
-|                      | DeepAgents         | Yes         |
+| **AI Frameworks**    | [Pydantic AI](https://ai.pydantic.dev/) | Yes         |
+|                      | [LangChain](https://python.langchain.com/) | Yes         |
+|                      | [LangGraph](https://langchain-ai.github.io/langgraph/) | Yes         |
+|                      | [DeepAgents](https://github.com/vstorm-co/pydantic-deepagents) | Yes         |
 | **LLM Providers**    | OpenAI             | Yes         |
 |                      | Anthropic          | Yes         |
 |                      | OpenRouter         | Yes         |
@@ -61,7 +61,7 @@ That generates a complete project with:
 |                      | fastapi-cache2     | Optional    |
 | **Rate Limiting**    | slowapi            | Optional    |
 | **Admin**            | SQLAdmin           | Optional    |
-| **Observability**    | Logfire            | Yes         |
+| **Observability**    | [Logfire](https://logfire.pydantic.dev/) | Yes         |
 |                      | Sentry             | Optional    |
 |                      | Prometheus         | Optional    |
 | **Background Tasks** | Celery             | Optional    |
@@ -291,7 +291,7 @@ The frontend is a modern Next.js setup:
 
 ## Try It Yourself
 
-[full-stack-fastapi-nextjs-llm-template](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template) -- Production-ready project generator for AI/LLM applications with FastAPI + Next.js + 20+ integrations.
+[full-stack-fastapi-nextjs-llm-template](https://github.com/vstorm-co/full-stack-ai-agent-template) -- Production-ready project generator for AI/LLM applications with FastAPI + Next.js + 20+ integrations.
 
 ```bash
 pip install fastapi-fullstack

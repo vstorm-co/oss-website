@@ -8,6 +8,7 @@ import {
 import {
   shouldShowAIOptions, shouldShowOpenRouter,
   shouldShowWebSocketAuth, shouldShowConversationPersistence,
+  shouldShowLangsmith,
 } from "../../../lib/validation";
 
 export function AIAgentStep() {
@@ -55,6 +56,15 @@ export function AIAgentStep() {
                 columns={3}
               />
             </div>
+
+            {shouldShowLangsmith(config) && (
+              <Toggle
+                label="LangSmith Observability"
+                desc="Enable LangSmith tracing for LangChain, LangGraph, or DeepAgents"
+                checked={config.enable_langsmith}
+                register={register("enable_langsmith")}
+              />
+            )}
 
             {shouldShowWebSocketAuth(config) && (
               <div>

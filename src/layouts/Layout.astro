@@ -1,7 +1,6 @@
 ---
 import Analytics from '@vercel/analytics/astro';
 import SpeedInsights from '@vercel/speed-insights/astro';
-import CursorGlow from '../components/CursorGlow.astro';
 
 interface Alternate {
   lang: string;
@@ -15,6 +14,7 @@ interface Props {
   lang?: string;
   alternates?: Alternate[];
   jsonLd?: Record<string, unknown>;
+  ogImage?: string;
 }
 
 const {
@@ -24,13 +24,14 @@ const {
   lang = "en",
   alternates = [],
   jsonLd: jsonLdOverride,
+  ogImage,
 } = Astro.props;
 
 const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith("/") ? rawBase : rawBase + "/";
 const siteUrl = Astro.site?.origin ?? "https://oss.vstorm.co";
 const canonicalURL = new URL(Astro.url.pathname, siteUrl).href;
-const ogImageURL = new URL(`${base}og-image.png`, siteUrl).href;
+const ogImageURL = ogImage ?? new URL(`${base}og-image.png`, siteUrl).href;
 
 const keywords = keywordsOverride ?? "pydantic ai, ai agents, python, fastapi, langchain, langgraph, crewai, deepagents, llm, open source, vstorm, template, middleware, subagents";
 
@@ -102,6 +103,7 @@ const breadcrumbSchema = breadcrumbItems.length > 1 ? {
     <meta name="generator" content={Astro.generator} />
 
     <link rel="canonical" href={canonicalURL} />
+    <link rel="alternate" type="application/rss+xml" title="Vstorm OSS Blog" href="/rss.xml" />
 
     {alternates.map((alt) => (
       <link rel="alternate" hreflang={alt.lang} href={new URL(alt.href, siteUrl).href} />
@@ -127,17 +129,18 @@ const breadcrumbSchema = breadcrumbItems.length > 1 ? {
     <link rel="icon" type="image/png" sizes="192x192" href={`${base}favicon.png`} />
     <link rel="apple-touch-icon" href={`${base}apple-touch-icon.png`} />
     <link rel="manifest" href={`${base}site.webmanifest`} />
+    <link rel="dns-prefetch" href="https://github.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="preload"
-      as="style"
-      onload="this.onload=null;this.rel='stylesheet'"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
     />
     <noscript>
       <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
         rel="stylesheet"
       />
     </noscript>
@@ -159,24 +162,50 @@ const breadcrumbSchema = breadcrumbItems.length > 1 ? {
     <!-- Grid background -->
     <div class="grid-bg pointer-events-none fixed inset-0 z-0" aria-hidden="true"></div>
 
-    <CursorGlow />
     <main id="main-content" class="relative z-10">
       <slot />
     </main>
     <Analytics />
     <SpeedInsights />
-    <!-- Scroll reveal observer -->
+    <!-- Back to top -->
+    <button id="back-to-top" class="fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.08] bg-bg/60 backdrop-blur-2xl text-text-tertiary shadow-lg shadow-black/20 opacity-0 translate-y-4 pointer-events-none transition-all duration-300 hover:text-accent hover:border-accent/40" aria-label="Back to top">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14l-5-5-5 5"/></svg>
+    </button>
     <script is:inline>
-      (function() {
-        var io = new IntersectionObserver(function(entries) {
-          entries.forEach(function(e) {
-            if (e.isIntersecting) {
-              e.target.classList.add('visible');
-              io.unobserve(e.target);
-            }
+      (function(){
+        /* Scroll reveal */
+        var rio=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.classList.add('visible');rio.unobserve(x.target)}})},{threshold:.12});
+        document.querySelectorAll('.reveal').forEach(function(el){rio.observe(el)});
+
+        /* Back to top */
+        var btn=document.getElementById('back-to-top');
+        if(btn){var s=false;window.addEventListener('scroll',function(){var v=window.scrollY>500;if(v!==s){s=v;btn.style.opacity=s?'1':'0';btn.style.transform=s?'translateY(0)':'translateY(1rem)';btn.style.pointerEvents=s?'auto':'none'}},{passive:true});btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})})}
+
+        /* Count-up animation */
+        var seen=new Set();
+        var cio=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting&&!seen.has(x.target)){seen.add(x.target);var el=x.target,raw=el.getAttribute('data-count-target')||el.textContent.trim(),suffix=raw.replace(/[\d,.]+/,''),target=parseFloat(raw.replace(/[^\d.]/g,'')),st=null;el.textContent='0'+suffix;function step(ts){if(!st)st=ts;var p=Math.min((ts-st)/1500,1),eased=1-Math.pow(1-p,3);el.textContent=Math.floor(eased*target).toLocaleString()+suffix;if(p<1)requestAnimationFrame(step);else el.textContent=raw}requestAnimationFrame(step)}})},{threshold:.3});
+        document.querySelectorAll('[data-count-up]').forEach(function(el){el.setAttribute('data-count-target',el.textContent.trim());cio.observe(el)});
+
+        /* Copy code button */
+        document.querySelectorAll('pre').forEach(function(pre) {
+          if (pre.querySelector('.copy-btn')) return;
+          var btn = document.createElement('button');
+          btn.className = 'copy-btn';
+          btn.setAttribute('aria-label', 'Copy code');
+          btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+          pre.style.position = 'relative';
+          pre.appendChild(btn);
+          btn.addEventListener('click', function() {
+            var code = pre.querySelector('code');
+            var text = code ? code.textContent : pre.textContent;
+            navigator.clipboard.writeText(text || '').then(function() {
+              btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+              setTimeout(function() {
+                btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+              }, 2000);
+            });
           });
-        }, { threshold: 0.12 });
-        document.querySelectorAll('.reveal').forEach(function(el) { io.observe(el); });
+        });
       })();
     </script>
   </body>

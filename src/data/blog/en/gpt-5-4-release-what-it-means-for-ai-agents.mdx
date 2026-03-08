@@ -1,0 +1,78 @@
+---
+title: "GPT-5.4 Is Here — What It Means for AI Agent Developers"
+description: "OpenAI released GPT-5.4 with native computer use, 1M context, tool search, and state-of-the-art coding. Here's what matters for teams building AI agents in production."
+pubDate: 2026-03-06
+author: "Vstorm"
+lang: en
+translationKey: gpt-5-4-release-what-it-means-for-ai-agents
+tags: ["gpt-5.4", "openai", "ai-agents", "llm", "news"]
+category: news
+draft: false
+---
+
+[OpenAI just released GPT-5.4](https://openai.com/index/introducing-gpt-5-4/) — their most capable model to date. It combines the coding strengths of GPT-5.3-Codex with major improvements in reasoning, computer use, and tool calling. Available now in the API as `gpt-5.4` and in ChatGPT as GPT-5.4 Thinking.
+
+Here's what matters if you're building AI agents.
+
+## Native Computer Use
+
+GPT-5.4 is OpenAI's first general-purpose model with **native computer-use capabilities**. It can operate computers through screenshots and keyboard/mouse commands, or via code libraries like [Playwright](https://playwright.dev/).
+
+The numbers are impressive:
+- **OSWorld-Verified**: 75.0% (up from 47.3% with GPT-5.2, surpassing human performance at 72.4%)
+- **WebArena-Verified**: 67.3% for browser-based tasks
+
+For agent frameworks like [Pydantic AI](https://ai.pydantic.dev/) and [LangChain](https://python.langchain.com/), this opens up a new class of workflows — agents that don't just call APIs but interact with actual software interfaces. Combined with sandboxed environments (like [Docker](https://docs.docker.com/) or [Daytona](https://daytona.io/)), computer-use agents become viable for production.
+
+## 1M Token Context Window
+
+GPT-5.4 supports up to **1 million tokens of context** in the API. For long-running agents, this is transformative — an agent can hold an entire codebase, a full document set, or hours of conversation history without hitting context limits.
+
+That said, context management still matters. Our experience with [summarization-pydantic-ai](https://github.com/vstorm-co/summarization-pydantic-ai) shows that even with large context windows, intelligent compression (LLM summarization + sliding window) produces better results than dumping everything into context. The model attends more carefully to recent, relevant information.
+
+## Tool Search — The Biggest API Change
+
+This is the sleeper feature. Previously, all tool definitions were included in every API request. With dozens of tools, that's thousands of tokens per call — expensive and slow.
+
+GPT-5.4 introduces **tool search**: the model gets a lightweight list of available tools and can look up full definitions on demand. OpenAI reports **47% fewer tokens** on tool-heavy workloads with identical accuracy.
+
+For frameworks that compose many toolsets — like [pydantic-deepagents](https://github.com/vstorm-co/pydantic-deepagents) where a single agent can have 30+ tools from filesystem, planning, sub-agents, middleware, and more — this directly translates to lower cost and faster responses.
+
+## Coding Improvements
+
+GPT-5.4 matches or beats GPT-5.3-Codex on coding benchmarks:
+- **SWE-Bench Pro**: 57.7% (vs 56.8%)
+- **Terminal-Bench 2.0**: 75.1%
+
+More importantly, it's significantly more token-efficient — solving problems with fewer reasoning tokens than GPT-5.2. For agent loops where the model iterates on code (edit → run → fix), fewer tokens per iteration means lower costs and faster cycles.
+
+## Better Tool Calling
+
+On [Toolathlon](https://openai.com/index/introducing-gpt-5-4/), which tests multi-step tool use, GPT-5.4 scores **54.6%** (vs 45.7% for GPT-5.2) — and does it in fewer turns. Better tool calling accuracy with less back-and-forth directly improves agent reliability.
+
+For developers using lifecycle hooks (like those in [pydantic-ai-middleware](https://github.com/vstorm-co/pydantic-ai-middleware)) to track cost and audit tool calls, fewer unnecessary calls means cleaner logs and lower budgets.
+
+## Pricing
+
+GPT-5.4 costs more per token but uses fewer tokens:
+
+| Model | Input | Cached Input | Output |
+|-------|-------|-------------|--------|
+| gpt-5.2 | $1.75/M | $0.175/M | $14/M |
+| **gpt-5.4** | **$2.50/M** | **$0.25/M** | **$15/M** |
+
+With tool search and more efficient reasoning, the total cost per task may actually decrease for tool-heavy agents.
+
+## What This Means for Our Stack
+
+We're already testing GPT-5.4 across our tooling:
+
+- **[pydantic-deepagents](https://github.com/vstorm-co/pydantic-deepagents)**: The 1M context window means fewer summarization triggers and longer autonomous runs. Tool search could reduce prompt overhead by 40%+ for our full toolset.
+- **[pydantic-ai-backend](https://github.com/vstorm-co/pydantic-ai-backend)**: Computer-use capabilities open the door for browser-based testing within sandboxes.
+- **[Full-Stack AI Agent Template](https://github.com/vstorm-co/full-stack-ai-agent-template)**: GPT-5.4 works as a drop-in replacement — just change the model string. Try it in the [web configurator](https://template.vstorm.co/configurator/).
+
+The model is available now. If you're building agents with [Pydantic AI](https://ai.pydantic.dev/), [LangChain](https://python.langchain.com/), or [LangGraph](https://langchain-ai.github.io/langgraph/), GPT-5.4 is worth testing today — especially for tool-heavy and long-running workflows.
+
+---
+
+*[Vstorm](https://vstorm.co) builds production AI agent systems. We maintain [10+ open-source packages](https://oss.vstorm.co/) for the Pydantic AI ecosystem.*

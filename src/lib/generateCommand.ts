@@ -73,6 +73,11 @@ export function generateCommand(config: ProjectConfig): string {
     if (config.llm_provider !== "openai") {
       parts.push(`--llm-provider ${config.llm_provider}`);
     }
+    if (config.enable_langsmith) parts.push("--langsmith");
+    if (config.enable_conversation_persistence) parts.push("--conversation-persistence");
+    if (config.websocket_auth !== "none") {
+      parts.push(`--websocket-auth ${config.websocket_auth}`);
+    }
   }
 
   // Boolean flags (only when enabled, since CLI defaults to false)

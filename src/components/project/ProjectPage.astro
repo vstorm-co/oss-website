@@ -128,7 +128,7 @@ const homeHref = lang === "en" ? "/" : `/${lang}/`;
           <h2 class="text-lg font-semibold mb-4">{t["project.features"]}</h2>
           <div class="grid gap-3 sm:grid-cols-2">
             {project.features[lang].map((feature) => (
-              <div class="flex items-center gap-2.5 rounded-xl border border-border bg-surface px-4 py-3">
+              <div class="flex items-center gap-2.5 rounded-xl border border-accent/15 bg-accent/[0.04] px-4 py-3">
                 <span class="text-accent">&mdash;</span>
                 <span class="text-sm text-text-secondary">{feature}</span>
               </div>
@@ -232,12 +232,12 @@ const homeHref = lang === "en" ? "/" : `/${lang}/`;
         startOnLoad: true,
         theme: 'dark',
         themeVariables: {
-          primaryColor: '#6366f1',
-          primaryTextColor: '#e2e8f0',
-          primaryBorderColor: '#4f46e5',
-          lineColor: '#94a3b8',
-          secondaryColor: '#1e293b',
-          tertiaryColor: '#0f172a',
+          primaryColor: '#ef4444',
+          primaryTextColor: '#fafafa',
+          primaryBorderColor: '#dc2626',
+          lineColor: '#a1a1aa',
+          secondaryColor: '#18181b',
+          tertiaryColor: '#09090b',
         },
       });
       m.default.run();

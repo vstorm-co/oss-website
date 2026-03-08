@@ -42,6 +42,7 @@ export function LivePreview() {
   if (config.enable_sentry) features.push("Sentry");
   if (config.enable_prometheus) features.push("Prom");
   if (config.enable_logfire) features.push("Logfire");
+  if (config.enable_langsmith) features.push("LangSmith");
   if (config.enable_websockets) features.push("WS");
   if (config.enable_file_storage) features.push("S3");
   if (config.enable_webhooks) features.push("Hooks");

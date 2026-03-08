@@ -9,16 +9,17 @@ const filtered = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 ---
 
 {filtered.length > 0 && (
-  <nav>
+  <nav id="toc-nav">
     <h3 class="mb-3 text-xs font-semibold uppercase tracking-wider text-text-tertiary">
       {label}
     </h3>
-    <ul class="space-y-2 text-sm">
+    <ul class="space-y-1 text-sm">
       {filtered.map((heading) => (
         <li class={heading.depth === 3 ? "pl-4" : ""}>
           <a
             href={`#${heading.slug}`}
-            class="text-text-secondary hover:text-accent transition-colors"
+            data-toc-link={heading.slug}
+            class="toc-link block py-1 text-text-tertiary hover:text-accent transition-colors border-l-2 border-transparent pl-3 -ml-px"
           >
             {heading.text}
           </a>
@@ -27,3 +28,51 @@ const filtered = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
     </ul>
   </nav>
 )}
+
+<style>
+  .toc-link.active {
+    color: var(--color-accent);
+    border-left-color: var(--color-accent);
+  }
+</style>
+
+<script is:inline>
+  (function() {
+    var links = document.querySelectorAll('[data-toc-link]');
+    if (!links.length) return;
+
+    var slugs = [];
+    links.forEach(function(l) { slugs.push(l.getAttribute('data-toc-link')); });
+
+    var headings = slugs.map(function(s) { return document.getElementById(s); }).filter(Boolean);
+    if (!headings.length) return;
+
+    var current = null;
+
+    function update() {
+      var scrollY = window.scrollY;
+      var found = null;
+
+      for (var i = headings.length - 1; i >= 0; i--) {
+        if (headings[i].getBoundingClientRect().top <= 100) {
+          found = headings[i].id;
+          break;
+        }
+      }
+
+      if (found !== current) {
+        current = found;
+        links.forEach(function(l) {
+          if (l.getAttribute('data-toc-link') === current) {
+            l.classList.add('active');
+          } else {
+            l.classList.remove('active');
+          }
+        });
+      }
+    }
+
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  })();
+</script>

@@ -100,6 +100,7 @@ export function ReviewStep() {
         {config.oauth_provider !== "none" && <Badge>OAuth: Google</Badge>}
         {config.enable_ai_agent && <Badge>{enumLabels.llm_provider[config.llm_provider]}</Badge>}
         {config.enable_ai_agent && config.enable_conversation_persistence && <Badge>Persistence</Badge>}
+        {config.enable_ai_agent && config.enable_langsmith && <Badge>LangSmith</Badge>}
         {features.map((f) => (
           <Badge key={f}>{f}</Badge>
         ))}

@@ -1,25 +1,47 @@
 ---
+import type { Lang } from '../../i18n/translations';
+import { translations } from '../../i18n/translations';
+
 interface Props {
   title: string;
   description: string;
   pubDate: Date;
   href: string;
   tags?: string[];
-  lang?: string;
+  lang?: Lang;
+  category?: string;
+  readingTime?: number;
 }
 
-const { title, description, pubDate, href, tags = [], lang = 'en' } = Astro.props;
+const { title, description, pubDate, href, tags = [], lang = 'en', category, readingTime } = Astro.props;
+const t = translations[lang as Lang];
+
+const estimatedReadTime = readingTime ?? 5; // default 5 min
 
 const formatDate = (date: Date) =>
   date.toLocaleDateString(lang, { year: "numeric", month: "short", day: "numeric" });
+
+const categoryKey = `blog.category.${category}` as keyof typeof t;
+const categoryLabel = category && t[categoryKey] ? t[categoryKey] : null;
 ---
 
 <a
   href={href}
-  class="group block rounded-lg border border-border bg-surface p-6 transition-colors hover:border-border-hover hover:bg-surface-hover"
+  class="group block glass-card rounded-xl p-6 hover:border-accent/30 relative overflow-hidden"
 >
+  <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/0 to-transparent group-hover:via-accent/50 transition-all duration-500"></div>
   <div class="flex items-center gap-3 text-sm text-text-tertiary">
     <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
+    <span>&middot;</span>
+    <span>{estimatedReadTime} min read</span>
+    {categoryLabel && (
+      <>
+        <span>&middot;</span>
+        <span class="rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent">
+          {categoryLabel}
+        </span>
+      </>
+    )}
   </div>
 
   <h2 class="mt-2 text-lg font-semibold text-text group-hover:text-accent transition-colors">
@@ -31,7 +53,7 @@ const formatDate = (date: Date) =>
   {tags.length > 0 && (
     <div class="mt-4 flex flex-wrap gap-2">
       {tags.map((tag) => (
-        <span class="rounded-full bg-bg px-2.5 py-0.5 text-xs text-text-tertiary">
+        <span class="rounded-full bg-accent/[0.10] px-2.5 py-0.5 text-xs font-medium text-accent border border-accent/25">
           {tag}
         </span>
       ))}

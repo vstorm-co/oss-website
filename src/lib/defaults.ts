@@ -58,6 +58,7 @@ export const defaultConfig: ProjectConfig = {
   ai_framework: "pydantic_ai",
   llm_provider: "openai",
   enable_conversation_persistence: false,
+  enable_langsmith: false,
   enable_webhooks: false,
   websocket_auth: "none",
   enable_cors: true,

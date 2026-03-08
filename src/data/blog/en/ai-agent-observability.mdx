@@ -6,7 +6,7 @@ author: "Vstorm"
 lang: en
 translationKey: ai-agent-observability
 tags: ["ai-agents", "observability", "logfire", "pydantic-ai", "python", "monitoring"]
-category: guide
+category: open-source
 draft: false
 ---
 
@@ -24,7 +24,7 @@ You deploy an AI agent to production. It starts making weird decisions. Customer
 
 This is the state of AI agent observability in 2026. The tools are built for web services - request/response, HTTP status codes, error rates. But AI agents don't follow request/response patterns. They loop, they branch, they call tools that call other tools. A single user message can spawn 15 spans across 3 sub-agents.
 
-We've instrumented every production agent we've built at Vstorm using Pydantic Logfire. Logfire is excellent at capturing the data - every LLM call, every tool invocation, every token. But querying that data with SQL dashboards is like reading assembly code. You need a translation layer.
+We've instrumented every production agent we've built at Vstorm using Pydantic [Logfire](https://logfire.pydantic.dev/). Logfire is excellent at capturing the data - every LLM call, every tool invocation, every token. But querying that data with SQL dashboards is like reading assembly code. You need a translation layer.
 
 So we built one: an AI-powered Logfire assistant that translates natural language questions into SQL queries against your Logfire data.
 
@@ -46,7 +46,7 @@ That's exactly what our Logfire assistant does. Natural language in, SQL queries
 
 ## Architecture: NL to SQL to Charts
 
-The assistant is a Pydantic AI agent with access to Logfire's query API:
+The assistant is a [Pydantic AI](https://ai.pydantic.dev/) agent with access to Logfire's query API:
 
 ```python
 class LogfireAgent:

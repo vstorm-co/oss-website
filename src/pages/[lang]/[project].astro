@@ -40,6 +40,8 @@ const jsonLd = project.status === "released" ? {
   offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
   programmingLanguage: ["Python"],
   author: { "@type": "Organization", name: "Vstorm" },
+  ...(project.github && { codeRepository: `https://github.com/${project.github}` }),
+  ...(project.pypi && { downloadUrl: `https://pypi.org/project/${project.pypi}/` }),
 } : undefined;
 ---
 

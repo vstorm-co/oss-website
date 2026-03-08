@@ -102,6 +102,7 @@ const baseConfigSchema = z.object({
   ai_framework: aiFrameworkSchema.default("pydantic_ai"),
   llm_provider: llmProviderSchema.default("openai"),
   enable_conversation_persistence: z.boolean().default(false),
+  enable_langsmith: z.boolean().default(false),
   enable_webhooks: z.boolean().default(false),
   websocket_auth: websocketAuthSchema.default("none"),
   enable_cors: z.boolean().default(true),

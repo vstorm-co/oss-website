@@ -4,6 +4,9 @@ import Navbar from '../components/Navbar.astro';
 import Footer from '../components/landing/Footer.astro';
 import TableOfContents from '../components/blog/TableOfContents.astro';
 import TranslationLinks from '../components/blog/TranslationLinks.astro';
+import ShareButtons from '../components/blog/ShareButtons.astro';
+import RelatedPosts from '../components/blog/RelatedPosts.astro';
+import StickyCTA from '../components/blog/StickyCTA.astro';
 import type { Lang } from '../i18n/translations';
 import { translations, languages, defaultLang } from '../i18n/translations';
 import '../styles/prose.css';
@@ -81,6 +84,12 @@ const howToSchema = category === "tutorial" && headings.length > 0
 
 const formatDate = (date: Date) =>
   date.toLocaleDateString(lang, { year: "numeric", month: "long", day: "numeric" });
+
+// Find the English slug for the OG image (all languages share the same OG via translationKey)
+const enTranslation = allTranslations.find((tr) => tr.lang === defaultLang);
+const ogSlug = enTranslation?.slug ?? translationKey;
+const siteUrl = Astro.site?.origin ?? "https://oss.vstorm.co";
+const ogImage = new URL(`/og/${ogSlug}.svg`, siteUrl).href;
 ---
 
 <Layout
@@ -89,7 +98,11 @@ const formatDate = (date: Date) =>
   keywords={tags.join(", ")}
   lang={lang}
   alternates={alternates}
+  ogImage={ogImage}
 >
+  <!-- Scroll progress bar -->
+  <div id="scroll-progress" class="fixed top-0 left-0 h-0.5 bg-accent z-50 transition-none" style="width: 0%"></div>
+
   <Navbar currentLang={lang} />
 
   <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
@@ -109,6 +122,11 @@ const formatDate = (date: Date) =>
         </a>
 
         <header class="mb-10">
+          {category && (
+            <span class="mb-3 inline-block rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
+              {t[`blog.category.${category}` as keyof typeof t] || category}
+            </span>
+          )}
           <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">{title}</h1>
           <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-text-secondary">
             <span>{author}</span>
@@ -133,9 +151,9 @@ const formatDate = (date: Date) =>
           {tags.length > 0 && (
             <div class="mt-4 flex flex-wrap gap-2">
               {tags.map((tag) => (
-                <span class="rounded-full bg-surface px-3 py-1 text-xs font-medium text-text-secondary">
+                <a href={lang === defaultLang ? `/blog/tag/${tag}/` : `/${lang}/blog/tag/${tag}/`} class="rounded-full bg-surface px-3 py-1 text-xs font-medium text-text-secondary hover:text-accent hover:bg-accent/10 transition-colors">
                   {tag}
-                </span>
+                </a>
               ))}
             </div>
           )}
@@ -145,9 +163,20 @@ const formatDate = (date: Date) =>
           )}
         </header>
 
+        {headings.length > 0 && (
+          <details class="lg:hidden glass-card rounded-xl p-4 mb-8">
+            <summary class="text-sm font-semibold cursor-pointer">{t["blog.tableOfContents"]}</summary>
+            <TableOfContents headings={headings} label="" />
+          </details>
+        )}
+
         <div class="prose">
           <slot />
         </div>
+
+        <ShareButtons title={title} url={Astro.url.href} t={t} />
+
+        <RelatedPosts currentSlug={Astro.url.pathname} currentTags={tags} lang={lang} t={t} />
       </article>
 
       <!-- Sidebar TOC (desktop only) -->
@@ -162,4 +191,17 @@ const formatDate = (date: Date) =>
   </main>
 
   <Footer t={t} />
+  <StickyCTA t={t} />
+
+  <script is:inline>
+    (function(){
+      var bar = document.getElementById('scroll-progress');
+      if (!bar) return;
+      window.addEventListener('scroll', function() {
+        var h = document.documentElement.scrollHeight - window.innerHeight;
+        var p = h > 0 ? (window.scrollY / h) * 100 : 0;
+        bar.style.width = p + '%';
+      }, { passive: true });
+    })();
+  </script>
 </Layout>

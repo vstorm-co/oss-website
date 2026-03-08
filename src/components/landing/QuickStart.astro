@@ -28,7 +28,7 @@ const steps = [
 ];
 ---
 
-<section id="quickstart" class="reveal px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
+<section id="quickstart" class="section-light section-stack reveal px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
   <div class="mx-auto max-w-2xl">
     <div class="text-center">
       <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl">{t["quickstart.title"]}</h2>
@@ -43,7 +43,7 @@ const steps = [
           <div class="flex-1">
             <h3 class="text-base font-semibold">{step.title}</h3>
             <div
-              class="copy-block group/copy relative mt-3 cursor-pointer overflow-hidden rounded-xl border border-border bg-surface transition-colors hover:border-accent/40"
+              class="copy-block force-dark group/copy relative mt-3 cursor-pointer overflow-hidden rounded-xl border border-border bg-surface transition-colors hover:border-accent/40"
               data-command={step.code}
             >
               <div class="flex items-center justify-between px-4 py-3 font-mono text-sm">
@@ -67,7 +67,7 @@ const steps = [
             </div>
             {step.alt && (
               <p class="mt-2 text-xs text-text-tertiary">
-                {t["ui.orWithPreset"]} <code class="rounded-md border border-border bg-surface px-1.5 py-0.5 font-mono text-xs text-accent">{step.alt}</code>
+                {t["ui.orWithPreset"]} <code class="force-dark rounded-md border border-border bg-surface px-1.5 py-0.5 font-mono text-xs text-accent">{step.alt}</code>
               </p>
             )}
           </div>

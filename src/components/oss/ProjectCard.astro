@@ -34,7 +34,7 @@ const href = lang === "en" ? `/${project.slug}/` : `/${lang}/${project.slug}/`;
   {project.features[lang] && project.features[lang].length > 0 && !isComingSoon && (
     <div class="mt-3 flex flex-wrap gap-1.5">
       {project.features[lang].slice(0, 3).map((f) => (
-        <span class="rounded-md bg-bg px-2 py-0.5 text-[11px] text-text-tertiary border border-border/50">{f}</span>
+        <span class="rounded-md bg-accent/[0.10] px-2 py-0.5 text-[11px] font-medium text-accent border border-accent/25">{f}</span>
       ))}
     </div>
   )}
@@ -44,8 +44,14 @@ const href = lang === "en" ? `/${project.slug}/` : `/${lang}/${project.slug}/`;
 
   {!isComingSoon && project.installCommand && (
     <div class="pt-4">
-      <div class="rounded-lg bg-bg border border-border/50 px-3 py-2 font-mono text-xs text-text-secondary">
-        <span class="text-text-tertiary">$</span> {project.installCommand}
+      <div
+        class="install-cmd group/cmd relative rounded-lg bg-bg border border-accent/10 px-3 py-2 font-mono text-xs text-text-secondary cursor-pointer transition-colors hover:border-accent/30"
+        data-cmd={project.installCommand}
+        role="button"
+        tabindex="0"
+      >
+        <span class="text-accent/50">$</span> {project.installCommand}
+        <span class="install-copied absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-sans text-green-400 opacity-0 transition-opacity">Copied!</span>
       </div>
     </div>
   )}
@@ -59,3 +65,35 @@ const href = lang === "en" ? `/${project.slug}/` : `/${lang}/${project.slug}/`;
     </div>
   )}
 </a>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.install-cmd').forEach((el) => {
+    el.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const cmd = el.dataset.cmd;
+      if (!cmd) return;
+      try {
+        await navigator.clipboard.writeText(cmd);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = cmd;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      const badge = el.querySelector('.install-copied');
+      if (badge) {
+        badge.classList.remove('opacity-0');
+        badge.classList.add('opacity-100');
+        setTimeout(() => {
+          badge.classList.add('opacity-0');
+          badge.classList.remove('opacity-100');
+        }, 1500);
+      }
+    });
+  });
+</script>

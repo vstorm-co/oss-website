@@ -1,7 +1,9 @@
 import type { APIRoute } from "astro";
+import { getCollection } from "astro:content";
 import { projects, categories } from "../data/projects";
+import { comparisonPages } from "../data/compare-pages";
 
-export const GET: APIRoute = ({ site }) => {
+export const GET: APIRoute = async ({ site }) => {
   const siteUrl = site?.origin ?? "https://oss.vstorm.co";
 
   const projectSections = categories
@@ -41,13 +43,24 @@ ${entries}`;
     .filter(Boolean)
     .join("\n\n---\n\n");
 
+  const posts = (
+    await getCollection("blog", ({ data }) => data.lang === "en" && !data.draft)
+  ).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+  const blogList = posts
+    .map((post) => {
+      const slug = post.id.split("/").slice(1).join("/");
+      return `- [${post.data.title}](${siteUrl}/blog/${slug}/): ${post.data.description}`;
+    })
+    .join("\n");
+
   const body = `# Vstorm OSS — Complete Reference
 
 > ${siteUrl}
 
 ## What is Vstorm OSS?
 
-Vstorm OSS is a collection of 20 open-source repositories (1,270+ GitHub stars, 285K+ PyPI downloads) for building production AI agent applications in Python. The projects span four categories: project templates, agent frameworks, specialized toolsets, and community resources.
+Vstorm OSS is a collection of ${projects.length} open-source repositories (1,270+ GitHub stars, 285K+ PyPI downloads) for building production AI agent applications in Python. The projects span four categories: project templates, agent frameworks, specialized toolsets, and community resources.
 
 All projects are MIT licensed and built by Vstorm (vstorm.co), an Applied Agentic AI Engineering Consultancy with 30+ production AI agent implementations.
 
@@ -107,30 +120,55 @@ Chrome extension + FastAPI backend for querying Pydantic Logfire data with natur
 
 ---
 
-## Blog Posts
+## Blog Posts (${posts.length} articles)
 
-- [Choosing an AI Framework](${siteUrl}/blog/choosing-ai-framework/): How to pick the right AI agent framework for your Python project
-- [FastAPI + Next.js AI Template Guide](${siteUrl}/blog/fastapi-nextjs-ai-template-guide/): Step-by-step guide to the Full-Stack AI Agent Template
-- [Pydantic AI vs LangChain](${siteUrl}/blog/pydantic-ai-vs-langchain/): Feature comparison of the two leading Python AI frameworks
-- [WebSocket Streaming for AI Agents](${siteUrl}/blog/websocket-streaming-ai-agents/): Real-time token streaming with FastAPI WebSockets
-- [AI Agent Memory Management](${siteUrl}/blog/ai-agent-memory-management/): How to fix context loss after 50 messages with summarization and persistent memory
-- [Task Planning for AI Agents](${siteUrl}/blog/task-planning-ai-agents/): Structured todo lists with subtasks, dependencies, and cycle detection for agents
-- [Ship a Production AI App in 5 Minutes](${siteUrl}/blog/ship-production-ai-app-fast/): FastAPI + Next.js template with 20+ integrations via one CLI command
-- [AI Agent Observability](${siteUrl}/blog/ai-agent-observability/): Why standard observability fails for agents and how Logfire Assistant fixes it
-- [AI Agent Selective Memory](${siteUrl}/blog/ai-agent-selective-memory/): File-based persistent memory that stores less and remembers better
-- [Predictive AI Docker Sandbox](${siteUrl}/blog/predictive-ai-docker-sandbox/): Give your agent a Docker lab to run ML models and data pipelines
-- [Hashline File Editing](${siteUrl}/blog/hashline-file-editing/): How 2-character content hashes fixed AI file editing accuracy
+${blogList}
 
 All blog posts available in 4 languages: English (default), Polish (/pl/), German (/de/), Spanish (/es/).
 
 ---
 
+## Site Features
+
+- **Project grid** with category filtering and status badges
+- **Interactive configurator** — 9-step React wizard for generating custom projects
+- **Blog** with search, category filtering, reading time, related posts, share buttons
+- **RSS feed** at ${siteUrl}/rss.xml
+- **Comparison pages** — ${comparisonPages.length} side-by-side framework/tool comparisons with feature tables, code examples, and FAQ
+- **FAQ** with collapsible Q&A organized by product category
+- **Breadcrumbs** on subpages for navigation
+- **Dynamic OG images** per blog post (SVG-based)
+- **4-language i18n** — English, Polish, German, Spanish
+- **Changelog** — latest releases timeline on homepage
+- **Contributors** section with GitHub avatars
+- **Back to top** button and sticky CTA bar on blog posts
+
+---
+
+## Comparisons (${comparisonPages.length} pages)
+
+Side-by-side comparisons of AI agent frameworks, templates, and tools.
+Compare index: ${siteUrl}/compare/
+
+${comparisonPages.map((c) => `### ${c.product} vs ${c.competitor}
+${siteUrl}/compare/${c.slug}/
+
+${c.verdict.en}
+
+Key differences: ${c.highlights.map((h) => h.title.en).join(", ")}
+Features compared: ${c.tableRows.length}`).join("\n\n")}
+
+---
+
 ## Other Pages
 
-- [Home](${siteUrl}/): OSS portfolio landing, all projects grouped by category
-- [Blog](${siteUrl}/blog/): Blog listing with all articles
+- [Home](${siteUrl}/): OSS portfolio landing with project grid, community recognition, changelog
+- [Blog](${siteUrl}/blog/): Blog listing with search, category filtering, and pagination
+- [Compare](${siteUrl}/compare/): Side-by-side framework and tool comparisons
 - [FAQ](${siteUrl}/faq/): Common questions about frameworks and configuration
-- [About](${siteUrl}/about/): About Vstorm OSS - team, philosophy, and company info
+- [Changelog](${siteUrl}/changelog/): Release history across all projects
+- [About](${siteUrl}/about/): About Vstorm OSS — team, philosophy, and company info
+- [RSS](${siteUrl}/rss.xml): RSS feed for blog posts
 
 ---
 

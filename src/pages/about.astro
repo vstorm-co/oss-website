@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 import OssFooter from '../components/oss/OssFooter.astro';
+import Breadcrumbs from '../components/shared/Breadcrumbs.astro';
 import { translations, languages, defaultLang } from '../i18n/translations';
 
 const lang = defaultLang;
@@ -40,12 +41,16 @@ const orgSchema = {
   <Navbar currentLang={lang} />
 
   <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
+  <Breadcrumbs items={[
+    { label: "Home", href: "/" },
+    { label: t["nav.about"] },
+  ]} />
 
-  <main class="mx-auto max-w-4xl px-4 py-16 sm:py-24">
+  <main class="mx-auto max-w-4xl px-4 pt-28 pb-16 sm:px-6 sm:pt-36 sm:pb-24 lg:px-8">
     <!-- Hero -->
     <div class="mb-16 text-center reveal">
-      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">{t["about.title"]}</h1>
-      <p class="mt-4 text-lg text-text-secondary max-w-2xl mx-auto">{t["about.subtitle"]}</p>
+      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl heading-accent">{t["about.title"]}</h1>
+      <p class="mt-6 text-lg text-text-secondary max-w-2xl mx-auto">{t["about.subtitle"]}</p>
     </div>
 
     <!-- Company -->
@@ -60,19 +65,19 @@ const orgSchema = {
       <h2 class="text-2xl font-bold tracking-tight mb-8">{t["about.numbers.title"]}</h2>
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
         <div class="text-center p-6 rounded-xl border border-border bg-surface">
-          <div class="text-3xl font-bold text-accent">1,270+</div>
+          <div class="text-3xl font-bold text-accent" data-count-up>1,270+</div>
           <div class="mt-1 text-sm text-text-secondary">{t["about.numbers.stars"]}</div>
         </div>
         <div class="text-center p-6 rounded-xl border border-border bg-surface">
-          <div class="text-3xl font-bold text-accent">285K+</div>
+          <div class="text-3xl font-bold text-accent" data-count-up>285K+</div>
           <div class="mt-1 text-sm text-text-secondary">{t["about.numbers.downloads"]}</div>
         </div>
         <div class="text-center p-6 rounded-xl border border-border bg-surface">
-          <div class="text-3xl font-bold text-accent">20</div>
+          <div class="text-3xl font-bold text-accent" data-count-up>20</div>
           <div class="mt-1 text-sm text-text-secondary">{t["about.numbers.repos"]}</div>
         </div>
         <div class="text-center p-6 rounded-xl border border-border bg-surface">
-          <div class="text-3xl font-bold text-accent">90+</div>
+          <div class="text-3xl font-bold text-accent" data-count-up>90+</div>
           <div class="mt-1 text-sm text-text-secondary">{t["about.numbers.projects"]}</div>
         </div>
       </div>

@@ -16,15 +16,16 @@ const previewItems = filteredItems.slice(0, 5);
 const faqHref = lang === 'en' ? '/faq/' : `/${lang}/faq/`;
 ---
 
-<section class="mx-auto max-w-4xl px-4 py-16 sm:py-24">
+<section class="section-stack px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
+  <div class="mx-auto max-w-4xl">
   <div class="mb-10 text-center reveal">
-    <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">{t["faq.title"]}</h2>
+    <h2 class="text-2xl font-bold tracking-tight sm:text-3xl heading-accent">{t["faq.title"]}</h2>
     <p class="mt-3 text-text-secondary">{t["faq.subtitle"]}</p>
   </div>
 
   <div class="space-y-3 reveal-group">
     {previewItems.map((item) => (
-      <details class="reveal group rounded-lg border border-border bg-surface transition-colors hover:border-border-hover">
+      <details class="reveal group rounded-lg border border-border bg-surface transition-colors hover:border-accent/30">
         <summary class="flex cursor-pointer items-center justify-between px-6 py-4 font-medium select-none">
           <span>{item.question[lang]}</span>
           <svg
@@ -54,5 +55,6 @@ const faqHref = lang === 'en' ? '/faq/' : `/${lang}/faq/`;
         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
       </svg>
     </a>
+  </div>
   </div>
 </section>

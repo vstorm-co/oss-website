@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import OssFooter from '../../components/oss/OssFooter.astro';
+import Breadcrumbs from '../../components/shared/Breadcrumbs.astro';
 import { translations, languages, defaultLang, type Lang } from '../../i18n/translations';
 import { faqItems } from '../../data/faq';
 
@@ -51,6 +52,10 @@ const faqSchema = {
   <Navbar currentLang={lang} />
 
   <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  <Breadcrumbs items={[
+    { label: "Home", href: `/${lang}/` },
+    { label: "FAQ" },
+  ]} />
 
   <main class="mx-auto max-w-3xl px-4 py-16 sm:py-24">
     <div class="mb-12 text-center">

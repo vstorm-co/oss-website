@@ -1,10 +1,17 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
+import GitHubStars from '../components/oss/GitHubStars.astro';
 import OssHero from '../components/oss/OssHero.astro';
 import ProjectGrid from '../components/oss/ProjectGrid.astro';
 import OssFooter from '../components/oss/OssFooter.astro';
+import CommunityRecognition from '../components/oss/CommunityRecognition.astro';
+import TrustedBy from '../components/oss/TrustedBy.astro';
+import HowWeWork from '../components/oss/HowWeWork.astro';
 import FaqPreview from '../components/landing/FaqPreview.astro';
+import Changelog from '../components/oss/Changelog.astro';
+import Contributors from '../components/oss/Contributors.astro';
+import RecentPosts from '../components/oss/RecentPosts.astro';
 import { translations, languages, defaultLang } from '../i18n/translations';
 
 const lang = defaultLang;
@@ -24,9 +31,16 @@ const alternates = [
   lang={lang}
   alternates={alternates}
 >
+  <GitHubStars t={t} />
   <Navbar currentLang={lang} />
   <OssHero t={t} />
+  <TrustedBy t={t} />
   <ProjectGrid lang={lang} t={t} />
+  <HowWeWork t={t} />
+  <CommunityRecognition t={t} />
   <FaqPreview t={t} lang={lang} />
+  <Changelog t={t} />
+  <Contributors t={t} />
+  <RecentPosts t={t} lang={lang} />
   <OssFooter t={t} />
 </Layout>

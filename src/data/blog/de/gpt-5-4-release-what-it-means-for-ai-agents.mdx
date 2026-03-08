@@ -1,0 +1,78 @@
+---
+title: "GPT-5.4 ist da — Was es für AI-Agent-Entwickler bedeutet"
+description: "OpenAI hat GPT-5.4 mit nativer Computer-Nutzung, 1M Kontext, Tool Search und State-of-the-Art-Coding veröffentlicht. Hier ist, was für Teams wichtig ist, die AI-Agents in Produktion bauen."
+pubDate: 2026-03-06
+author: "Vstorm"
+lang: de
+translationKey: gpt-5-4-release-what-it-means-for-ai-agents
+tags: ["gpt-5.4", "openai", "ai-agents", "llm", "news"]
+category: news
+draft: false
+---
+
+[OpenAI hat gerade GPT-5.4 veröffentlicht](https://openai.com/index/introducing-gpt-5-4/) — ihr bisher leistungsfähigstes Modell. Es kombiniert die Coding-Stärken von GPT-5.3-Codex mit wesentlichen Verbesserungen bei Reasoning, Computer-Nutzung und Tool Calling. Jetzt verfügbar in der API als `gpt-5.4` und in ChatGPT als GPT-5.4 Thinking.
+
+Hier ist, was wichtig ist, wenn Sie AI-Agents bauen.
+
+## Native Computer-Nutzung
+
+GPT-5.4 ist OpenAIs erstes Allzweck-Modell mit **nativen Computer-Use-Fähigkeiten**. Es kann Computer über Screenshots und Tastatur-/Mausbefehle steuern oder über Code-Bibliotheken wie [Playwright](https://playwright.dev/).
+
+Die Zahlen sind beeindruckend:
+- **OSWorld-Verified**: 75,0% (gegenüber 47,3% mit GPT-5.2, übertrifft die menschliche Leistung von 72,4%)
+- **WebArena-Verified**: 67,3% für browserbasierte Aufgaben
+
+Für Agent-Frameworks wie [Pydantic AI](https://ai.pydantic.dev/) und [LangChain](https://python.langchain.com/) eröffnet dies eine neue Klasse von Workflows — Agents, die nicht nur APIs aufrufen, sondern mit echten Software-Oberflächen interagieren. In Kombination mit Sandbox-Umgebungen (wie [Docker](https://docs.docker.com/) oder [Daytona](https://daytona.io/)) werden Computer-Use-Agents produktionstauglich.
+
+## 1M Token Context Window
+
+GPT-5.4 unterstützt bis zu **1 Million Tokens Kontext** in der API. Für langlebige Agents ist das transformativ — ein Agent kann eine gesamte Codebasis, einen vollständigen Dokumentensatz oder stundenlange Konversationsverläufe halten, ohne an Kontextgrenzen zu stoßen.
+
+Dennoch bleibt Kontextmanagement wichtig. Unsere Erfahrung mit [summarization-pydantic-ai](https://github.com/vstorm-co/summarization-pydantic-ai) zeigt, dass selbst bei großen Context Windows intelligente Komprimierung (LLM-Zusammenfassung + Sliding Window) bessere Ergebnisse liefert als alles in den Kontext zu packen. Das Modell achtet sorgfältiger auf aktuelle, relevante Informationen.
+
+## Tool Search — Die größte API-Änderung
+
+Das ist das unterschätzte Feature. Bisher wurden alle Tool-Definitionen in jede API-Anfrage einbezogen. Bei Dutzenden von Tools sind das Tausende von Tokens pro Aufruf — teuer und langsam.
+
+GPT-5.4 führt **Tool Search** ein: Das Modell erhält eine kompakte Liste verfügbarer Tools und kann vollständige Definitionen bei Bedarf abrufen. OpenAI berichtet von **47% weniger Tokens** bei tool-intensiven Workloads bei identischer Genauigkeit.
+
+Für Frameworks, die viele Toolsets zusammenstellen — wie [pydantic-deepagents](https://github.com/vstorm-co/pydantic-deepagents), wo ein einzelner Agent über 30 Tools aus Dateisystem, Planung, Sub-Agents, Middleware und mehr haben kann — bedeutet das direkt niedrigere Kosten und schnellere Antworten.
+
+## Coding-Verbesserungen
+
+GPT-5.4 erreicht oder übertrifft GPT-5.3-Codex bei Coding-Benchmarks:
+- **SWE-Bench Pro**: 57,7% (vs 56,8%)
+- **Terminal-Bench 2.0**: 75,1%
+
+Noch wichtiger ist, dass es deutlich token-effizienter ist — es löst Probleme mit weniger Reasoning-Tokens als GPT-5.2. Für Agent-Schleifen, in denen das Modell Code iterativ bearbeitet (Bearbeiten → Ausführen → Korrigieren), bedeuten weniger Tokens pro Iteration niedrigere Kosten und schnellere Zyklen.
+
+## Besseres Tool Calling
+
+Auf [Toolathlon](https://openai.com/index/introducing-gpt-5-4/), das mehrstufige Tool-Nutzung testet, erreicht GPT-5.4 **54,6%** (vs 45,7% für GPT-5.2) — und das in weniger Durchgängen. Bessere Tool-Calling-Genauigkeit mit weniger Hin und Her verbessert direkt die Zuverlässigkeit von Agents.
+
+Für Entwickler, die Lifecycle Hooks nutzen (wie in [pydantic-ai-middleware](https://github.com/vstorm-co/pydantic-ai-middleware)), um Kosten zu verfolgen und Tool-Aufrufe zu prüfen, bedeuten weniger unnötige Aufrufe sauberere Logs und niedrigere Budgets.
+
+## Preise
+
+GPT-5.4 kostet mehr pro Token, verbraucht aber weniger Tokens:
+
+| Modell | Input | Cached Input | Output |
+|-------|-------|-------------|--------|
+| gpt-5.2 | $1.75/M | $0.175/M | $14/M |
+| **gpt-5.4** | **$2.50/M** | **$0.25/M** | **$15/M** |
+
+Mit Tool Search und effizienterem Reasoning können die Gesamtkosten pro Aufgabe für tool-intensive Agents tatsächlich sinken.
+
+## Was das für unseren Stack bedeutet
+
+Wir testen GPT-5.4 bereits in unseren Tools:
+
+- **[pydantic-deepagents](https://github.com/vstorm-co/pydantic-deepagents)**: Das 1M Context Window bedeutet weniger Zusammenfassungs-Trigger und längere autonome Läufe. Tool Search könnte den Prompt-Overhead für unser gesamtes Toolset um über 40% reduzieren.
+- **[pydantic-ai-backend](https://github.com/vstorm-co/pydantic-ai-backend)**: Computer-Use-Fähigkeiten eröffnen die Möglichkeit für browserbasiertes Testen in Sandboxes.
+- **[Full-Stack AI Agent Template](https://github.com/vstorm-co/full-stack-ai-agent-template)**: GPT-5.4 funktioniert als Drop-in-Ersatz — einfach den Model-String ändern. Probieren Sie es im [Web-Konfigurator](https://template.vstorm.co/configurator/) aus.
+
+Das Modell ist ab sofort verfügbar. Wenn Sie Agents mit [Pydantic AI](https://ai.pydantic.dev/), [LangChain](https://python.langchain.com/) oder [LangGraph](https://langchain-ai.github.io/langgraph/) bauen, lohnt es sich, GPT-5.4 heute zu testen — besonders für tool-intensive und langlebige Workflows.
+
+---
+
+*[Vstorm](https://vstorm.co) baut produktionsreife AI-Agent-Systeme. Wir pflegen [10+ Open-Source-Pakete](https://oss.vstorm.co/) für das Pydantic AI Ökosystem.*

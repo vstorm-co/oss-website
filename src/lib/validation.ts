@@ -43,6 +43,16 @@ export function shouldShowConversationPersistence(config: ProjectConfig): boolea
   return config.enable_ai_agent && config.database !== "none";
 }
 
+/** Show LangSmith toggle when AI agent uses a LangChain-ecosystem framework. */
+export function shouldShowLangsmith(config: ProjectConfig): boolean {
+  return (
+    config.enable_ai_agent &&
+    (config.ai_framework === "langchain" ||
+      config.ai_framework === "langgraph" ||
+      config.ai_framework === "deepagents")
+  );
+}
+
 /** Show admin panel sub-options (environments, auth) when admin panel is enabled. */
 export function shouldShowAdminOptions(config: ProjectConfig): boolean {
   return config.enable_admin_panel;

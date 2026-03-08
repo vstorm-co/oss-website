@@ -36,7 +36,7 @@ const logos = [
 ];
 ---
 
-<section class="reveal px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+<section class="section-stack reveal px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
   <div class="mx-auto max-w-5xl text-center">
     <p class="text-xs font-medium uppercase tracking-[0.2em] text-text-tertiary">{t["frameworks.title"]}</p>
 
@@ -97,11 +97,11 @@ const logos = [
     opacity: 1;
   }
 
-  /* Dark mode: invert only logos marked with .logo-invert (LangChain, LangGraph, Next.js) */
-  html:not([data-theme="light"]) .logo-invert {
+  /* Invert dark logos so they're visible on dark bg */
+  .logo-invert {
     filter: brightness(0) invert(1);
   }
-  html:not([data-theme="light"]) .logo-invert:hover {
+  .logo-invert:hover {
     filter: brightness(0) invert(1);
     opacity: 1;
   }

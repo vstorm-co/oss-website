@@ -1,0 +1,198 @@
+---
+title: "Estamos Construyendo una Alternativa Open-Source a Claude Code en Python"
+description: "Conoce pydantic-deepagents — 5 paquetes modulares, 30+ funcionalidades y una experiencia de terminal que hace que los agentes de programación con IA se sientan como una herramienta nativa de desarrollo."
+pubDate: 2026-03-02
+author: "Vstorm"
+lang: es
+translationKey: open-source-claude-code-alternative
+tags: ["pydantic-ai", "ai-agents", "python", "cli", "open-source"]
+category: open-source
+draft: false
+---
+
+Claude Code cambió la forma en que los desarrolladores piensan sobre los asistentes de programación con IA. Un agente que vive en tu terminal, lee tu código, edita archivos, ejecuta comandos — sin pestañas del navegador, sin copiar y pegar, sin acrobacias con la ventana de contexto.
+
+Pero hay un problema: es un monolito de código cerrado. No puedes cambiar el modelo. No puedes extender el conjunto de herramientas. No puedes desplegarlo en tu propia infraestructura. Y si estás construyendo agentes para clientes — no puedes enviar Claude Code como tu producto.
+
+Queríamos la misma arquitectura — planificación, checkpointing, edición de archivos, human-in-the-loop — pero modular, open-source, y construida sobre Pydantic AI. Así que la construimos.
+
+## Qué es realmente pydantic-deepagents
+
+pydantic-deepagents (`pydantic-deep`) es un framework de Python para construir deep agents al estilo de Claude Code — del tipo que planifican, delegan, recuerdan y se autocorrigen. Se distribuye como dos cosas:
+
+1. **Un framework** — `create_deep_agent()` con 30+ funcionalidades opcionales que activas/desactivas
+2. **Un CLI** — `pydantic-deep chat` — un asistente de terminal completamente interactivo
+
+Ambos están construidos sobre [Pydantic AI](https://ai.pydantic.dev/) y siguen el mismo patrón de deep agent utilizado por Claude Code, Devin y Manus AI.
+
+La diferencia clave: todo es modular. El framework está dividido en 5 paquetes open-source independientes:
+
+```
+pydantic-deep              — core agent + CLI
+├── pydantic-ai-backend    — file storage (local, state, Docker, Daytona)
+├── pydantic-ai-todo       — task planning with dependencies
+├── subagents-pydantic-ai  — sync/async agent delegation
+├── summarization-pydantic-ai — context management + sliding window
+└── pydantic-ai-middleware — lifecycle hooks, permissions, cost tracking
+```
+
+Cada paquete funciona de forma independiente. Puedes usar `pydantic-ai-todo` sin el resto. Puedes sustituir `pydantic-ai-backend` por tu propia capa de almacenamiento. El framework los compone — tú eliges lo que necesitas.
+
+## La API de Una Sola Función
+
+Crear un agente con todas las funcionalidades requiere una sola llamada a función:
+
+```python
+from pydantic_deep import create_deep_agent, DeepAgentDeps, StateBackend
+
+agent = create_deep_agent(
+    model="openai:gpt-4.1",
+    instructions="You are a helpful coding assistant",
+    include_plan=True,           # Planning subagent
+    include_checkpoints=True,    # Save/rewind state
+    include_memory=True,         # Persistent MEMORY.md
+    include_skills=True,         # Slash commands
+    cost_tracking=True,          # Budget enforcement
+    cost_budget_usd=5.0,
+)
+
+deps = DeepAgentDeps(backend=StateBackend())
+result = await agent.run("Refactor the auth module", deps=deps)
+```
+
+Cada funcionalidad es un flag booleano. ¿Necesitas equipos? Agrega `include_teams=True`. ¿Quieres hooks? Pasa una lista de `hooks`. El framework ensambla automáticamente los conjuntos de herramientas, middleware y secciones del system prompt adecuados.
+
+## Checkpointing y Rebobinado
+
+Esta es la funcionalidad que cambia cómo trabajas con agentes. Cada llamada a herramienta crea un checkpoint — una instantánea del estado de la conversación. Cuando el agente toma el camino equivocado (y lo hará), rebobinas:
+
+```python
+from pydantic_deep import InMemoryCheckpointStore, RewindRequested
+
+store = InMemoryCheckpointStore()
+agent = create_deep_agent(
+    include_checkpoints=True,
+    checkpoint_store=store,
+    checkpoint_frequency="every_tool",
+)
+
+while True:
+    try:
+        result = await agent.run(user_input, deps=deps, message_history=history)
+        history = result.all_messages()
+    except RewindRequested as e:
+        print(f"Rewinding to '{e.label}'...")
+        history = e.messages
+```
+
+El agente dice "save_checkpoint('before refactor')" antes de operaciones riesgosas. Tú dices "rewind to 'before refactor'" cuando algo se rompe. El estado de la conversación retrocede — sin perder contexto, sin re-explicar la tarea.
+
+En el CLI, los checkpoints aparecen como instantáneas etiquetadas entre las que puedes saltar. Como commits de git para la conversación con tu agente.
+
+## Equipos de Agentes
+
+Los agentes individuales tienen límites en tareas complejas. Nuestra solución: equipos planos con estado compartido.
+
+```python
+from pydantic_deep.toolsets.teams import AgentTeam, TeamMember
+
+team = AgentTeam(
+    name="backend-team",
+    members=[
+        TeamMember(name="alice", role="api-designer",
+                   instructions="Focus on clean REST API design"),
+        TeamMember(name="bob", role="db-architect",
+                   instructions="Design efficient database schema"),
+    ],
+)
+
+# Assign tasks with dependencies
+task_a = await team.todos.add("Design the API schema", created_by="lead")
+task_b = await team.todos.add("Implement endpoints",
+                               blocked_by=[task_a], created_by="lead")
+```
+
+Cada miembro del equipo comparte un `SharedTodoList` (reclamación de tareas segura para asyncio con dependencias) y un `TeamMessageBus` para mensajería peer-to-peer. Sin cadenas jerárquicas de subagentes — los agentes se coordinan como pares, reclaman tareas y se envían mensajes entre sí cuando necesitan información.
+
+## Hooks — Eventos de Ciclo de Vida al Estilo Claude Code
+
+Cada llamada a herramienta en pydantic-deep dispara eventos de ciclo de vida. Los interceptas con hooks:
+
+```python
+from pydantic_deep import Hook, HookEvent, HookInput, HookResult
+
+async def safety_gate(hook_input: HookInput) -> HookResult:
+    if "rm -rf" in str(hook_input.tool_input):
+        return HookResult(allow=False, reason="Dangerous command blocked")
+    return HookResult(allow=True)
+
+agent = create_deep_agent(
+    hooks=[
+        Hook(
+            event=HookEvent.PRE_TOOL_USE,
+            handler=safety_gate,
+            matcher="execute",
+        ),
+        Hook(
+            event=HookEvent.POST_TOOL_USE,
+            command="echo '$TOOL_NAME' >> /tmp/audit.log",
+        ),
+    ],
+)
+```
+
+Tres tipos de eventos: `PRE_TOOL_USE`, `POST_TOOL_USE`, `POST_TOOL_USE_FAILURE`. Los hooks pueden ser handlers de Python o comandos de shell. Código de salida 0 = permitir, código de salida 2 = denegar.
+
+## Slash Commands Personalizados
+
+Coloca un archivo Markdown en `.pydantic-deep/commands/`, y se convierte en un slash command:
+
+```markdown
+<!-- .pydantic-deep/commands/commit.md -->
+# /commit
+
+Create a conventional git commit for the current changes.
+
+## Instructions
+1. Run `git diff --staged` to see what's staged
+2. If nothing is staged, run `git add -A`
+3. Generate a commit message following Conventional Commits
+4. Run `git commit -m "..."` with the generated message
+```
+
+El CLI incluye comandos integrados: `/commit`, `/pr`, `/review`, `/test`, `/fix`, `/explain`. Descubrimiento en tres ámbitos: integrados, nivel de usuario (`~/.pydantic-deep/commands/`), y nivel de proyecto (`.pydantic-deep/commands/`).
+
+## La Experiencia de Terminal del CLI
+
+El CLI (`pydantic-deep chat`) es donde todo se une:
+
+**Visor de diffs para aprobación de archivos.** Cuando el agente quiere editar un archivo, ves un diff unificado con colores y barras laterales antes de aprobar.
+
+**Barra de progreso de contexto.** La barra de estado muestra el nombre del modelo, el costo acumulado y un indicador visual del uso de contexto. Colores de umbral: verde por debajo del 60%, ámbar entre 60–85%, rojo por encima del 85%.
+
+**Streaming con spinner braille.** El texto se transmite con una transición fluida — spinner braille durante el pensamiento, luego renderizado de Markdown en vivo.
+
+**Menciones @file** con autocompletado por tabulación. Escribe `@src/` y obtén autocompletado para archivos a incluir en el contexto.
+
+## Memoria Persistente
+
+El agente mantiene un archivo `MEMORY.md` — notas persistentes que sobreviven entre sesiones:
+
+```python
+agent = create_deep_agent(include_memory=True)
+# Agent can call: read_memory, write_memory, update_memory
+# MEMORY.md auto-injected into system prompt (first 200 lines)
+```
+
+En el CLI, usa `/remember` para guardar preferencias: "siempre usa pytest, nunca uses unittest." En la siguiente sesión, el agente ya lo sabe. El mismo patrón que la memoria de Claude Code, con la misma auto-inyección de 200 líneas.
+
+## Puntos Clave
+
+- **Los deep agents son un patrón, no un producto** — Claude Code demostró la arquitectura, pero no necesitas una herramienta de código cerrado para construirla
+- **La modularidad gana** — 5 paquetes que se componen vs 1 monolito significa que puedes intercambiar cualquier capa sin reescribir todo
+- **El checkpointing cambia el flujo de trabajo** — tratar las sesiones de agentes como ramas de git (guardar, rebobinar, bifurcar) hace que los asistentes de programación con IA sean dramáticamente más útiles
+- **El CLI es la interfaz** — para tareas de programación, un agente de terminal supera a una ventana de chat en todo momento
+
+---
+
+**Pruébalo:** [pydantic-deepagents en GitHub](https://github.com/vstorm-co/pydantic-deepagents) — `pip install pydantic-deep[cli]`

@@ -80,6 +80,15 @@ export function WizardProvider({ children, initialPreset }: WizardProviderProps)
       form.setValue("enable_redis", true);
     }
 
+    // Auto-disable LangSmith when framework doesn't support it
+    const langsmithFrameworks = ["langchain", "langgraph", "deepagents"];
+    if (cur.enable_langsmith && !langsmithFrameworks.includes(cur.ai_framework)) {
+      form.setValue("enable_langsmith", false);
+    }
+    if (cur.enable_langsmith && !cur.enable_ai_agent) {
+      form.setValue("enable_langsmith", false);
+    }
+
     // Auto-disable logfire sub-features when their dependency is gone
     if (!cur.enable_logfire && prev.enable_logfire) {
       // Logfire turned off — no action needed, features hidden

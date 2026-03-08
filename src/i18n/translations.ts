@@ -91,6 +91,10 @@ export const translations = {
     "blog.backToBlog": "Back to blog",
     "blog.tableOfContents": "Table of Contents",
     "blog.availableIn": "Available in",
+    "blog.allCategories": "All",
+    "blog.category.open-source": "Open Source",
+    "blog.category.news": "News",
+    "blog.category.case-study": "Case Study",
 
     // FAQ
     "faq.title": "Frequently Asked Questions",
@@ -109,11 +113,55 @@ export const translations = {
     "oss.hero.description": "Production-tested libraries, frameworks, and templates for building AI agents. Built by Vstorm.",
     "oss.hero.cta.explore": "Explore Projects",
     "oss.hero.cta.github": "GitHub",
+    "oss.hero.consultancy.title": "Need help building production AI agents?",
+    "oss.hero.consultancy.description": "We're Vstorm — an Applied Agentic AI Engineering Consultancy with 30+ production AI agent implementations.",
     "oss.projects.title": "Our Projects",
     "oss.projects.subtitle": "Open-source packages for the Pydantic AI ecosystem",
+    "oss.trustedby.title": "Featured & trusted by",
+    "oss.trustedby.reactions": "LinkedIn reactions",
+    "oss.trustedby.stars": "GitHub stars",
+    "oss.trustedby.downloads": "PyPI downloads",
+    "oss.howwework.title": "How It Works",
+    "oss.howwework.subtitle": "From install to production in three steps",
+    "oss.howwework.step1.title": "Pick a Package",
+    "oss.howwework.step1.desc": "Browse our ecosystem of 20 open-source packages. Install via pip — each one works standalone or together.",
+    "oss.howwework.step2.title": "Configure & Build",
+    "oss.howwework.step2.desc": "Use our CLI generators, presets, and templates to scaffold your AI agent project in minutes, not weeks.",
+    "oss.howwework.step3.title": "Ship to Production",
+    "oss.howwework.step3.desc": "Deploy with Docker, add observability with Logfire, and scale confidently with production-tested code.",
     "oss.card.install": "Install",
     "oss.card.comingSoon": "Coming Soon",
     "oss.card.viewProject": "View Project",
+
+    // Changelog
+    "oss.changelog.title": "What's New",
+    "oss.changelog.subtitle": "Latest releases across our ecosystem",
+    "oss.changelog.1.title": "DeepResearch & Multi-provider Support",
+    "oss.changelog.1.desc": "Added DeepResearch agent pattern, Gemini/Groq providers, and improved context management.",
+    "oss.changelog.2.title": "Web Configurator & 5 AI Frameworks",
+    "oss.changelog.2.desc": "Interactive web configurator with 75+ options, CrewAI & LangGraph support, Logfire integration.",
+    "oss.changelog.3.title": "Logfire Assistant 1.0 — Chrome Extension",
+    "oss.changelog.3.desc": "Natural language queries for Logfire data. Chat with your traces, metrics, and logs directly in the browser.",
+    "oss.changelog.viewAll": "View all releases on GitHub",
+
+    // Contributors
+    "oss.contributors.title": "Built by the Community",
+    "oss.contributors.subtitle": "Open source contributors making our tools better every day",
+    "oss.contributors.join": "Become a contributor →",
+
+    // Recent Posts
+    "oss.recentPosts.title": "From Our Blog",
+    "oss.recentPosts.subtitle": "Latest tutorials, guides, and insights on building AI agents",
+    "oss.recentPosts.viewAll": "View all posts →",
+
+    // Community
+    "oss.community.title": "Community & Recognition",
+    "oss.community.subtitle": "What the ecosystem says about our tools",
+    "oss.community.stats.langchain": "Likes on LangChain feature",
+    "oss.community.stats.references": "References in Pydantic AI issues & PRs",
+    "oss.community.stats.docs": "Listed in official Pydantic AI docs",
+    "oss.community.stats.contributors": "Community contributors",
+    "oss.community.langchain.description": "LangChain featured our Full-Stack AI Agent Template as a Community Content Spotlight — generating 600+ likes, 26 comments, and 71 reshares.",
 
     // Generic Project Page
     "project.backToProjects": "All Projects",
@@ -274,6 +322,7 @@ export const translations = {
     "ui.followOnGithub": "Follow on GitHub",
 
     // Blog
+    "blog.search": "Search articles...",
     "blog.noPosts": "No posts yet. Check back soon.",
 
     // Home
@@ -380,6 +429,25 @@ export const translations = {
     "comparison.logfire.row.history": "Conversation History",
     "comparison.logfire.row.nl": "Natural Language Input",
 
+    // Compare landing pages
+    "compare.index.title": "Compare Our Tools",
+    "compare.index.subtitle": "See how Vstorm OSS tools stack up against alternatives",
+    "compare.index.meta.description": "Feature comparisons of Vstorm OSS tools vs LangChain, CrewAI, AutoGen, and other AI frameworks",
+    "compare.verdict": "The Verdict",
+    "compare.highlights": "Key Differences",
+    "compare.table.title": "Feature Comparison",
+    "compare.code.title": "Code Comparison",
+    "compare.whenToUse": "When to Use Which",
+    "compare.whenToUse.ours": "Choose {product} when:",
+    "compare.whenToUse.theirs": "Choose {competitor} when:",
+    "compare.faq.title": "Frequently Asked Questions",
+    "compare.relatedTitle": "Related Comparisons",
+    "compare.cta.title": "Ready to try {product}?",
+    "compare.cta.button": "Get Started",
+    "compare.winner.ours": "Advantage: {product}",
+    "compare.winner.theirs": "Advantage: {competitor}",
+    "compare.winner.tie": "Tie",
+
     // Testimonials
     "testimonials.title": "What developers say",
     "testimonials.subtitle": "From early adopters and beta testers.",
@@ -403,6 +471,13 @@ export const translations = {
     "404.description": "The page you're looking for doesn't exist or has been moved.",
     "404.back": "Back to Home",
     "blog.readingTime": "{min} min read",
+    "blog.pagination.prev": "Previous",
+    "blog.pagination.next": "Next",
+    "blog.share": "Share this article",
+    "blog.share.copied": "Link copied!",
+    "blog.relatedPosts": "Related Articles",
+    "blog.stickyCta.text": "Need help building production AI agents?",
+    "blog.stickyCta.button": "Talk to Vstorm",
     "skip.toContent": "Skip to content",
 
     // About page
@@ -422,7 +497,15 @@ export const translations = {
     "about.philosophy.title": "Why Open Source",
     "about.philosophy.description": "We believe the best AI agent tooling should be open, modular, and production-tested. Closed-source monoliths lock you into one vendor's decisions. Our approach: build each capability as a standalone package, test it across 90+ client projects, then release it. If it works in production, it should be available to everyone.",
     "about.links.title": "Connect",
+    "blog.tag.title": "Tag: {tag}",
+    "blog.tag.postCount": "{count} posts",
+    "oss.githubStars": "stars on GitHub — Star us!",
+    "changelog.title": "Changelog",
+    "changelog.subtitle": "Release history across all Vstorm OSS projects",
+    "roadmap.title": "Roadmap",
+    "roadmap.subtitle": "What we're building and what's coming next",
     "nav.about": "About",
+    "nav.compare": "Compare",
   },
 
   pl: {
@@ -495,6 +578,10 @@ export const translations = {
     "blog.backToBlog": "Wróć do bloga",
     "blog.tableOfContents": "Spis treści",
     "blog.availableIn": "Dostępne w",
+    "blog.allCategories": "Wszystkie",
+    "blog.category.open-source": "Open Source",
+    "blog.category.news": "Aktualności",
+    "blog.category.case-study": "Case Study",
 
     // FAQ
     "faq.title": "Często zadawane pytania",
@@ -513,11 +600,55 @@ export const translations = {
     "oss.hero.description": "Przetestowane w produkcji biblioteki, frameworki i szablony do budowania agentów AI. Stworzone przez Vstorm.",
     "oss.hero.cta.explore": "Przeglądaj projekty",
     "oss.hero.cta.github": "GitHub",
+    "oss.hero.consultancy.title": "Potrzebujesz pomocy z produkcyjnymi agentami AI?",
+    "oss.hero.consultancy.description": "Jesteśmy Vstorm — konsultingowa firma inżynierii AI z ponad 30 wdrożeniami agentów AI w produkcji.",
     "oss.projects.title": "Nasze projekty",
     "oss.projects.subtitle": "Pakiety open-source dla ekosystemu Pydantic AI",
+    "oss.trustedby.title": "Polecane i zaufane przez",
+    "oss.trustedby.reactions": "reakcji na LinkedIn",
+    "oss.trustedby.stars": "gwiazdek GitHub",
+    "oss.trustedby.downloads": "pobrań PyPI",
+    "oss.howwework.title": "Jak to działa",
+    "oss.howwework.subtitle": "Od instalacji do produkcji w trzech krokach",
+    "oss.howwework.step1.title": "Wybierz pakiet",
+    "oss.howwework.step1.desc": "Przeglądaj nasz ekosystem 20 pakietów open source. Instaluj przez pip — każdy działa samodzielnie lub razem.",
+    "oss.howwework.step2.title": "Konfiguruj i buduj",
+    "oss.howwework.step2.desc": "Użyj naszych generatorów CLI, presetów i szablonów, aby stworzyć projekt agenta AI w minuty, nie tygodnie.",
+    "oss.howwework.step3.title": "Wdróż na produkcję",
+    "oss.howwework.step3.desc": "Deployuj z Dockerem, dodaj obserwowalność z Logfire i skaluj pewnie z kodem przetestowanym w produkcji.",
     "oss.card.install": "Instalacja",
     "oss.card.comingSoon": "Wkrótce",
     "oss.card.viewProject": "Zobacz projekt",
+
+    // Changelog
+    "oss.changelog.title": "Co nowego",
+    "oss.changelog.subtitle": "Najnowsze wydania w naszym ekosystemie",
+    "oss.changelog.1.title": "DeepResearch i wsparcie wielu providerów",
+    "oss.changelog.1.desc": "Dodano wzorzec agenta DeepResearch, providery Gemini/Groq oraz ulepszone zarządzanie kontekstem.",
+    "oss.changelog.2.title": "Konfigurator webowy i 5 frameworków AI",
+    "oss.changelog.2.desc": "Interaktywny konfigurator webowy z 75+ opcjami, wsparcie CrewAI i LangGraph, integracja z Logfire.",
+    "oss.changelog.3.title": "Logfire Assistant 1.0 — rozszerzenie Chrome",
+    "oss.changelog.3.desc": "Zapytania w języku naturalnym do danych Logfire. Rozmawiaj ze swoimi trace'ami, metrykami i logami w przeglądarce.",
+    "oss.changelog.viewAll": "Zobacz wszystkie wydania na GitHub",
+
+    // Contributors
+    "oss.contributors.title": "Tworzone przez społeczność",
+    "oss.contributors.subtitle": "Kontrybutorzy open source ulepszający nasze narzędzia każdego dnia",
+    "oss.contributors.join": "Zostań kontrybutorem →",
+
+    // Recent Posts
+    "oss.recentPosts.title": "Z naszego bloga",
+    "oss.recentPosts.subtitle": "Najnowsze tutoriale, przewodniki i porady o budowie agentów AI",
+    "oss.recentPosts.viewAll": "Zobacz wszystkie posty →",
+
+    // Community
+    "oss.community.title": "Społeczność i uznanie",
+    "oss.community.subtitle": "Co ekosystem mówi o naszych narzędziach",
+    "oss.community.stats.langchain": "Polubień na poście LangChain",
+    "oss.community.stats.references": "Odniesień w issues i PR-ach Pydantic AI",
+    "oss.community.stats.docs": "Wymienieni w oficjalnej dokumentacji Pydantic AI",
+    "oss.community.stats.contributors": "Kontrybutorzy ze społeczności",
+    "oss.community.langchain.description": "LangChain wyróżnił nasz Full-Stack AI Agent Template jako Community Content Spotlight — generując 600+ polubień, 26 komentarzy i 71 udostępnień.",
 
     // Generic Project Page
     "project.backToProjects": "Wszystkie projekty",
@@ -672,6 +803,7 @@ export const translations = {
     "ui.terminal": "Terminal",
     "ui.orWithPreset": "Lub z presetem:",
     "ui.followOnGithub": "Śledź na GitHub",
+    "blog.search": "Szukaj artykułów...",
     "blog.noPosts": "Brak wpisów. Wróć wkrótce.",
     "oss.meta.title": "Vstorm OSS — Narzędzia Open Source dla agentów AI w Pythonie",
     "deepagents.code.tab.basic": "Podstawowy",
@@ -774,6 +906,25 @@ export const translations = {
     "comparison.logfire.row.history": "Historia konwersacji",
     "comparison.logfire.row.nl": "Wejście w języku naturalnym",
 
+    // Compare landing pages
+    "compare.index.title": "Porównaj nasze narzędzia",
+    "compare.index.subtitle": "Zobacz jak narzędzia Vstorm OSS wypadają na tle alternatyw",
+    "compare.index.meta.description": "Porównania funkcji narzędzi Vstorm OSS vs LangChain, CrewAI, AutoGen i inne frameworki AI",
+    "compare.verdict": "Werdykt",
+    "compare.highlights": "Kluczowe różnice",
+    "compare.table.title": "Porównanie funkcji",
+    "compare.code.title": "Porównanie kodu",
+    "compare.whenToUse": "Kiedy użyć którego",
+    "compare.whenToUse.ours": "Wybierz {product}, gdy:",
+    "compare.whenToUse.theirs": "Wybierz {competitor}, gdy:",
+    "compare.faq.title": "Często zadawane pytania",
+    "compare.relatedTitle": "Powiązane porównania",
+    "compare.cta.title": "Gotowy wypróbować {product}?",
+    "compare.cta.button": "Rozpocznij",
+    "compare.winner.ours": "Przewaga: {product}",
+    "compare.winner.theirs": "Przewaga: {competitor}",
+    "compare.winner.tie": "Remis",
+
     // Testimonials
     "testimonials.title": "Co mówią deweloperzy",
     "testimonials.subtitle": "Od wczesnych użytkowników i beta testerów.",
@@ -797,6 +948,13 @@ export const translations = {
     "404.description": "Strona, której szukasz, nie istnieje lub została przeniesiona.",
     "404.back": "Wróć na stronę główną",
     "blog.readingTime": "{min} min czytania",
+    "blog.pagination.prev": "Poprzednia",
+    "blog.pagination.next": "Następna",
+    "blog.share": "Udostępnij artykuł",
+    "blog.share.copied": "Link skopiowany!",
+    "blog.relatedPosts": "Powiązane artykuły",
+    "blog.stickyCta.text": "Potrzebujesz pomocy przy budowie agentów AI?",
+    "blog.stickyCta.button": "Porozmawiaj z Vstorm",
     "skip.toContent": "Przejdź do treści",
 
     // About page
@@ -816,7 +974,15 @@ export const translations = {
     "about.philosophy.title": "Dlaczego open source",
     "about.philosophy.description": "Wierzymy, że najlepsze narzędzia do agentów AI powinny być otwarte, modularne i przetestowane w produkcji. Zamknięte monolity uzależniają od decyzji jednego dostawcy. Nasze podejście: budujemy każdą funkcjonalność jako osobny pakiet, testujemy w 90+ projektach klienckich, a potem udostępniamy. Jeśli działa w produkcji, powinno być dostępne dla wszystkich.",
     "about.links.title": "Kontakt",
+    "blog.tag.title": "Tag: {tag}",
+    "blog.tag.postCount": "{count} postów",
+    "oss.githubStars": "gwiazdek na GitHub — Daj gwiazdke!",
+    "changelog.title": "Historia zmian",
+    "changelog.subtitle": "Historia wydań wszystkich projektów Vstorm OSS",
+    "roadmap.title": "Plan rozwoju",
+    "roadmap.subtitle": "Co budujemy i co nadchodzi",
     "nav.about": "O nas",
+    "nav.compare": "Porównaj",
   },
 
   de: {
@@ -889,6 +1055,10 @@ export const translations = {
     "blog.backToBlog": "Zurück zum Blog",
     "blog.tableOfContents": "Inhaltsverzeichnis",
     "blog.availableIn": "Verfügbar in",
+    "blog.allCategories": "Alle",
+    "blog.category.open-source": "Open Source",
+    "blog.category.news": "Neuigkeiten",
+    "blog.category.case-study": "Fallstudie",
 
     // FAQ
     "faq.title": "Häufig gestellte Fragen",
@@ -907,11 +1077,55 @@ export const translations = {
     "oss.hero.description": "Produktionserprobte Bibliotheken, Frameworks und Templates für KI-Agenten. Erstellt von Vstorm.",
     "oss.hero.cta.explore": "Projekte erkunden",
     "oss.hero.cta.github": "GitHub",
+    "oss.hero.consultancy.title": "Brauchen Sie Hilfe beim Aufbau von KI-Agenten für die Produktion?",
+    "oss.hero.consultancy.description": "Wir sind Vstorm — eine Beratung für angewandtes KI-Engineering mit über 30 produktiven KI-Agenten-Implementierungen.",
     "oss.projects.title": "Unsere Projekte",
     "oss.projects.subtitle": "Open-Source-Pakete für das Pydantic AI Ökosystem",
+    "oss.trustedby.title": "Empfohlen und vertraut von",
+    "oss.trustedby.reactions": "LinkedIn-Reaktionen",
+    "oss.trustedby.stars": "GitHub-Sterne",
+    "oss.trustedby.downloads": "PyPI-Downloads",
+    "oss.howwework.title": "So funktioniert es",
+    "oss.howwework.subtitle": "Von der Installation zur Produktion in drei Schritten",
+    "oss.howwework.step1.title": "Paket wählen",
+    "oss.howwework.step1.desc": "Durchstöbern Sie unser Ökosystem mit 20 Open-Source-Paketen. Installation via pip — jedes funktioniert eigenständig oder zusammen.",
+    "oss.howwework.step2.title": "Konfigurieren & Bauen",
+    "oss.howwework.step2.desc": "Nutzen Sie unsere CLI-Generatoren, Presets und Templates, um Ihr KI-Agenten-Projekt in Minuten zu erstellen.",
+    "oss.howwework.step3.title": "In Produktion bringen",
+    "oss.howwework.step3.desc": "Deployment mit Docker, Observability mit Logfire und sicher skalieren mit produktionserprobtem Code.",
     "oss.card.install": "Installation",
     "oss.card.comingSoon": "Demnächst",
     "oss.card.viewProject": "Projekt ansehen",
+
+    // Changelog
+    "oss.changelog.title": "Was gibt's Neues",
+    "oss.changelog.subtitle": "Neueste Releases in unserem Ökosystem",
+    "oss.changelog.1.title": "DeepResearch & Multi-Provider-Unterstützung",
+    "oss.changelog.1.desc": "DeepResearch-Agent-Muster, Gemini/Groq-Provider und verbessertes Kontextmanagement hinzugefügt.",
+    "oss.changelog.2.title": "Web-Konfigurator & 5 KI-Frameworks",
+    "oss.changelog.2.desc": "Interaktiver Web-Konfigurator mit 75+ Optionen, CrewAI- & LangGraph-Unterstützung, Logfire-Integration.",
+    "oss.changelog.3.title": "Logfire Assistant 1.0 — Chrome-Erweiterung",
+    "oss.changelog.3.desc": "Natürliche Sprachabfragen für Logfire-Daten. Chatten Sie mit Ihren Traces, Metriken und Logs im Browser.",
+    "oss.changelog.viewAll": "Alle Releases auf GitHub ansehen",
+
+    // Contributors
+    "oss.contributors.title": "Von der Community gebaut",
+    "oss.contributors.subtitle": "Open-Source-Mitwirkende, die unsere Tools jeden Tag besser machen",
+    "oss.contributors.join": "Mitwirkender werden →",
+
+    // Recent Posts
+    "oss.recentPosts.title": "Aus unserem Blog",
+    "oss.recentPosts.subtitle": "Neueste Tutorials, Anleitungen und Einblicke zum Aufbau von KI-Agenten",
+    "oss.recentPosts.viewAll": "Alle Beiträge ansehen →",
+
+    // Community
+    "oss.community.title": "Community & Anerkennung",
+    "oss.community.subtitle": "Was das Ökosystem über unsere Tools sagt",
+    "oss.community.stats.langchain": "Likes auf LangChain-Feature",
+    "oss.community.stats.references": "Referenzen in Pydantic AI Issues & PRs",
+    "oss.community.stats.docs": "Aufgeführt in der offiziellen Pydantic AI Doku",
+    "oss.community.stats.contributors": "Community-Mitwirkende",
+    "oss.community.langchain.description": "LangChain hat unser Full-Stack AI Agent Template als Community Content Spotlight vorgestellt — mit 600+ Likes, 26 Kommentaren und 71 Reposts.",
 
     // Generic Project Page
     "project.backToProjects": "Alle Projekte",
@@ -1066,6 +1280,7 @@ export const translations = {
     "ui.terminal": "Terminal",
     "ui.orWithPreset": "Oder mit einem Preset:",
     "ui.followOnGithub": "Auf GitHub folgen",
+    "blog.search": "Artikel suchen...",
     "blog.noPosts": "Noch keine Beiträge. Schauen Sie bald wieder vorbei.",
     "oss.meta.title": "Vstorm OSS — Open-Source-KI-Agent-Tools für Python",
     "deepagents.code.tab.basic": "Einfach",
@@ -1168,6 +1383,25 @@ export const translations = {
     "comparison.logfire.row.history": "Konversationshistorie",
     "comparison.logfire.row.nl": "Natürlichsprachige Eingabe",
 
+    // Compare landing pages
+    "compare.index.title": "Unsere Tools vergleichen",
+    "compare.index.subtitle": "Sieh wie Vstorm OSS Tools im Vergleich zu Alternativen abschneiden",
+    "compare.index.meta.description": "Funktionsvergleiche von Vstorm OSS Tools vs LangChain, CrewAI, AutoGen und andere KI-Frameworks",
+    "compare.verdict": "Das Urteil",
+    "compare.highlights": "Wesentliche Unterschiede",
+    "compare.table.title": "Funktionsvergleich",
+    "compare.code.title": "Code-Vergleich",
+    "compare.whenToUse": "Wann welches verwenden",
+    "compare.whenToUse.ours": "Wähle {product}, wenn:",
+    "compare.whenToUse.theirs": "Wähle {competitor}, wenn:",
+    "compare.faq.title": "Häufig gestellte Fragen",
+    "compare.relatedTitle": "Verwandte Vergleiche",
+    "compare.cta.title": "Bereit {product} auszuprobieren?",
+    "compare.cta.button": "Loslegen",
+    "compare.winner.ours": "Vorteil: {product}",
+    "compare.winner.theirs": "Vorteil: {competitor}",
+    "compare.winner.tie": "Unentschieden",
+
     // Testimonials
     "testimonials.title": "Was Entwickler sagen",
     "testimonials.subtitle": "Von Early Adoptern und Beta-Testern.",
@@ -1191,6 +1425,13 @@ export const translations = {
     "404.description": "Die gesuchte Seite existiert nicht oder wurde verschoben.",
     "404.back": "Zurück zur Startseite",
     "blog.readingTime": "{min} Min. Lesezeit",
+    "blog.pagination.prev": "Zurück",
+    "blog.pagination.next": "Weiter",
+    "blog.share": "Artikel teilen",
+    "blog.share.copied": "Link kopiert!",
+    "blog.relatedPosts": "Verwandte Artikel",
+    "blog.stickyCta.text": "Brauchen Sie Hilfe beim Aufbau von KI-Agenten?",
+    "blog.stickyCta.button": "Sprechen Sie mit Vstorm",
     "skip.toContent": "Zum Inhalt springen",
 
     // About page
@@ -1210,7 +1451,15 @@ export const translations = {
     "about.philosophy.title": "Warum Open Source",
     "about.philosophy.description": "Wir glauben, dass die besten KI-Agent-Tools offen, modular und produktionserprobt sein sollten. Geschlossene Monolithen binden Sie an die Entscheidungen eines Anbieters. Unser Ansatz: Jede Fähigkeit als eigenständiges Paket entwickeln, in 90+ Kundenprojekten testen und dann veröffentlichen. Wenn es in der Produktion funktioniert, sollte es für alle verfügbar sein.",
     "about.links.title": "Kontakt",
+    "blog.tag.title": "Tag: {tag}",
+    "blog.tag.postCount": "{count} Beiträge",
+    "oss.githubStars": "Sterne auf GitHub — Gib uns einen Stern!",
+    "changelog.title": "Änderungsprotokoll",
+    "changelog.subtitle": "Veröffentlichungsverlauf aller Vstorm OSS-Projekte",
+    "roadmap.title": "Roadmap",
+    "roadmap.subtitle": "Was wir bauen und was als nächstes kommt",
     "nav.about": "Über uns",
+    "nav.compare": "Vergleich",
   },
 
   es: {
@@ -1283,6 +1532,10 @@ export const translations = {
     "blog.backToBlog": "Volver al blog",
     "blog.tableOfContents": "Tabla de contenidos",
     "blog.availableIn": "Disponible en",
+    "blog.allCategories": "Todos",
+    "blog.category.open-source": "Open Source",
+    "blog.category.news": "Noticias",
+    "blog.category.case-study": "Caso de Estudio",
 
     // FAQ
     "faq.title": "Preguntas frecuentes",
@@ -1301,11 +1554,55 @@ export const translations = {
     "oss.hero.description": "Bibliotecas, frameworks y plantillas probadas en producción para construir agentes IA. Creado por Vstorm.",
     "oss.hero.cta.explore": "Explorar proyectos",
     "oss.hero.cta.github": "GitHub",
+    "oss.hero.consultancy.title": "¿Necesitas ayuda para construir agentes IA en producción?",
+    "oss.hero.consultancy.description": "Somos Vstorm — una consultoría de ingeniería de IA aplicada con más de 30 implementaciones de agentes IA en producción.",
     "oss.projects.title": "Nuestros proyectos",
     "oss.projects.subtitle": "Paquetes open source para el ecosistema Pydantic AI",
+    "oss.trustedby.title": "Destacado y confiado por",
+    "oss.trustedby.reactions": "reacciones en LinkedIn",
+    "oss.trustedby.stars": "estrellas en GitHub",
+    "oss.trustedby.downloads": "descargas en PyPI",
+    "oss.howwework.title": "Cómo funciona",
+    "oss.howwework.subtitle": "De la instalación a producción en tres pasos",
+    "oss.howwework.step1.title": "Elige un paquete",
+    "oss.howwework.step1.desc": "Explora nuestro ecosistema de 20 paquetes open source. Instala con pip — cada uno funciona solo o en conjunto.",
+    "oss.howwework.step2.title": "Configura y construye",
+    "oss.howwework.step2.desc": "Usa nuestros generadores CLI, presets y plantillas para crear tu proyecto de agente IA en minutos, no semanas.",
+    "oss.howwework.step3.title": "Despliega a producción",
+    "oss.howwework.step3.desc": "Despliega con Docker, añade observabilidad con Logfire y escala con confianza usando código probado en producción.",
     "oss.card.install": "Instalación",
     "oss.card.comingSoon": "Próximamente",
     "oss.card.viewProject": "Ver proyecto",
+
+    // Changelog
+    "oss.changelog.title": "Novedades",
+    "oss.changelog.subtitle": "Últimos lanzamientos en nuestro ecosistema",
+    "oss.changelog.1.title": "DeepResearch y soporte multi-proveedor",
+    "oss.changelog.1.desc": "Añadido patrón de agente DeepResearch, proveedores Gemini/Groq y gestión de contexto mejorada.",
+    "oss.changelog.2.title": "Configurador web y 5 frameworks de IA",
+    "oss.changelog.2.desc": "Configurador web interactivo con 75+ opciones, soporte CrewAI y LangGraph, integración con Logfire.",
+    "oss.changelog.3.title": "Logfire Assistant 1.0 — Extensión de Chrome",
+    "oss.changelog.3.desc": "Consultas en lenguaje natural para datos de Logfire. Chatea con tus trazas, métricas y logs en el navegador.",
+    "oss.changelog.viewAll": "Ver todos los lanzamientos en GitHub",
+
+    // Contributors
+    "oss.contributors.title": "Construido por la comunidad",
+    "oss.contributors.subtitle": "Colaboradores open source mejorando nuestras herramientas cada día",
+    "oss.contributors.join": "Conviértete en colaborador →",
+
+    // Recent Posts
+    "oss.recentPosts.title": "De nuestro blog",
+    "oss.recentPosts.subtitle": "Últimos tutoriales, guías y perspectivas sobre la construcción de agentes IA",
+    "oss.recentPosts.viewAll": "Ver todos los posts →",
+
+    // Community
+    "oss.community.title": "Comunidad y reconocimiento",
+    "oss.community.subtitle": "Lo que el ecosistema dice sobre nuestras herramientas",
+    "oss.community.stats.langchain": "Likes en publicación de LangChain",
+    "oss.community.stats.references": "Referencias en issues y PRs de Pydantic AI",
+    "oss.community.stats.docs": "Listados en la documentación oficial de Pydantic AI",
+    "oss.community.stats.contributors": "Contribuidores de la comunidad",
+    "oss.community.langchain.description": "LangChain destacó nuestro Full-Stack AI Agent Template como Community Content Spotlight — generando 600+ likes, 26 comentarios y 71 compartidos.",
 
     // Generic Project Page
     "project.backToProjects": "Todos los proyectos",
@@ -1460,6 +1757,7 @@ export const translations = {
     "ui.terminal": "Terminal",
     "ui.orWithPreset": "O con un preset:",
     "ui.followOnGithub": "Seguir en GitHub",
+    "blog.search": "Buscar artículos...",
     "blog.noPosts": "No hay publicaciones aún. Vuelve pronto.",
     "oss.meta.title": "Vstorm OSS — Herramientas Open Source de Agentes IA para Python",
     "deepagents.code.tab.basic": "Básico",
@@ -1562,6 +1860,25 @@ export const translations = {
     "comparison.logfire.row.history": "Historial de conversaciones",
     "comparison.logfire.row.nl": "Entrada en lenguaje natural",
 
+    // Compare landing pages
+    "compare.index.title": "Compara nuestras herramientas",
+    "compare.index.subtitle": "Mira cómo las herramientas Vstorm OSS se comparan con las alternativas",
+    "compare.index.meta.description": "Comparaciones de características de herramientas Vstorm OSS vs LangChain, CrewAI, AutoGen y otros frameworks de IA",
+    "compare.verdict": "El veredicto",
+    "compare.highlights": "Diferencias clave",
+    "compare.table.title": "Comparación de características",
+    "compare.code.title": "Comparación de código",
+    "compare.whenToUse": "Cuándo usar cuál",
+    "compare.whenToUse.ours": "Elige {product} cuando:",
+    "compare.whenToUse.theirs": "Elige {competitor} cuando:",
+    "compare.faq.title": "Preguntas frecuentes",
+    "compare.relatedTitle": "Comparaciones relacionadas",
+    "compare.cta.title": "¿Listo para probar {product}?",
+    "compare.cta.button": "Comenzar",
+    "compare.winner.ours": "Ventaja: {product}",
+    "compare.winner.theirs": "Ventaja: {competitor}",
+    "compare.winner.tie": "Empate",
+
     // Testimonials
     "testimonials.title": "Lo que dicen los desarrolladores",
     "testimonials.subtitle": "De early adopters y beta testers.",
@@ -1585,6 +1902,13 @@ export const translations = {
     "404.description": "La página que buscas no existe o ha sido movida.",
     "404.back": "Volver al inicio",
     "blog.readingTime": "{min} min de lectura",
+    "blog.pagination.prev": "Anterior",
+    "blog.pagination.next": "Siguiente",
+    "blog.share": "Compartir artículo",
+    "blog.share.copied": "¡Enlace copiado!",
+    "blog.relatedPosts": "Artículos relacionados",
+    "blog.stickyCta.text": "¿Necesitas ayuda construyendo agentes de IA?",
+    "blog.stickyCta.button": "Habla con Vstorm",
     "skip.toContent": "Saltar al contenido",
 
     // About page
@@ -1604,7 +1928,15 @@ export const translations = {
     "about.philosophy.title": "Por qué código abierto",
     "about.philosophy.description": "Creemos que las mejores herramientas para agentes de IA deben ser abiertas, modulares y probadas en producción. Los monolitos cerrados te atan a las decisiones de un proveedor. Nuestro enfoque: construir cada capacidad como un paquete independiente, probarlo en más de 90 proyectos de clientes y luego publicarlo. Si funciona en producción, debería estar disponible para todos.",
     "about.links.title": "Conectar",
+    "blog.tag.title": "Etiqueta: {tag}",
+    "blog.tag.postCount": "{count} publicaciones",
+    "oss.githubStars": "estrellas en GitHub — !Danos una estrella!",
+    "changelog.title": "Registro de cambios",
+    "changelog.subtitle": "Historial de lanzamientos de todos los proyectos de Vstorm OSS",
+    "roadmap.title": "Hoja de ruta",
+    "roadmap.subtitle": "Qué estamos construyendo y qué viene después",
     "nav.about": "Acerca de",
+    "nav.compare": "Comparar",
   },
 } as const;
 

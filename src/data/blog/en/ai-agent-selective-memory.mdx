@@ -6,7 +6,7 @@ author: "Vstorm"
 lang: en
 translationKey: ai-agent-selective-memory
 tags: ["ai-agents", "memory", "memv", "pydantic-ai", "python"]
-category: guide
+category: open-source
 draft: false
 ---
 
@@ -26,7 +26,7 @@ Vector databases saved every message - including "yes," "ok," and "can you repea
 
 The fundamental problem: most AI memory systems are designed to *remember everything*. But the best human memory works by *forgetting almost everything* and keeping only what matters.
 
-After years of production agent work at Vstorm, we converged on a different approach. Instead of storing every message in a vector database, we give the agent a structured file system for persistent memory - and teach it to decide *what's worth saving*.
+After years of production agent work at Vstorm, we converged on a different approach using [Pydantic AI](https://ai.pydantic.dev/). Instead of storing every message in a vector database, we give the agent a structured file system for persistent memory - and teach it to decide *what's worth saving*.
 
 ## The Problem: Context Windows Are Finite
 

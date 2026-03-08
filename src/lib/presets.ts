@@ -74,6 +74,7 @@ export const presets: Record<PresetName, PresetDefinition> = {
       ai_framework: "pydantic_ai",
       enable_websockets: true,
       enable_conversation_persistence: true,
+      enable_langsmith: false,
       enable_docker: true,
       ci_type: "github",
     },
