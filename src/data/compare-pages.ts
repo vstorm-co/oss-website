@@ -155,23 +155,23 @@ export const comparisonPages: ComparisonPage[] = [
     ],
     codeOurs: {
       label: "Pydantic DeepAgents",
-      code: `from pydantic_deep import create_deep_agent
-from pydantic_deep import create_default_deps
-from pydantic_ai_backends import LocalBackend
+      code: `from pydantic_deep import (
+    create_deep_agent, create_default_deps, LocalBackend
+)
+from pydantic_deep.types import SubAgentConfig
 
 agent = create_deep_agent(
     model="openai:gpt-4.1",
+    instructions="You are a senior developer.",
     include_todo=True,
     include_filesystem=True,
     include_subagents=True,
     include_memory=True,
-    include_checkpoints=True,
-    cost_tracking=True,
-    subagents=[{
-        "name": "code-reviewer",
-        "description": "Reviews code",
-        "instructions": "You are a senior reviewer.",
-    }],
+    subagents=[SubAgentConfig(
+        name="code-reviewer",
+        description="Reviews code for bugs",
+        instructions="You are a senior reviewer.",
+    )],
 )
 
 deps = create_default_deps(LocalBackend("."))
@@ -393,26 +393,27 @@ result = agent.invoke({
     ],
     codeOurs: {
       label: "Pydantic DeepAgents",
-      code: `from pydantic_deep import create_deep_agent
-from pydantic_deep import create_default_deps
-from pydantic_ai_backends import StateBackend
+      code: `from pydantic_deep import (
+    create_deep_agent, create_default_deps
+)
+from pydantic_deep.types import SubAgentConfig
 
 agent = create_deep_agent(
     model="openai:gpt-4.1",
+    instructions="Research and write articles.",
     include_subagents=True,
     include_todo=True,
-    include_teams=True,
-    include_plan=True,
-    context_manager=True,
     subagents=[
-        {"name": "researcher",
-         "description": "Deep-dives into topics"},
-        {"name": "writer",
-         "description": "Writes articles"},
+        SubAgentConfig(name="researcher",
+            description="Deep-dives into topics",
+            instructions="You research thoroughly."),
+        SubAgentConfig(name="writer",
+            description="Writes articles",
+            instructions="You write clearly."),
     ],
 )
 
-deps = create_default_deps(StateBackend())
+deps = create_default_deps()
 result = await agent.run(
     "Research AI trends and write an article",
     deps=deps,
@@ -647,19 +648,18 @@ result = crew.kickoff()`,
     ],
     codeOurs: {
       label: "Pydantic DeepAgents",
-      code: `from pydantic_deep import create_deep_agent
-from pydantic_deep import create_default_deps
-from pydantic_ai_backends import LocalBackend
+      code: `from pydantic_deep import (
+    create_deep_agent, create_default_deps,
+    LocalBackend,
+)
 
 agent = create_deep_agent(
     model="openai:gpt-4.1",
+    instructions="Research and summarize topics.",
     include_filesystem=True,
     include_subagents=True,
     include_memory=True,
     include_todo=True,
-    context_manager=True,
-    cost_tracking=True,
-    cost_budget_usd=5.0,
 )
 
 deps = create_default_deps(

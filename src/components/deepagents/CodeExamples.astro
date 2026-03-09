@@ -15,45 +15,51 @@ const tabs = [
 
 // Plain text for clipboard
 const plainCode: Record<string, string> = {
-  basic: `from pydantic_deep import DeepAgent
+  basic: `from pydantic_deep import create_deep_agent, DeepAgentDeps, StateBackend
 
-agent = DeepAgent(
-    model="claude-sonnet-4-20250514",
-    system_prompt="You are a senior Python developer.",
-    tools=["filesystem", "shell", "web_search"],
+agent = create_deep_agent(
+    model="anthropic:claude-sonnet-4-20250514",
+    instructions="You are a senior Python developer.",
 )
 
-result = await agent.run(
-    "Refactor the auth module to use JWT tokens"
-)`,
-  tools: `from pydantic_deep import DeepAgent
-from pydantic_deep.tools import tool
+deps = DeepAgentDeps(backend=StateBackend())
 
-@tool
-def analyze_logs(path: str) -> str:
+result = await agent.run(
+    "Refactor the auth module to use JWT tokens",
+    deps=deps,
+)`,
+  tools: `from pydantic_ai import RunContext
+from pydantic_deep import create_deep_agent, DeepAgentDeps, StateBackend
+
+async def analyze_logs(ctx: RunContext[DeepAgentDeps], path: str) -> str:
     """Analyze log files for errors and patterns."""
-    with open(path) as f:
-        return f.read()
+    return ctx.deps.backend.read(path)
 
-agent = DeepAgent(
-    model="gpt-4o",
-    tools=["filesystem", analyze_logs],
+agent = create_deep_agent(
+    model="openai:gpt-4.1",
+    instructions="You are a DevOps assistant.",
+    tools=[analyze_logs],
 )
 
-result = await agent.run("Find and fix recent errors")`,
-  subagents: `from pydantic_deep import DeepAgent
+deps = DeepAgentDeps(backend=StateBackend())
+result = await agent.run("Find and fix recent errors", deps=deps)`,
+  subagents: `from pydantic_deep import create_deep_agent, DeepAgentDeps, StateBackend
+from pydantic_deep.types import SubAgentConfig
 
-agent = DeepAgent(
-    model="claude-sonnet-4-20250514",
-    tools=["filesystem", "shell", "subagent"],
-    system_prompt=\"\"\"You are a tech lead.
-Delegate code review to a sub-agent
-and summarize the findings.\"\"\",
+agent = create_deep_agent(
+    model="anthropic:claude-sonnet-4-20250514",
+    instructions="You are a tech lead. Delegate tasks to subagents.",
+    subagents=[
+        SubAgentConfig(
+            name="code-reviewer",
+            description="Reviews code for bugs and best practices",
+            instructions="You are an expert code reviewer.",
+        ),
+    ],
 )
 
-result = await agent.run(
-    "Review the PR changes and suggest improvements"
-)`,
+deps = DeepAgentDeps(backend=StateBackend())
+result = await agent.run("Review the PR changes", deps=deps)`,
 };
 ---
 
@@ -104,16 +110,18 @@ result = await agent.run(
               </svg>
             </div>
           </div>
-          <pre class="p-4 text-sm font-mono overflow-x-auto leading-relaxed"><code><span class="text-violet-400">from</span> <span class="text-cyan-400">pydantic_deep</span> <span class="text-violet-400">import</span> <span class="text-cyan-400">DeepAgent</span>
+          <pre class="p-4 text-sm font-mono overflow-x-auto leading-relaxed"><code><span class="text-violet-400">from</span> <span class="text-cyan-400">pydantic_deep</span> <span class="text-violet-400">import</span> <span class="text-cyan-400">create_deep_agent</span><span class="text-text-secondary">,</span> <span class="text-cyan-400">DeepAgentDeps</span><span class="text-text-secondary">,</span> <span class="text-cyan-400">StateBackend</span>
 
-<span class="text-text">agent</span> <span class="text-violet-400">=</span> <span class="text-cyan-400">DeepAgent</span><span class="text-text-secondary">(</span>
-    <span class="text-text-secondary">model</span><span class="text-violet-400">=</span><span class="text-amber-400">"claude-sonnet-4-20250514"</span><span class="text-text-secondary">,</span>
-    <span class="text-text-secondary">system_prompt</span><span class="text-violet-400">=</span><span class="text-amber-400">"You are a senior Python developer."</span><span class="text-text-secondary">,</span>
-    <span class="text-text-secondary">tools</span><span class="text-violet-400">=</span><span class="text-text-secondary">[</span><span class="text-amber-400">"filesystem"</span><span class="text-text-secondary">,</span> <span class="text-amber-400">"shell"</span><span class="text-text-secondary">,</span> <span class="text-amber-400">"web_search"</span><span class="text-text-secondary">],</span>
+<span class="text-text">agent</span> <span class="text-violet-400">=</span> <span class="text-cyan-400">create_deep_agent</span><span class="text-text-secondary">(</span>
+    <span class="text-text-secondary">model</span><span class="text-violet-400">=</span><span class="text-amber-400">"anthropic:claude-sonnet-4-20250514"</span><span class="text-text-secondary">,</span>
+    <span class="text-text-secondary">instructions</span><span class="text-violet-400">=</span><span class="text-amber-400">"You are a senior Python developer."</span><span class="text-text-secondary">,</span>
 <span class="text-text-secondary">)</span>
 
+<span class="text-text">deps</span> <span class="text-violet-400">=</span> <span class="text-cyan-400">DeepAgentDeps</span><span class="text-text-secondary">(</span><span class="text-text-secondary">backend</span><span class="text-violet-400">=</span><span class="text-cyan-400">StateBackend</span><span class="text-text-secondary">())</span>
+
 <span class="text-text">result</span> <span class="text-violet-400">=</span> <span class="text-violet-400">await</span> <span class="text-text">agent</span><span class="text-text-secondary">.</span><span class="text-cyan-400">run</span><span class="text-text-secondary">(</span>
-    <span class="text-amber-400">"Refactor the auth module to use JWT tokens"</span>
+    <span class="text-amber-400">"Refactor the auth module to use JWT tokens"</span><span class="text-text-secondary">,</span>
+    <span class="text-text-secondary">deps</span><span class="text-violet-400">=</span><span class="text-text">deps</span><span class="text-text-secondary">,</span>
 <span class="text-text-secondary">)</span></code></pre>
         </div>
       </div>
@@ -137,21 +145,21 @@ result = await agent.run(
               </svg>
             </div>
           </div>
-          <pre class="p-4 text-sm font-mono overflow-x-auto leading-relaxed"><code><span class="text-violet-400">from</span> <span class="text-cyan-400">pydantic_deep</span> <span class="text-violet-400">import</span> <span class="text-cyan-400">DeepAgent</span>
-<span class="text-violet-400">from</span> <span class="text-cyan-400">pydantic_deep.tools</span> <span class="text-violet-400">import</span> <span class="text-cyan-400">tool</span>
+          <pre class="p-4 text-sm font-mono overflow-x-auto leading-relaxed"><code><span class="text-violet-400">from</span> <span class="text-cyan-400">pydantic_ai</span> <span class="text-violet-400">import</span> <span class="text-cyan-400">RunContext</span>
+<span class="text-violet-400">from</span> <span class="text-cyan-400">pydantic_deep</span> <span class="text-violet-400">import</span> <span class="text-cyan-400">create_deep_agent</span><span class="text-text-secondary">,</span> <span class="text-cyan-400">DeepAgentDeps</span><span class="text-text-secondary">,</span> <span class="text-cyan-400">StateBackend</span>
 
-<span class="text-cyan-400">@tool</span>
-<span class="text-violet-400">def</span> <span class="text-cyan-400">analyze_logs</span><span class="text-text-secondary">(</span><span class="text-text">path</span><span class="text-text-secondary">:</span> <span class="text-cyan-400">str</span><span class="text-text-secondary">)</span> <span class="text-text-secondary">-&gt;</span> <span class="text-cyan-400">str</span><span class="text-text-secondary">:</span>
+<span class="text-violet-400">async def</span> <span class="text-cyan-400">analyze_logs</span><span class="text-text-secondary">(</span><span class="text-text">ctx</span><span class="text-text-secondary">:</span> <span class="text-cyan-400">RunContext</span><span class="text-text-secondary">[</span><span class="text-cyan-400">DeepAgentDeps</span><span class="text-text-secondary">],</span> <span class="text-text">path</span><span class="text-text-secondary">:</span> <span class="text-cyan-400">str</span><span class="text-text-secondary">)</span> <span class="text-text-secondary">-&gt;</span> <span class="text-cyan-400">str</span><span class="text-text-secondary">:</span>
     <span class="text-amber-400">"""Analyze log files for errors and patterns."""</span>
-    <span class="text-violet-400">with</span> <span class="text-cyan-400">open</span><span class="text-text-secondary">(</span><span class="text-text">path</span><span class="text-text-secondary">)</span> <span class="text-violet-400">as</span> <span class="text-text">f</span><span class="text-text-secondary">:</span>
-        <span class="text-violet-400">return</span> <span class="text-text">f</span><span class="text-text-secondary">.</span><span class="text-cyan-400">read</span><span class="text-text-secondary">()</span>
+    <span class="text-violet-400">return</span> <span class="text-text">ctx</span><span class="text-text-secondary">.</span><span class="text-text">deps</span><span class="text-text-secondary">.</span><span class="text-text">backend</span><span class="text-text-secondary">.</span><span class="text-cyan-400">read</span><span class="text-text-secondary">(</span><span class="text-text">path</span><span class="text-text-secondary">)</span>
 
-<span class="text-text">agent</span> <span class="text-violet-400">=</span> <span class="text-cyan-400">DeepAgent</span><span class="text-text-secondary">(</span>
-    <span class="text-text-secondary">model</span><span class="text-violet-400">=</span><span class="text-amber-400">"gpt-4o"</span><span class="text-text-secondary">,</span>
-    <span class="text-text-secondary">tools</span><span class="text-violet-400">=</span><span class="text-text-secondary">[</span><span class="text-amber-400">"filesystem"</span><span class="text-text-secondary">,</span> <span class="text-text">analyze_logs</span><span class="text-text-secondary">],</span>
+<span class="text-text">agent</span> <span class="text-violet-400">=</span> <span class="text-cyan-400">create_deep_agent</span><span class="text-text-secondary">(</span>
+    <span class="text-text-secondary">model</span><span class="text-violet-400">=</span><span class="text-amber-400">"openai:gpt-4.1"</span><span class="text-text-secondary">,</span>
+    <span class="text-text-secondary">instructions</span><span class="text-violet-400">=</span><span class="text-amber-400">"You are a DevOps assistant."</span><span class="text-text-secondary">,</span>
+    <span class="text-text-secondary">tools</span><span class="text-violet-400">=</span><span class="text-text-secondary">[</span><span class="text-text">analyze_logs</span><span class="text-text-secondary">],</span>
 <span class="text-text-secondary">)</span>
 
-<span class="text-text">result</span> <span class="text-violet-400">=</span> <span class="text-violet-400">await</span> <span class="text-text">agent</span><span class="text-text-secondary">.</span><span class="text-cyan-400">run</span><span class="text-text-secondary">(</span><span class="text-amber-400">"Find and fix recent errors"</span><span class="text-text-secondary">)</span></code></pre>
+<span class="text-text">deps</span> <span class="text-violet-400">=</span> <span class="text-cyan-400">DeepAgentDeps</span><span class="text-text-secondary">(</span><span class="text-text-secondary">backend</span><span class="text-violet-400">=</span><span class="text-cyan-400">StateBackend</span><span class="text-text-secondary">())</span>
+<span class="text-text">result</span> <span class="text-violet-400">=</span> <span class="text-violet-400">await</span> <span class="text-text">agent</span><span class="text-text-secondary">.</span><span class="text-cyan-400">run</span><span class="text-text-secondary">(</span><span class="text-amber-400">"Find and fix recent errors"</span><span class="text-text-secondary">,</span> <span class="text-text-secondary">deps</span><span class="text-violet-400">=</span><span class="text-text">deps</span><span class="text-text-secondary">)</span></code></pre>
         </div>
       </div>
 
@@ -174,19 +182,23 @@ result = await agent.run(
               </svg>
             </div>
           </div>
-          <pre class="p-4 text-sm font-mono overflow-x-auto leading-relaxed"><code><span class="text-violet-400">from</span> <span class="text-cyan-400">pydantic_deep</span> <span class="text-violet-400">import</span> <span class="text-cyan-400">DeepAgent</span>
+          <pre class="p-4 text-sm font-mono overflow-x-auto leading-relaxed"><code><span class="text-violet-400">from</span> <span class="text-cyan-400">pydantic_deep</span> <span class="text-violet-400">import</span> <span class="text-cyan-400">create_deep_agent</span><span class="text-text-secondary">,</span> <span class="text-cyan-400">DeepAgentDeps</span><span class="text-text-secondary">,</span> <span class="text-cyan-400">StateBackend</span>
+<span class="text-violet-400">from</span> <span class="text-cyan-400">pydantic_deep.types</span> <span class="text-violet-400">import</span> <span class="text-cyan-400">SubAgentConfig</span>
 
-<span class="text-text">agent</span> <span class="text-violet-400">=</span> <span class="text-cyan-400">DeepAgent</span><span class="text-text-secondary">(</span>
-    <span class="text-text-secondary">model</span><span class="text-violet-400">=</span><span class="text-amber-400">"claude-sonnet-4-20250514"</span><span class="text-text-secondary">,</span>
-    <span class="text-text-secondary">tools</span><span class="text-violet-400">=</span><span class="text-text-secondary">[</span><span class="text-amber-400">"filesystem"</span><span class="text-text-secondary">,</span> <span class="text-amber-400">"shell"</span><span class="text-text-secondary">,</span> <span class="text-amber-400">"subagent"</span><span class="text-text-secondary">],</span>
-    <span class="text-text-secondary">system_prompt</span><span class="text-violet-400">=</span><span class="text-amber-400">"""You are a tech lead.
-Delegate code review to a sub-agent
-and summarize the findings."""</span><span class="text-text-secondary">,</span>
+<span class="text-text">agent</span> <span class="text-violet-400">=</span> <span class="text-cyan-400">create_deep_agent</span><span class="text-text-secondary">(</span>
+    <span class="text-text-secondary">model</span><span class="text-violet-400">=</span><span class="text-amber-400">"anthropic:claude-sonnet-4-20250514"</span><span class="text-text-secondary">,</span>
+    <span class="text-text-secondary">instructions</span><span class="text-violet-400">=</span><span class="text-amber-400">"You are a tech lead. Delegate tasks to subagents."</span><span class="text-text-secondary">,</span>
+    <span class="text-text-secondary">subagents</span><span class="text-violet-400">=</span><span class="text-text-secondary">[</span>
+        <span class="text-cyan-400">SubAgentConfig</span><span class="text-text-secondary">(</span>
+            <span class="text-text-secondary">name</span><span class="text-violet-400">=</span><span class="text-amber-400">"code-reviewer"</span><span class="text-text-secondary">,</span>
+            <span class="text-text-secondary">description</span><span class="text-violet-400">=</span><span class="text-amber-400">"Reviews code for bugs and best practices"</span><span class="text-text-secondary">,</span>
+            <span class="text-text-secondary">instructions</span><span class="text-violet-400">=</span><span class="text-amber-400">"You are an expert code reviewer."</span><span class="text-text-secondary">,</span>
+        <span class="text-text-secondary">),</span>
+    <span class="text-text-secondary">],</span>
 <span class="text-text-secondary">)</span>
 
-<span class="text-text">result</span> <span class="text-violet-400">=</span> <span class="text-violet-400">await</span> <span class="text-text">agent</span><span class="text-text-secondary">.</span><span class="text-cyan-400">run</span><span class="text-text-secondary">(</span>
-    <span class="text-amber-400">"Review the PR changes and suggest improvements"</span>
-<span class="text-text-secondary">)</span></code></pre>
+<span class="text-text">deps</span> <span class="text-violet-400">=</span> <span class="text-cyan-400">DeepAgentDeps</span><span class="text-text-secondary">(</span><span class="text-text-secondary">backend</span><span class="text-violet-400">=</span><span class="text-cyan-400">StateBackend</span><span class="text-text-secondary">())</span>
+<span class="text-text">result</span> <span class="text-violet-400">=</span> <span class="text-violet-400">await</span> <span class="text-text">agent</span><span class="text-text-secondary">.</span><span class="text-cyan-400">run</span><span class="text-text-secondary">(</span><span class="text-amber-400">"Review the PR changes"</span><span class="text-text-secondary">,</span> <span class="text-text-secondary">deps</span><span class="text-violet-400">=</span><span class="text-text">deps</span><span class="text-text-secondary">)</span></code></pre>
         </div>
       </div>
     </div>

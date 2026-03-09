@@ -197,18 +197,28 @@ function winnerBg(winner: string) {
         </div>
 
         <div class="grid gap-6 sm:grid-cols-2 reveal">
-          <div class="force-dark glass-card rounded-2xl overflow-hidden">
-            <div class="px-4 py-2.5 border-b border-white/[0.06] text-xs font-mono text-green-400 bg-gradient-to-r from-green-400/[0.08] to-transparent">
-              {comparison.codeOurs.label}
+          <div class="force-dark copy-block group/copy relative cursor-pointer rounded-xl border border-border bg-surface overflow-hidden" data-command={comparison.codeOurs.code}>
+            <div class="flex items-center justify-between border-b border-border px-4 py-2">
+              <span class="text-xs font-mono text-green-400">{comparison.codeOurs.label}</span>
+              <div class="flex items-center gap-1.5 opacity-0 transition-opacity group-hover/copy:opacity-100">
+                <span class="copy-label text-[11px] text-text-tertiary" data-copied={t["ui.copied"] ?? "Copied!"}>{t["ui.clickToCopy"] ?? "Click to copy"}</span>
+                <svg class="copy-icon h-4 w-4 text-text-tertiary transition-colors group-hover/copy:text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                <svg class="check-icon hidden h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+              </div>
             </div>
-            <pre class="p-4 overflow-x-auto text-xs leading-relaxed"><code class="font-mono text-text-secondary">{comparison.codeOurs.code}</code></pre>
+            <pre class="p-4 overflow-x-auto text-sm leading-relaxed"><code class="font-mono text-text-secondary">{comparison.codeOurs.code}</code></pre>
           </div>
           {comparison.codeTheirs && (
-            <div class="force-dark glass-card rounded-2xl overflow-hidden">
-              <div class="px-4 py-2.5 border-b border-white/[0.06] text-xs font-mono text-blue-400 bg-gradient-to-r from-blue-400/[0.08] to-transparent">
-                {comparison.codeTheirs.label}
+            <div class="force-dark copy-block group/copy relative cursor-pointer rounded-xl border border-border bg-surface overflow-hidden" data-command={comparison.codeTheirs.code}>
+              <div class="flex items-center justify-between border-b border-border px-4 py-2">
+                <span class="text-xs font-mono text-blue-400">{comparison.codeTheirs.label}</span>
+                <div class="flex items-center gap-1.5 opacity-0 transition-opacity group-hover/copy:opacity-100">
+                  <span class="copy-label text-[11px] text-text-tertiary" data-copied={t["ui.copied"] ?? "Copied!"}>{t["ui.clickToCopy"] ?? "Click to copy"}</span>
+                  <svg class="copy-icon h-4 w-4 text-text-tertiary transition-colors group-hover/copy:text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                  <svg class="check-icon hidden h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                </div>
               </div>
-              <pre class="p-4 overflow-x-auto text-xs leading-relaxed"><code class="font-mono text-text-secondary">{comparison.codeTheirs.code}</code></pre>
+              <pre class="p-4 overflow-x-auto text-sm leading-relaxed"><code class="font-mono text-text-secondary">{comparison.codeTheirs.code}</code></pre>
             </div>
           )}
         </div>
@@ -350,3 +360,36 @@ function winnerBg(winner: string) {
 
   <OssFooter t={t} />
 </Layout>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.copy-block').forEach((block) => {
+    block.addEventListener('click', async () => {
+      const command = block.dataset.command;
+      if (!command) return;
+      try {
+        await navigator.clipboard.writeText(command);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = command;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      const label = block.querySelector('.copy-label') as HTMLElement | null;
+      const copyIcon = block.querySelector('.copy-icon') as HTMLElement | null;
+      const checkIcon = block.querySelector('.check-icon') as HTMLElement | null;
+      const originalText = label?.textContent || '';
+      if (label) label.textContent = label.dataset.copied || 'Copied!';
+      if (copyIcon) copyIcon.classList.add('hidden');
+      if (checkIcon) checkIcon.classList.remove('hidden');
+      setTimeout(() => {
+        if (label) label.textContent = originalText;
+        if (copyIcon) copyIcon.classList.remove('hidden');
+        if (checkIcon) checkIcon.classList.add('hidden');
+      }, 2000);
+    });
+  });
+</script>

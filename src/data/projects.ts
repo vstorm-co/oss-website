@@ -207,17 +207,17 @@ result = await agent.run("Hello, how are you?")`,
       ],
     },
     mermaidDiagram: `flowchart LR
-    Input["🔵 Input"] --> before_run["🟣 before_run"]
-    before_run --> before_model["🟣 before_model_request"]
-    before_model --> Agent["🟠 Agent"]
-    Agent -->|"tool call"| before_tool["🟣 before_tool_call"]
-    before_tool --> Tool["🟠 Tool"]
-    Tool --> after_tool["🟣 after_tool_call"]
+    Input[Input] --> before_run[before_run]
+    before_run --> before_model[before_model_request]
+    before_model --> Agent[Agent]
+    Agent -->|tool call| before_tool[before_tool_call]
+    before_tool --> Tool[Tool]
+    Tool --> after_tool[after_tool_call]
     after_tool --> Agent
-    Tool -.->|"error"| on_error["🔴 on_tool_error"]
+    Tool -.->|error| on_error[on_tool_error]
     on_error -.-> Agent
-    Agent -->|"finish"| after_run["🟣 after_run"]
-    after_run --> Output["🟢 Output"]`,
+    Agent -->|finish| after_run[after_run]
+    after_run --> Output[Output]`,
   },
   {
     slug: "subagents-pydantic-ai",
