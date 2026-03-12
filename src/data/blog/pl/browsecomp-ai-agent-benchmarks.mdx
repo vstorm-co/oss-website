@@ -1,0 +1,115 @@
+---
+title: "BrowseComp: Benchmark, który testuje co agenci AI potrafią naprawdę znaleźć"
+description: "BrowseComp od OpenAI odwraca tradycyjne benchmarki do góry nogami - pytania łatwo zweryfikować, ale brutalnie trudno rozwiązać. Oto dlaczego ma to znaczenie dla rozwoju agentów AI."
+pubDate: 2026-03-09
+author: "Vstorm"
+lang: pl
+translationKey: browsecomp-ai-agent-benchmarks
+tags: ["ai-agents", "benchmarks", "browsecomp", "deep-research", "llm-evaluation"]
+category: news
+draft: false
+---
+
+Większość benchmarków AI testuje to, co model _wie_. BrowseComp testuje to, co model potrafi _znaleźć_. Ta różnica ma znacznie większe znaczenie, niż mogłoby się wydawać.
+
+[BrowseComp](https://arxiv.org/abs/2504.12516) to benchmark OpenAI do oceny agentów AI przeglądających internet. Zawiera 1266 pytań zaprojektowanych z jednym brutalnym ograniczeniem: człowiek nie był w stanie ich rozwiązać w dziesięć minut, a ChatGPT (z przeglądaniem i bez) ani wczesna wersja OpenAI Deep Research również nie. Mimo to każdą odpowiedź można zweryfikować w kilka sekund.
+
+## TL;DR
+
+- **BrowseComp to benchmark przeglądania sieci**, a nie test wiedzy czy rozumowania. Ocenia, czy agenci AI potrafią nawigować po otwartym internecie, aby znaleźć konkretne, niszowe informacje.
+- **Pytania są „odwrócone"** — autorzy zaczynają od faktu i pracują wstecz, tworząc pytanie, które łatwo zweryfikować, ale ekstremalnie trudno rozwiązać przez wyszukiwanie.
+- **Brute-force nie działa.** Przestrzeń wyszukiwania jest celowo ogromna — tysiące artykułów, meczów, wydarzeń — co sprawia, że systematyczne przeszukiwanie jest niepraktyczne.
+- **Ocena wykorzystuje sędziego LLM z wynikiem pewności**, tworząc interesującą meta-warstwę, w której jeden model ocenia pewność drugiego.
+- **Ten benchmark ujawnia przepaść** między „potrafi odpowiadać na pytania" a „potrafi prowadzić badania" — dokładnie ta zdolność odróżnia chatboty od użytecznych agentów AI.
+
+## Projektowanie odwróconych pytań
+
+Kluczowy pomysł stojący za BrowseComp jest zwodniczo prosty: zacznij od odpowiedzi, a następnie stwórz pytanie, które sprawia, że odpowiedź jest prawie niemożliwa do znalezienia przez bezpośrednie wyszukiwanie.
+
+Oto przykład, który OpenAI dało swoim twórcom pytań:
+
+> Jaki jest tytuł artykułu naukowego opublikowanego na konferencji EMNLP w latach 2018-2023, gdzie pierwszy autor ukończył studia licencjackie w Dartmouth College, a czwarty autor ukończył studia licencjackie na University of Pennsylvania?
+>
+> **Odpowiedź:** Frequency Effects on Syntactic Rule Learning in Transformers
+
+Weryfikacja tej odpowiedzi wymaga kilku wyszukiwań — sprawdź artykuł, potwierdź wykształcenie autorów, gotowe. Ale _znalezienie_ odpowiedzi wymaga przejrzenia tysięcy artykułów EMNLP i zbadania wykształcenia ich autorów. Podejście brute-force jest technicznie możliwe, ale praktycznie niewykonalne.
+
+To właśnie odróżnia BrowseComp od benchmarków takich jak MMLU czy ARC. Tamte testują przywoływanie i rozumowanie informacji, które model już posiada. BrowseComp testuje zdolność do _nawigowania po informacjach, których jeszcze nie masz_.
+
+## Jak wyglądają pytania
+
+Pytania są krótkie, samodzielne i konkretne. Oto prawdziwy przykład z benchmarku:
+
+> W latach 1990-1994 włącznie, jakie drużyny grały w meczu piłki nożnej z brazylijskim sędzią, który miał cztery żółte kartki, po dwie dla każdej drużyny, gdzie trzy z czterech nie zostały wystawione w pierwszej połowie, i cztery zmiany, z których jedna była spowodowana kontuzją w pierwszych 25 minutach meczu?
+>
+> **Odpowiedź:** Irlandia vs Rumunia
+
+Pomyśl, co agent AI musiałby zrobić, żeby to rozwiązać. Nie może po prostu wyszukać „mecz piłkarski brazylijski sędzia cztery żółte kartki" — to zwraca szum. Musi systematycznie zawężać mecze z pięcioletniego okna, sprawdzać narodowości sędziów, weryfikować rozkład kartek według połów i potwierdzać szczegóły zmian. To wieloetapowe badanie, a nie odpowiadanie na pytania.
+
+Twórcy pytań kierowali się trzema zasadami projektowania:
+
+1. **Wymagające.** Inny człowiek nie był w stanie rozwiązać ich w dziesięć minut. Istniejące modele (ChatGPT z przeglądaniem, wczesny Deep Research) też nie mogły ich rozwiązać.
+2. **Proste i łatwe do weryfikacji.** Odpowiedzi są krótkie — nazwa, tytuł, data. Sprawdzenie poprawności jest trywialne.
+3. **Prawdopodobnie unikalne.** Choć odwrócony projekt nie może zagwarantować, że istnieje tylko jedna prawidłowa odpowiedź, twórcy wybierali ograniczenia z wystarczająco małą przestrzenią wyszukiwania, aby duplikaty były mało prawdopodobne. W przykładzie EMNLP, Dartmouth jest małą uczelnią, a twórca znał społeczność NLP na tyle dobrze, by wiedzieć, że żaden inny absolwent Dartmouth nie publikował na EMNLP w tym oknie czasowym.
+
+## Dlaczego „łatwe do weryfikacji, trudne do rozwiązania" ma znaczenie
+
+Ta asymetria to nie tylko sprytna sztuczka do projektowania benchmarków — odzwierciedla rzeczywiste zadania badawcze.
+
+Kiedy prawnik szuka precedensów, wie czego potrzebuje, ale nie wie, gdzie to jest. Kiedy programista debuguje problem produkcyjny, może natychmiast zweryfikować poprawkę, ale znalezienie przyczyny zajmuje godziny. Kiedy dziennikarz weryfikuje fakty, potwierdzenie jest szybkie, ale początkowe dochodzenie jest trudną częścią.
+
+BrowseComp uchwyca ten wzorzec. Pytania są przybliżeniem rodzaju pracy, w której agenci AI mogliby dostarczyć prawdziwą wartość: zadań, gdzie przestrzeń wyszukiwania jest zbyt duża, by człowiek mógł ją efektywnie pokryć, ale gdzie człowiek może łatwo zweryfikować wynik.
+
+To także sprawia, że jest lepszym benchmarkiem konkretnie dla _agentów_. Benchmark testujący wiedzę nagradza większe zbiory treningowe. Benchmark testujący rozumowanie nagradza lepsze architektury. Ale benchmark testujący wyszukiwanie informacji w otwartym internecie nagradza cały stos agenta — planowanie, użycie narzędzi, strategię wyszukiwania, syntezę wyników i wiedzę, kiedy się poddać.
+
+## System oceniania: LLM jako sędzia
+
+BrowseComp używa LLM do oceny, czy odpowiedź agenta pasuje do prawidłowej odpowiedzi. Prompt sędziego jest bardzo wymowny:
+
+```
+Oceń, czy następująca [odpowiedź] na [pytanie] jest prawidłowa na podstawie
+precyzyjnej i jednoznacznej [prawidłowej_odpowiedzi] poniżej.
+
+wyodrębniona_odpowiedź_końcowa: Ostateczna dokładna odpowiedź wyodrębniona
+z [odpowiedzi]. Wpisz 'None' jeśli nie ma dokładnej odpowiedzi do wyodrębnienia.
+
+rozumowanie: Wyjaśnij, dlaczego wyodrębniona odpowiedź jest prawidłowa lub
+nieprawidłowa na podstawie [prawidłowej_odpowiedzi]. Nie próbuj rozwiązywać
+problemu ani argumentować za inną odpowiedzią - skup się wyłącznie na tym,
+czy odpowiedzi się zgadzają.
+
+prawidłowa: 'yes' jeśli wyodrębniona odpowiedź pasuje, 'no' w przeciwnym razie.
+
+pewność: Wyodrębniony wynik pewności między 0% a 100% z [odpowiedzi].
+Wpisz 100 jeśli brak wyniku pewności.
+```
+
+Trzy rzeczy zwracają tutaj uwagę:
+
+**1. Wyodrębnianie odpowiedzi, nie generowanie.** Sędzia nie ocenia jakości rozumowania ani strategii wyszukiwania. Wyodrębnia końcową odpowiedź i porównuje ją. To utrzymuje czystość oceny — albo znalazłeś prawidłową odpowiedź, albo nie.
+
+**2. Rozumowanie jest jednokierunkowe.** Prompt wyraźnie mówi „nie próbuj rozwiązywać problemu, nie argumentuj za inną odpowiedzią niż [prawidłowa_odpowiedź]". To zapobiega racjonalizowaniu nieprawidłowych odpowiedzi przez sędziego. Może tylko sprawdzić z referencją, nie improwizować.
+
+**3. Pewność jako metryka pierwszej klasy.** Sędzia wyodrębnia samodzielnie zgłoszony wynik pewności agenta. To tworzy warstwę meta-oceny: nie tylko „czy agent odpowiedział prawidłowo?", ale „czy agent _wiedział_, czy odpowiedział prawidłowo?" Agent, który odpowiada prawidłowo z 95% pewnością, jest bardziej użyteczny niż ten, który odpowiada prawidłowo z 50% pewnością — a agent, który odpowiada nieprawidłowo z 95% pewnością, jest bardziej niebezpieczny niż ten, który mówi „nie jestem pewien".
+
+Wymiar pewności jest szczególnie istotny dla produkcyjnych agentów AI. W rzeczywistym wdrożeniu musisz wiedzieć, kiedy ufać wynikowi agenta, a kiedy eskalować do człowieka. Benchmark mierzący kalibrację obok dokładności daje znacznie lepszy sygnał o niezawodności w rzeczywistych warunkach.
+
+## Co to oznacza dla rozwoju agentów AI
+
+BrowseComp uwydatnia kilka rzeczy istotnych dla każdego, kto buduje agentów AI:
+
+**Strategia wyszukiwania jest wąskim gardłem, nie inteligencja modelu.** Pytania nie są intelektualnie trudne — człowiek, który przypadkiem trafiłby na właściwą stronę Wikipedii, mógłby odpowiedzieć na większość z nich. Trudność polega na _znalezieniu_ tej strony wśród milionów. Oznacza to, że zdolności wyszukiwania i nawigacji agenta mają większe znaczenie niż jego zdolność rozumowania.
+
+**Wieloetapowe wyszukiwanie fundamentalnie różni się od pojedynczego zapytania.** Nie możesz rozwiązać pytań BrowseComp jednym wyszukiwaniem w Google. Musisz zdekomponować pytanie, szukać częściowych ograniczeń, porównywać wyniki i iteracyjnie zawężać przestrzeń wyszukiwania. To bliższe temu, jak naprawdę działa badanie.
+
+**Wiedza o tym, czego nie wiesz, jest wartościowa.** Punktacja pewności w systemie oceniania BrowseComp wskazuje na niedocenianą zdolność. Agent, który potrafi wiarygodnie powiedzieć „nie mogłem tego znaleźć", jest bardziej godny zaufania niż ten, który zawsze produkuje odpowiedź. Skalibrowana niepewność to cecha, nie ograniczenie.
+
+**Asymetria weryfikacji umożliwia przepływy pracy człowiek-w-pętli.** Jeśli agent produkuje kandydującą odpowiedź na pytanie w stylu BrowseComp, człowiek może ją zweryfikować w kilka minut. To mapuje się bezpośrednio na praktyczne wdrożenia agentów, gdzie agent wykonuje ciężką pracę, a człowiek dokonuje ostatecznej weryfikacji.
+
+## Szerszy obraz
+
+Benchmarki AI kształtują to, co jest budowane. Gdy branża optymalizowała pod MMLU, otrzymaliśmy modele z szerszą wiedzą. Gdy optymalizowała pod HumanEval, otrzymaliśmy lepsze generowanie kodu. BrowseComp optymalizuje pod coś innego: zdolność do znajdowania konkretnych informacji w otwartym internecie poprzez wieloetapowe badanie.
+
+Ma to znaczenie, ponieważ następna fala użytecznej AI nie dotyczy tego, co modele wiedzą — dotyczy tego, co potrafią znaleźć, zweryfikować i zsyntetyzować ze źródeł zewnętrznych. BrowseComp jest jednym z pierwszych benchmarków, który bezpośrednio mierzy tę zdolność. Niezależnie od tego, czy stanie się standardem, zasady projektowania stojące za nim — odwrócone pytania, asymetria weryfikacji, kalibracja pewności — wskazują kierunek, w jakim powinniśmy oceniać agentów AI.
+
+Benchmark jest otwarty, a [artykuł dostępny na arXiv](https://arxiv.org/abs/2504.12516). Jeśli budujesz agentów, którzy wchodzą w interakcję z siecią, warto zrozumieć, co testuje BrowseComp i dlaczego istniejące modele mają z nim problem.
