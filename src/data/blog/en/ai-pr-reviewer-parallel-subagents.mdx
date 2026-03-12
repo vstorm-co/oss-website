@@ -1,0 +1,317 @@
+---
+title: "Build an AI PR Reviewer with 3 Parallel Subagents in Python"
+description: "Security, style, and performance checks in 30 seconds — using pydantic-deepagents to run 3 specialized subagents in parallel against your git diff."
+pubDate: 2026-03-12
+author: "Kacper Wlodarczyk"
+lang: en
+translationKey: ai-pr-reviewer-parallel-subagents
+tags: ["pydantic-ai", "ai-agents", "python", "code-review", "open-source"]
+category: case-study
+draft: false
+---
+
+Code reviews are one of the most valuable — and most expensive — activities in software engineering.
+
+A senior developer spends 2-4 hours per day reviewing pull requests. That's 10-20 hours per week. Not writing code. Not designing systems. Not mentoring. Just reading diffs, checking for SQL injection, spotting N+1 queries, and leaving comments about missing type hints.
+
+Now multiply that across a team of five seniors. That's 50-100 hours of human brainpower per week, much of it spent on checks that follow clear, repeatable patterns.
+
+What if you could automate the repeatable parts? Not replace the senior reviewer — augment them. Catch the obvious issues before they even look at the PR, so they can focus on architecture, logic, and design.
+
+That's exactly what we built. An AI PR reviewer that runs three specialized subagents in parallel — security, style, and performance — and returns a structured, priority-sorted review in about 30 seconds.
+
+Here's how it works, and the full working code you can run today.
+
+## The Architecture: 3 Specialists, 1 Coordinator
+
+The core idea is simple: instead of one monolithic "review this code" prompt, we split the review into three domains, each handled by a specialized subagent.
+
+**Security Reviewer** — checks for:
+- SQL injection vulnerabilities
+- Cross-site scripting (XSS)
+- Hardcoded secrets and API keys
+- Unsafe deserialization
+- Command injection
+- Insecure file operations
+
+**Style Reviewer** — checks for:
+- Naming convention violations
+- Code duplication
+- Excessive cyclomatic complexity
+- Missing type hints
+- Docstring coverage
+- Dead code and unused imports
+
+**Performance Reviewer** — checks for:
+- N+1 query patterns
+- Unnecessary memory allocations
+- Blocking I/O in async contexts
+- Missing database indexes
+- Cache opportunities
+- Unoptimized loops and data structures
+
+Each subagent receives the same git diff, reviews it through its specialized lens, and returns structured findings. A parent agent coordinates them — dispatching all three in parallel, then aggregating the results into a unified review sorted by severity.
+
+This is the deep agent pattern: a coordinator that plans, delegates to specialists, and synthesizes results. It's the same architecture used by Claude Code, Codex, and other production coding agents — but open-source and built on [Pydantic AI](https://ai.pydantic.dev/).
+
+## The Code: ~40 Lines, Fully Working
+
+Here's the complete implementation using [pydantic-deepagents](https://github.com/vstorm-co/pydantic-deepagents):
+
+```python
+import asyncio
+from pydantic import BaseModel
+from pydantic_deep import create_deep_agent, DeepAgentDeps, LocalBackend
+from pydantic_deep.types import SubAgentConfig
+
+
+class ReviewFinding(BaseModel):
+    """A single finding from the code review."""
+    file: str
+    line: int
+    severity: str   # critical, warning, info
+    category: str   # security, style, performance
+    description: str
+    suggestion: str
+
+
+# --- Define 3 specialist subagents ---
+
+security_agent = SubAgentConfig(
+    name="security-reviewer",
+    description="Reviews code for security vulnerabilities",
+    instructions=(
+        "You are a security-focused code reviewer. "
+        "Check for: SQL injection, XSS, hardcoded secrets, "
+        "unsafe deserialization, command injection, insecure file ops. "
+        "Return structured findings with file path, line number, "
+        "severity (critical/warning/info), and a concrete fix suggestion."
+    ),
+)
+
+style_agent = SubAgentConfig(
+    name="style-reviewer",
+    description="Reviews code style and conventions",
+    instructions=(
+        "You are a code style reviewer. "
+        "Check for: naming convention violations, code duplication, "
+        "excessive complexity, missing type hints, missing docstrings, "
+        "dead code, unused imports. "
+        "Return structured findings with file path, line number, "
+        "severity, and a concrete improvement suggestion."
+    ),
+)
+
+perf_agent = SubAgentConfig(
+    name="performance-reviewer",
+    description="Reviews code for performance issues",
+    instructions=(
+        "You are a performance-focused code reviewer. "
+        "Check for: N+1 queries, unnecessary allocations, "
+        "blocking I/O in async code, missing indexes, cache opportunities, "
+        "unoptimized loops. "
+        "Return structured findings with file path, line number, "
+        "severity, and a concrete optimization suggestion."
+    ),
+)
+
+
+# --- Create the coordinator agent ---
+
+agent = create_deep_agent(
+    "claude-sonnet-4-5",
+    instructions=(
+        "You are a senior code reviewer. "
+        "Delegate to your 3 specialist subagents in parallel, "
+        "then aggregate their findings into a unified review "
+        "sorted by severity (critical first). "
+        "Remove duplicates and add an overall summary."
+    ),
+    subagents=[security_agent, style_agent, perf_agent],
+)
+
+
+# --- Run the review ---
+
+async def main():
+    deps = DeepAgentDeps(backend=LocalBackend(root_dir="."))
+    result = await agent.run(
+        "Review the current git diff and provide a comprehensive code review. "
+        "Focus on security vulnerabilities, style issues, and performance problems.",
+        deps=deps,
+    )
+    print(result.output)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+That's it. Under 40 lines of actual logic. Let's break down what's happening.
+
+## How It Works, Step by Step
+
+### 1. Structured Output with Pydantic
+
+The `ReviewFinding` model defines exactly what each finding looks like. File path, line number, severity level, category, description, and a concrete suggestion. No free-form text. No "maybe consider..." hand-waving. Structured, parseable, actionable data.
+
+This is one of the advantages of building on [Pydantic AI](https://ai.pydantic.dev/) — the model's output is validated at runtime. If the LLM returns a finding without a severity level, it gets caught immediately.
+
+### 2. Three SubAgentConfigs
+
+Each `SubAgentConfig` defines a specialist:
+
+- **`name`** — unique identifier the parent agent uses to delegate
+- **`description`** — tells the parent *when* to use this subagent (the routing logic)
+- **`instructions`** — the system prompt for the subagent, focused on its domain
+
+The instructions are specific. We don't say "review this code." We say "check for SQL injection, XSS, hardcoded secrets..." This specificity is what makes the reviews actually useful. Each subagent is an expert in its domain, not a generalist trying to cover everything.
+
+### 3. Parallel Execution via Subagents
+
+When you pass `subagents=[security_agent, style_agent, perf_agent]` to `create_deep_agent()`, the parent agent gets tools to delegate tasks to each subagent. The parent decides how to orchestrate them — and because the instructions say "delegate in parallel," all three run concurrently.
+
+This is fundamentally different from sequential chains. Instead of waiting for security review to finish before starting style review, all three run simultaneously. That's why you get results in ~30 seconds instead of ~90 seconds.
+
+### 4. LocalBackend for File Access
+
+`LocalBackend(root_dir=".")` gives the agent (and its subagents) read access to your local filesystem. The subagents can read the git diff, inspect specific files for context, and understand the codebase structure.
+
+If you want sandboxed execution instead, swap `LocalBackend` for `StateBackend()` (in-memory) or `DockerSandbox()` (containerized). The agent code stays the same — only the backend changes.
+
+### 5. Aggregation by the Parent Agent
+
+The parent agent's instructions tell it to aggregate, deduplicate, and sort by severity. So if the security reviewer and the style reviewer both flag the same line (e.g., a hardcoded API key is both a security issue and a style issue), the parent merges them into a single finding with the highest severity.
+
+The output is a clean, prioritized review — critical issues first, warnings next, informational notes last.
+
+## What the Output Looks Like
+
+Here's an example of what the reviewer produces when run against a real PR:
+
+```
+## Code Review Summary
+
+**Files reviewed:** 4
+**Total findings:** 7 (2 critical, 3 warning, 2 info)
+
+### Critical
+
+1. **[SECURITY]** `api/auth.py:42` — SQL query built with f-string interpolation.
+   Vulnerable to SQL injection.
+   → Use parameterized queries: `cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))`
+
+2. **[SECURITY]** `config.py:15` — AWS secret key hardcoded in source.
+   → Move to environment variable: `os.environ["AWS_SECRET_KEY"]`
+
+### Warning
+
+3. **[PERFORMANCE]** `api/users.py:78` — Querying user.posts inside a loop (N+1 pattern).
+   → Use `selectinload(User.posts)` in the initial query.
+
+4. **[STYLE]** `api/users.py:23-45` — Function `process_user_data` is 67 lines with 8 branches.
+   Cyclomatic complexity too high.
+   → Extract validation logic into separate function.
+
+5. **[PERFORMANCE]** `api/export.py:31` — Building CSV by string concatenation in loop.
+   → Use `io.StringIO` or `csv.writer` for O(n) instead of O(n^2).
+
+### Info
+
+6. **[STYLE]** `models/user.py:12` — Missing type hints on `calculate_score` parameters.
+   → Add: `def calculate_score(self, weights: list[float], threshold: float = 0.5) -> float:`
+
+7. **[STYLE]** `api/auth.py:1-5` — `import os, sys, json` — unused imports `sys` and `json`.
+   → Remove unused imports.
+```
+
+Every finding has a file, a line number, a category, and a concrete fix. A senior reviewer can scan this in 30 seconds and decide which findings to accept, which to modify, and which to dismiss.
+
+## Running It: As a Script or Slash Command
+
+### Standalone Script
+
+Save the code above as `review.py` and run:
+
+```bash
+pip install pydantic-deep
+python review.py
+```
+
+The agent reads the current directory, gets the git diff, and prints the review.
+
+### As a pydantic-deep Slash Command
+
+If you're using [pydantic-deepagents](https://github.com/vstorm-co/pydantic-deepagents) as a CLI (like Claude Code), you can register this as a slash command:
+
+```bash
+# Run the built-in review command
+pydantic-deep review
+```
+
+The agent runs in your terminal, reads your working directory, and outputs the review inline. You can pipe it to a file, post it as a PR comment, or integrate it into your CI/CD pipeline.
+
+### In CI/CD (GitHub Actions)
+
+```yaml
+- name: AI Code Review
+  run: |
+    pip install pydantic-deep
+    python review.py > review.md
+
+- name: Post Review Comment
+  uses: actions/github-script@v7
+  with:
+    script: |
+      const fs = require('fs');
+      const review = fs.readFileSync('review.md', 'utf8');
+      github.rest.issues.createComment({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        issue_number: context.issue.number,
+        body: review
+      });
+```
+
+Now every PR automatically gets an AI review before a human even looks at it.
+
+## Why 3 Subagents Instead of 1 Prompt?
+
+You might be wondering: why not just give one agent a single prompt that says "review this code for security, style, and performance"?
+
+Three reasons:
+
+**1. Specialization beats generalization.** When you ask one LLM to do everything, it tends to go wide and shallow. A security-focused prompt with specific vulnerability patterns produces more thorough findings than a generic "review this code" prompt.
+
+**2. Parallel execution.** Three subagents run concurrently. One agent doing three passes runs sequentially. At scale, this is the difference between 30-second reviews and 2-minute reviews.
+
+**3. Independent scaling.** Want to add a fourth subagent for accessibility checks? Or a fifth for API contract validation? Just add another `SubAgentConfig`. The parent agent handles coordination automatically. You can also swap models per subagent — use a faster model for style checks and a more powerful one for security analysis.
+
+## The Bigger Picture: Deep Agent Pattern
+
+This PR reviewer is one example of the deep agent pattern — the same architecture powering Claude Code, OpenAI Codex, and Cursor behind the scenes.
+
+The pattern:
+1. **Plan** — break a complex task into subtasks
+2. **Delegate** — dispatch subtasks to specialists (subagents)
+3. **Execute** — each specialist works independently with its own tools
+4. **Synthesize** — parent aggregates results into a coherent output
+
+[pydantic-deepagents](https://github.com/vstorm-co/pydantic-deepagents) is an open-source implementation of this pattern, built on [Pydantic AI](https://ai.pydantic.dev/). It's the framework we use at [Vstorm](https://vstorm.co) to ship production AI agents — and the PR reviewer is one of the simplest things you can build with it.
+
+## Try It
+
+- **Repository:** [pydantic-deepagents on GitHub](https://github.com/vstorm-co/pydantic-deepagents)
+- **Install:** `pip install pydantic-deep`
+- **Subagents package:** [subagents-pydantic-ai](https://github.com/vstorm-co/subagents-pydantic-ai)
+- **Docs:** [pydantic-deep.vstorm.co](https://pydantic-deep.vstorm.co)
+
+The PR reviewer code from this article is in the `examples/` directory. Clone it, point it at your repo, and see what it finds.
+
+If you're already doing code reviews manually, try running this alongside your existing process for a week. Compare the findings. You might be surprised how many issues the AI catches that humans miss — especially the boring, pattern-matching ones like N+1 queries and missing type hints.
+
+The humans on your team should be reviewing architecture, logic, and design. Let the subagents handle the checklist.
+
+---
+
+*I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering Consultancy. We build and open-source production AI agent tooling in Python. Star [pydantic-deepagents](https://github.com/vstorm-co/pydantic-deepagents) on GitHub if you find it useful.*

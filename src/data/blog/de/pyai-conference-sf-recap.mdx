@@ -1,0 +1,84 @@
+---
+title: "Was ich auf der PyAI Conf in San Francisco gelernt habe — Wo Python auf produktive AI Agents trifft"
+description: "Ein Tag. Die Schoepfer von Python, Pydantic, FastAPI und FastMCP in einem Raum. Same-Day-Bericht von der PyAI Conf mit Panel-Highlights, Flurgespraechen und Erkenntnissen fuer produktive AI-Agent-Systeme."
+pubDate: 2026-03-10
+author: "Vstorm"
+lang: de
+translationKey: pyai-conference-sf-recap
+tags: ["ai-agents", "conference", "pydantic-ai", "python", "open-source", "multi-agent"]
+category: open-source
+draft: false
+---
+
+Heute war ich auf der PyAI Conf in San Francisco — eine eintaegige Konferenz, veranstaltet von Pydantic, FastMCP (Prefect) und Theory Ventures. Das Lineup war absurd: Samuel Colvin, Sebastian Ramirez Montano, Jeremiah Lowin, Armin Ronacher und Guido van Rossum — der Schoepfer von Python hoechstpersoenlich.
+
+Das hier ist mein Bericht vom selben Tag. Keine Pressemitteilung — einfach was ich gesehen, gehoert und aus einem einzigen, vollgepackten Tag mitgenommen habe.
+
+---
+
+*Ich bin Kacper, AI Engineer bei [Vstorm](https://vstorm.co) — einer Applied Agentic AI Engineering Consultancy. Wir haben 30+ produktive AI-Agent-Implementierungen ausgeliefert und stellen unsere Tools als Open Source unter [github.com/vstorm-co](https://github.com/vstorm-co) bereit. Verbinde dich mit mir auf [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+
+---
+
+## Die Stimmung: Kein Blabla, nur Ingenieure
+
+Das Erste, was mir beim Reinkommen auffiel: Das war keine typische Tech-Konferenz mit Staenden und Pitch Decks. Es war eine Community von Ingenieuren, die die Tools bauen, die modernes Python antreiben — und ueber praktische AI, LLMs und Agents in Produktion reden.
+
+Kein Hype. Keine "AI wird alles veraendern"-Keynotes. Einfach Leute, die Code ausliefern und teilen, was funktioniert und was nicht.
+
+## Das Panel, das den Tag definierte
+
+Das Highlight war ein Panel mit Samuel Colvin (Pydantic), Sebastian Ramirez Montano (FastAPI), Jeremiah Lowin (Prefect & FastMCP) und Guido van Rossum.
+
+Die Diskussion drehte sich darum, wohin sich das Python-Oekosystem entwickelt, waehrend wir die naechste Generation von AI- und Agentensystemen bauen — und welche neuen Herausforderungen Open-Source-Projekte in einer Welt mit explodierenden Coding Agents erwarten.
+
+Ein paar Dinge, die herausstachen:
+
+**Pythons Rolle in AI ist kein Zufall.** Guido sprach darueber, wie Pythons Lesbarkeit und Flexibilitaet es zur natuerlichen Heimat fuer AI-Tooling machten. Aber er wies auch darauf hin, dass die Sprache sich weiterentwickeln muss — bessere Async-Primitive, bessere Type-Unterstuetzung, bessere Performance fuer die Art von langlaufenden Agent-Prozessen, die wir jetzt alle bauen.
+
+**Die Open-Source-Herausforderung durch AI Coding Agents.** Jeremiah brachte einen Punkt auf, ueber den ich nicht tief nachgedacht hatte: Wenn AI Coding Agents Code in grossem Massstab generieren koennen, was passiert dann mit der Open-Source-Wartung? Pull Requests von Agents sehen anders aus. Issue Reports von Agents sehen anders aus. Der soziale Vertrag von Open Source verschiebt sich, und Framework-Maintainer muessen sich anpassen.
+
+**Type Safety ist das Fundament, nicht das Feature.** Samuel argumentierte, dass Type Safety bei LLM-Interaktionen kein Nice-to-have ist — es ist das, was den Unterschied zwischen Prototyp-Code und Produktionscode ausmacht. Wenn dein Agent validierte, typisierte Daten zurueckgibt, kannst du zuverlaessige Systeme darauf aufbauen. Wenn er `Any` zurueckgibt, schreibst du ewig Parsing-Code.
+
+## Was ich auf den Fluren gehoert habe
+
+Die eigentliche Konferenz fand zwischen den Sessions statt — in Gespraechen beim Kaffee und in den Pausen.
+
+**Jeder baut Agents, aber das "Wie" variiert enorm.** Manche Teams setzen voll auf Multi-Agent-Orchestrierung. Andere bleiben bei einzelnen Agents mit guten Tools. Der Konsens: Begrenzte Sub-Agent-Delegation funktioniert (ein Parent, 2-3 spezialisierte Sub-Agents), aber der "Schwarm von 15 autonomen Agents" ist immer noch mehr Wunsch als Produktion.
+
+**Framework-Konvergenz ist real.** Ich sprach mit Ingenieuren, die verschiedene Frameworks nutzen — Pydantic AI, LangChain, LangGraph, CrewAI — und sie konvergieren alle auf dieselben Muster: typisierte Tool-Definitionen, Structured Outputs, austauschbare Model-Provider, Sub-Agent-Delegation. Die APIs sehen unterschiedlich aus, aber die Architektur darunter gleicht sich an.
+
+**Produktionsreife ist der neue Massstab.** Niemand fragte "kann dein Framework X?" — sie fragten "was passiert, wenn X um 3 Uhr nachts ausfaellt?" Fehlerbehandlung, Kostenueberwachung, Failure Recovery, Observability. Das sind die Gespraeche, die jetzt zaehlen.
+
+**Die Pydantic AI Community ist stark.** Contributors, die sich nur von GitHub kannten, trafen sich zum ersten Mal persoenlich. Es gibt eine echte Kameradschaft — gemeinsame Probleme, gemeinsame Muster, Bereitschaft zu helfen. Samuel Colvin und das Pydantic-Team haben etwas Besonderes aufgebaut, das ueber den Code hinausgeht.
+
+## Die Punkte verbinden
+
+Ich kam zur PyAI Conf als jemand, der Open-Source AI-Agent-Tooling bei Vstorm baut. Zwei Dinge haben besonders mit dem resoniert, woran wir arbeiten:
+
+**Das "plan -> execute -> delegate"-Muster taucht immer wieder auf.** Mehrere Leute, mit denen ich sprach — unabhaengig voneinander — beschrieben dieselbe Architektur fuer produktive Agents: ein LLM, das plant, Tools, die ausfuehren, Sub-Agents, die spezialisieren. Es ist das Muster hinter Claude Code, und es ist das, was wir in [pydantic-deepagents](https://github.com/vstorm-co/pydantic-deepagents) implementieren. Wenn mehrere Teams aus verschiedenen Richtungen auf dieselbe Architektur konvergieren, ist das ein Signal.
+
+**Framework-Wahl sollte keine Verpflichtung sein.** Mehrere Ingenieure teilten ihre Frustration darueber, an ein Framework gebunden zu sein. Die Idee, mehrere Frameworks hinter derselben Infrastruktur zu unterstuetzen — was unser [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template) mit 5 verschiedenen AI-Frameworks macht — stiess in Gespraechen auf echtes Interesse. Die Leute wollen die Freiheit zu wechseln, ohne alles neu schreiben zu muessen.
+
+## Drei Dinge, die ich mitnehme
+
+**1. Bessere Fehlergeschichten.** Die wertvollsten Vortraege heute waren keine Erfolgsgeschichten — es waren Fehlergeschichten. Agent-Retry-Schleifen, die Hunderte Dollar verbrannt haben. Memory Leaks durch nicht bereinigte Tool-Ergebnisse. Ich will offener sein und auch unsere Fehler teilen.
+
+**2. Tieferes Investment in das Pydantic AI Oekosystem.** Nachdem ich die Community persoenlich getroffen habe, bin ich ueberzeugter denn je, dass hier die Zukunft von produktiver AI in Python liegt. Type Safety, Structured Outputs, zusammensetzbare Agents — das ist das richtige Fundament.
+
+**3. Same-Day-Energie ist real.** Ich schreibe das auf dem Rueckflug, waehrend alles noch frisch ist. Die Verbindungen, die heute entstanden sind, sind mehr wert als jede Dokumentation, die ich dieses Jahr gelesen habe.
+
+## Abschluss
+
+Die PyAI Conf hat etwas bewiesen: Die Python-AI-Community waechst nicht nur — sie reift. Die Gespraeche heute drehten sich um Zuverlaessigkeit, Wartbarkeit und die schwierigen Engineering-Probleme, die kommen, nachdem die Demo funktioniert.
+
+Grosses Dankeschoen an Pydantic, Prefect/FastMCP und Theory Ventures fuer die Organisation. Und an Samuel Colvin, Sebastian Ramirez Montano, Jeremiah Lowin, Armin Ronacher und Guido van Rossum dafuer, dass das Panel eine der besten Tech-Diskussionen war, an denen ich teilgenommen habe.
+
+Bis zum naechsten Mal.
+
+---
+
+**Ressourcen:**
+
+- [pydantic-deepagents](https://github.com/vstorm-co/pydantic-deepagents) — Modulares AI-Agent-Framework (Claude Code Architektur, Open Source)
+- [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template) — Von Null zur Produktion (5 Frameworks, 75+ Optionen)

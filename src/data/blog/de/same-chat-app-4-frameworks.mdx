@@ -1,0 +1,210 @@
+---
+title: "Dieselbe Chat-App, 4 Frameworks: Pydantic AI vs LangChain vs LangGraph vs CrewAI (Code-Vergleich)"
+description: "Ich habe dieselbe Chat-App 4 Mal mit 4 verschiedenen AI-Frameworks gebaut. Dasselbe FastAPI-Backend, dasselbe Next.js-Frontend, dieselbe PostgreSQL-Datenbank. So sieht der Code tatsaechlich aus."
+pubDate: 2026-03-13
+author: "Vstorm"
+lang: de
+translationKey: same-chat-app-4-frameworks
+tags: ["pydantic-ai", "langchain", "langgraph", "crewai", "comparison", "full-stack-template"]
+category: open-source
+draft: false
+---
+
+Jeder hat Meinungen ueber AI-Frameworks. Nur wenige zeigen Code.
+
+Wir pflegen [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template) -- ein Produktions-Template fuer AI/LLM-Anwendungen mit FastAPI, Next.js und ueber 75 Konfigurationsoptionen. Eine dieser Optionen ist das AI-Framework. Sie waehlen zwischen Pydantic AI, LangChain, LangGraph oder CrewAI, und das Template generiert exakt dieselbe Chat-Anwendung mit derselben API, demselben Datenbankschema, demselben WebSocket-Streaming und demselben Frontend. Nur die AI-Schicht aendert sich.
+
+Das gab uns eine einzigartige Moeglichkeit: einen kontrollierten Vergleich. Dieselbe Funktionalitaet, dieselben Tests, dasselbe Deployment -- vier Implementierungen.
+
+## Das Setup
+
+Jedes generierte Projekt hat dieselbe Struktur:
+
+- **FastAPI**-Backend mit WebSocket-Endpunkt fuer Streaming
+- **Next.js**-Frontend mit Chat-UI
+- **PostgreSQL** fuer Konversationsspeicherung
+- **JWT-Authentifizierung** fuer WebSocket-Verbindungen
+- Eine Agent-Datei in `app/agents/`, die die AI-Logik behandelt
+
+Der Agent muss eine Benutzernachricht und Konversationshistorie akzeptieren, Tool-Aufrufe unterstuetzen, eine Antwort als `(output_text, tool_events, context)` zurueckgeben und Streaming fuer Echtzeit-Token-Auslieferung unterstuetzen.
+
+## Pydantic AI (~160 Zeilen)
+
+Die kompakteste Implementierung. Volle generische Typen mit `Agent[Deps, str]`, typisierte Dependency Injection ueber `RunContext[Deps]` und natives Async.
+
+```python
+from pydantic_ai import Agent, RunContext
+from pydantic_ai.settings import ModelSettings
+
+@dataclass
+class Deps:
+    user_id: str | None = None
+    user_name: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
+
+class AssistantAgent:
+    def _create_agent(self) -> Agent[Deps, str]:
+        model = OpenAIChatModel(
+            self.model_name,
+            provider=OpenAIProvider(api_key=settings.OPENAI_API_KEY),
+        )
+        agent = Agent[Deps, str](
+            model=model,
+            model_settings=ModelSettings(temperature=self.temperature),
+            system_prompt=self.system_prompt,
+        )
+        self._register_tools(agent)
+        return agent
+
+    def _register_tools(self, agent: Agent[Deps, str]) -> None:
+        @agent.tool
+        async def current_datetime(ctx: RunContext[Deps]) -> str:
+            """Get the current date and time."""
+            return get_current_datetime()
+
+    async def run(self, user_input, history=None, deps=None):
+        result = await self.agent.run(
+            user_input, deps=agent_deps, message_history=model_history
+        )
+        return result.output, tool_events, agent_deps
+```
+
+**Wichtige Merkmale:** `Agent[Deps, str]`-Generics -- die IDE kennt den Ausgabetyp. `RunContext[Deps]` in Tools gibt typisierten Zugriff auf Abhaengigkeiten. Tools werden mit `@agent.tool` direkt am Agent registriert. Natives Async mit `agent.run()` und `agent.iter()` fuer Streaming.
+
+## LangChain (~170 Zeilen)
+
+Aehnliches Wrapper-Muster mit eigenstaendigem `@tool`-Dekorator und Nachrichtenkonvertierung:
+
+```python
+from langchain.agents import create_agent
+from langchain.tools import tool
+from langchain_openai import ChatOpenAI
+
+@tool
+def current_datetime() -> str:
+    """Get the current date and time."""
+    return get_current_datetime()
+
+class LangChainAssistant:
+    def _create_agent(self):
+        model = ChatOpenAI(
+            model=self.model_name,
+            temperature=self.temperature,
+            api_key=settings.OPENAI_API_KEY,
+        )
+        return create_agent(model=model, tools=self._tools, system_prompt=self.system_prompt)
+
+    async def run(self, user_input, history=None, context=None):
+        messages = self._convert_history(history)
+        messages.append(HumanMessage(content=user_input))
+        result = self.agent.invoke({"messages": messages})
+        return output, tool_events, agent_context
+```
+
+**Wichtige Merkmale:** Tools als Modul-Level-Funktionen mit `@tool`. `create_agent()` baut einen vorkonfigurierten Graphen. Benoetigt `_convert_history()` zur Uebersetzung zwischen Standard-Dicts und `HumanMessage`/`AIMessage`. Streaming ueber `agent.astream(stream_mode=["messages", "updates"])`.
+
+## LangGraph (~280 Zeilen)
+
+Expliziter Zustandsgraph mit Knoten und bedingten Kanten -- die gesamte Agent-Schleife wird manuell aufgebaut:
+
+```python
+from langgraph.graph import END, START, StateGraph
+from langgraph.checkpoint.memory import MemorySaver
+
+class AgentState(TypedDict):
+    messages: Annotated[list[BaseMessage], add_messages]
+
+class LangGraphAssistant:
+    def _agent_node(self, state: AgentState):
+        model = self._create_model()
+        messages = [SystemMessage(content=self.system_prompt), *state["messages"]]
+        response = model.invoke(messages)
+        return {"messages": [response]}
+
+    def _tools_node(self, state: AgentState):
+        last_message = state["messages"][-1]
+        tool_results = []
+        for tool_call in last_message.tool_calls:
+            tool_fn = TOOLS_BY_NAME.get(tool_call["name"])
+            result = tool_fn.invoke(tool_call["args"])
+            tool_results.append(ToolMessage(content=str(result), tool_call_id=tool_call["id"]))
+        return {"messages": tool_results}
+
+    def _should_continue(self, state) -> Literal["tools", "__end__"]:
+        if state["messages"][-1].tool_calls:
+            return "tools"
+        return "__end__"
+
+    def _build_graph(self):
+        workflow = StateGraph(AgentState)
+        workflow.add_node("agent", self._agent_node)
+        workflow.add_node("tools", self._tools_node)
+        workflow.add_edge(START, "agent")
+        workflow.add_conditional_edges("agent", self._should_continue)
+        workflow.add_edge("tools", "agent")
+        return workflow.compile(checkpointer=MemorySaver())
+```
+
+**Wichtige Merkmale:** `StateGraph` mit `AgentState` fuer explizite Zustandsverwaltung. Zwei Knoten (`agent`, `tools`) verbunden durch bedingte Kanten. `_should_continue` leitet zu Tools oder zum Ende. `MemorySaver` fuer Konversationsspeicher. Etwa 75% mehr Code als Pydantic AI, aber volle Kontrolle ueber jeden Schritt.
+
+## CrewAI (~420 Zeilen)
+
+Grundlegend anders -- Multi-Agent-Teams mit Rollen, Zielen und Hintergrundgeschichten:
+
+```python
+from crewai import Agent, Crew, Process, Task
+
+class CrewAIAssistant:
+    def _default_config(self):
+        return CrewConfig(
+            agents=[
+                AgentConfig(role="Research Analyst", goal="Gather and analyze info"),
+                AgentConfig(role="Content Writer", goal="Create clear responses"),
+            ],
+            tasks=[
+                TaskConfig(description="Research query: {user_input}", agent_role="Research Analyst"),
+                TaskConfig(description="Write response", agent_role="Content Writer",
+                           context_from=["Research Analyst"]),
+            ],
+        )
+
+    def _build_crew(self):
+        return Crew(agents=[...], tasks=[...], process=Process.sequential)
+
+    async def run(self, user_input, history=None, context=None):
+        loop = asyncio.get_event_loop()
+        result = await loop.run_in_executor(None, lambda: self.crew.kickoff(inputs=inputs))
+        return output, task_results, crew_context
+```
+
+**Wichtige Merkmale:** Standardmaessig Multi-Agent -- Research Analyst + Content Writer als Team. `Agent(role=..., goal=..., backstory=...)` fuer natuerlichsprachliche Konfiguration. Synchron unter der Haube -- benoetigt `run_in_executor` fuer Async. Event-Bus (`crewai_event_bus`) fuer Streaming ueber Hintergrund-Thread + Queue. Mehr als doppelt so viel Code, aber Multi-Agent-Orchestrierung sofort einsatzbereit.
+
+## Vergleichstabelle
+
+| Metrik | Pydantic AI | LangChain | LangGraph | CrewAI |
+|--------|------------|-----------|-----------|--------|
+| **Codezeilen** | ~160 | ~170 | ~280 | ~420 |
+| **Typsicherheit** | Volle Generics | TypedDict | TypedDict | Pydantic-Modelle |
+| **Async-Support** | Nativ | Nativ | Nativ | Sync (Executor) |
+| **Streaming** | `agent.iter()` | `astream()` | `astream()` | Event-Bus + Thread |
+| **Tool-Syntax** | `@agent.tool` | `@tool` | `bind_tools()` | Konfigurationsbasiert |
+| **Architektur** | Einzelner Agent | Agent (abstrahiert) | Expliziter Graph | Multi-Agent-Crew |
+| **Am besten fuer** | Typsichere Agenten | Schnelle Prototypen | Komplexe Workflows | Agent-Teams |
+
+## Wann welches verwenden
+
+**Pydantic AI** -- typsichere einzelne Agenten, IDE-Unterstuetzung, Pydantic-Oekosystem.
+
+**LangChain** -- groesstes Integrations-Oekosystem, schnelles Prototyping, Teamvertrautheit.
+
+**LangGraph** -- komplexes mehrstufiges Reasoning, bedingte Verzweigung, Human-in-the-Loop.
+
+**CrewAI** -- Multi-Agent-Zusammenarbeit, rollenbasierte Personas, hierarchische Aufgabendelegation.
+
+## Alle vier ausprobieren
+
+Das [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template) ermoeglicht es, dasselbe Projekt mit jedem der vier Frameworks zu generieren. Dieselbe API, dasselbe Frontend, dieselbe Datenbank, dieselben Tests, dasselbe Docker-Setup.
+
+[Web-Konfigurator](https://template.vstorm.co/configurator/) -- Framework in Schritt 4 waehlen, als ZIP herunterladen.
+
+CLI: `pip install fastapi-fullstack && fastapi-fullstack init`
