@@ -1,0 +1,66 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Navbar from '../../../components/Navbar.astro';
+import DeepAgentsHero from '../../../components/deepagents/DeepAgentsHero.astro';
+import DeepAgentsFeatures from '../../../components/deepagents/DeepAgentsFeatures.astro';
+import DeepAgentsHowItWorks from '../../../components/deepagents/DeepAgentsHowItWorks.astro';
+import Architecture from '../../../components/deepagents/Architecture.astro';
+import CodeExamples from '../../../components/deepagents/CodeExamples.astro';
+import UseCases from '../../../components/deepagents/UseCases.astro';
+import Showcase from '../../../components/deepagents/Showcase.astro';
+import OssFooter from '../../../components/oss/OssFooter.astro';
+import BeforeAfter from '../../../components/shared/BeforeAfter.astro';
+import ComparisonTable from '../../../components/shared/ComparisonTable.astro';
+import StarsBadge from '../../../components/shared/StarsBadge.astro';
+import FaqPreview from '../../../components/landing/FaqPreview.astro';
+import Breadcrumbs from '../../../components/shared/Breadcrumbs.astro';
+import { translations, languages, defaultLang } from '../../../i18n/translations';
+import { getProjectBySlug } from '../../../data/projects';
+import { getDeepagentsComparison } from '../../../data/comparisons';
+import { softwareApplicationSchema, SITE_URL } from '../../../lib/schemas';
+
+const lang = defaultLang;
+const t = translations[lang];
+const project = getProjectBySlug("pydantic-deepagents")!;
+
+const alternates = [
+  { lang: "en", href: "/projects/pydantic-deepagents/" },
+  ...Object.keys(languages)
+    .filter((l) => l !== defaultLang)
+    .map((l) => ({ lang: l, href: `/${l}/projects/pydantic-deepagents/` })),
+];
+---
+
+<Layout
+  theme="dark"
+  title="Pydantic DeepAgents — Autonomous AI Agent Framework for Python"
+  description={t["deepagents.meta.description"]}
+  keywords="pydantic deepagents, ai agent framework, claude code alternative, python ai agents, autonomous agents, deep agents python, pydantic ai"
+  lang={lang}
+  alternates={alternates}
+  schemas={[softwareApplicationSchema({ name: "Pydantic DeepAgents", description: t["deepagents.meta.description"], url: SITE_URL + "/projects/pydantic-deepagents/" })]}
+>
+  <Navbar currentLang={lang} project={project} pathSuffix="projects/pydantic-deepagents/" />
+  <Breadcrumbs items={[
+    { label: "Home", href: "/" },
+    { label: t["oss.projects.title"], href: "/projects/" },
+    { label: "Pydantic DeepAgents" },
+  ]} />
+  <DeepAgentsHero t={t} />
+  <BeforeAfter
+    title={t["beforeafter.title"]}
+    beforeTitle={t["beforeafter.deepagents.before.title"]}
+    afterTitle={t["beforeafter.deepagents.after.title"]}
+    beforeItems={[t["beforeafter.deepagents.before.1"], t["beforeafter.deepagents.before.2"], t["beforeafter.deepagents.before.3"], t["beforeafter.deepagents.before.4"], t["beforeafter.deepagents.before.5"]]}
+    afterItems={[t["beforeafter.deepagents.after.1"], t["beforeafter.deepagents.after.2"], t["beforeafter.deepagents.after.3"], t["beforeafter.deepagents.after.4"], t["beforeafter.deepagents.after.5"]]}
+  />
+  <DeepAgentsHowItWorks t={t} />
+  <DeepAgentsFeatures t={t} />
+  <ComparisonTable t={t} data={getDeepagentsComparison(t)} />
+  <Architecture t={t} />
+  <CodeExamples t={t} />
+  <UseCases t={t} />
+  <Showcase t={t} />
+  <FaqPreview t={t} lang={lang} category="deepagents" />
+  <OssFooter t={t} variant="deepagents" />
+</Layout>

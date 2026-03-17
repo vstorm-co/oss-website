@@ -50,6 +50,19 @@ html {
   color: var(--color-text-tertiary);
 }
 
+/* ---- Subtle gradient tints for visual rhythm ---- */
+.section-gradient-blue {
+  background: linear-gradient(180deg, var(--color-bg) 0%, #0c1222 40%, #0c1222 60%, var(--color-bg) 100%);
+}
+
+.section-gradient-purple {
+  background: linear-gradient(180deg, var(--color-bg) 0%, #120c20 40%, #120c20 60%, var(--color-bg) 100%);
+}
+
+.section-gradient-warm {
+  background: linear-gradient(180deg, var(--color-bg) 0%, #1a1008 40%, #1a1008 60%, var(--color-bg) 100%);
+}
+
 /* ---- Grid background ---- */
 .grid-bg {
   background-size: 64px 64px;
@@ -63,16 +76,82 @@ html {
 /* ---- Light section (alternating) ---- */
 /* Override CSS custom properties so ALL Tailwind utilities automatically flip */
 .section-light {
-  --color-bg: #fafafa;
-  --color-surface: #ffffff;
-  --color-surface-hover: #f4f4f5;
-  --color-border: #e4e4e7;
-  --color-border-hover: #d4d4d8;
-  --color-text: #18181b;
-  --color-text-secondary: #52525b;
-  --color-text-tertiary: #71717a;
+  --color-bg: #ffffff;
+  --color-surface: #f9fafb;
+  --color-surface-hover: #f3f4f6;
+  --color-border: #e5e7eb;
+  --color-border-hover: #d1d5db;
+  --color-text: #111827;
+  --color-text-secondary: #4b5563;
+  --color-text-tertiary: #6b7280;
   background-color: var(--color-bg);
   color: var(--color-text);
+}
+
+/* Alternate light sections get a subtle warm-gray tint */
+.section-light-alt {
+  --color-bg: #f9fafb;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f3f4f6;
+  --color-border: #e5e7eb;
+  --color-border-hover: #d1d5db;
+  --color-text: #111827;
+  --color-text-secondary: #4b5563;
+  --color-text-tertiary: #6b7280;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* ---- Navbar with animated beam border ---- */
+.navbar-beam {
+  background: #09090b;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #fafafa;
+}
+
+/* Rotating conic-gradient beam */
+.navbar-beam::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(
+    from var(--beam-angle, 0deg),
+    transparent 0%,
+    transparent 60%,
+    rgba(239, 68, 68, 1) 72%,
+    rgba(251, 146, 60, 0.9) 80%,
+    rgba(239, 68, 68, 1) 88%,
+    transparent 95%,
+    transparent 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: beam-rotate 4s linear infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@property --beam-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes beam-rotate {
+  to { --beam-angle: 360deg; }
+}
+
+/* Subtle static border fallback (for browsers without @property support) */
+@supports not (background: conic-gradient(from 0deg, red, blue)) {
+  .navbar-beam {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .navbar-beam::before { display: none; }
 }
 
 /* ---- Scroll reveal animations ---- */
@@ -129,14 +208,18 @@ html {
   background: rgba(24, 24, 27, 0.7);
 }
 
-.section-light .glass-card {
-  background: rgba(255, 255, 255, 0.6);
-  border-color: rgba(0, 0, 0, 0.06);
+.section-light .glass-card,
+.section-light-alt .glass-card {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.section-light .glass-card:hover {
-  background: rgba(255, 255, 255, 0.8);
-  border-color: rgba(0, 0, 0, 0.1);
+.section-light .glass-card:hover,
+.section-light-alt .glass-card:hover {
+  background: #ffffff;
+  border-color: rgba(239, 68, 68, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 /* ---- Glow border card ---- */
@@ -152,6 +235,20 @@ html {
     0 0 0 1px rgba(239, 68, 68, 0.15),
     0 0 20px -4px rgba(239, 68, 68, 0.2),
     0 0 50px -8px rgba(239, 68, 68, 0.08);
+}
+
+.section-light .glow-card,
+.section-light-alt .glow-card {
+  border-color: #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.section-light .glow-card:hover,
+.section-light-alt .glow-card:hover {
+  border-color: rgba(239, 68, 68, 0.4);
+  box-shadow:
+    0 4px 16px rgba(239, 68, 68, 0.1),
+    0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
 /* ---- Section stacking effect ---- */
@@ -171,7 +268,7 @@ html {
 }
 
 /* Ensure stacking sections have correct background */
-.section-stack:not(.section-light) {
+.section-stack:not(.section-light):not(.section-light-alt):not([class*="section-gradient"]):not([style*="background"]) {
   background-color: var(--color-bg);
 }
 
@@ -185,6 +282,7 @@ html {
   --color-text: #fafafa;
   --color-text-secondary: #a1a1aa;
   --color-text-tertiary: #8b8b93;
+  color: var(--color-text);
 }
 
 /* ---- Hero scroll-down arrow ---- */
@@ -260,4 +358,82 @@ pre:hover .copy-btn {
 .copy-btn:hover {
   color: rgba(255, 255, 255, 0.9);
   border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ---- Micro-interactions ---- */
+
+/* Card hover lift — subtle translateY + shadow boost */
+.card-hover {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.3s;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+}
+
+/* Active press for clickable cards */
+.card-hover:active {
+  transform: translateY(-1px);
+  transition-duration: 0.1s;
+}
+
+/* Icon container hover pulse */
+.icon-hover {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.3s;
+}
+
+.group:hover .icon-hover {
+  transform: scale(1.1);
+}
+
+/* Button press effect */
+.btn-press {
+  transition: transform 0.15s, box-shadow 0.15s, background-color 0.2s;
+}
+
+.btn-press:hover {
+  transform: translateY(-1px);
+}
+
+.btn-press:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+/* Feature tag hover shimmer */
+.tag-hover {
+  transition: border-color 0.25s, background-color 0.25s, color 0.25s;
+}
+
+.group:hover .tag-hover {
+  border-color: rgba(239, 68, 68, 0.15);
+  background-color: rgba(239, 68, 68, 0.04);
+}
+
+/* Stat card counter bounce on reveal */
+@keyframes count-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+.count-pop {
+  animation: count-pop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* CTA arrow slide on hover */
+.arrow-slide {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), gap 0.3s;
+}
+
+/* Smooth category badge color shift */
+.badge-hover {
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.group:hover .badge-hover {
+  background-color: rgba(239, 68, 68, 0.15);
 }

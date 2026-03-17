@@ -10,6 +10,7 @@ import StickyCTA from '../components/blog/StickyCTA.astro';
 import Breadcrumbs from '../components/shared/Breadcrumbs.astro';
 import type { Lang } from '../i18n/translations';
 import { translations, languages, defaultLang } from '../i18n/translations';
+import { blogPostingSchema, howToSchema as buildHowToSchema, type JsonLdSchema } from '../lib/schemas';
 import '../styles/prose.css';
 
 interface Props {
@@ -50,39 +51,6 @@ const alternates = allTranslations.map((tr) => ({
   href: tr.lang === defaultLang ? `/blog/${tr.slug}/` : `/${tr.lang}/blog/${tr.slug}/`,
 }));
 
-const articleSchema = {
-  "@context": "https://schema.org",
-  "@type": "BlogPosting",
-  headline: title,
-  description,
-  datePublished: pubDate.toISOString(),
-  ...(updatedDate && { dateModified: updatedDate.toISOString() }),
-  author: { "@type": "Organization", name: author },
-  publisher: { "@type": "Organization", name: "Vstorm" },
-  mainEntityOfPage: {
-    "@type": "WebPage",
-    "@id": Astro.url.href,
-  },
-  inLanguage: lang,
-};
-
-const howToSchema = category === "tutorial" && headings.length > 0
-  ? {
-      "@context": "https://schema.org",
-      "@type": "HowTo",
-      name: title,
-      description,
-      step: headings
-        .filter((h) => h.depth === 2)
-        .map((h, i) => ({
-          "@type": "HowToStep",
-          position: i + 1,
-          name: h.text,
-          url: `${Astro.url.href}#${h.slug}`,
-        })),
-    }
-  : null;
-
 const formatDate = (date: Date) =>
   date.toLocaleDateString(lang, { year: "numeric", month: "long", day: "numeric" });
 
@@ -91,6 +59,35 @@ const enTranslation = allTranslations.find((tr) => tr.lang === defaultLang);
 const ogSlug = enTranslation?.slug ?? translationKey;
 const siteUrl = Astro.site?.origin ?? "https://oss.vstorm.co";
 const ogImage = new URL(`/og/${ogSlug}.svg`, siteUrl).href;
+
+// Build JSON-LD schemas
+const schemas: JsonLdSchema[] = [
+  blogPostingSchema({
+    title,
+    description,
+    pubDate,
+    updatedDate,
+    author,
+    url: Astro.url.href,
+    lang,
+    image: ogImage,
+  }),
+];
+
+if (category === "tutorial" && headings.length > 0) {
+  schemas.push(
+    buildHowToSchema({
+      name: title,
+      description,
+      steps: headings
+        .filter((h) => h.depth === 2)
+        .map((h) => ({
+          name: h.text,
+          url: `${Astro.url.href}#${h.slug}`,
+        })),
+    }),
+  );
+}
 ---
 
 <Layout
@@ -100,6 +97,7 @@ const ogImage = new URL(`/og/${ogSlug}.svg`, siteUrl).href;
   lang={lang}
   alternates={alternates}
   ogImage={ogImage}
+  schemas={schemas}
 >
   <!-- Scroll progress bar -->
   <div id="scroll-progress" class="fixed top-0 left-0 h-0.5 bg-accent z-50 transition-none" style="width: 0%"></div>
@@ -110,11 +108,6 @@ const ogImage = new URL(`/og/${ogSlug}.svg`, siteUrl).href;
     { label: t["nav.blog"], href: blogHref },
     { label: title },
   ]} />
-
-  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
-  {howToSchema && (
-    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)} />
-  )}
 
   <main class="mx-auto max-w-7xl px-4 py-16 sm:py-24">
     <div class="flex gap-10">
@@ -196,7 +189,7 @@ const ogImage = new URL(`/og/${ogSlug}.svg`, siteUrl).href;
     </div>
   </main>
 
-  <Footer t={t} />
+  <Footer t={t} lang={lang} />
   <StickyCTA t={t} />
 
   <script is:inline>

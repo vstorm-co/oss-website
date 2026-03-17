@@ -5,6 +5,7 @@ import OssFooter from '../../components/oss/OssFooter.astro';
 import Breadcrumbs from '../../components/shared/Breadcrumbs.astro';
 import { translations, languages, defaultLang, type Lang } from '../../i18n/translations';
 import { faqItems } from '../../data/faq';
+import { faqPageSchema } from '../../lib/schemas';
 
 export function getStaticPaths() {
   return Object.keys(languages)
@@ -28,18 +29,6 @@ const categories = [
   { key: "logfire" as const, label: t["faq.category.logfire"] },
 ];
 
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqItems.map((item) => ({
-    "@type": "Question",
-    name: item.question[lang],
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: item.answer[lang],
-    },
-  })),
-};
 ---
 
 <Layout
@@ -48,10 +37,10 @@ const faqSchema = {
   keywords="ai agent faq, pydantic ai questions, ai framework comparison, python ai tools, deepagents faq, logfire faq"
   lang={lang}
   alternates={alternates}
+  schemas={[faqPageSchema({ questions: faqItems.map((item) => ({ question: item.question[lang], answer: item.answer[lang] })) })]}
 >
   <Navbar currentLang={lang} />
 
-  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
   <Breadcrumbs items={[
     { label: "Home", href: `/${lang}/` },
     { label: "FAQ" },
@@ -94,5 +83,5 @@ const faqSchema = {
     })}
   </main>
 
-  <OssFooter t={t} />
+  <OssFooter t={t} lang={lang} />
 </Layout>

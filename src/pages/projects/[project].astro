@@ -1,0 +1,55 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import ProjectPage from '../../components/project/ProjectPage.astro';
+import OssFooter from '../../components/oss/OssFooter.astro';
+import Breadcrumbs from '../../components/shared/Breadcrumbs.astro';
+import { translations, languages, defaultLang } from '../../i18n/translations';
+import { getGenericProjects } from '../../data/projects';
+import { softwareApplicationSchema, SITE_URL, type JsonLdSchema } from '../../lib/schemas';
+
+export function getStaticPaths() {
+  return getGenericProjects().map((p) => ({
+    params: { project: p.slug },
+    props: { project: p },
+  }));
+}
+
+const { project } = Astro.props;
+const lang = defaultLang;
+const t = translations[lang];
+
+const alternates = [
+  { lang: "en", href: `/projects/${project.slug}/` },
+  ...Object.keys(languages)
+    .filter((l) => l !== defaultLang)
+    .map((l) => ({ lang: l, href: `/${l}/projects/${project.slug}/` })),
+];
+
+const schemas: JsonLdSchema[] = project.status === "released" ? [
+  softwareApplicationSchema({
+    name: project.name,
+    description: project.description[lang],
+    url: SITE_URL + `/projects/${project.slug}/`,
+    github: project.github,
+    pypi: project.pypi,
+  }),
+] : [];
+---
+
+<Layout
+  title={`${project.name} — Vstorm OSS`}
+  description={project.description[lang]}
+  lang={lang}
+  alternates={alternates}
+  schemas={schemas}
+>
+  <Navbar currentLang={lang} project={project} pathSuffix={`projects/${project.slug}/`} />
+  <Breadcrumbs items={[
+    { label: "Home", href: "/" },
+    { label: t["oss.projects.title"], href: "/projects/" },
+    { label: project.name },
+  ]} />
+  <ProjectPage project={project} lang={lang} t={t} />
+  <OssFooter t={t} />
+</Layout>

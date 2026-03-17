@@ -41,10 +41,10 @@ ${projectList}
 
 ## Product Landings
 
-- [Full-Stack AI Agent Template](${siteUrl}/full-stack-ai-agent-template/): Production-ready FastAPI + Next.js template with 5 AI frameworks, 75+ config options
-- [Configurator](${siteUrl}/full-stack-ai-agent-template/configurator/): 9-step visual wizard to generate and download custom projects
-- [Pydantic DeepAgents](${siteUrl}/pydantic-deepagents/): Modular AI agent framework inspired by Claude Code architecture
-- [Logfire Assistant](${siteUrl}/logfire-assistant/): Chrome extension + backend for querying Pydantic Logfire with natural language
+- [Full-Stack AI Agent Template](${siteUrl}/projects/full-stack-ai-agent-template/): Production-ready FastAPI + Next.js template with 5 AI frameworks, 75+ config options
+- [Configurator](${siteUrl}/projects/full-stack-ai-agent-template/configurator/): 9-step visual wizard to generate and download custom projects
+- [Pydantic DeepAgents](${siteUrl}/projects/pydantic-deepagents/): Modular AI agent framework inspired by Claude Code architecture
+- [Logfire Assistant](${siteUrl}/projects/logfire-assistant/): Chrome extension + backend for querying Pydantic Logfire with natural language
 
 ## Comparisons (${comparisonPages.length} pages)
 

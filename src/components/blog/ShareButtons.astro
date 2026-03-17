@@ -59,7 +59,7 @@ const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encod
 ></div>
 
 <script is:inline>
-  (function () {
+  document.addEventListener('astro:page-load', function() {
     var btn = document.getElementById('copy-link-btn');
     var toast = document.getElementById('copy-toast');
     if (!btn || !toast) return;
@@ -76,5 +76,5 @@ const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encod
         }, 2000);
       });
     });
-  })();
+  });
 </script>

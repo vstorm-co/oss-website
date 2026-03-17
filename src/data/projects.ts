@@ -75,7 +75,7 @@ export const projects: Project[] = [
     },
     status: "released",
     category: "template",
-    github: "vstorm-co/full-stack-ai-agent-template",
+    github: "vstorm.co/projects/full-stack-ai-agent-template",
     pypi: "fastapi-fullstack",
     installCommand: "pip install fastapi-fullstack",
     features: {
@@ -106,7 +106,7 @@ export const projects: Project[] = [
     },
     status: "released",
     category: "framework",
-    github: "vstorm-co/pydantic-deepagents",
+    github: "vstorm.co/projects/pydantic-deepagents",
     pypi: "pydantic-deep",
     installCommand: "pip install pydantic-deep",
     features: {
@@ -702,7 +702,7 @@ async with SQLiteDatabase("data.db") as db:
     },
     status: "released",
     category: "toolset",
-    github: "vstorm-co/logfire-assistant",
+    github: "vstorm.co/projects/logfire-assistant",
     pypi: "polly-logfire",
     installCommand: "pip install polly-logfire",
     features: {

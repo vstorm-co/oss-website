@@ -36,7 +36,7 @@ const { t } = Astro.props;
 </div>
 
 <script is:inline>
-  (function () {
+  document.addEventListener('astro:page-load', function() {
     var bar = document.getElementById('sticky-cta');
     var closeBtn = document.getElementById('sticky-cta-close');
     if (!bar || !closeBtn) return;
@@ -69,5 +69,5 @@ const { t } = Astro.props;
         }
       }
     }, { passive: true });
-  })();
+  });
 </script>

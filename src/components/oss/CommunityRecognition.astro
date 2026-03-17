@@ -94,7 +94,7 @@ const stats = [
 ];
 ---
 
-<section class="section-light section-stack min-h-screen flex items-center px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
+<section class="section-light px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
   <div class="mx-auto w-full max-w-6xl">
     <div class="reveal text-center mb-12">
       <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl text-text heading-accent">{t["oss.community.title"]}</h2>
@@ -102,11 +102,11 @@ const stats = [
     </div>
 
     <!-- Stats row -->
-    <div class="reveal grid grid-cols-2 gap-4 sm:grid-cols-4 mb-12">
+    <div class="reveal grid grid-cols-2 gap-5 sm:grid-cols-4 mb-14">
       {stats.map((stat) => (
-        <div class="rounded-xl border border-border bg-surface p-5 text-center shadow-sm">
+        <div class="rounded-xl border border-border bg-white p-6 text-center shadow-sm hover:shadow-md hover:border-accent/30 card-hover">
           <div class="text-2xl font-bold text-accent sm:text-3xl" data-count-up>{stat.value}</div>
-          <div class="mt-1 text-sm text-text-secondary leading-tight">{stat.label}</div>
+          <div class="mt-1.5 text-sm text-text-secondary leading-tight">{stat.label}</div>
         </div>
       ))}
     </div>
@@ -165,15 +165,15 @@ const stats = [
     <!-- Carousel -->
     <div class="reveal relative overflow-hidden" id="testimonial-carousel">
       <!-- Gradient masks -->
-      <div class="pointer-events-none absolute inset-y-0 left-0 z-10 w-6 sm:w-16 bg-gradient-to-r from-bg to-transparent"></div>
-      <div class="pointer-events-none absolute inset-y-0 right-0 z-10 w-6 sm:w-16 bg-gradient-to-l from-bg to-transparent"></div>
+      <div class="pointer-events-none absolute inset-y-0 left-0 z-10 w-6 sm:w-16 bg-gradient-to-r from-white to-transparent"></div>
+      <div class="pointer-events-none absolute inset-y-0 right-0 z-10 w-6 sm:w-16 bg-gradient-to-l from-white to-transparent"></div>
 
       <!-- Scrolling track -->
-      <div class="carousel-track flex gap-4" id="carousel-track">
+      <div class="carousel-track flex gap-5" id="carousel-track">
         {allQuotes.map((quote) => (
-          <div class="carousel-card shrink-0 w-[280px] sm:w-[320px] rounded-xl border border-border bg-surface p-5 transition-colors hover:border-accent/40 shadow-sm flex flex-col">
+          <div class="carousel-card shrink-0 w-[300px] sm:w-[340px] rounded-xl border border-border bg-white p-6 transition-all hover:border-accent/40 shadow-sm hover:shadow-lg hover:-translate-y-1 flex flex-col">
             <!-- Quote icon -->
-            <svg class="h-5 w-5 text-accent/40 mb-2 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+            <svg class="h-5 w-5 text-accent/40 mb-3 shrink-0" fill="currentColor" viewBox="0 0 24 24">
               <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983z" />
             </svg>
 
@@ -183,10 +183,10 @@ const stats = [
             </p>
 
             <!-- Author -->
-            <div class="mt-3 flex items-center justify-between border-t border-border pt-3">
+            <div class="mt-4 flex items-center justify-between border-t border-border pt-4">
               <div>
                 {quote.url ? (
-                  <a href={quote.url} target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-text hover:text-red-500 transition-colors">
+                  <a href={quote.url} target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-text hover:text-accent transition-colors">
                     {quote.author}
                   </a>
                 ) : (
@@ -194,7 +194,7 @@ const stats = [
                 )}
                 <p class="text-xs text-text-tertiary">{quote.role}</p>
               </div>
-              <span class="rounded-full border border-red-200 bg-red-50 px-2.5 py-0.5 text-[11px] text-red-500">
+              <span class="rounded-full border border-accent/20 bg-accent/5 px-2.5 py-0.5 text-[11px] font-medium text-accent">
                 {quote.source}
               </span>
             </div>

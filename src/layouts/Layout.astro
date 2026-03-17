@@ -1,6 +1,13 @@
 ---
+import { ClientRouter } from 'astro:transitions';
 import Analytics from '@vercel/analytics/astro';
 import SpeedInsights from '@vercel/speed-insights/astro';
+import AnnouncementBar from '../components/AnnouncementBar.astro';
+import {
+  websiteSchema as buildWebsiteSchema,
+  breadcrumbSchema as buildBreadcrumbSchema,
+  type JsonLdSchema,
+} from '../lib/schemas';
 
 interface Alternate {
   lang: string;
@@ -13,8 +20,9 @@ interface Props {
   keywords?: string;
   lang?: string;
   alternates?: Alternate[];
-  jsonLd?: Record<string, unknown>;
+  schemas?: JsonLdSchema[];
   ogImage?: string;
+  theme?: "light" | "dark";
 }
 
 const {
@@ -23,9 +31,12 @@ const {
   keywords: keywordsOverride,
   lang = "en",
   alternates = [],
-  jsonLd: jsonLdOverride,
+  schemas = [],
   ogImage,
+  theme = "light",
 } = Astro.props;
+
+const isLight = theme === "light";
 
 const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith("/") ? rawBase : rawBase + "/";
@@ -35,26 +46,8 @@ const ogImageURL = ogImage ?? new URL(`${base}og-image.png`, siteUrl).href;
 
 const keywords = keywordsOverride ?? "pydantic ai, ai agents, python, fastapi, langchain, langgraph, crewai, deepagents, llm, open source, vstorm, template, middleware, subagents";
 
-const defaultJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: "Vstorm OSS",
-  description,
-  url: siteUrl,
-  sameAs: ["https://github.com/vstorm-co", "https://vstorm.co"],
-  author: { "@type": "Organization", name: "Vstorm" },
-};
-
-const jsonLd = jsonLdOverride ?? defaultJsonLd;
-
-// WebSite schema for GEO/SEO
-const websiteSchema = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: "Vstorm OSS",
-  url: siteUrl,
-  publisher: { "@type": "Organization", name: "Vstorm", url: "https://vstorm.co" },
-};
+// Auto-generate WebSite schema
+const websiteSchema = buildWebsiteSchema();
 
 // Auto-generate BreadcrumbList from URL path
 const pathSegments = Astro.url.pathname.split('/').filter(Boolean);
@@ -80,16 +73,7 @@ if (cleanSegments.length > 0) {
   });
 }
 
-const breadcrumbSchema = breadcrumbItems.length > 1 ? {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: breadcrumbItems.map((bc, i) => ({
-    "@type": "ListItem",
-    position: i + 1,
-    name: bc.name,
-    item: bc.item,
-  })),
-} : null;
+const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbItems);
 ---
 
 <!doctype html>
@@ -145,22 +129,27 @@ const breadcrumbSchema = breadcrumbItems.length > 1 ? {
       />
     </noscript>
 
-    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    {schemas.map((s) => (
+      <script type="application/ld+json" set:html={JSON.stringify(s)} />
+    ))}
     <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
     {breadcrumbSchema && (
       <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
     )}
 
     <title>{title}</title>
+    <ClientRouter />
   </head>
-  <body class="min-h-screen bg-bg text-text antialiased">
+  <body class:list={["min-h-screen antialiased", isLight ? "section-light" : "bg-bg text-text"]}>
     <!-- Skip to content (accessibility) -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:text-white focus:outline-none">
       Skip to content
     </a>
 
-    <!-- Grid background -->
-    <div class="grid-bg pointer-events-none fixed inset-0 z-0" aria-hidden="true"></div>
+    <AnnouncementBar lang={lang} />
+
+    <!-- Grid background (dark theme only) -->
+    {!isLight && <div class="grid-bg pointer-events-none fixed inset-0 z-0" aria-hidden="true"></div>}
 
     <main id="main-content" class="relative z-10">
       <slot />
@@ -168,14 +157,14 @@ const breadcrumbSchema = breadcrumbItems.length > 1 ? {
     <Analytics />
     <SpeedInsights />
     <!-- Back to top -->
-    <button id="back-to-top" class="fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.08] bg-bg/60 backdrop-blur-2xl text-text-tertiary shadow-lg shadow-black/20 opacity-0 translate-y-4 pointer-events-none transition-all duration-300 hover:text-accent hover:border-accent/40" aria-label="Back to top">
+    <button id="back-to-top" class:list={["fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full border shadow-lg opacity-0 translate-y-4 pointer-events-none transition-all duration-300 hover:text-accent hover:border-accent/40", isLight ? "border-border bg-white/80 backdrop-blur-2xl text-text-tertiary shadow-black/10" : "border-white/[0.08] bg-bg/60 backdrop-blur-2xl text-text-tertiary shadow-black/20"]} aria-label="Back to top">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14l-5-5-5 5"/></svg>
     </button>
     <script is:inline>
-      (function(){
+      document.addEventListener('astro:page-load', function() {
         /* Scroll reveal */
         var rio=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.classList.add('visible');rio.unobserve(x.target)}})},{threshold:.12});
-        document.querySelectorAll('.reveal').forEach(function(el){rio.observe(el)});
+        document.querySelectorAll('.reveal:not(.visible)').forEach(function(el){rio.observe(el)});
 
         /* Back to top */
         var btn=document.getElementById('back-to-top');
@@ -206,7 +195,7 @@ const breadcrumbSchema = breadcrumbItems.length > 1 ? {
             });
           });
         });
-      })();
+      });
     </script>
   </body>
 </html>

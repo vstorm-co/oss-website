@@ -1,0 +1,37 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import Navbar from '../../../../components/Navbar.astro';
+import ConfiguratorApp from '../../../../components/configurator/ConfiguratorApp';
+import Breadcrumbs from '../../../../components/shared/Breadcrumbs.astro';
+import { languages, defaultLang, type Lang } from '../../../../i18n/translations';
+import { getProjectBySlug } from '../../../../data/projects';
+
+export function getStaticPaths() {
+  return Object.keys(languages)
+    .filter((lang) => lang !== defaultLang)
+    .map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const url = new URL(Astro.request.url);
+const preset = url.searchParams.get('preset') || undefined;
+const project = getProjectBySlug("full-stack-ai-agent-template")!;
+---
+
+<Layout
+  theme="dark"
+  title="Configure Your Project — Vstorm OSS"
+  description="Configure and download a production-ready FastAPI + Next.js AI project. Choose from 5 AI frameworks, databases, auth, and 75+ options."
+  schemas={[]}
+>
+  <Navbar showLang={false} project={project} pathSuffix="projects/full-stack-ai-agent-template/" />
+  <Breadcrumbs items={[
+    { label: "Home", href: `/${lang}/` },
+    { label: "Projects", href: `/${lang}/projects/` },
+    { label: "Full-Stack AI Agent Template", href: `/${lang}/projects/full-stack-ai-agent-template/` },
+    { label: "Configurator" },
+  ]} />
+  <div class="mx-auto max-w-7xl px-4 py-8">
+    <ConfiguratorApp client:only="react" initialPreset={preset} />
+  </div>
+</Layout>

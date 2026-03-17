@@ -89,40 +89,41 @@ const steps = [
   </div>
 </section>
 
-<script>
-  document.querySelectorAll<HTMLElement>('.copy-block').forEach((block) => {
-    block.addEventListener('click', async () => {
-      const command = block.dataset.command;
-      if (!command) return;
+<script is:inline>
+  document.addEventListener('astro:page-load', function() {
+    document.querySelectorAll('.copy-block').forEach(function(block) {
+      if (block.dataset.bound) return;
+      block.dataset.bound = '1';
+      block.addEventListener('click', function() {
+        var command = block.dataset.command;
+        if (!command) return;
 
-      try {
-        await navigator.clipboard.writeText(command);
-      } catch {
-        // fallback
-        const ta = document.createElement('textarea');
-        ta.value = command;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-      }
+        navigator.clipboard.writeText(command).catch(function() {
+          var ta = document.createElement('textarea');
+          ta.value = command;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        });
 
-      const label = block.querySelector('.copy-label') as HTMLElement | null;
-      const copyIcon = block.querySelector('.copy-icon') as HTMLElement | null;
-      const checkIcon = block.querySelector('.check-icon') as HTMLElement | null;
+        var label = block.querySelector('.copy-label');
+        var copyIcon = block.querySelector('.copy-icon');
+        var checkIcon = block.querySelector('.check-icon');
 
-      const originalText = label?.textContent || '';
-      if (label) label.textContent = label.dataset.copied || 'Copied!';
-      if (copyIcon) copyIcon.classList.add('hidden');
-      if (checkIcon) checkIcon.classList.remove('hidden');
+        var originalText = label ? label.textContent : '';
+        if (label) label.textContent = label.dataset.copied || 'Copied!';
+        if (copyIcon) copyIcon.classList.add('hidden');
+        if (checkIcon) checkIcon.classList.remove('hidden');
 
-      setTimeout(() => {
-        if (label) label.textContent = originalText;
-        if (copyIcon) copyIcon.classList.remove('hidden');
-        if (checkIcon) checkIcon.classList.add('hidden');
-      }, 2000);
+        setTimeout(function() {
+          if (label) label.textContent = originalText;
+          if (copyIcon) copyIcon.classList.remove('hidden');
+          if (checkIcon) checkIcon.classList.add('hidden');
+        }, 2000);
+      });
     });
   });
 </script>

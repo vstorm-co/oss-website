@@ -1,0 +1,214 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Navbar from '../../../components/Navbar.astro';
+import OssFooter from '../../../components/oss/OssFooter.astro';
+import Breadcrumbs from '../../../components/shared/Breadcrumbs.astro';
+import { Code } from 'astro-expressive-code/components';
+import { translations, languages, defaultLang, type Lang } from '../../../i18n/translations';
+import { getAllGuideSlugs, getGuideBySlug, getGuidesForFramework, getGuidesForUseCase } from '../../../data/seo-guides';
+import { howToSchema } from '../../../lib/schemas';
+
+export function getStaticPaths() {
+  const slugs = getAllGuideSlugs();
+  const langs = Object.keys(languages).filter((l) => l !== defaultLang);
+  return langs.flatMap((lang) =>
+    slugs.map((slug) => ({ params: { lang, slug } }))
+  );
+}
+
+const lang = Astro.params.lang as Lang;
+const t = translations[lang];
+const { slug } = Astro.params;
+const guide = getGuideBySlug(slug!)!;
+
+const title = guide.useCase.pageTitle[lang].replace("{framework}", guide.framework.name);
+const description = guide.useCase.description[lang].replace("{framework}", guide.framework.name);
+
+const alternates = [
+  { lang: "en", href: `/guides/${slug}/` },
+  ...Object.keys(languages)
+    .filter((l) => l !== defaultLang)
+    .map((l) => ({ lang: l, href: `/${l}/guides/${slug}/` })),
+];
+
+const otherFrameworks = getGuidesForUseCase(guide.useCase.slug)
+  .filter((g) => g.framework.slug !== guide.framework.slug);
+
+const otherUseCases = getGuidesForFramework(guide.framework.slug)
+  .filter((g) => g.useCase.slug !== guide.useCase.slug)
+  .slice(0, 4);
+
+---
+
+<Layout
+  title={`${title} — Vstorm OSS`}
+  description={description}
+  keywords={`${guide.useCase.tags.join(", ")}, ${guide.framework.name.toLowerCase()}, python, tutorial, ai agent`}
+  lang={lang}
+  alternates={alternates}
+  schemas={[howToSchema({ name: title, description, steps: [
+    { name: t["guides.step1.title"] ?? "Install dependencies" },
+    { name: t["guides.step2.title"] ?? "Define your tools" },
+    { name: t["guides.step3.title"] ?? "Create the agent and run" },
+  ] })]}
+>
+  <Navbar currentLang={lang} />
+
+  <Breadcrumbs items={[
+    { label: "Home", href: `/${lang}/` },
+    { label: t["guides.index.title"] ?? "Guides", href: `/${lang}/guides/` },
+    { label: title },
+  ]} />
+
+  <!-- Hero -->
+  <section class="relative mx-auto max-w-4xl px-4 pt-28 pb-12 sm:px-6 sm:pt-36 sm:pb-16 lg:px-8 text-center">
+    <div class="pointer-events-none absolute inset-0 -top-24 flex items-center justify-center" aria-hidden="true">
+      <div class="h-[200px] w-[300px] sm:h-[340px] sm:w-[540px] rounded-full bg-accent/[0.07] blur-[60px] sm:blur-[100px]"></div>
+    </div>
+    <div class="reveal relative">
+      <span class="inline-flex items-center rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-text-secondary mb-6">
+        {guide.framework.name}
+      </span>
+      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+        {title}
+      </h1>
+      <p class="mt-6 text-lg sm:text-xl text-text-secondary max-w-2xl mx-auto leading-relaxed">
+        {description}
+      </p>
+      <div class="mt-6 flex flex-wrap items-center justify-center gap-2">
+        {guide.useCase.tags.map((tag) => (
+          <span class="rounded-full border border-border px-3 py-1 text-xs text-text-tertiary">{tag}</span>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Code Example -->
+  <section class="section-stack px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+    <div class="mx-auto max-w-4xl">
+      <div class="mb-10 text-center reveal">
+        <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
+          {t["usecases.code.title"] ?? "Working Code"}
+        </h2>
+      </div>
+      <div class="reveal">
+        <Code code={guide.code} lang="python" title={guide.framework.name} />
+      </div>
+    </div>
+  </section>
+
+  <!-- Steps -->
+  <section class="section-stack px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+    <div class="mx-auto max-w-4xl">
+      <div class="mb-10 text-center reveal">
+        <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
+          {t["usecases.steps.title"] ?? "Step by Step"}
+        </h2>
+      </div>
+      <div class="space-y-6 reveal-group">
+        <div class="reveal glass-card rounded-2xl p-6 sm:p-8 flex gap-5">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent font-bold text-lg">1</div>
+          <div>
+            <h3 class="text-lg font-semibold">{t["guides.step1.title"] ?? "Install dependencies"}</h3>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">{(t["guides.step1.description"] ?? "Install {framework} and the required tools for this use case.").replace("{framework}", guide.framework.name)}</p>
+          </div>
+        </div>
+        <div class="reveal glass-card rounded-2xl p-6 sm:p-8 flex gap-5">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent font-bold text-lg">2</div>
+          <div>
+            <h3 class="text-lg font-semibold">{t["guides.step2.title"] ?? "Define your tools"}</h3>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">{t["guides.step2.description"] ?? "Create the domain-specific tool functions your agent will use to interact with external services."}</p>
+          </div>
+        </div>
+        <div class="reveal glass-card rounded-2xl p-6 sm:p-8 flex gap-5">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent font-bold text-lg">3</div>
+          <div>
+            <h3 class="text-lg font-semibold">{t["guides.step3.title"] ?? "Create the agent and run"}</h3>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">{(t["guides.step3.description"] ?? "Initialize the {framework} agent with your tools, set the system prompt, and execute a query.").replace("{framework}", guide.framework.name)}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Other Frameworks -->
+  {otherFrameworks.length > 0 && (
+    <section class="section-stack px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <div class="mx-auto max-w-4xl">
+        <div class="mb-8 text-center reveal">
+          <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
+            {t["guides.related.frameworks"] ?? "Build with other frameworks"}
+          </h2>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-4 reveal-group">
+          {otherFrameworks.map((g) => (
+            <a
+              href={`/${lang}/guides/${g.slug}/`}
+              class="reveal glass-card glow-card rounded-xl p-4 text-center group"
+            >
+              <span class="font-semibold text-sm group-hover:text-accent transition-colors">{g.framework.name}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Other Use Cases -->
+  {otherUseCases.length > 0 && (
+    <section class="section-stack px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <div class="mx-auto max-w-4xl">
+        <div class="mb-8 text-center reveal">
+          <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
+            {(t["guides.related.usecases"] ?? "More guides with {framework}").replace("{framework}", guide.framework.name)}
+          </h2>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-2 reveal-group">
+          {otherUseCases.map((g) => {
+            const ucTitle = g.useCase.pageTitle[lang].replace("{framework}", g.framework.name);
+            return (
+              <a
+                href={`/${lang}/guides/${g.slug}/`}
+                class="reveal glass-card glow-card rounded-xl p-4 flex items-center justify-between gap-3 group"
+              >
+                <span class="font-semibold text-sm group-hover:text-accent transition-colors">{ucTitle}</span>
+                <svg class="w-4 h-4 shrink-0 text-text-tertiary group-hover:text-accent transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- CTA -->
+  <section class="relative section-stack px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
+    <div class="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden="true">
+      <div class="h-[180px] w-[300px] sm:h-[280px] sm:w-[480px] rounded-full bg-accent/[0.06] blur-[60px] sm:blur-[90px]"></div>
+    </div>
+    <div class="mx-auto max-w-3xl text-center reveal relative">
+      <div class="glass-card glow-card rounded-2xl p-6 sm:p-10 lg:p-14">
+        <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
+          {(t["guides.cta.title"] ?? "Ready to build with {framework}?").replace("{framework}", guide.framework.name)}
+        </h2>
+        <p class="mt-4 text-text-secondary">
+          {(t["guides.cta.description"] ?? "Generate a production-ready project with {framework} pre-configured — FastAPI + Next.js, auth, streaming, and more.").replace("{framework}", guide.framework.name)}
+        </p>
+        <a
+          href={`/${lang}/${guide.framework.projectSlug}/`}
+          class="mt-6 sm:mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-base font-semibold text-white transition-colors hover:bg-accent-hover"
+        >
+          {t["guides.cta.button"] ?? "Get Started"}
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <OssFooter t={t} lang={lang} />
+</Layout>
+

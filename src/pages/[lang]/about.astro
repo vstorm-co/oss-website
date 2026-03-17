@@ -4,6 +4,7 @@ import Navbar from '../../components/Navbar.astro';
 import OssFooter from '../../components/oss/OssFooter.astro';
 import Breadcrumbs from '../../components/shared/Breadcrumbs.astro';
 import { translations, languages, defaultLang, type Lang } from '../../i18n/translations';
+import { organizationSchema } from '../../lib/schemas';
 
 export function getStaticPaths() {
   return Object.keys(languages)
@@ -21,20 +22,6 @@ const alternates = [
     .map((l) => ({ lang: l, href: `/${l}/about/` })),
 ];
 
-const orgSchema = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: "Vstorm",
-  url: "https://vstorm.co",
-  description: t["about.company.description"],
-  foundingDate: "2017",
-  numberOfEmployees: { "@type": "QuantitativeValue", minValue: 25 },
-  sameAs: [
-    "https://github.com/vstorm-co",
-    "https://www.linkedin.com/company/vstormco/",
-    "https://pypi.org/user/kacperwlodarczyk-vstorm/",
-  ],
-};
 ---
 
 <Layout
@@ -43,10 +30,10 @@ const orgSchema = {
   keywords="vstorm, ai consultancy, pydantic ai, open source ai, agentic ai, ai agent framework, python ai tools"
   lang={lang}
   alternates={alternates}
+  schemas={[organizationSchema({ foundingDate: "2017", numberOfEmployees: 25 })]}
 >
   <Navbar currentLang={lang} />
 
-  <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
   <Breadcrumbs items={[
     { label: "Home", href: `/${lang}/` },
     { label: t["nav.about"] },
@@ -54,8 +41,8 @@ const orgSchema = {
 
   <main class="mx-auto max-w-4xl px-4 py-16 sm:py-24">
     <!-- Hero -->
-    <div class="mb-16 text-center reveal">
-      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">{t["about.title"]}</h1>
+    <div class="mb-12 text-center reveal">
+      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl heading-accent">{t["about.title"]}</h1>
       <p class="mt-4 text-lg text-text-secondary max-w-2xl mx-auto">{t["about.subtitle"]}</p>
     </div>
 
@@ -151,5 +138,5 @@ const orgSchema = {
     </section>
   </main>
 
-  <OssFooter t={t} />
+  <OssFooter t={t} lang={lang} />
 </Layout>

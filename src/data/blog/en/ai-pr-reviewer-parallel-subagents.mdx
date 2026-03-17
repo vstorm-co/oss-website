@@ -56,7 +56,7 @@ This is the deep agent pattern: a coordinator that plans, delegates to specialis
 
 ## The Code: ~40 Lines, Fully Working
 
-Here's the complete implementation using [pydantic-deepagents](https://github.com/vstorm-co/pydantic-deepagents):
+Here's the complete implementation using [pydantic-deepagents](https://github.com/vstorm.co/projects/pydantic-deepagents):
 
 ```python
 import asyncio
@@ -242,7 +242,7 @@ The agent reads the current directory, gets the git diff, and prints the review.
 
 ### As a pydantic-deep Slash Command
 
-If you're using [pydantic-deepagents](https://github.com/vstorm-co/pydantic-deepagents) as a CLI (like Claude Code), you can register this as a slash command:
+If you're using [pydantic-deepagents](https://github.com/vstorm.co/projects/pydantic-deepagents) as a CLI (like Claude Code), you can register this as a slash command:
 
 ```bash
 # Run the built-in review command
@@ -297,11 +297,11 @@ The pattern:
 3. **Execute** — each specialist works independently with its own tools
 4. **Synthesize** — parent aggregates results into a coherent output
 
-[pydantic-deepagents](https://github.com/vstorm-co/pydantic-deepagents) is an open-source implementation of this pattern, built on [Pydantic AI](https://ai.pydantic.dev/). It's the framework we use at [Vstorm](https://vstorm.co) to ship production AI agents — and the PR reviewer is one of the simplest things you can build with it.
+[pydantic-deepagents](https://github.com/vstorm.co/projects/pydantic-deepagents) is an open-source implementation of this pattern, built on [Pydantic AI](https://ai.pydantic.dev/). It's the framework we use at [Vstorm](https://vstorm.co) to ship production AI agents — and the PR reviewer is one of the simplest things you can build with it.
 
 ## Try It
 
-- **Repository:** [pydantic-deepagents on GitHub](https://github.com/vstorm-co/pydantic-deepagents)
+- **Repository:** [pydantic-deepagents on GitHub](https://github.com/vstorm.co/projects/pydantic-deepagents)
 - **Install:** `pip install pydantic-deep`
 - **Subagents package:** [subagents-pydantic-ai](https://github.com/vstorm-co/subagents-pydantic-ai)
 - **Docs:** [pydantic-deep.vstorm.co](https://pydantic-deep.vstorm.co)
@@ -314,4 +314,4 @@ The humans on your team should be reviewing architecture, logic, and design. Let
 
 ---
 
-*I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering Consultancy. We build and open-source production AI agent tooling in Python. Star [pydantic-deepagents](https://github.com/vstorm-co/pydantic-deepagents) on GitHub if you find it useful.*
+*I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering Consultancy. We build and open-source production AI agent tooling in Python. Star [pydantic-deepagents](https://github.com/vstorm.co/projects/pydantic-deepagents) on GitHub if you find it useful.*

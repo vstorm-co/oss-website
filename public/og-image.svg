@@ -4,17 +4,18 @@
       <stop offset="0%" stop-color="#09090b"/>
       <stop offset="100%" stop-color="#18181b"/>
     </linearGradient>
-    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#6366f1"/>
-      <stop offset="100%" stop-color="#8b5cf6"/>
-    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#ef4444" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#09090b" stop-opacity="0"/>
+    </radialGradient>
   </defs>
 
   <!-- Background -->
   <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
 
   <!-- Subtle grid -->
-  <g opacity="0.06" stroke="#fff" stroke-width="1">
+  <g opacity="0.04" stroke="#fff" stroke-width="1">
     <line x1="0" y1="64" x2="1200" y2="64"/>
     <line x1="0" y1="128" x2="1200" y2="128"/>
     <line x1="0" y1="192" x2="1200" y2="192"/>
@@ -44,41 +45,44 @@
     <line x1="1152" y1="0" x2="1152" y2="630"/>
   </g>
 
-  <!-- Glow blob -->
-  <circle cx="600" cy="260" r="300" fill="#6366f1" opacity="0.08"/>
-  <circle cx="600" cy="260" r="150" fill="#8b5cf6" opacity="0.06"/>
+  <!-- Top accent line -->
+  <rect x="80" y="80" width="80" height="4" rx="2" fill="#ef4444"/>
 
-  <!-- Logo badge -->
-  <rect x="540" y="120" width="120" height="48" rx="24" fill="url(#accent)"/>
-  <text x="600" y="151" font-family="monospace, sans-serif" font-size="18" font-weight="700" text-anchor="middle" fill="white">OPEN SOURCE</text>
+  <!-- Logo text -->
+  <text x="80" y="130" font-family="system-ui,-apple-system,sans-serif" font-size="22" font-weight="600" fill="#a1a1aa">Vstorm OSS</text>
 
   <!-- Title -->
-  <text x="600" y="240" font-family="'Inter', system-ui, sans-serif" font-size="56" font-weight="800" text-anchor="middle" fill="white">Ship Production</text>
-  <text x="600" y="310" font-family="'Inter', system-ui, sans-serif" font-size="56" font-weight="800" text-anchor="middle" fill="#8b5cf6">AI Apps</text>
-  <text x="600" y="375" font-family="'Inter', system-ui, sans-serif" font-size="56" font-weight="800" text-anchor="middle" fill="white">In Minutes</text>
+  <text x="80" y="230" font-family="system-ui,-apple-system,sans-serif" font-size="56" font-weight="800" fill="#fafafa">Open Source</text>
+  <text x="80" y="300" font-family="system-ui,-apple-system,sans-serif" font-size="56" font-weight="800" fill="#ef4444">AI Agent Tools</text>
 
   <!-- Subtitle -->
-  <text x="600" y="430" font-family="'Inter', system-ui, sans-serif" font-size="20" text-anchor="middle" fill="#a1a1aa">FastAPI + Next.js &#8226; 5 AI Frameworks &#8226; 75+ Options</text>
+  <text x="80" y="365" font-family="system-ui,-apple-system,sans-serif" font-size="22" fill="#a1a1aa">Frameworks &#183; Templates &#183; Guides &#183; Comparisons</text>
 
   <!-- Tech badges -->
-  <g transform="translate(275, 470)">
-    <rect x="0" y="0" width="100" height="34" rx="17" fill="#27272a" stroke="#3f3f46" stroke-width="1"/>
-    <text x="50" y="22" font-family="'Inter', sans-serif" font-size="13" font-weight="500" text-anchor="middle" fill="#a1a1aa">FastAPI</text>
+  <g transform="translate(80, 420)">
+    <rect x="0" y="0" width="130" height="38" rx="19" fill="#27272a" stroke="#3f3f46" stroke-width="1"/>
+    <text x="65" y="25" font-family="system-ui,sans-serif" font-size="14" font-weight="500" text-anchor="middle" fill="#fafafa">Pydantic AI</text>
 
-    <rect x="115" y="0" width="100" height="34" rx="17" fill="#27272a" stroke="#3f3f46" stroke-width="1"/>
-    <text x="165" y="22" font-family="'Inter', sans-serif" font-size="13" font-weight="500" text-anchor="middle" fill="#a1a1aa">Next.js</text>
+    <rect x="145" y="0" width="160" height="38" rx="19" fill="#27272a" stroke="#3f3f46" stroke-width="1"/>
+    <text x="225" y="25" font-family="system-ui,sans-serif" font-size="14" font-weight="500" text-anchor="middle" fill="#fafafa">DeepAgents</text>
 
-    <rect x="230" y="0" width="100" height="34" rx="17" fill="#27272a" stroke="#3f3f46" stroke-width="1"/>
-    <text x="280" y="22" font-family="'Inter', sans-serif" font-size="13" font-weight="500" text-anchor="middle" fill="#a1a1aa">Pydantic AI</text>
+    <rect x="320" y="0" width="130" height="38" rx="19" fill="#27272a" stroke="#3f3f46" stroke-width="1"/>
+    <text x="385" y="25" font-family="system-ui,sans-serif" font-size="14" font-weight="500" text-anchor="middle" fill="#fafafa">LangChain</text>
 
-    <rect x="345" y="0" width="110" height="34" rx="17" fill="#27272a" stroke="#3f3f46" stroke-width="1"/>
-    <text x="400" y="22" font-family="'Inter', sans-serif" font-size="13" font-weight="500" text-anchor="middle" fill="#a1a1aa">LangChain</text>
+    <rect x="465" y="0" width="100" height="38" rx="19" fill="#27272a" stroke="#3f3f46" stroke-width="1"/>
+    <text x="515" y="25" font-family="system-ui,sans-serif" font-size="14" font-weight="500" text-anchor="middle" fill="#fafafa">FastAPI</text>
 
-    <rect x="470" y="0" width="90" height="34" rx="17" fill="#27272a" stroke="#3f3f46" stroke-width="1"/>
-    <text x="515" y="22" font-family="'Inter', sans-serif" font-size="13" font-weight="500" text-anchor="middle" fill="#a1a1aa">Docker</text>
+    <rect x="580" y="0" width="100" height="38" rx="19" fill="#27272a" stroke="#3f3f46" stroke-width="1"/>
+    <text x="630" y="25" font-family="system-ui,sans-serif" font-size="14" font-weight="500" text-anchor="middle" fill="#fafafa">Next.js</text>
   </g>
 
   <!-- Bottom bar -->
-  <rect x="0" y="560" width="1200" height="70" fill="#09090b" opacity="0.8"/>
-  <text x="600" y="602" font-family="'JetBrains Mono', monospace" font-size="16" text-anchor="middle" fill="#71717a">pip install fastapi-fullstack</text>
+  <rect x="0" y="540" width="1200" height="90" fill="#09090b" opacity="0.6"/>
+  <text x="80" y="580" font-family="system-ui,-apple-system,sans-serif" font-size="16" fill="#52525b">oss.vstorm.co</text>
+
+  <!-- GitHub star callout -->
+  <g transform="translate(1000, 560)">
+    <rect x="0" y="0" width="120" height="32" rx="16" fill="#ef4444" opacity="0.15"/>
+    <text x="60" y="21" font-family="system-ui,sans-serif" font-size="13" font-weight="600" text-anchor="middle" fill="#ef4444">&#9733; Star on GitHub</text>
+  </g>
 </svg>

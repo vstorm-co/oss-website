@@ -37,7 +37,7 @@ const filtered = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 </style>
 
 <script is:inline>
-  (function() {
+  document.addEventListener('astro:page-load', function() {
     var links = document.querySelectorAll('[data-toc-link]');
     if (!links.length) return;
 
@@ -50,7 +50,6 @@ const filtered = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
     var current = null;
 
     function update() {
-      var scrollY = window.scrollY;
       var found = null;
 
       for (var i = headings.length - 1; i >= 0; i--) {
@@ -74,5 +73,5 @@ const filtered = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 
     window.addEventListener('scroll', update, { passive: true });
     update();
-  })();
+  });
 </script>
