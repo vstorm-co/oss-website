@@ -36,7 +36,7 @@ This is the sleeper feature. Previously, all tool definitions were included in e
 
 GPT-5.4 introduces **tool search**: the model gets a lightweight list of available tools and can look up full definitions on demand. OpenAI reports **47% fewer tokens** on tool-heavy workloads with identical accuracy.
 
-For frameworks that compose many toolsets — like [pydantic-deepagents](https://github.com/vstorm-co/pydantic-deepagents) where a single agent can have 30+ tools from filesystem, planning, sub-agents, middleware, and more — this directly translates to lower cost and faster responses.
+For frameworks that compose many toolsets — like [pydantic-deepagents](https://github.com/vstorm.co/projects/pydantic-deepagents) where a single agent can have 30+ tools from filesystem, planning, sub-agents, middleware, and more — this directly translates to lower cost and faster responses.
 
 ## Coding Improvements
 
@@ -67,9 +67,9 @@ With tool search and more efficient reasoning, the total cost per task may actua
 
 We're already testing GPT-5.4 across our tooling:
 
-- **[pydantic-deepagents](https://github.com/vstorm-co/pydantic-deepagents)**: The 1M context window means fewer summarization triggers and longer autonomous runs. Tool search could reduce prompt overhead by 40%+ for our full toolset.
+- **[pydantic-deepagents](https://github.com/vstorm.co/projects/pydantic-deepagents)**: The 1M context window means fewer summarization triggers and longer autonomous runs. Tool search could reduce prompt overhead by 40%+ for our full toolset.
 - **[pydantic-ai-backend](https://github.com/vstorm-co/pydantic-ai-backend)**: Computer-use capabilities open the door for browser-based testing within sandboxes.
-- **[Full-Stack AI Agent Template](https://github.com/vstorm-co/full-stack-ai-agent-template)**: GPT-5.4 works as a drop-in replacement — just change the model string. Try it in the [web configurator](https://template.vstorm.co/configurator/).
+- **[Full-Stack AI Agent Template](https://github.com/vstorm.co/projects/full-stack-ai-agent-template)**: GPT-5.4 works as a drop-in replacement — just change the model string. Try it in the [web configurator](https://template.vstorm.co/configurator/).
 
 The model is available now. If you're building agents with [Pydantic AI](https://ai.pydantic.dev/), [LangChain](https://python.langchain.com/), or [LangGraph](https://langchain-ai.github.io/langgraph/), GPT-5.4 is worth testing today — especially for tool-heavy and long-running workflows.
 

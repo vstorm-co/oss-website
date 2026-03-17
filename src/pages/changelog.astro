@@ -5,6 +5,7 @@ import OssFooter from '../components/oss/OssFooter.astro';
 import Breadcrumbs from '../components/shared/Breadcrumbs.astro';
 import { translations, languages, defaultLang } from '../i18n/translations';
 import { changelog } from '../data/changelog';
+import { webPageSchema, SITE_URL } from '../lib/schemas';
 
 const lang = defaultLang;
 const t = translations[lang];
@@ -35,6 +36,7 @@ const tagColors: Record<string, string> = {
   keywords="vstorm changelog, ai agent releases, pydantic deepagents changelog, open source ai updates"
   lang={lang}
   alternates={alternates}
+  schemas={[webPageSchema({ name: t["changelog.title"], description: t["changelog.subtitle"], url: SITE_URL + "/changelog/" })]}
 >
   <Navbar currentLang={lang} />
 

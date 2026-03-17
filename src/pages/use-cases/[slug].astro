@@ -1,0 +1,211 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import OssFooter from '../../components/oss/OssFooter.astro';
+import Breadcrumbs from '../../components/shared/Breadcrumbs.astro';
+import { Code } from 'astro-expressive-code/components';
+import { translations, languages, defaultLang } from '../../i18n/translations';
+import { getAllUseCaseSlugs, getUseCaseBySlug, useCasePages } from '../../data/use-case-pages';
+import { howToSchema } from '../../lib/schemas';
+
+export function getStaticPaths() {
+  return getAllUseCaseSlugs().map((slug) => ({ params: { slug } }));
+}
+
+const lang = defaultLang;
+const t = translations[lang];
+const { slug } = Astro.params;
+const useCase = getUseCaseBySlug(slug!)!;
+
+const alternates = [
+  { lang: "en", href: `/use-cases/${slug}/` },
+  ...Object.keys(languages)
+    .filter((l) => l !== defaultLang)
+    .map((l) => ({ lang: l, href: `/${l}/use-cases/${slug}/` })),
+];
+
+const relatedUseCases = useCase.relatedUseCases
+  .map((s) => getUseCaseBySlug(s))
+  .filter(Boolean);
+
+function difficultyColor(d: string) {
+  if (d === "beginner") return "text-green-400 bg-green-400/10";
+  if (d === "intermediate") return "text-amber-400 bg-amber-400/10";
+  return "text-red-400 bg-red-400/10";
+}
+---
+
+<Layout
+  title={`${useCase.title[lang]} — Vstorm OSS`}
+  description={useCase.description[lang]}
+  keywords={`${useCase.tags.join(", ")}, ai agent, python, tutorial`}
+  lang={lang}
+  alternates={alternates}
+  schemas={[howToSchema({ name: useCase.title[lang], description: useCase.description[lang], steps: useCase.steps.map((s) => ({ name: s.title[lang], text: s.description[lang] })) })]}
+>
+  <Navbar currentLang={lang} />
+
+  <Breadcrumbs items={[
+    { label: "Home", href: "/" },
+    { label: t["usecases.index.title"] ?? "Use Cases", href: "/use-cases/" },
+    { label: useCase.title[lang] },
+  ]} />
+
+  <!-- Hero -->
+  <section class="relative mx-auto max-w-4xl px-4 pt-28 pb-12 sm:px-6 sm:pt-36 sm:pb-16 lg:px-8 text-center">
+    <div class="pointer-events-none absolute inset-0 -top-24 flex items-center justify-center" aria-hidden="true">
+      <div class="h-[200px] w-[300px] sm:h-[340px] sm:w-[540px] rounded-full bg-accent/[0.07] blur-[60px] sm:blur-[100px]"></div>
+    </div>
+    <div class="reveal relative">
+      <div class="flex items-center justify-center gap-3 mb-6">
+        <span class={`rounded-full px-3 py-1 text-xs font-medium ${difficultyColor(useCase.difficulty)}`}>
+          {useCase.difficulty}
+        </span>
+        <span class="text-sm text-text-tertiary">{useCase.timeToComplete}</span>
+      </div>
+      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+        {useCase.title[lang]}
+      </h1>
+      <p class="mt-6 text-lg sm:text-xl text-text-secondary max-w-2xl mx-auto leading-relaxed">
+        {useCase.heroSubtitle[lang]}
+      </p>
+      <div class="mt-8 flex flex-wrap items-center justify-center gap-2">
+        {useCase.tags.map((tag) => (
+          <span class="rounded-full border border-border px-3 py-1 text-xs text-text-tertiary">{tag}</span>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem -->
+  <section class="section-stack px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+    <div class="mx-auto max-w-3xl">
+      <div class="reveal">
+        <h2 class="text-2xl font-bold tracking-tight sm:text-3xl mb-6">
+          {t["usecases.problem.title"] ?? "The Problem"}
+        </h2>
+        <div class="glass-card rounded-2xl p-6 sm:p-8 border-l-4 border-red-400/40">
+          <p class="text-text-secondary leading-relaxed">{useCase.problem[lang]}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Solution -->
+  <section class="section-stack px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+    <div class="mx-auto max-w-3xl">
+      <div class="reveal">
+        <h2 class="text-2xl font-bold tracking-tight sm:text-3xl mb-6">
+          {t["usecases.solution.title"] ?? "The Solution"}
+        </h2>
+        <div class="glass-card rounded-2xl p-6 sm:p-8 border-l-4 border-green-400/40">
+          <p class="text-text-secondary leading-relaxed">{useCase.solution[lang]}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Code Example -->
+  <section class="section-stack px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+    <div class="mx-auto max-w-4xl">
+      <div class="mb-10 text-center reveal">
+        <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
+          {t["usecases.code.title"] ?? "Working Code"}
+        </h2>
+      </div>
+      <div class="reveal">
+        <Code code={useCase.codeExample.code} lang="python" title={useCase.codeExample.label} />
+      </div>
+    </div>
+  </section>
+
+  <!-- Steps -->
+  <section class="section-stack px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+    <div class="mx-auto max-w-4xl">
+      <div class="mb-10 text-center reveal">
+        <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
+          {t["usecases.steps.title"] ?? "Step by Step"}
+        </h2>
+      </div>
+      <div class="space-y-6 reveal-group">
+        {useCase.steps.map((step, i) => (
+          <div class="reveal glass-card rounded-2xl p-6 sm:p-8 flex gap-5">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent font-bold text-lg">
+              {i + 1}
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold">{step.title[lang]}</h3>
+              <p class="mt-2 text-sm text-text-secondary leading-relaxed">{step.description[lang]}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Related Use Cases -->
+  {relatedUseCases.length > 0 && (
+    <section class="section-stack px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <div class="mx-auto max-w-4xl">
+        <div class="mb-10 text-center reveal">
+          <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
+            {t["usecases.related.title"] ?? "Related Use Cases"}
+          </h2>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2 reveal-group">
+          {relatedUseCases.map((rel) => (
+            <a
+              href={`/use-cases/${rel!.slug}/`}
+              class="glass-card glow-card rounded-2xl p-6 flex items-center justify-between gap-4 reveal group"
+            >
+              <div>
+                <div class="flex items-center gap-2 text-xs mb-2">
+                  <span class={`rounded-full px-2 py-0.5 font-medium ${difficultyColor(rel!.difficulty)}`}>
+                    {rel!.difficulty}
+                  </span>
+                  <span class="text-text-tertiary">{rel!.timeToComplete}</span>
+                </div>
+                <h3 class="font-semibold group-hover:text-accent transition-colors">
+                  {rel!.title[lang]}
+                </h3>
+                <p class="text-sm text-text-secondary mt-1 line-clamp-2">{rel!.description[lang]}</p>
+              </div>
+              <svg class="w-5 h-5 shrink-0 text-text-tertiary group-hover:text-accent transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- CTA -->
+  <section class="relative section-stack px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
+    <div class="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden="true">
+      <div class="h-[180px] w-[300px] sm:h-[280px] sm:w-[480px] rounded-full bg-accent/[0.06] blur-[60px] sm:blur-[90px]"></div>
+    </div>
+    <div class="mx-auto max-w-3xl text-center reveal relative">
+      <div class="glass-card glow-card rounded-2xl p-6 sm:p-10 lg:p-14">
+        <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
+          {t["usecases.cta.title"] ?? "Ready to build this?"}
+        </h2>
+        <p class="mt-4 text-text-secondary">
+          {t["usecases.cta.description"] ?? "Get started with Vstorm's open-source tools — production-tested, fully documented, and free."}
+        </p>
+        <a
+          href={`/${useCase.projectSlug}/`}
+          class="mt-6 sm:mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-base font-semibold text-white transition-colors hover:bg-accent-hover"
+        >
+          {t["usecases.cta.button"] ?? "Get Started"}
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <OssFooter t={t} />
+</Layout>
+

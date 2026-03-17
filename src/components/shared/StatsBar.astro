@@ -28,15 +28,14 @@ const { items } = Astro.props;
 </section>
 
 <script is:inline>
-  (function() {
-    var observed = false;
+  document.addEventListener('astro:page-load', function() {
     var bar = document.getElementById('stats-bar');
-    if (!bar) return;
+    if (!bar || bar.dataset.animated) return;
 
     var observer = new IntersectionObserver(function(entries) {
       entries.forEach(function(entry) {
-        if (entry.isIntersecting && !observed) {
-          observed = true;
+        if (entry.isIntersecting) {
+          bar.dataset.animated = '1';
           var nums = bar.querySelectorAll('.stat-number');
           nums.forEach(function(el) {
             var target = el.getAttribute('data-target') || '';
@@ -44,14 +43,13 @@ const { items } = Astro.props;
             if (!match) return;
             var end = parseInt(match[1], 10);
             var duration = 1200;
-            var start = 0;
             var startTime = null;
             var rest = target.slice(match[1].length);
             function animate(ts) {
               if (!startTime) startTime = ts;
               var progress = Math.min((ts - startTime) / duration, 1);
               var eased = 1 - Math.pow(1 - progress, 3);
-              var current = Math.round(start + (end - start) * eased);
+              var current = Math.round(end * eased);
               el.textContent = current + rest;
               if (progress < 1) requestAnimationFrame(animate);
             }
@@ -63,5 +61,5 @@ const { items } = Astro.props;
     }, { threshold: 0.3 });
 
     observer.observe(bar);
-  })();
+  });
 </script>

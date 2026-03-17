@@ -1,6 +1,7 @@
 ---
 import type { Lang } from '../../i18n/translations';
 import type { Project } from '../../data/projects';
+import { Code } from 'astro-expressive-code/components';
 
 interface Props {
   project: Project;
@@ -64,27 +65,7 @@ const homeHref = lang === "en" ? "/" : `/${lang}/`;
       {project.installCommand && (
         <div class="mb-10">
           <h2 class="text-lg font-semibold mb-4">{t["project.install"]}</h2>
-          <div
-            class="copy-block group/copy relative cursor-pointer overflow-hidden rounded-xl border border-border bg-surface transition-colors hover:border-accent/40"
-            data-command={project.installCommand}
-          >
-            <div class="flex items-center justify-between px-4 py-3 font-mono text-sm">
-              <div>
-                <span class="text-text-tertiary">$</span>{" "}
-                <span class="text-text">{project.installCommand}</span>
-              </div>
-              <div class="flex items-center gap-1.5 opacity-0 transition-opacity group-hover/copy:opacity-100">
-                <span class="copy-label text-[11px] text-text-tertiary" data-copied={t["ui.copied"]}>{t["ui.clickToCopy"]}</span>
-                <svg class="copy-icon h-4 w-4 text-text-tertiary transition-colors group-hover/copy:text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                </svg>
-                <svg class="check-icon hidden h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-            </div>
-          </div>
+          <Code code={project.installCommand} lang="bash" title="Terminal" />
         </div>
       )}
 
@@ -141,25 +122,7 @@ const homeHref = lang === "en" ? "/" : `/${lang}/`;
       {project.quickStart && (
         <div class="mb-10">
           <h2 class="text-lg font-semibold mb-4">{t["project.quickStart"]}</h2>
-          <div
-            class="copy-block group/copy relative cursor-pointer overflow-hidden rounded-xl border border-border bg-surface transition-colors hover:border-accent/40"
-            data-command={project.quickStart.code}
-          >
-            <div class="flex items-center justify-between border-b border-border px-4 py-2">
-              <span class="text-xs text-text-tertiary font-mono">{project.quickStart.filename}</span>
-              <div class="flex items-center gap-1.5 opacity-0 transition-opacity group-hover/copy:opacity-100">
-                <span class="copy-label text-[11px] text-text-tertiary" data-copied={t["ui.copied"]}>{t["ui.clickToCopy"]}</span>
-                <svg class="copy-icon h-4 w-4 text-text-tertiary transition-colors group-hover/copy:text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                </svg>
-                <svg class="check-icon hidden h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-            </div>
-            <pre class="p-4 text-sm font-mono overflow-x-auto leading-relaxed"><code set:html={project.quickStart.highlightedHtml} /></pre>
-          </div>
+          <Code code={project.quickStart.code} lang="python" title={project.quickStart.filename} />
         </div>
       )}
 
@@ -190,39 +153,6 @@ const homeHref = lang === "en" ? "/" : `/${lang}/`;
     </>
   )}
 </main>
-
-<script>
-  document.querySelectorAll<HTMLElement>('.copy-block').forEach((block) => {
-    block.addEventListener('click', async () => {
-      const command = block.dataset.command;
-      if (!command) return;
-      try {
-        await navigator.clipboard.writeText(command);
-      } catch {
-        const ta = document.createElement('textarea');
-        ta.value = command;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-      }
-      const label = block.querySelector('.copy-label') as HTMLElement | null;
-      const copyIcon = block.querySelector('.copy-icon') as HTMLElement | null;
-      const checkIcon = block.querySelector('.check-icon') as HTMLElement | null;
-      const originalText = label?.textContent || '';
-      if (label) label.textContent = label.dataset.copied || 'Copied!';
-      if (copyIcon) copyIcon.classList.add('hidden');
-      if (checkIcon) checkIcon.classList.remove('hidden');
-      setTimeout(() => {
-        if (label) label.textContent = originalText;
-        if (copyIcon) copyIcon.classList.remove('hidden');
-        if (checkIcon) checkIcon.classList.add('hidden');
-      }, 2000);
-    });
-  });
-</script>
 
 <script>
   // Lazy-load Mermaid only if a diagram exists on the page

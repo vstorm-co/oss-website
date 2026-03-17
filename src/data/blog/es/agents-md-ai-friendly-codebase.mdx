@@ -1,0 +1,217 @@
+---
+title: "AGENTS.md: Cómo hacer tu código amigable para agentes de IA (Copilot, Cursor, Codex, Claude Code)"
+description: "Cada herramienta de codificación con IA lee tu repositorio de manera diferente. Así es como AGENTS.md — el estándar emergente agnóstico — les da el contexto que necesitan."
+pubDate: 2026-03-18
+author: "Vstorm"
+lang: es
+translationKey: agents-md-ai-friendly-codebase
+tags: ["ai-agents", "developer-tools", "python", "fastapi", "open-source"]
+category: open-source
+draft: false
+---
+
+Tu README explica tu proyecto a humanos. Tu `.gitignore` le dice a Git qué omitir. Tu `pyproject.toml` le dice a Python cómo construir.
+
+Pero, ¿quién le dice a Copilot que no toque tus archivos de migración generados? ¿Quién le dice a Claude Code qué comando de prueba ejecutar? ¿Quién le dice a Cursor sobre tu patrón de repositorio donde `flush()` ocurre en la capa de repositorio, no `commit()`?
+
+Nadie. Y por eso los agentes de IA siguen cometiendo los mismos errores en tu base de código — reescribiendo archivos que no deberían, usando patrones que ya abandonaste, ejecutando los comandos incorrectos.
+
+La solución es un archivo que toma 15 minutos escribir. El ecosistema simplemente no se ha puesto de acuerdo en el nombre aún.
+
+## El problema: los agentes de IA son poderosos pero desconocen el contexto
+
+Cada herramienta importante de codificación con IA — [GitHub Copilot](https://github.com/features/copilot), [Cursor](https://cursor.sh/), [OpenAI Codex](https://openai.com/index/codex/), [Claude Code](https://docs.anthropic.com/en/docs/claude-code) — ahora puede leer, entender y modificar repositorios completos. Ya no es autocompletado de líneas individuales. Es refactorización de módulos, escritura de pruebas, creación de nuevas funciones a partir de descripciones en lenguaje natural.
+
+Pero hay una brecha: **entienden la sintaxis del código perfectamente y las convenciones del proyecto en absoluto.**
+
+Un agente de IA puede leer tu router de [FastAPI](https://fastapi.tiangolo.com/) y generar un nuevo endpoint. Pero no sabrá que tu equipo usa el patrón de repositorio, que las operaciones de base de datos pasan por una capa de servicio, que los schemas se dividen en variantes `Create`, `Update` y `Response`. No sabrá que `alembic/versions/` se genera automáticamente y nunca debe editarse a mano. No sabrá que tu proyecto usa `uv` en lugar de `pip`.
+
+¿El resultado? Pasas la mitad de tu tiempo revisando y corrigiendo código generado por IA que es sintácticamente correcto pero arquitectónicamente incorrecto.
+
+## El panorama: diferentes herramientas, diferentes archivos
+
+Esto es lo que cada herramienta de codificación con IA lee hoy:
+
+| Herramienta | Archivo de configuración | Alcance |
+|-------------|------------------------|---------|
+| **GitHub Copilot** | `.github/copilot-instructions.md` | Instrucciones a nivel de repo para Copilot Chat |
+| **Cursor** | `.cursor/rules/*.mdc` | Reglas de proyecto con coincidencia glob |
+| **Claude Code** | `CLAUDE.md` | Contexto del proyecto, comandos, arquitectura |
+| **OpenAI Codex** | `AGENTS.md` | Guía de proyecto legible por agentes |
+| **Zed** | (lee AGENTS.md) | Igual que Codex |
+
+Cada herramienta inventó su propio formato. Si tu equipo usa Copilot Y Cursor Y Claude Code (lo cual es cada vez más común), necesitarías tres archivos separados describiendo las mismas convenciones del proyecto.
+
+Aquí es donde entra `AGENTS.md`. Está emergiendo como el **estándar agnóstico de herramienta** — un solo archivo que cualquier agente de IA puede leer para entender tu base de código. GitHub Copilot, Codex y Zed ya lo buscan. Claude Code también lo lee (junto con `CLAUDE.md`). Cursor puede configurarse para incluirlo.
+
+Un archivo. Todas las herramientas.
+
+## Qué va en AGENTS.md
+
+Después de generar archivos AGENTS.md para docenas de proyectos, aquí está la estructura que funciona:
+
+### 1. Resumen del proyecto (2-3 líneas)
+
+Qué es el proyecto. Cuál es el stack. Nada más.
+
+```markdown
+## Project Overview
+
+**my-ai-app** — Aplicación FastAPI.
+
+**Stack:** FastAPI + Pydantic v2, PostgreSQL (async), JWT auth, Redis, PydanticAI, Next.js 15
+```
+
+### 2. Comandos (la sección más importante)
+
+Qué comandos ejecutar para pruebas, linting y construcción. Aquí es donde los agentes cometen más errores sin guía — ejecutan `pip install` en lugar de `uv sync`, o `npm` en lugar de `bun`.
+
+```bash
+# Backend
+cd backend
+uv run uvicorn app.main:app --reload --port 8000
+pytest
+ruff check . --fix && ruff format .
+
+# Base de datos
+uv run alembic upgrade head
+
+# Frontend
+cd frontend
+bun dev
+
+# Docker
+docker compose up -d
+```
+
+### 3. Estructura del proyecto
+
+Un árbol mostrando dónde están las cosas. No la salida completa de `tree` — solo los directorios que importan.
+
+```
+backend/app/
+├── api/routes/v1/    # Endpoints HTTP
+├── services/         # Lógica de negocio
+├── repositories/     # Acceso a datos
+├── schemas/          # Modelos Pydantic
+├── db/models/        # Modelos de base de datos
+├── agents/           # Agentes de IA
+└── commands/         # Comandos CLI
+```
+
+### 4. Convenciones clave
+
+La sección que ahorra más tiempo de revisión:
+
+```markdown
+## Key Conventions
+
+- Usar `db.flush()` en repositorios (no `commit`)
+- Los servicios lanzan excepciones de dominio (`NotFoundError`, `AlreadyExistsError`)
+- Schemas: modelos separados `Create`, `Update`, `Response`
+```
+
+### 5. Qué NO modificar
+
+Igualmente importante — dile a los agentes qué está prohibido:
+
+```markdown
+## Do Not Modify
+
+- `alembic/versions/` — migraciones auto-generadas
+- `frontend/node_modules/` — gestionado por bun
+- `.env` — secretos locales, nunca hacer commit
+```
+
+### 6. Referencias a documentación más profunda
+
+```markdown
+## More Info
+
+- `docs/architecture.md` — Detalles de arquitectura
+- `docs/adding_features.md` — Cómo agregar funciones
+- `docs/testing.md` — Guía de pruebas
+```
+
+## Ejemplo real: AGENTS.md auto-generado
+
+Aquí se pone meta.
+
+Nuestro [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template) es un CLI que genera proyectos [FastAPI](https://fastapi.tiangolo.com/) + [Next.js](https://nextjs.org/) listos para producción con más de 75 opciones de configuración — base de datos, auth, framework de IA ([Pydantic AI](https://ai.pydantic.dev/), [LangChain](https://python.langchain.com/), [LangGraph](https://langchain-ai.github.io/langgraph/), [CrewAI](https://docs.crewai.com/), DeepAgents), tareas en segundo plano, [Docker](https://docs.docker.com/), CI/CD.
+
+Cada proyecto generado incluye **tanto** `AGENTS.md` como `CLAUDE.md` — auto-generados según tus opciones de configuración.
+
+¿Elegiste PostgreSQL? La sección de comandos incluye comandos de migración de Alembic. ¿Habilitaste el agente de IA? La estructura del proyecto muestra el directorio `agents/`. ¿Elegiste JWT auth? La sección de variables de entorno incluye `SECRET_KEY`.
+
+El template usa condicionales Jinja2 para personalizar estos archivos:
+
+```jinja2
+**Stack:** FastAPI + Pydantic v2
+{%- if cookiecutter.use_postgresql %}, PostgreSQL (async){%- endif %}
+{%- if cookiecutter.use_jwt %}, JWT auth{%- endif %}
+{%- if cookiecutter.enable_redis %}, Redis{%- endif %}
+{%- if cookiecutter.enable_ai_agent and cookiecutter.use_pydantic_ai %}, PydanticAI{%- endif %}
+{%- if cookiecutter.use_frontend %}, Next.js 15{%- endif %}
+```
+
+No obtienes un AGENTS.md genérico — obtienes uno adaptado a tu stack exacto.
+
+**Estamos haciendo un template de agentes de IA que es amigable para otros agentes de IA.** Un template que genera apps construidas con frameworks de IA, y también genera los archivos que ayudan a los agentes de IA de codificación a trabajar con esas apps. Agentes en todos los niveles.
+
+## AGENTS.md vs. CLAUDE.md: ¿Necesitas ambos?
+
+Respuesta corta: sí, si usas Claude Code.
+
+`AGENTS.md` es agnóstico de herramienta. Cubre lo que cualquier agente de IA necesita: comandos, estructura, convenciones.
+
+`CLAUDE.md` es específico de Claude Code. Puede incluir instrucciones específicas de Claude como patrones de memoria, preferencias de herramientas y el modelo de interacción particular de Claude Code. Claude Code lee `CLAUDE.md` primero, luego `AGENTS.md` para contexto adicional.
+
+La superposición es intencional. Si un agente solo lee un archivo, obtiene suficiente contexto. Si lee ambos, obtiene el panorama completo.
+
+## Cómo agregar AGENTS.md a tu proyecto existente
+
+No necesitas un template. Aquí está la versión mínima para cualquier proyecto Python:
+
+```markdown
+# AGENTS.md
+
+## Project Overview
+[Nombre del proyecto] — [descripción de una línea].
+Stack: [lenguajes, frameworks, bases de datos]
+
+## Commands
+# Comandos de instalación / pruebas / lint aquí
+
+## Structure
+[árbol simplificado de directorios clave]
+
+## Conventions
+- [patrón 1]
+- [patrón 2]
+- [patrón 3]
+
+## Do Not Modify
+- [archivos generados]
+- [archivos lock]
+- [secretos]
+```
+
+Copia ese template, llena los espacios, haz commit. Cada herramienta de codificación con IA que lea tu repo se volverá inmediatamente más útil.
+
+## Conclusiones clave
+
+- **Los agentes de IA de codificación leen tu repo pero no entienden tus convenciones.** AGENTS.md llena esa brecha — estructura del proyecto, comandos, patrones y qué no tocar.
+- **Diferentes herramientas usan diferentes archivos** (`.github/copilot-instructions.md`, `.cursor/rules/`, `CLAUDE.md`), pero `AGENTS.md` está emergiendo como el estándar agnóstico de herramienta.
+- **Las secciones más impactantes son Commands y Conventions.** Estas previenen los errores más comunes de la IA: herramientas de construcción incorrectas y patrones arquitectónicos incorrectos.
+- **Toma 15 minutos escribirlo** y ahorra horas de revisar código generado por IA que rompe tus patrones.
+- **La auto-generación es posible** — nuestro template genera AGENTS.md y CLAUDE.md adaptados a la configuración exacta de cada proyecto.
+
+---
+
+**Pruébalo:** [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template) — genera apps FastAPI + Next.js de IA listas para producción con AGENTS.md y CLAUDE.md integrados
+
+```bash
+pip install fastapi-fullstack
+```
+
+[Todos los proyectos open-source de Vstorm](https://oss.vstorm.co) | [awesome-pydantic-ai](https://github.com/vstorm-co/awesome-pydantic-ai) | [vstorm.co](https://vstorm.co)

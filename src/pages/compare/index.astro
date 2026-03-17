@@ -5,6 +5,7 @@ import OssFooter from '../../components/oss/OssFooter.astro';
 import Breadcrumbs from '../../components/shared/Breadcrumbs.astro';
 import { translations, languages, defaultLang } from '../../i18n/translations';
 import { comparisonPages } from '../../data/compare-pages';
+import { collectionPageSchema, SITE_URL } from '../../lib/schemas';
 
 const lang = defaultLang;
 const t = translations[lang];
@@ -23,6 +24,7 @@ const alternates = [
   keywords="ai framework comparison, pydantic ai vs langchain, ai agent template comparison, python ai tools"
   lang={lang}
   alternates={alternates}
+  schemas={[collectionPageSchema({ name: t["compare.index.title"] ?? "Compare", description: t["compare.index.subtitle"] ?? "Side-by-side comparisons of AI agent frameworks, templates, and tools.", url: SITE_URL + "/compare/" })]}
 >
   <Navbar currentLang={lang} />
 
@@ -37,7 +39,7 @@ const alternates = [
       <h1 class="text-3xl font-bold tracking-tight sm:text-4xl heading-accent">
         {t["compare.index.title"] ?? "Compare"}
       </h1>
-      <p class="mt-4 text-text-secondary">
+      <p class="mt-4 text-lg text-text-secondary max-w-2xl mx-auto">
         {t["compare.index.subtitle"] ?? "Side-by-side comparisons of AI agent frameworks, templates, and tools."}
       </p>
     </div>

@@ -6,6 +6,7 @@ import BlogCard from '../../../components/blog/BlogCard.astro';
 import Breadcrumbs from '../../../components/shared/Breadcrumbs.astro';
 import { getCollection } from 'astro:content';
 import { translations, defaultLang } from '../../../i18n/translations';
+import { collectionPageSchema, SITE_URL } from '../../../lib/schemas';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => data.lang === 'en' && !data.draft);
@@ -39,6 +40,7 @@ const postCount = t["blog.tag.postCount"].replace("{count}", String(posts.length
   title={`${pageTitle} — Vstorm OSS`}
   description={`${postCount} tagged "${tag}"`}
   lang={lang}
+  schemas={[collectionPageSchema({ name: pageTitle, description: `${postCount} tagged "${tag}"`, url: SITE_URL + `/blog/tag/${tag}/` })]}
 >
   <Navbar currentLang={lang} />
   <Breadcrumbs items={[

@@ -1,0 +1,30 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import ProjectGrid from '../../components/oss/ProjectGrid.astro';
+import OssFooter from '../../components/oss/OssFooter.astro';
+import { translations, languages, defaultLang } from '../../i18n/translations';
+import { collectionPageSchema, SITE_URL } from '../../lib/schemas';
+
+const lang = defaultLang;
+const t = translations[lang];
+
+const alternates = [
+  { lang: "en", href: "/projects/" },
+  ...Object.keys(languages)
+    .filter((l) => l !== defaultLang)
+    .map((l) => ({ lang: l, href: `/${l}/projects/` })),
+];
+---
+
+<Layout
+  title={`${t["oss.projects.title"]} — Vstorm OSS`}
+  description={t["oss.projects.subtitle"]}
+  lang={lang}
+  alternates={alternates}
+  schemas={[collectionPageSchema({ name: t["oss.projects.title"], description: t["oss.projects.subtitle"], url: SITE_URL + "/projects/" })]}
+>
+  <Navbar currentLang={lang} />
+  <ProjectGrid lang={lang} t={t} />
+  <OssFooter t={t} />
+</Layout>

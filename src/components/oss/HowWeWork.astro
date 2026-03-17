@@ -27,25 +27,25 @@ const steps = [
 ];
 ---
 
-<section class="section-stack px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
+<section class="section-light-alt px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
   <div class="mx-auto max-w-5xl">
     <div class="reveal text-center mb-16">
       <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl heading-accent">{t["oss.howwework.title"]}</h2>
       <p class="mt-4 text-lg text-text-secondary">{t["oss.howwework.subtitle"]}</p>
     </div>
 
-    <div class="reveal-group grid gap-6 sm:grid-cols-3">
+    <div class="reveal-group grid gap-8 sm:grid-cols-3">
       {steps.map((step) => (
-        <div class="reveal glass-card rounded-2xl p-6 sm:p-8 text-center group hover:border-accent/30 transition-all">
-          <!-- Step number -->
-          <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-accent/10 border border-accent/20 text-accent mb-5 group-hover:bg-accent/20 transition-colors">
+        <div class="reveal rounded-2xl border border-border bg-white p-8 sm:p-10 text-center group hover:border-accent/30 shadow-sm hover:shadow-lg card-hover">
+          <!-- Step icon -->
+          <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-accent/10 border border-accent/20 text-accent mb-6 icon-hover">
             <Fragment set:html={step.icon} />
           </div>
 
           <!-- Number badge -->
-          <div class="text-xs font-bold text-accent/60 uppercase tracking-widest mb-2">Step {step.number}</div>
+          <div class="text-xs font-bold text-accent/60 uppercase tracking-widest mb-3">Step {step.number}</div>
 
-          <h3 class="text-lg font-semibold mb-2">{step.title}</h3>
+          <h3 class="text-xl font-semibold mb-3 group-hover:text-accent transition-colors">{step.title}</h3>
           <p class="text-sm text-text-secondary leading-relaxed">{step.description}</p>
         </div>
       ))}

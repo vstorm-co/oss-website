@@ -7,9 +7,10 @@
 </div>
 
 <script is:inline>
-  (function() {
+  document.addEventListener('astro:page-load', function() {
     var inner = document.getElementById('cursor-glow-inner');
-    if (!inner || window.matchMedia('(pointer: coarse)').matches) return;
+    if (!inner || inner.dataset.init || window.matchMedia('(pointer: coarse)').matches) return;
+    inner.dataset.init = '1';
     var x = -1000, y = -1000, cx = -1000, cy = -1000;
     var active = false;
 
@@ -32,5 +33,5 @@
         active = false;
       }
     }
-  })();
+  });
 </script>

@@ -2,6 +2,7 @@
 import LanguageSwitcher from './LanguageSwitcher.astro';
 import { translations, type Lang } from '../i18n/translations';
 import type { Project } from '../data/projects';
+import { projects, categories, getProjectsByCategory } from '../data/projects';
 
 interface Props {
   currentLang?: Lang;
@@ -16,23 +17,36 @@ const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith("/") ? rawBase : rawBase + "/";
 
 const homeHref = currentLang === "en" ? "/" : `/${currentLang}/`;
+const projectsHref = currentLang === "en" ? "/projects/" : `/${currentLang}/projects/`;
 const blogHref = currentLang === "en" ? "/blog/" : `/${currentLang}/blog/`;
 const compareHref = currentLang === "en" ? "/compare/" : `/${currentLang}/compare/`;
+const usecasesHref = currentLang === "en" ? "/use-cases/" : `/${currentLang}/use-cases/`;
+const guidesHref = currentLang === "en" ? "/guides/" : `/${currentLang}/guides/`;
+const toolsHref = currentLang === "en" ? "/tools/" : `/${currentLang}/tools/`;
 const aboutHref = currentLang === "en" ? "/about/" : `/${currentLang}/about/`;
 
 const pathname = Astro.url.pathname;
-const isProjects = pathname === '/' || /^\/[a-z]{2}\/?$/.test(pathname);
+const isProjects = pathname.includes('/projects');
 const isBlog = pathname.includes('/blog');
 const isCompare = pathname.includes('/compare');
+const isUseCases = pathname.includes('/use-cases');
+const isGuides = pathname.includes('/guides');
+const isTools = pathname.includes('/tools');
 const isAbout = pathname.includes('/about');
 
 const githubHref = project?.github
   ? `https://github.com/${project.github}`
   : "https://github.com/vstorm-co";
-const siteName = project ? project.name : "Vstorm OSS";
+
+// Mega-menu: featured projects + categories
+const featured = projects.filter((p) => p.hasCustomLanding && p.status === "released").slice(0, 2);
+const grouped = getProjectsByCategory(currentLang);
+
+const getProjectHref = (slug: string) =>
+  currentLang === "en" ? `/projects/${slug}/` : `/${currentLang}/projects/${slug}/`;
 ---
 
-<nav class="fixed top-3 left-3 right-3 sm:left-4 sm:right-4 z-40 mx-auto max-w-5xl rounded-2xl border border-white/[0.08] bg-bg/60 backdrop-blur-2xl shadow-xl shadow-black/20">
+<nav class="navbar-beam force-dark fixed left-3 right-3 sm:left-4 sm:right-4 z-40 mx-auto max-w-5xl rounded-2xl shadow-xl backdrop-blur-2xl" style="top: calc(0.75rem + var(--announcement-h, 0px))">
   <div class="flex items-center justify-between px-4 sm:px-6 h-14">
     <!-- Left: Logo -->
     <div class="flex items-center gap-2 min-w-0">
@@ -43,29 +57,62 @@ const siteName = project ? project.name : "Vstorm OSS";
     </div>
 
     <!-- Center: Links (hidden on mobile) -->
-    <div class="hidden md:flex items-center gap-0.5">
-      <a
-        href={homeHref}
-        aria-label={t["nav.projects"]}
-        class:list={["px-3.5 py-2 text-[13px] font-medium transition-colors rounded-xl hover:bg-white/[0.06]", isProjects ? "text-accent" : "text-text-secondary hover:text-text"]}
-      >
-        {t["nav.projects"]}
-      </a>
+    <div class="hidden lg:flex items-center gap-0.5">
+      <!-- Projects dropdown trigger -->
+      <div class="relative" id="projects-dropdown-trigger">
+        <button
+          type="button"
+          data-nav-section="projects"
+          class:list={["flex items-center gap-1 px-2 py-2 text-xs font-medium whitespace-nowrap transition-colors rounded-xl hover:bg-white/[0.06] cursor-pointer", isProjects ? "text-accent" : "text-text-secondary hover:text-text"]}
+          aria-expanded="false"
+          aria-haspopup="true"
+        >
+          {t["nav.projects"]}
+          <svg class="w-3.5 h-3.5 transition-transform duration-200" id="projects-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+          </svg>
+        </button>
+      </div>
+
       <a
         href={blogHref}
-        class:list={["px-3.5 py-2 text-[13px] font-medium transition-colors rounded-xl hover:bg-white/[0.06]", isBlog ? "text-accent" : "text-text-secondary hover:text-text"]}
+        data-nav-section="blog"
+        class:list={["px-2 py-2 text-xs font-medium whitespace-nowrap transition-colors rounded-xl hover:bg-white/[0.06]", isBlog ? "text-accent" : "text-text-secondary hover:text-text"]}
       >
         {t["nav.blog"]}
       </a>
       <a
+        href={usecasesHref}
+        data-nav-section="use-cases"
+        class:list={["px-2 py-2 text-xs font-medium whitespace-nowrap transition-colors rounded-xl hover:bg-white/[0.06]", isUseCases ? "text-accent" : "text-text-secondary hover:text-text"]}
+      >
+        {t["nav.usecases"] ?? "Use Cases"}
+      </a>
+      <a
+        href={guidesHref}
+        data-nav-section="guides"
+        class:list={["px-2 py-2 text-xs font-medium whitespace-nowrap transition-colors rounded-xl hover:bg-white/[0.06]", isGuides ? "text-accent" : "text-text-secondary hover:text-text"]}
+      >
+        {t["nav.guides"] ?? "Guides"}
+      </a>
+      <a
+        href={toolsHref}
+        data-nav-section="tools"
+        class:list={["px-2 py-2 text-xs font-medium whitespace-nowrap transition-colors rounded-xl hover:bg-white/[0.06]", isTools ? "text-accent" : "text-text-secondary hover:text-text"]}
+      >
+        {t["nav.tools"] ?? "Free Tools"}
+      </a>
+      <a
         href={compareHref}
-        class:list={["px-3.5 py-2 text-[13px] font-medium transition-colors rounded-xl hover:bg-white/[0.06]", isCompare ? "text-accent" : "text-text-secondary hover:text-text"]}
+        data-nav-section="compare"
+        class:list={["px-2 py-2 text-xs font-medium whitespace-nowrap transition-colors rounded-xl hover:bg-white/[0.06]", isCompare ? "text-accent" : "text-text-secondary hover:text-text"]}
       >
         {t["nav.compare"] ?? "Compare"}
       </a>
       <a
         href={aboutHref}
-        class:list={["px-3.5 py-2 text-[13px] font-medium transition-colors rounded-xl hover:bg-white/[0.06]", isAbout ? "text-accent" : "text-text-secondary hover:text-text"]}
+        data-nav-section="about"
+        class:list={["px-2 py-2 text-xs font-medium whitespace-nowrap transition-colors rounded-xl hover:bg-white/[0.06]", isAbout ? "text-accent" : "text-text-secondary hover:text-text"]}
       >
         {t["nav.about"]}
       </a>
@@ -77,7 +124,7 @@ const siteName = project ? project.name : "Vstorm OSS";
         href={githubHref}
         target="_blank"
         rel="noopener noreferrer"
-        class="hidden md:flex items-center justify-center w-9 h-9 rounded-xl text-text-secondary hover:text-text hover:bg-white/[0.06] transition-colors"
+        class="hidden lg:flex items-center justify-center w-9 h-9 rounded-xl text-text-secondary hover:text-text hover:bg-white/[0.06] transition-colors"
         aria-label="GitHub"
       >
         <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
@@ -86,15 +133,15 @@ const siteName = project ? project.name : "Vstorm OSS";
         href="https://vstorm.co/contact-us/"
         target="_blank"
         rel="noopener noreferrer"
-        class="hidden md:inline-flex items-center rounded-full bg-accent px-4 py-1.5 text-[13px] font-semibold text-white transition-all hover:bg-accent-hover hover:shadow-lg hover:shadow-accent/20"
+        class="hidden lg:inline-flex items-center rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-white whitespace-nowrap transition-all hover:bg-accent-hover hover:shadow-lg hover:shadow-accent/20"
       >
         {t["footer.cta.button"]}
       </a>
-      {showLang && <div class="hidden md:block"><LanguageSwitcher currentLang={currentLang} pathSuffix={pathSuffix} /></div>}
+      {showLang && <div class="hidden lg:block"><LanguageSwitcher currentLang={currentLang} pathSuffix={pathSuffix} /></div>}
       <!-- Hamburger (mobile only) -->
       <button
         id="mobile-menu-btn"
-        class="md:hidden flex items-center justify-center w-9 h-9 rounded-xl text-text-secondary hover:text-text hover:bg-white/[0.06] transition-colors"
+        class="lg:hidden flex items-center justify-center w-9 h-9 rounded-xl text-text-secondary hover:text-text hover:bg-white/[0.06] transition-colors"
         aria-label="Open menu"
       >
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -103,11 +150,106 @@ const siteName = project ? project.name : "Vstorm OSS";
       </button>
     </div>
   </div>
+
+  <!-- Projects Mega Menu -->
+  <div
+    id="projects-mega-menu"
+    class="mega-menu force-dark hidden absolute left-0 right-0 top-full mt-2 mx-3 sm:mx-4 rounded-2xl border border-white/[0.08] bg-[#18181b] shadow-2xl overflow-hidden"
+  >
+    <div class="p-5 sm:p-6">
+      <!-- Featured row -->
+      <div class="grid gap-4 sm:grid-cols-2 mb-5">
+        {featured.map((p) => (
+          <a
+            href={getProjectHref(p.slug)}
+            class="group flex gap-4 rounded-xl border border-border p-4 transition-all hover:border-accent/40 hover:shadow-md card-hover"
+          >
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent icon-hover">
+              {p.slug === "full-stack-ai-agent-template" ? (
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z" /></svg>
+              ) : (
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" /></svg>
+              )}
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-semibold group-hover:text-accent transition-colors">{p.name}</span>
+                <svg class="w-3.5 h-3.5 text-text-tertiary transition-transform group-hover:translate-x-0.5 group-hover:text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+              </div>
+              <p class="mt-0.5 text-xs text-text-tertiary leading-relaxed line-clamp-2">{p.tagline[currentLang]}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      <!-- Categories — CSS columns for balanced heights -->
+      <div class="sm:columns-3 gap-x-6 border-t border-border pt-5 [column-fill:balance]">
+        {grouped.map((group) => (
+          <div class="mb-4 break-inside-avoid">
+            <h4 class="text-[11px] font-bold uppercase tracking-wider text-text-tertiary mb-2.5">
+              <span class="text-accent mr-1">&#10095;</span>{group.label[currentLang]}
+            </h4>
+            <ul class="space-y-1">
+              {group.projects.filter(p => p.status === "released").slice(0, 5).map((p) => (
+                <li>
+                  <a
+                    href={getProjectHref(p.slug)}
+                    class="group/item flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px] text-text-secondary hover:text-text hover:bg-white/[0.05] transition-colors"
+                  >
+                    <span class="truncate">{p.name}</span>
+                    <svg class="w-3 h-3 shrink-0 text-text-tertiary opacity-0 -translate-x-1 transition-all group-hover/item:opacity-100 group-hover/item:translate-x-0 group-hover/item:text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+
+        <!-- Compare & links -->
+        <div class="mb-4 break-inside-avoid">
+          <h4 class="text-[11px] font-bold uppercase tracking-wider text-text-tertiary mb-2.5">
+            <span class="text-accent mr-1">&#10095;</span>{t["nav.compare"] ?? "Compare"}
+          </h4>
+          <ul class="space-y-1">
+            <li>
+              <a
+                href={compareHref}
+                class="group/item flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px] text-text-secondary hover:text-text hover:bg-white/[0.05] transition-colors"
+              >
+                <span>Framework Comparisons</span>
+                <svg class="w-3 h-3 shrink-0 text-text-tertiary opacity-0 -translate-x-1 transition-all group-hover/item:opacity-100 group-hover/item:translate-x-0 group-hover/item:text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+              </a>
+            </li>
+            <li>
+              <a
+                href={usecasesHref}
+                class="group/item flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px] text-text-secondary hover:text-text hover:bg-white/[0.05] transition-colors"
+              >
+                <span>{t["nav.usecases"] ?? "Use Cases"}</span>
+                <svg class="w-3 h-3 shrink-0 text-text-tertiary opacity-0 -translate-x-1 transition-all group-hover/item:opacity-100 group-hover/item:translate-x-0 group-hover/item:text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- View All Projects CTA -->
+      <div class="mt-5 border-t border-border pt-4">
+        <a
+          href={projectsHref}
+          class="flex items-center justify-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-[13px] font-semibold text-white transition-all hover:bg-accent-hover hover:shadow-lg hover:shadow-accent/20 group/all"
+        >
+          {t["oss.projects.viewAll"] ?? "View All Projects"}
+          <svg class="w-3.5 h-3.5 transition-transform group-hover/all:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+        </a>
+      </div>
+    </div>
+  </div>
 </nav>
 
 <!-- Mobile Sidebar -->
-<div id="mobile-sidebar-overlay" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-md hidden" aria-hidden="true">
-  <div id="mobile-sidebar" class="fixed top-0 right-0 h-full w-72 bg-bg/80 backdrop-blur-2xl border-l border-white/[0.08] shadow-2xl translate-x-full transition-transform duration-200 ease-out">
+<div id="mobile-sidebar-overlay" class="fixed inset-0 z-50 bg-black/20 backdrop-blur-md hidden" aria-hidden="true">
+  <div id="mobile-sidebar" class="force-dark fixed top-0 right-0 h-full w-72 bg-[#18181b] border-l border-white/[0.08] shadow-2xl translate-x-full transition-transform duration-200 ease-out">
     <!-- Header -->
     <div class="flex items-center justify-between px-4 h-14 border-b border-border/50">
       <span class="text-sm font-semibold tracking-tight">Menu</span>
@@ -124,7 +266,8 @@ const siteName = project ? project.name : "Vstorm OSS";
     <!-- Links -->
     <div class="flex flex-col p-4 gap-1">
       <a
-        href={homeHref}
+        href={projectsHref}
+        data-nav-section="projects"
         class:list={["flex items-center gap-3 px-3 py-2.5 text-sm transition-colors rounded-lg hover:bg-surface-hover", isProjects ? "text-accent" : "text-text-secondary hover:text-text"]}
       >
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -134,6 +277,7 @@ const siteName = project ? project.name : "Vstorm OSS";
       </a>
       <a
         href={blogHref}
+        data-nav-section="blog"
         class:list={["flex items-center gap-3 px-3 py-2.5 text-sm transition-colors rounded-lg hover:bg-surface-hover", isBlog ? "text-accent" : "text-text-secondary hover:text-text"]}
       >
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -142,7 +286,38 @@ const siteName = project ? project.name : "Vstorm OSS";
         {t["nav.blog"]}
       </a>
       <a
+        href={usecasesHref}
+        data-nav-section="use-cases"
+        class:list={["flex items-center gap-3 px-3 py-2.5 text-sm transition-colors rounded-lg hover:bg-surface-hover", isUseCases ? "text-accent" : "text-text-secondary hover:text-text"]}
+      >
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/>
+        </svg>
+        {t["nav.usecases"] ?? "Use Cases"}
+      </a>
+      <a
+        href={guidesHref}
+        data-nav-section="guides"
+        class:list={["flex items-center gap-3 px-3 py-2.5 text-sm transition-colors rounded-lg hover:bg-surface-hover", isGuides ? "text-accent" : "text-text-secondary hover:text-text"]}
+      >
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/>
+        </svg>
+        {t["nav.guides"] ?? "Guides"}
+      </a>
+      <a
+        href={toolsHref}
+        data-nav-section="tools"
+        class:list={["flex items-center gap-3 px-3 py-2.5 text-sm transition-colors rounded-lg hover:bg-surface-hover", isTools ? "text-accent" : "text-text-secondary hover:text-text"]}
+      >
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.049.58.025 1.193-.14 1.743"/>
+        </svg>
+        {t["nav.tools"] ?? "Free Tools"}
+      </a>
+      <a
         href={compareHref}
+        data-nav-section="compare"
         class:list={["flex items-center gap-3 px-3 py-2.5 text-sm transition-colors rounded-lg hover:bg-surface-hover", isCompare ? "text-accent" : "text-text-secondary hover:text-text"]}
       >
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -152,6 +327,7 @@ const siteName = project ? project.name : "Vstorm OSS";
       </a>
       <a
         href={aboutHref}
+        data-nav-section="about"
         class:list={["flex items-center gap-3 px-3 py-2.5 text-sm transition-colors rounded-lg hover:bg-surface-hover", isAbout ? "text-accent" : "text-text-secondary hover:text-text"]}
       >
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -180,30 +356,124 @@ const siteName = project ? project.name : "Vstorm OSS";
   </div>
 </div>
 
-<!-- Spacer so content isn't hidden behind fixed navbar -->
-<div class="h-[5rem]"></div>
+<!-- Spacer so content isn't hidden behind fixed navbar + announcement bar -->
+<div style="height: calc(5rem + var(--announcement-h, 0px))"></div>
 
-<script>
-  const btn = document.getElementById('mobile-menu-btn');
-  const closeBtn = document.getElementById('mobile-menu-close');
-  const overlay = document.getElementById('mobile-sidebar-overlay');
-  const sidebar = document.getElementById('mobile-sidebar');
-
-  function open() {
-    overlay?.classList.remove('hidden');
-    requestAnimationFrame(() => {
-      sidebar?.classList.remove('translate-x-full');
+<script is:inline>
+  document.addEventListener('astro:page-load', function() {
+    // Update active nav state based on current URL
+    var path = window.location.pathname;
+    document.querySelectorAll('[data-nav-section]').forEach(function(el) {
+      var section = el.dataset.navSection;
+      var active = path.includes('/' + section);
+      el.classList.toggle('text-accent', active);
+      el.classList.toggle('text-text-secondary', !active);
     });
-  }
 
-  function close() {
-    sidebar?.classList.add('translate-x-full');
-    setTimeout(() => overlay?.classList.add('hidden'), 200);
-  }
+    // Mobile menu
+    var btn = document.getElementById('mobile-menu-btn');
+    var closeBtn = document.getElementById('mobile-menu-close');
+    var overlay = document.getElementById('mobile-sidebar-overlay');
+    var sidebar = document.getElementById('mobile-sidebar');
 
-  btn?.addEventListener('click', open);
-  closeBtn?.addEventListener('click', close);
-  overlay?.addEventListener('click', (e) => {
-    if (e.target === overlay) close();
+    function openMobile() {
+      overlay?.classList.remove('hidden');
+      requestAnimationFrame(function() {
+        sidebar?.classList.remove('translate-x-full');
+      });
+    }
+
+    function closeMobile() {
+      sidebar?.classList.add('translate-x-full');
+      setTimeout(function() { overlay?.classList.add('hidden'); }, 200);
+    }
+
+    btn?.addEventListener('click', openMobile);
+    closeBtn?.addEventListener('click', closeMobile);
+    overlay?.addEventListener('click', function(e) {
+      if (e.target === overlay) closeMobile();
+    });
+
+    // Projects mega menu
+    var trigger = document.getElementById('projects-dropdown-trigger');
+    var menu = document.getElementById('projects-mega-menu');
+    var chevron = document.getElementById('projects-chevron');
+    if (!trigger || !menu) return;
+
+    var openTimer = null;
+    var closeTimer = null;
+
+    function showMenu() {
+      clearTimeout(closeTimer);
+      openTimer = setTimeout(function() {
+        menu.classList.remove('hidden');
+        // Trigger reflow then animate
+        menu.offsetHeight;
+        menu.classList.add('mega-menu-open');
+        if (chevron) chevron.style.transform = 'rotate(180deg)';
+        trigger.querySelector('button')?.setAttribute('aria-expanded', 'true');
+      }, 80);
+    }
+
+    function hideMenu() {
+      clearTimeout(openTimer);
+      closeTimer = setTimeout(function() {
+        menu.classList.remove('mega-menu-open');
+        if (chevron) chevron.style.transform = '';
+        trigger.querySelector('button')?.setAttribute('aria-expanded', 'false');
+        setTimeout(function() {
+          if (!menu.classList.contains('mega-menu-open')) {
+            menu.classList.add('hidden');
+          }
+        }, 200);
+      }, 150);
+    }
+
+    trigger.addEventListener('mouseenter', showMenu);
+    trigger.addEventListener('mouseleave', hideMenu);
+    menu.addEventListener('mouseenter', function() { clearTimeout(closeTimer); });
+    menu.addEventListener('mouseleave', hideMenu);
+
+    // Also handle click on trigger button to navigate
+    trigger.querySelector('button')?.addEventListener('click', function() {
+      if (menu.classList.contains('mega-menu-open')) {
+        hideMenu();
+      } else {
+        showMenu();
+      }
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && menu.classList.contains('mega-menu-open')) {
+        hideMenu();
+      }
+    });
+
+    // Close on click outside
+    document.addEventListener('click', function(e) {
+      if (!trigger.contains(e.target) && !menu.contains(e.target)) {
+        clearTimeout(openTimer);
+        menu.classList.remove('mega-menu-open');
+        if (chevron) chevron.style.transform = '';
+        menu.classList.add('hidden');
+      }
+    });
   });
 </script>
+
+<style>
+  .mega-menu {
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+  }
+
+  .mega-menu.mega-menu-open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+</style>

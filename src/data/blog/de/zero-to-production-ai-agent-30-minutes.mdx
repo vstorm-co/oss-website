@@ -1,0 +1,257 @@
+---
+title: "Von 0 zum produktionsreifen KI-Agenten in 30 Minuten — Full-Stack-Template mit 5 KI-Frameworks"
+description: "Schritt-fuer-Schritt-Anleitung: Web-Konfigurator, Preset waehlen, KI-Framework auswaehlen, 75+ Optionen konfigurieren, docker-compose up — fertige Produktions-KI-App."
+pubDate: 2026-03-16
+author: "Vstorm"
+lang: de
+translationKey: zero-to-production-ai-agent-30-minutes
+tags: ["ai-agents", "fastapi", "full-stack", "python", "pydantic-ai"]
+category: open-source
+draft: false
+---
+
+Jedes KI-Projekt beginnt gleich.
+
+Du brauchst ein FastAPI-Backend. Dann Authentifizierung — JWT-Tokens, Refresh-Logik, Benutzerverwaltung. Dann eine Datenbank — PostgreSQL, Migrationen, asynchrone Verbindungen. Dann WebSocket-Streaming fuer KI-Antworten in Echtzeit. Dann ein Frontend — Next.js, State Management, Chat-UI. Dann Docker. Dann CI/CD.
+
+Drei Tage Boilerplate, bevor du eine einzige Zeile KI-Code schreibst.
+
+Ich habe diesen Stack oefter von Grund auf aufgesetzt, als mir lieb ist. Nach dem dritten Projekt, bei dem ich dieselbe Auth-Middleware, denselben WebSocket-Handler, dieselbe Docker-Compose-Konfiguration kopiert habe — entschied ich mich, einen Generator zu bauen, der alles mit einem Befehl erledigt.
+
+Das Ergebnis: [full-stack-ai-agent-template](https://github.com/vstorm.co/projects/full-stack-ai-agent-template) — ein Open-Source Full-Stack-Template mit 5 KI-Frameworks, 75+ Konfigurationsoptionen und einem Web-Konfigurator, der dein gesamtes Projekt in Minuten generiert.
+
+614 Sterne auf GitHub. Genutzt von Teams bei NVIDIA, Pfizer, TikTok und anderen. Und du kannst von null zu einem laufenden produktionsreifen KI-Agenten in etwa 30 Minuten gelangen.
+
+Lass mich dir genau zeigen, wie.
+
+---
+
+*Ich bin Kacper, KI-Ingenieur bei [Vstorm](https://vstorm.co) — einer Applied Agentic AI Engineering Consultancy. Wir haben 30+ produktionsreife KI-Agent-Implementierungen ausgeliefert und stellen unsere Tools als Open-Source unter [github.com/vstorm-co](https://github.com/vstorm-co) bereit. Verbinde dich mit mir auf [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+
+---
+
+## Schritt 1: Oeffne den Web-Konfigurator
+
+Gehe zu [oss.vstorm.co/projects/full-stack-ai-agent-template/configurator/](https://oss.vstorm.co/projects/full-stack-ai-agent-template/configurator/).
+
+Keine CLI-Installation noetig. Kein pip. Nur ein Browser.
+
+Der Konfigurator bietet dir eine visuelle Oberflaeche, um jede Option fuer dein Projekt auszuwaehlen. Datenbank, Auth, KI-Framework, Hintergrundaufgaben, Observability, Frontend — alles. Du siehst die vollstaendige Konfiguration, bevor du etwas generierst.
+
+Alternativ, wenn du das Terminal bevorzugst:
+
+```bash
+pip install fastapi-fullstack
+fastapi-fullstack
+```
+
+Dies startet den interaktiven Assistenten, der dich durch dieselben Optionen fuehrt.
+
+## Schritt 2: Waehle ein Preset (oder konfiguriere individuell)
+
+Das Template kommt mit drei Presets fuer die haeufigsten Anwendungsfaelle:
+
+| Preset | Was du bekommst |
+|--------|----------------|
+| `--minimal` | Reines FastAPI — keine Datenbank, kein Auth, keine Extras |
+| `--preset ai-agent` | PostgreSQL + JWT Auth + KI-Agent + WebSocket-Streaming + Konversationsspeicherung + Redis |
+| `--preset production` | Volle Produktionskonfiguration — Redis, Caching, Rate Limiting, Sentry, Prometheus, Kubernetes |
+
+Fuer diese Anleitung verwende ich das **AI Agent**-Preset mit Pydantic AI — der haeufigste Startpunkt fuer KI-Anwendungen:
+
+```bash
+fastapi-fullstack create my_ai_app \
+  --preset ai-agent \
+  --ai-framework pydantic_ai \
+  --frontend nextjs
+```
+
+Dieser einzelne Befehl generiert ein Full-Stack-Projekt mit:
+- FastAPI-Backend mit async PostgreSQL
+- JWT-Authentifizierung mit Benutzerverwaltung
+- Pydantic AI Agent mit WebSocket-Streaming
+- Konversationsspeicherung (Chat-Verlauf in der DB)
+- Redis fuer Caching und Sessions
+- Next.js 15 Frontend mit React 19 und Tailwind CSS v4
+- Docker Compose fuer den gesamten Stack
+- GitHub Actions CI/CD
+- Logfire Observability
+
+## Schritt 3: Schau dir an, was du bekommen hast
+
+Das generierte Projekt folgt einer sauberen Schichtarchitektur — Repository + Service Pattern, inspiriert von echten Produktions-Codebases:
+
+```
+my_ai_app/
+├── backend/
+│   ├── app/
+│   │   ├── main.py              # FastAPI App mit Lifespan
+│   │   ├── api/routes/v1/       # Versionierte API-Endpunkte
+│   │   ├── core/                # Konfiguration, Sicherheit, Middleware
+│   │   ├── db/models/           # SQLAlchemy-Modelle
+│   │   ├── schemas/             # Pydantic-Schemas
+│   │   ├── repositories/        # Datenzugriffsschicht
+│   │   ├── services/            # Geschaeftslogik
+│   │   ├── agents/              # KI-Agenten (hier kommt dein Code hin)
+│   │   └── commands/            # Django-style CLI-Befehle
+│   ├── cli/                     # Projekt-CLI
+│   ├── tests/                   # pytest Test-Suite
+│   └── alembic/                 # Datenbank-Migrationen
+├── frontend/
+│   ├── src/
+│   │   ├── app/                 # Next.js App Router
+│   │   ├── components/          # React-Komponenten (Chat-UI inklusive)
+│   │   ├── hooks/               # useChat, useWebSocket
+│   │   └── stores/              # Zustand State Management
+├── docker-compose.yml
+├── Makefile
+├── CLAUDE.md                    # KI-Coding-Assistent-Kontext
+└── AGENTS.md                    # Multi-Agent-Projektleitfaden
+```
+
+Beachte die `CLAUDE.md`- und `AGENTS.md`-Dateien — das generierte Projekt ist fuer KI-Coding-Assistenten wie Claude Code, Cursor und Copilot optimiert.
+
+## Schritt 4: Starte alles mit Docker
+
+```bash
+cd my_ai_app
+make docker-up        # Backend + PostgreSQL + Redis
+make docker-frontend  # Next.js Frontend
+```
+
+Das war's. Zwei Befehle. Der gesamte Stack laeuft:
+
+- **API**: http://localhost:8000
+- **API-Docs**: http://localhost:8000/docs
+- **Frontend**: http://localhost:3000
+- **Admin-Panel**: http://localhost:8000/admin
+
+Wenn du lieber ohne Docker arbeitest, generiert das Template ein Makefile mit Abkuerzungen:
+
+```bash
+make install       # Python + Node Abhaengigkeiten installieren
+make docker-db     # Nur PostgreSQL starten
+make db-migrate    # Initiale Migration erstellen
+make db-upgrade    # Migrationen anwenden
+make create-admin  # Admin-Benutzer erstellen
+make run           # Backend starten
+cd frontend && bun dev  # Frontend starten
+```
+
+## Schritt 5: Dein KI-Agent funktioniert bereits
+
+Oeffne `http://localhost:3000`, melde dich an und starte einen Chat. Der KI-Agent ist bereits verdrahtet — WebSocket-Streaming, Konversationsverlauf, Tool-Aufrufe — alles funktioniert sofort.
+
+So sieht der generierte Agent aus:
+
+```python
+# app/agents/assistant.py
+from pydantic_ai import Agent, RunContext
+from dataclasses import dataclass
+
+@dataclass
+class Deps:
+    user_id: str | None = None
+    db: AsyncSession | None = None
+
+agent = Agent[Deps, str](
+    model="openai:gpt-4o-mini",
+    system_prompt="You are a helpful assistant.",
+)
+
+@agent.tool
+async def search_database(ctx: RunContext[Deps], query: str) -> list[dict]:
+    """Search the database for relevant information."""
+    # Access user context and database via ctx.deps
+    ...
+```
+
+Type-safe. Eingebaute Dependency Injection. Tool-Aufrufe mit vollem Kontextzugriff. Das ist kein Spielzeugbeispiel — es ist dasselbe Muster, das wir in der Produktion bei Vstorm verwenden.
+
+## Schritt 6: Passe die KI-Schicht an
+
+Die zentrale Erkenntnis: **Alles ausser dem KI-Agenten ist produktionsreife Infrastruktur, die du nicht anfassen musst**. Auth funktioniert. Datenbank funktioniert. Streaming funktioniert. Frontend funktioniert.
+
+Du aenderst ein Verzeichnis: `app/agents/`.
+
+Von OpenAI zu Anthropic wechseln? Aktualisiere den Model-String:
+
+```python
+agent = Agent[Deps, str](
+    model="anthropic:claude-sonnet-4-5",
+    system_prompt="You are a helpful assistant.",
+)
+```
+
+Ein Tool hinzufuegen? Fuege eine Funktion hinzu:
+
+```python
+@agent.tool
+async def get_weather(ctx: RunContext[Deps], city: str) -> str:
+    """Get current weather for a city."""
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(f"https://api.weather.com/{city}")
+        return resp.json()["summary"]
+```
+
+Komplett zu LangChain oder CrewAI wechseln? Generiere das Projekt mit einer anderen `--ai-framework`-Flag neu. Der Rest des Stacks bleibt gleich.
+
+## 5 KI-Frameworks, ein Template
+
+Das Template unterstuetzt fuenf KI-Frameworks, alle mit derselben Backend-Infrastruktur:
+
+| Framework | Am besten fuer | Observability |
+|-----------|---------------|--------------|
+| **Pydantic AI** | Type-safe Agenten, Dependency Injection | Logfire |
+| **LangChain** | Chains, bestehende LangChain-Tools | LangSmith |
+| **LangGraph** | Komplexe mehrstufige Workflows, ReAct-Agenten | LangSmith |
+| **CrewAI** | Multi-Agent-Crews, rollenbasierte Agenten | LangSmith |
+| **DeepAgents** | Agentisches Coding im Claude-Code-Stil, HITL | LangSmith |
+
+```bash
+# Mit LangGraph generieren
+fastapi-fullstack create my_app --preset ai-agent --ai-framework langgraph --frontend nextjs
+
+# Mit CrewAI generieren
+fastapi-fullstack create my_app --preset ai-agent --ai-framework crewai --frontend nextjs
+```
+
+## 75+ Konfigurationsoptionen
+
+Ueber KI-Frameworks hinaus deckt das Template das volle Spektrum an Produktionsanforderungen ab:
+
+**Datenbanken:** PostgreSQL (async), MongoDB (async), SQLite
+**ORMs:** SQLAlchemy, SQLModel
+**Auth:** JWT + Refresh-Tokens, API-Keys, Google OAuth
+**Hintergrundaufgaben:** Celery, Taskiq, ARQ
+**Observability:** Logfire, LangSmith, Sentry, Prometheus
+**Infrastruktur:** Docker, Kubernetes, GitHub Actions, GitLab CI, Traefik, Nginx
+**Frontend:** Next.js 15 mit React 19, TypeScript, Tailwind CSS v4, Dark Mode, i18n
+**Extras:** Redis-Caching, Rate Limiting, SQLAdmin-Panel, Webhooks, S3 File Storage, RAG mit Milvus
+
+## Wichtigste Erkenntnisse
+
+- **Der Web-Konfigurator auf [oss.vstorm.co](https://oss.vstorm.co/projects/full-stack-ai-agent-template/configurator/) ermoeglicht es, ein Full-Stack-KI-Projekt visuell zu konfigurieren und herunterzuladen** — kein CLI noetig.
+- **Drei Presets (minimal, ai-agent, production) decken 90% der Anwendungsfaelle ab** — von dort aus anpassen.
+- **5 KI-Frameworks teilen sich dieselbe Infrastruktur** — Frameworks wechseln ohne Backend-Neuschreibung.
+- **Der generierte Code ist produktionsreif, kein Prototyp** — Schichtarchitektur, async ueberall, type-safe.
+- **Du aenderst `app/agents/` und nichts anderes** — Auth, Streaming, Persistenz, Frontend sind fertig.
+
+---
+
+## Probiere es selbst aus
+
+[full-stack-ai-agent-template](https://github.com/vstorm.co/projects/full-stack-ai-agent-template) — Produktionsreifes Full-Stack KI-Agent-Template mit 5 Frameworks und 75+ Optionen.
+
+```bash
+pip install fastapi-fullstack
+```
+
+Oder nutze den [Web-Konfigurator](https://oss.vstorm.co/projects/full-stack-ai-agent-template/configurator/) — keine Installation noetig.
+
+**Mehr aus dem Open-Source-Oekosystem von Vstorm:**
+- [Alle unsere Open-Source-Projekte](https://oss.vstorm.co) — 13 Pakete fuer das Pydantic AI Oekosystem
+- [awesome-pydantic-ai](https://github.com/vstorm-co/awesome-pydantic-ai) — kuratierte Liste von Pydantic AI Ressourcen und Tools
+- [vstorm.co](https://vstorm.co) — unsere Beratung (30+ KI-Agent-Implementierungen)
+
+Wenn das hilfreich war, folge mir auf [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/) fuer taegliche KI-Agent-Insights.

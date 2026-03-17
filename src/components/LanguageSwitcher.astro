@@ -44,10 +44,9 @@ function getLangHref(targetLang: string): string {
 }
 ---
 
-<div class="relative" id="lang-switcher">
+<div class="relative lang-switcher">
   <button
-    id="lang-btn"
-    class="flex items-center gap-1.5 rounded-xl border border-border hover:border-border-hover bg-surface px-3 py-2 text-xs font-medium text-text-secondary transition-all cursor-pointer"
+    class="lang-btn flex items-center gap-1.5 rounded-xl border border-border hover:border-border-hover bg-surface px-3 py-2 text-xs font-medium text-text-secondary transition-all cursor-pointer"
     aria-label={`${languages[currentLang]} — Switch language`}
   >
     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -58,8 +57,7 @@ function getLangHref(targetLang: string): string {
   </button>
 
   <div
-    id="lang-dropdown"
-    class="absolute right-0 top-full mt-1 hidden min-w-[120px] rounded-xl border border-border bg-surface shadow-xl shadow-black/20 overflow-hidden"
+    class="lang-dropdown absolute right-0 top-full mt-1 hidden min-w-[120px] rounded-xl border border-border bg-surface shadow-xl shadow-black/20 overflow-hidden"
   >
     {Object.entries(languages).map(([code, label]) => (
       <a
@@ -77,18 +75,25 @@ function getLangHref(targetLang: string): string {
 </div>
 
 <script is:inline>
-  (function() {
-    const btn = document.getElementById('lang-btn');
-    const dropdown = document.getElementById('lang-dropdown');
-    if (!btn || !dropdown) return;
+  document.addEventListener('astro:page-load', function() {
+    document.querySelectorAll('.lang-switcher').forEach(function(switcher) {
+      if (switcher.dataset.bound) return;
+      switcher.dataset.bound = '1';
 
-    btn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      dropdown.classList.toggle('hidden');
-    });
+      var btn = switcher.querySelector('.lang-btn');
+      var dropdown = switcher.querySelector('.lang-dropdown');
+      if (!btn || !dropdown) return;
 
-    document.addEventListener('click', function() {
-      dropdown.classList.add('hidden');
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        dropdown.classList.toggle('hidden');
+      });
+
+      document.addEventListener('click', function(e) {
+        if (!switcher.contains(e.target)) {
+          dropdown.classList.add('hidden');
+        }
+      });
     });
-  })();
+  });
 </script>

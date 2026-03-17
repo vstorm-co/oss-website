@@ -1,0 +1,217 @@
+---
+title: "AGENTS.md: Jak przygotować repozytorium dla agentów AI (Copilot, Cursor, Codex, Claude Code)"
+description: "Każde narzędzie AI do kodowania czyta Twoje repozytorium inaczej. Sprawdź, jak AGENTS.md — wschodzący standard — daje im potrzebny kontekst."
+pubDate: 2026-03-18
+author: "Vstorm"
+lang: pl
+translationKey: agents-md-ai-friendly-codebase
+tags: ["ai-agents", "developer-tools", "python", "fastapi", "open-source"]
+category: open-source
+draft: false
+---
+
+Twój README wyjaśnia projekt ludziom. `.gitignore` mówi Gitowi, co pomijać. `pyproject.toml` mówi Pythonowi, jak budować.
+
+Ale kto powie Copilotowi, żeby nie ruszał wygenerowanych plików migracji? Kto powie Claude Code, jaką komendę testową uruchomić? Kto powie Cursorowi o wzorcu repozytorium, gdzie `flush()` dzieje się w warstwie repozytorium, a nie `commit()`?
+
+Nikt. I dlatego agenci AI ciągle popełniają te same błędy w Twojej bazie kodu — nadpisują pliki, których nie powinni, używają wzorców, z których zrezygnowałeś, i uruchamiają złe komendy.
+
+Rozwiązaniem jest plik, którego napisanie zajmuje 15 minut. Ekosystem po prostu nie uzgodnił jeszcze nazwy.
+
+## Problem: agenci AI są potężni, ale nieświadomi kontekstu
+
+Każde duże narzędzie AI do kodowania — [GitHub Copilot](https://github.com/features/copilot), [Cursor](https://cursor.sh/), [OpenAI Codex](https://openai.com/index/codex/), [Claude Code](https://docs.anthropic.com/en/docs/claude-code) — potrafi teraz czytać, rozumieć i modyfikować całe repozytoria. To już nie autouzupełnianie pojedynczych linii. To refaktoryzacja modułów, pisanie testów, tworzenie nowych funkcji z opisów w języku naturalnym.
+
+Ale jest luka: **doskonale rozumieją składnię kodu, a konwencje projektu wcale.**
+
+Agent AI może przeczytać router [FastAPI](https://fastapi.tiangolo.com/) i wygenerować nowy endpoint. Ale nie będzie wiedział, że Twój zespół używa wzorca repozytorium, że operacje bazodanowe przechodzą przez warstwę serwisową, że schematy są podzielone na warianty `Create`, `Update` i `Response`. Nie będzie wiedział, że `alembic/versions/` jest autogenerowany i nigdy nie powinien być edytowany ręcznie. Nie będzie wiedział, że projekt używa `uv` zamiast `pip`.
+
+Efekt? Połowę czasu spędzasz na przeglądaniu i poprawianiu kodu wygenerowanego przez AI, który jest poprawny składniowo, ale architektonicznie błędny.
+
+## Krajobraz: różne narzędzia, różne pliki
+
+Oto co każde narzędzie AI do kodowania czyta dzisiaj:
+
+| Narzędzie | Plik konfiguracyjny | Zakres |
+|-----------|-------------------|-------|
+| **GitHub Copilot** | `.github/copilot-instructions.md` | Instrukcje na poziomie repo dla Copilot Chat |
+| **Cursor** | `.cursor/rules/*.mdc` | Reguły projektu z dopasowaniem glob |
+| **Claude Code** | `CLAUDE.md` | Kontekst projektu, komendy, architektura |
+| **OpenAI Codex** | `AGENTS.md` | Wskazówki dla agentów AI |
+| **Zed** | (czyta AGENTS.md) | Jak Codex |
+
+Każde narzędzie wymyśliło swój format. Jeśli Twój zespół używa Copilota I Cursora I Claude Code (co jest coraz częstsze), potrzebujesz trzech oddzielnych plików opisujących te same konwencje projektu.
+
+Tu wchodzi `AGENTS.md`. Wyłania się jako **standard niezależny od narzędzia** — jeden plik, który każdy agent AI może przeczytać, by zrozumieć Twoją bazę kodu. GitHub Copilot, Codex i Zed już go szukają. Claude Code też go czyta (obok `CLAUDE.md`). Cursor można skonfigurować, by go uwzględniał.
+
+Jeden plik. Każde narzędzie.
+
+## Co umieścić w AGENTS.md
+
+Po wygenerowaniu plików AGENTS.md dla dziesiątek projektów, oto struktura, która działa:
+
+### 1. Przegląd projektu (2-3 linie)
+
+Czym jest projekt. Jaki jest stack. Nic więcej.
+
+```markdown
+## Project Overview
+
+**my-ai-app** — Aplikacja FastAPI.
+
+**Stack:** FastAPI + Pydantic v2, PostgreSQL (async), JWT auth, Redis, PydanticAI, Next.js 15
+```
+
+### 2. Komendy (najważniejsza sekcja)
+
+Jakie komendy uruchomić do testowania, lintowania i budowania. To miejsce, gdzie agenci popełniają najwięcej błędów bez wskazówek — uruchamiają `pip install` zamiast `uv sync`, lub `npm` zamiast `bun`.
+
+```bash
+# Backend
+cd backend
+uv run uvicorn app.main:app --reload --port 8000
+pytest
+ruff check . --fix && ruff format .
+
+# Database
+uv run alembic upgrade head
+
+# Frontend
+cd frontend
+bun dev
+
+# Docker
+docker compose up -d
+```
+
+### 3. Struktura projektu
+
+Drzewo pokazujące, gdzie co się znajduje. Nie pełny output `tree` — tylko katalogi, które mają znaczenie.
+
+```
+backend/app/
+├── api/routes/v1/    # Endpointy HTTP
+├── services/         # Logika biznesowa
+├── repositories/     # Warstwa dostępu do danych
+├── schemas/          # Modele Pydantic
+├── db/models/        # Modele bazodanowe
+├── agents/           # Agenci AI
+└── commands/         # Komendy CLI
+```
+
+### 4. Kluczowe konwencje
+
+Sekcja, która oszczędza najwięcej czasu na code review:
+
+```markdown
+## Key Conventions
+
+- Używaj `db.flush()` w repozytoriach (nie `commit`)
+- Serwisy rzucają wyjątki domenowe (`NotFoundError`, `AlreadyExistsError`)
+- Schematy: oddzielne modele `Create`, `Update`, `Response`
+```
+
+### 5. Czego NIE modyfikować
+
+Równie ważne — powiedz agentom, co jest zakazane:
+
+```markdown
+## Do Not Modify
+
+- `alembic/versions/` — autogenerowane migracje
+- `frontend/node_modules/` — zarządzane przez bun
+- `.env` — lokalne sekrety, nigdy nie commituj
+```
+
+### 6. Wskaźniki do głębszej dokumentacji
+
+```markdown
+## More Info
+
+- `docs/architecture.md` — Szczegóły architektury
+- `docs/adding_features.md` — Jak dodawać funkcje
+- `docs/testing.md` — Przewodnik po testach
+```
+
+## Prawdziwy przykład: autogenerowany AGENTS.md
+
+Tu robi się meta.
+
+Nasz [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template) to CLI generujące gotowe do produkcji projekty [FastAPI](https://fastapi.tiangolo.com/) + [Next.js](https://nextjs.org/) z ponad 75 opcjami konfiguracyjnymi — baza danych, auth, framework AI ([Pydantic AI](https://ai.pydantic.dev/), [LangChain](https://python.langchain.com/), [LangGraph](https://langchain-ai.github.io/langgraph/), [CrewAI](https://docs.crewai.com/), DeepAgents), zadania w tle, [Docker](https://docs.docker.com/), CI/CD.
+
+Każdy wygenerowany projekt zawiera **zarówno** `AGENTS.md`, jak i `CLAUDE.md` — autogenerowane na podstawie Twoich wyborów konfiguracyjnych.
+
+Wybierasz PostgreSQL? Sekcja komend zawiera komendy migracji Alembic. Włączasz agenta AI? Struktura projektu pokazuje katalog `agents/`. Wybierasz JWT auth? Sekcja zmiennych środowiskowych zawiera `SECRET_KEY`.
+
+Szablon używa warunków Jinja2 do personalizacji tych plików:
+
+```jinja2
+**Stack:** FastAPI + Pydantic v2
+{%- if cookiecutter.use_postgresql %}, PostgreSQL (async){%- endif %}
+{%- if cookiecutter.use_jwt %}, JWT auth{%- endif %}
+{%- if cookiecutter.enable_redis %}, Redis{%- endif %}
+{%- if cookiecutter.enable_ai_agent and cookiecutter.use_pydantic_ai %}, PydanticAI{%- endif %}
+{%- if cookiecutter.use_frontend %}, Next.js 15{%- endif %}
+```
+
+Nie dostajesz generycznego AGENTS.md — dostajesz plik dopasowany do Twojego dokładnego stacku.
+
+**Tworzymy szablon dla aplikacji agentów AI, który jest przyjazny dla innych agentów AI.** Szablon generujący aplikacje z frameworkami AI, a jednocześnie generujący pliki pomagające agentom AI do kodowania pracować z tymi aplikacjami. Agenci na każdym poziomie.
+
+## AGENTS.md vs. CLAUDE.md: czy potrzebujesz obu?
+
+Krótka odpowiedź: tak, jeśli używasz Claude Code.
+
+`AGENTS.md` jest niezależny od narzędzia. Obejmuje to, czego potrzebuje każdy agent AI: komendy, strukturę, konwencje.
+
+`CLAUDE.md` jest specyficzny dla Claude Code. Może zawierać instrukcje specyficzne dla Claude, takie jak wzorce pamięci, preferencje narzędzi i specyficzny model interakcji Claude Code. Claude Code czyta `CLAUDE.md` najpierw, potem `AGENTS.md` jako dodatkowy kontekst.
+
+Nakładanie się jest celowe. Jeśli agent czyta tylko jeden plik, dostaje wystarczający kontekst. Jeśli czyta oba, dostaje pełny obraz.
+
+## Jak dodać AGENTS.md do istniejącego projektu
+
+Nie potrzebujesz szablonu. Oto minimalna wersja dla dowolnego projektu Python:
+
+```markdown
+# AGENTS.md
+
+## Project Overview
+[Nazwa projektu] — [opis jednolinijkowy].
+Stack: [języki, frameworki, bazy danych]
+
+## Commands
+# Komendy instalacji / testów / lintowania
+
+## Structure
+[uproszczone drzewo kluczowych katalogów]
+
+## Conventions
+- [wzorzec 1]
+- [wzorzec 2]
+- [wzorzec 3]
+
+## Do Not Modify
+- [wygenerowane pliki]
+- [pliki lock]
+- [sekrety]
+```
+
+Skopiuj ten szablon, wypełnij luki, zrób commit. Każde narzędzie AI do kodowania czytające Twoje repo natychmiast stanie się bardziej użyteczne.
+
+## Kluczowe wnioski
+
+- **Agenci AI do kodowania czytają Twoje repo, ale nie rozumieją konwencji.** AGENTS.md wypełnia tę lukę — struktura projektu, komendy, wzorce i czego nie ruszać.
+- **Różne narzędzia używają różnych plików** (`.github/copilot-instructions.md`, `.cursor/rules/`, `CLAUDE.md`), ale `AGENTS.md` wyłania się jako standard niezależny od narzędzia.
+- **Najważniejsze sekcje to Commands i Conventions.** Zapobiegają najczęstszym błędom AI: złym narzędziom do budowania i złym wzorcom architektonicznym.
+- **Napisanie zajmuje 15 minut** i oszczędza godziny przeglądania kodu AI łamiącego Twoje wzorce.
+- **Autogeneracja jest możliwa** — nasz szablon generuje AGENTS.md i CLAUDE.md dopasowane do konfiguracji każdego projektu.
+
+---
+
+**Wypróbuj:** [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template) — generuje gotowe do produkcji aplikacje FastAPI + Next.js AI z wbudowanymi AGENTS.md i CLAUDE.md
+
+```bash
+pip install fastapi-fullstack
+```
+
+[Wszystkie projekty open-source Vstorm](https://oss.vstorm.co) | [awesome-pydantic-ai](https://github.com/vstorm-co/awesome-pydantic-ai) | [vstorm.co](https://vstorm.co)

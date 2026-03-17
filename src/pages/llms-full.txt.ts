@@ -72,7 +72,7 @@ ${projectSections}
 
 ## Full-Stack AI Agent Template — Configurator
 
-The web configurator at ${siteUrl}/full-stack-ai-agent-template/configurator/ is a 9-step wizard:
+The web configurator at ${siteUrl}/projects/full-stack-ai-agent-template/configurator/ is a 9-step wizard:
 
 1. **Project Info** — Name, description, author, Python version
 2. **Database** — PostgreSQL, MongoDB, SQLite, or none
@@ -104,17 +104,17 @@ Pydantic AI with WebSocket streaming, conversation persistence, PostgreSQL, Redi
 ## Product Landings
 
 ### Full-Stack AI Agent Template
-${siteUrl}/full-stack-ai-agent-template/
+${siteUrl}/projects/full-stack-ai-agent-template/
 
 Production-ready FastAPI + Next.js project template with 5 AI agent frameworks (Pydantic AI, LangChain, CrewAI, AutoGen, OpenAI Agents), 75+ configuration options, and a 9-step web configurator. Includes authentication, database setup, WebSocket streaming, Docker, CI/CD, and observability out of the box.
 
 ### Pydantic DeepAgents
-${siteUrl}/pydantic-deepagents/
+${siteUrl}/projects/pydantic-deepagents/
 
 Modular AI agent framework inspired by Claude Code architecture. Built on Pydantic AI with 6 standalone PyPI packages: filesystem backend with hashline editing, task planning with dependencies, sub-agent delegation, context compression, lifecycle hooks, and multi-agent teams with shared state.
 
 ### Logfire Assistant
-${siteUrl}/logfire-assistant/
+${siteUrl}/projects/logfire-assistant/
 
 Chrome extension + FastAPI backend for querying Pydantic Logfire data with natural language. Converts questions to SQL, generates live charts, provides span context analysis. Supports OpenAI, Anthropic, Google, and other LLM providers. Conversations stored locally in PostgreSQL.
 

@@ -1073,7 +1073,7 @@ uvx fastapi-fullstack my-project \\
   --ci github
 
 # Or use the 9-step web configurator:
-# oss.vstorm.co/full-stack-ai-agent-template/configurator/`,
+# oss.vstorm.co/projects/full-stack-ai-agent-template/configurator/`,
     },
     codeTheirs: {
       label: "Cookiecutter",

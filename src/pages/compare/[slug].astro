@@ -3,8 +3,18 @@ import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import OssFooter from '../../components/oss/OssFooter.astro';
 import Breadcrumbs from '../../components/shared/Breadcrumbs.astro';
+import { Code } from 'astro-expressive-code/components';
 import { translations, languages, defaultLang } from '../../i18n/translations';
 import { comparisonPages, getAllComparisonSlugs, getComparisonBySlug } from '../../data/compare-pages';
+import { faqPageSchema, type JsonLdSchema } from '../../lib/schemas';
+
+function detectLang(code: string): "python" | "bash" {
+  for (const line of code.trim().split('\n').slice(0, 5)) {
+    const t = line.trim();
+    if (t.startsWith('from ') || t.startsWith('import ')) return 'python';
+  }
+  return 'bash';
+}
 
 export function getStaticPaths() {
   return getAllComparisonSlugs().map((slug) => ({ params: { slug } }));
@@ -29,18 +39,9 @@ const alternates = [
 const productHref = `/${comparison.productSlug}/`;
 
 // FAQ schema
-const faqSchema = comparison.faq.length > 0 ? {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: comparison.faq.map((item) => ({
-    "@type": "Question",
-    name: item.question[lang],
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: item.answer[lang],
-    },
-  })),
-} : null;
+const schemas: JsonLdSchema[] = comparison.faq.length > 0
+  ? [faqPageSchema({ questions: comparison.faq.map((item) => ({ question: item.question[lang], answer: item.answer[lang] })) })]
+  : [];
 
 // Related comparisons
 const relatedComparisons = comparison.relatedSlugs
@@ -72,12 +73,9 @@ function winnerBg(winner: string) {
   keywords={pageKeywords}
   lang={lang}
   alternates={alternates}
+  schemas={schemas}
 >
   <Navbar currentLang={lang} />
-
-  {faqSchema && (
-    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
-  )}
 
   <Breadcrumbs items={[
     { label: "Home", href: "/" },
@@ -193,28 +191,12 @@ function winnerBg(winner: string) {
         </div>
 
         <div class="grid gap-6 sm:grid-cols-2 reveal">
-          <div class="force-dark copy-block group/copy relative cursor-pointer rounded-xl border border-border bg-surface overflow-hidden" data-command={comparison.codeOurs.code}>
-            <div class="flex items-center justify-between border-b border-border px-4 py-2">
-              <span class="text-xs font-mono text-green-400">{comparison.codeOurs.label}</span>
-              <div class="flex items-center gap-1.5 opacity-0 transition-opacity group-hover/copy:opacity-100">
-                <span class="copy-label text-[11px] text-text-tertiary" data-copied={t["ui.copied"] ?? "Copied!"}>{t["ui.clickToCopy"] ?? "Click to copy"}</span>
-                <svg class="copy-icon h-4 w-4 text-text-tertiary transition-colors group-hover/copy:text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
-                <svg class="check-icon hidden h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-              </div>
-            </div>
-            <pre class="p-4 overflow-x-auto text-sm leading-relaxed"><code class="font-mono text-text-secondary">{comparison.codeOurs.code}</code></pre>
+          <div>
+            <Code code={comparison.codeOurs.code} lang={detectLang(comparison.codeOurs.code)} title={comparison.codeOurs.label} />
           </div>
           {comparison.codeTheirs && (
-            <div class="force-dark copy-block group/copy relative cursor-pointer rounded-xl border border-border bg-surface overflow-hidden" data-command={comparison.codeTheirs.code}>
-              <div class="flex items-center justify-between border-b border-border px-4 py-2">
-                <span class="text-xs font-mono text-blue-400">{comparison.codeTheirs.label}</span>
-                <div class="flex items-center gap-1.5 opacity-0 transition-opacity group-hover/copy:opacity-100">
-                  <span class="copy-label text-[11px] text-text-tertiary" data-copied={t["ui.copied"] ?? "Copied!"}>{t["ui.clickToCopy"] ?? "Click to copy"}</span>
-                  <svg class="copy-icon h-4 w-4 text-text-tertiary transition-colors group-hover/copy:text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
-                  <svg class="check-icon hidden h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                </div>
-              </div>
-              <pre class="p-4 overflow-x-auto text-sm leading-relaxed"><code class="font-mono text-text-secondary">{comparison.codeTheirs.code}</code></pre>
+            <div>
+              <Code code={comparison.codeTheirs.code} lang={detectLang(comparison.codeTheirs.code)} title={comparison.codeTheirs.label} />
             </div>
           )}
         </div>
@@ -357,35 +339,3 @@ function winnerBg(winner: string) {
   <OssFooter t={t} />
 </Layout>
 
-<script>
-  document.querySelectorAll<HTMLElement>('.copy-block').forEach((block) => {
-    block.addEventListener('click', async () => {
-      const command = block.dataset.command;
-      if (!command) return;
-      try {
-        await navigator.clipboard.writeText(command);
-      } catch {
-        const ta = document.createElement('textarea');
-        ta.value = command;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-      }
-      const label = block.querySelector('.copy-label') as HTMLElement | null;
-      const copyIcon = block.querySelector('.copy-icon') as HTMLElement | null;
-      const checkIcon = block.querySelector('.check-icon') as HTMLElement | null;
-      const originalText = label?.textContent || '';
-      if (label) label.textContent = label.dataset.copied || 'Copied!';
-      if (copyIcon) copyIcon.classList.add('hidden');
-      if (checkIcon) checkIcon.classList.remove('hidden');
-      setTimeout(() => {
-        if (label) label.textContent = originalText;
-        if (copyIcon) copyIcon.classList.remove('hidden');
-        if (checkIcon) checkIcon.classList.add('hidden');
-      }, 2000);
-    });
-  });
-</script>
