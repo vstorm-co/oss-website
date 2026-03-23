@@ -11,9 +11,10 @@ interface Props {
   lang?: Lang;
   category?: string;
   readingTime?: number;
+  author?: string;
 }
 
-const { title, description, pubDate, href, tags = [], lang = 'en', category, readingTime } = Astro.props;
+const { title, description, pubDate, href, tags = [], lang = 'en', category, readingTime, author } = Astro.props;
 const t = translations[lang as Lang];
 
 const estimatedReadTime = readingTime ?? 5; // default 5 min
@@ -34,6 +35,12 @@ const categoryLabel = category && t[categoryKey] ? t[categoryKey] : null;
     <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
     <span>&middot;</span>
     <span>{estimatedReadTime} min read</span>
+    {author && (
+      <>
+        <span>&middot;</span>
+        <span>{author}</span>
+      </>
+    )}
     {categoryLabel && (
       <>
         <span>&middot;</span>

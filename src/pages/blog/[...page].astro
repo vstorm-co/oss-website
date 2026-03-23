@@ -15,7 +15,7 @@ export async function getStaticPaths({ paginate }: { paginate: Function }) {
     await getCollection('blog', ({ data }) => data.lang === 'en' && !data.draft)
   ).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
-  return paginate(posts, { pageSize: 50 });
+  return paginate(posts, { pageSize: 20 });
 }
 
 const lang = defaultLang;
@@ -87,6 +87,7 @@ const alternates = [
                 tags={post.data.tags}
                 lang={lang}
                 category={post.data.category}
+                author={post.data.author}
               />
             </div>
           );

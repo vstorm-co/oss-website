@@ -39,6 +39,7 @@ const architectures = [
   lang={lang}
   alternates={alternates}
   schemas={[softwareApplicationSchema({ name: "Agent Architecture Quiz", description: t["tools.quiz.subtitle"] ?? "Free interactive quiz to find the best AI agent architecture for your use case — from simple ReAct to hierarchical multi-agent systems.", url: SITE_URL + "/tools/architecture-quiz/", operatingSystem: "Web" })]}
+  theme="light"
 >
   <Navbar currentLang={lang} />
 
@@ -49,32 +50,27 @@ const architectures = [
   ]} />
 
   <!-- Hero -->
-  <section class="relative mx-auto max-w-4xl px-4 pt-28 pb-12 sm:px-6 sm:pt-36 sm:pb-16 lg:px-8 text-center">
-    <div class="pointer-events-none absolute inset-0 -top-24 flex items-center justify-center" aria-hidden="true">
-      <div class="h-[200px] w-[300px] sm:h-[340px] sm:w-[540px] rounded-full bg-accent/[0.07] blur-[60px] sm:blur-[100px]"></div>
+  <section class="mx-auto max-w-4xl px-4 py-16 sm:py-24">
     </div>
-    <div class="reveal relative">
-      <span class="inline-flex items-center rounded-full border border-green-500/30 bg-green-500/10 px-3 py-1 text-xs font-medium text-green-400 mb-6">
-        {t["tools.badge.quiz"] ?? "Free Quiz — 5 Questions"}
-      </span>
-      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl heading-accent">
+    <div class="mb-12 text-center reveal">
+      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl heading-accent heading-accent">
         {t["tools.quiz.title"] ?? "Agent Architecture Quiz"}
       </h1>
-      <p class="mt-6 text-lg sm:text-xl text-text-secondary max-w-2xl mx-auto leading-relaxed">
+      <p class="mt-4 text-lg text-text-secondary max-w-2xl mx-auto">
         {t["tools.quiz.subtitle"] ?? "Answer 5 quick questions about your project and discover the ideal agent architecture pattern — with a framework recommendation and next steps."}
       </p>
     </div>
   </section>
 
   <!-- Quiz -->
-  <section class="section-stack px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-    <div class="mx-auto max-w-2xl force-dark">
+  <section class="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+    <div class="mx-auto max-w-2xl">
       <ArchitectureQuiz client:only="react" />
     </div>
   </section>
 
   <!-- Architecture Patterns Overview -->
-  <section class="section-stack px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+  <section class="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
     <div class="mx-auto max-w-4xl">
       <div class="mb-10 text-center reveal">
         <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
@@ -93,11 +89,8 @@ const architectures = [
   </section>
 
   <!-- CTA -->
-  <section class="relative section-stack px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
-    <div class="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden="true">
-      <div class="h-[180px] w-[300px] sm:h-[280px] sm:w-[480px] rounded-full bg-accent/[0.06] blur-[60px] sm:blur-[90px]"></div>
-    </div>
-    <div class="mx-auto max-w-3xl text-center reveal relative">
+  <section class="px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
+    <div class="mx-auto max-w-3xl text-center reveal">
       <div class="glass-card glow-card rounded-2xl p-6 sm:p-10 lg:p-14">
         <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
           {t["tools.quiz.cta.title"] ?? "Know your architecture — now pick a framework"}

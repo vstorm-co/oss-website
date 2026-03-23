@@ -1,0 +1,16 @@
+---
+title: "Autonomous Context Compression"
+description: "LangChain introduces autonomous context compression in the Deep Agents SDK -- a tool that lets models trigger their own context window compaction at opportune moments."
+pubDate: 2026-03-22
+updatedDate: 2026-03-22
+author: "Kacper Włodarczyk"
+lang: en
+translationKey: autonomous-context-compression
+tags: ["ai-agents", "langchain", "context-management", "deep-agents"]
+category: news
+draft: false
+---
+
+LangChain introduces autonomous context compression in the Deep Agents SDK and CLI -- a tool that lets models trigger their own context window compaction at opportune moments rather than relying on fixed token thresholds. The motivation is that compaction timing matters: compressing mid-refactor is harmful, while compressing at task boundaries or before consuming large new context is beneficial. The feature is implemented as a middleware that retains 10% of available context as recent messages and summarizes the rest, and agents are tuned to be conservative about triggering it. This approach aligns with the "bitter lesson" philosophy of giving agents more control over their own working memory rather than hand-tuning harness rules.
+
+Source: [Autonomous context compression](https://blog.langchain.com/autonomous-context-compression/)

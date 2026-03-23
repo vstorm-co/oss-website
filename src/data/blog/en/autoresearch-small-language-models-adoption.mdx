@@ -1,0 +1,16 @@
+---
+title: "How Autoresearch Will Change Small Language Models Adoption"
+description: "Autoresearch lets an AI agent run hundreds of model training experiments overnight. Learn how it works, early results from Karpathy and Shopify, and how to apply it."
+pubDate: 2026-03-22
+updatedDate: 2026-03-22
+author: "Kacper Włodarczyk"
+lang: en
+translationKey: autoresearch-small-language-models-adoption
+tags: ["llm", "machine-learning", "autoresearch", "slm", "training"]
+category: news
+draft: false
+---
+
+This article introduces autoresearch, an approach where an AI agent autonomously runs hundreds of model training experiments by editing code, running short experiments, checking metrics, and keeping or discarding results. The method uses fixed 5-minute time budgets, single-file scope, and git-based memory to maintain reproducibility. Two early examples demonstrate its potential: Karpathy ran ~700 experiments on his GPT-2 training code and achieved an 11% speedup, while Shopify CEO Tobi Lutke trained a 0.8B model overnight that outscored his previous 1.6B model by 19%. The article emphasizes that the eval pipeline becomes the bottleneck when experiments run 100x faster than humans can manage, and distinguishes autoresearch (weight optimization) from prompt optimization approaches like GEPA.
+
+Source: [How Autoresearch will change Small Language Models adoption](https://www.philschmid.de/autoresearch)

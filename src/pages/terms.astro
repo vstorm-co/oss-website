@@ -1,0 +1,42 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/landing/Footer.astro';
+import { translations } from '../i18n/translations';
+
+const t = translations.en;
+---
+
+<Layout title="Terms of Service — Vstorm OSS" description="Terms of service for oss.vstorm.co and Vstorm open-source projects.">
+  <Navbar />
+  <main class="max-w-3xl mx-auto px-6 py-20">
+    <h1 class="text-3xl font-bold mb-8">Terms of Service</h1>
+    <p class="text-sm text-zinc-500 mb-8">Last updated: March 22, 2026</p>
+
+    <div class="prose prose-zinc dark:prose-invert max-w-none">
+      <h2>About this website</h2>
+      <p><strong>oss.vstorm.co</strong> is a documentation and blog portal for open-source projects maintained by <strong>Vstorm</strong> (vstorm.co). The site provides project documentation, technical blog posts, comparison tools, and guides for building AI agents with Python.</p>
+
+      <h2>Open-source licenses</h2>
+      <p>All open-source projects listed on this website are distributed under their respective licenses (primarily <strong>MIT License</strong>). The specific license for each project is available in its GitHub repository.</p>
+      <p>By using our open-source software, you agree to the terms of the applicable license.</p>
+
+      <h2>Website content</h2>
+      <p>Blog posts, guides, comparisons, and other content on this website are provided for informational and educational purposes. Content is written by Vstorm team members based on real experience building AI agents in production.</p>
+      <p>We strive for accuracy but do not guarantee that all information is complete, current, or error-free. Technical content may become outdated as frameworks and tools evolve.</p>
+
+      <h2>Code examples</h2>
+      <p>Code examples in blog posts and guides are provided under the <strong>MIT License</strong> unless otherwise noted. You are free to use, modify, and distribute them in your own projects.</p>
+
+      <h2>Interactive tools</h2>
+      <p>The AI Agent Configurator, Framework Comparison Tool, and Architecture Quiz are provided as-is. Generated project configurations are suggestions — you are responsible for reviewing and adapting them to your specific requirements.</p>
+
+      <h2>No warranty</h2>
+      <p>This website and all content, tools, and software are provided "as is" without warranty of any kind. Vstorm is not liable for any damages arising from the use of this website or our open-source projects.</p>
+
+      <h2>Contact</h2>
+      <p>For questions about these terms, contact us at <strong>legal@vstorm.co</strong> or via our <a href="https://github.com/vstorm-co">GitHub organization</a>.</p>
+    </div>
+  </main>
+  <Footer t={t} lang="en" />
+</Layout>

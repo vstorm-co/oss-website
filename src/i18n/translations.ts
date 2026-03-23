@@ -11,7 +11,7 @@ export const defaultLang: Lang = "en";
 export const translations = {
   en: {
     // Meta
-    "meta.description": "Generate production-ready AI/LLM applications with FastAPI + Next.js. 5 AI frameworks, 75+ config options, 3 presets.",
+    "meta.description": "Open-source tools for building production AI agents with Python. Full-stack template (FastAPI + Next.js), RAG pipeline, 5 AI frameworks, middleware, subagents. By Vstorm.",
 
     // Nav
     "nav.back": "Back to home",
@@ -95,8 +95,8 @@ export const translations = {
 
     // Blog
     "nav.blog": "Blog",
-    "blog.title": "Blog",
-    "blog.subtitle": "Tutorials, comparisons, and guides for building AI apps",
+    "blog.title": "AI Agent Blog",
+    "blog.subtitle": "Tutorials, framework comparisons, and production guides for building AI agents with Python",
     "blog.readMore": "Read more",
     "blog.publishedOn": "Published on",
     "blog.updatedOn": "Updated on",
@@ -118,7 +118,7 @@ export const translations = {
 
     // OSS Landing
     "oss.meta.description": "Open-source tools for building production AI agents with Python. By Vstorm.",
-    "oss.hero.badge": "20 Open Source Repos · 1,270+ Stars",
+    "oss.hero.badge": "13 Open Source Repos · 1,730+ Stars",
     "oss.hero.title.line1": "Build",
     "oss.hero.title.highlight": "Production AI Agents",
     "oss.hero.title.line2": "Not Infrastructure",
@@ -533,7 +533,7 @@ export const translations = {
     // About page
     "about.title": "About Vstorm OSS",
     "about.subtitle": "Open-source AI agent tools built by practitioners, for practitioners.",
-    "about.meta.description": "Learn about Vstorm OSS - 20 open-source repositories, 1,270+ GitHub stars, and 285K+ PyPI downloads. Production AI agent tools for Python. Built by Vstorm.",
+    "about.meta.description": "Learn about Vstorm OSS - 13 open-source repositories, 1,730+ GitHub stars, and 830K+ PyPI downloads. Production AI agent tools for Python. Built by Vstorm.",
     "about.company.title": "Who We Are",
     "about.company.description": "Vstorm is an Applied Agentic AI Engineering Consultancy. We build production AI agent systems for companies across the US, Europe, and the Middle East. Every tool in this portfolio was born from a real production challenge - we open-source what we build.",
     "about.numbers.title": "By the Numbers",
@@ -622,7 +622,7 @@ export const translations = {
   },
 
   pl: {
-    "meta.description": "Generuj gotowe do produkcji aplikacje AI/LLM z FastAPI + Next.js. 5 frameworków AI, 75+ opcji konfiguracji, 3 presety.",
+    "meta.description": "Narzędzia open-source do budowania produkcyjnych agentów AI w Pythonie. Template full-stack (FastAPI + Next.js), pipeline RAG, 5 frameworków AI, middleware, subagenty. Od Vstorm.",
 
     "nav.back": "Wróć do strony głównej",
     "hero.badge": "Open Source",
@@ -719,7 +719,7 @@ export const translations = {
 
     // OSS Landing
     "oss.meta.description": "Open-source narzędzia do budowania produkcyjnych agentów AI w Pythonie. By Vstorm.",
-    "oss.hero.badge": "20 repozytoriów Open Source · 1 270+ gwiazdek",
+    "oss.hero.badge": "13 repozytoriów Open Source · 1 730+ gwiazdek",
     "oss.hero.title.line1": "Twórz",
     "oss.hero.title.highlight": "produkcyjne agenty AI",
     "oss.hero.title.line2": "Nie infrastrukturę",
@@ -1125,7 +1125,7 @@ export const translations = {
     // About page
     "about.title": "O Vstorm OSS",
     "about.subtitle": "Open-source'owe narzędzia do budowania agentów AI - tworzone przez praktyków, dla praktyków.",
-    "about.meta.description": "Poznaj Vstorm OSS - 20 repozytoriów open source, 1 270+ gwiazdek na GitHub i 285K+ pobrań z PyPI. Produkcyjne narzędzia AI dla Pythona. Stworzone przez Vstorm.",
+    "about.meta.description": "Poznaj Vstorm OSS - 13 repozytoriów open source, 1 730+ gwiazdek na GitHub i 830K+ pobrań z PyPI. Produkcyjne narzędzia AI dla Pythona. Stworzone przez Vstorm.",
     "about.company.title": "Kim jesteśmy",
     "about.company.description": "Vstorm to konsulting specjalizujący się w inżynierii agentowej AI. Budujemy produkcyjne systemy agentów AI dla firm w USA, Europie i na Bliskim Wschodzie. Każde narzędzie w tym portfolio powstało z realnego wyzwania produkcyjnego - udostępniamy jako open source to, co budujemy.",
     "about.numbers.title": "W liczbach",
@@ -1214,7 +1214,7 @@ export const translations = {
   },
 
   de: {
-    "meta.description": "Generiere produktionsreife KI/LLM-Anwendungen mit FastAPI + Next.js. 5 KI-Frameworks, 75+ Konfigurationsoptionen, 3 Vorlagen.",
+    "meta.description": "Open-Source-Tools für produktionsreife KI-Agenten mit Python. Full-Stack-Template (FastAPI + Next.js), RAG-Pipeline, 5 KI-Frameworks, Middleware, Subagenten. Von Vstorm.",
 
     "nav.back": "Zurück zur Startseite",
     "hero.badge": "Open Source",
@@ -1311,7 +1311,7 @@ export const translations = {
 
     // OSS Landing
     "oss.meta.description": "Open-Source-Tools für produktionsreife KI-Agenten mit Python. Von Vstorm.",
-    "oss.hero.badge": "20 Open-Source-Repos · 1.270+ Sterne",
+    "oss.hero.badge": "13 Open-Source-Repos · 1.730+ Sterne",
     "oss.hero.title.line1": "Baue",
     "oss.hero.title.highlight": "produktionsreife KI-Agenten",
     "oss.hero.title.line2": "Keine Infrastruktur",
@@ -1330,7 +1330,7 @@ export const translations = {
     "oss.howwework.title": "So funktioniert es",
     "oss.howwework.subtitle": "Von der Installation zur Produktion in drei Schritten",
     "oss.howwework.step1.title": "Paket wählen",
-    "oss.howwework.step1.desc": "Durchstöbern Sie unser Ökosystem mit 20 Open-Source-Paketen. Installation via pip — jedes funktioniert eigenständig oder zusammen.",
+    "oss.howwework.step1.desc": "Durchstöbern Sie unser Ökosystem mit 13 Open-Source-Paketen. Installation via pip — jedes funktioniert eigenständig oder zusammen.",
     "oss.howwework.step2.title": "Konfigurieren & Bauen",
     "oss.howwework.step2.desc": "Nutzen Sie unsere CLI-Generatoren, Presets und Templates, um Ihr KI-Agenten-Projekt in Minuten zu erstellen.",
     "oss.howwework.step3.title": "In Produktion bringen",
@@ -1717,7 +1717,7 @@ export const translations = {
     // About page
     "about.title": "Über Vstorm OSS",
     "about.subtitle": "Open-Source-KI-Agent-Tools, von Praktikern für Praktiker entwickelt.",
-    "about.meta.description": "Erfahren Sie mehr über Vstorm OSS - 20 Open-Source-Repositories, 1.270+ GitHub-Sterne und 285K+ PyPI-Downloads. Produktionsreife KI-Agent-Tools für Python. Von Vstorm.",
+    "about.meta.description": "Erfahren Sie mehr über Vstorm OSS - 13 Open-Source-Repositories, 1.730+ GitHub-Sterne und 830K+ PyPI-Downloads. Produktionsreife KI-Agent-Tools für Python. Von Vstorm.",
     "about.company.title": "Wer wir sind",
     "about.company.description": "Vstorm ist eine Applied Agentic AI Engineering Consultancy. Wir entwickeln produktionsreife KI-Agent-Systeme für Unternehmen in den USA, Europa und dem Nahen Osten. Jedes Tool in diesem Portfolio entstand aus einer echten Produktionsherausforderung - wir veröffentlichen als Open Source, was wir entwickeln.",
     "about.numbers.title": "In Zahlen",
@@ -1806,7 +1806,7 @@ export const translations = {
   },
 
   es: {
-    "meta.description": "Genera aplicaciones AI/LLM listas para producción con FastAPI + Next.js. 5 frameworks de IA, 75+ opciones de configuración, 3 presets.",
+    "meta.description": "Herramientas open-source para construir agentes de IA en producción con Python. Template full-stack (FastAPI + Next.js), pipeline RAG, 5 frameworks de IA, middleware, subagentes. Por Vstorm.",
 
     "nav.back": "Volver al inicio",
     "hero.badge": "Open Source",
@@ -1903,7 +1903,7 @@ export const translations = {
 
     // OSS Landing
     "oss.meta.description": "Herramientas open source para construir agentes IA de producción con Python. Por Vstorm.",
-    "oss.hero.badge": "20 repos Open Source · 1.270+ estrellas",
+    "oss.hero.badge": "13 repos Open Source · 1.730+ estrellas",
     "oss.hero.title.line1": "Construye",
     "oss.hero.title.highlight": "agentes IA de producción",
     "oss.hero.title.line2": "No infraestructura",
@@ -2309,7 +2309,7 @@ export const translations = {
     // About page
     "about.title": "Sobre Vstorm OSS",
     "about.subtitle": "Herramientas de agentes de IA de código abierto creadas por profesionales, para profesionales.",
-    "about.meta.description": "Conoce Vstorm OSS - 20 repositorios de código abierto, 1.270+ estrellas en GitHub y 285K+ descargas de PyPI. Herramientas de agentes de IA para Python. Por Vstorm.",
+    "about.meta.description": "Conoce Vstorm OSS - 13 repositorios de código abierto, 1.730+ estrellas en GitHub y 830K+ descargas de PyPI. Herramientas de agentes de IA para Python. Por Vstorm.",
     "about.company.title": "Quiénes somos",
     "about.company.description": "Vstorm es una consultora de ingeniería de IA agéntica aplicada. Construimos sistemas de agentes de IA en producción para empresas en EE.UU., Europa y Oriente Medio. Cada herramienta en este portafolio nació de un desafío real de producción - publicamos como código abierto lo que construimos.",
     "about.numbers.title": "En números",

@@ -11,6 +11,7 @@ import Breadcrumbs from '../components/shared/Breadcrumbs.astro';
 import type { Lang } from '../i18n/translations';
 import { translations, languages, defaultLang } from '../i18n/translations';
 import { blogPostingSchema, howToSchema as buildHowToSchema, type JsonLdSchema } from '../lib/schemas';
+import { getAuthor } from '../data/authors';
 import '../styles/prose.css';
 
 interface Props {
@@ -60,6 +61,10 @@ const ogSlug = enTranslation?.slug ?? translationKey;
 const siteUrl = Astro.site?.origin ?? "https://oss.vstorm.co";
 const ogImage = new URL(`/og/${ogSlug}.svg`, siteUrl).href;
 
+// Resolve author Person data
+const authorData = getAuthor(author);
+const authorSameAs = [authorData.linkedIn, authorData.github, authorData.twitter].filter(Boolean) as string[];
+
 // Build JSON-LD schemas
 const schemas: JsonLdSchema[] = [
   blogPostingSchema({
@@ -67,10 +72,17 @@ const schemas: JsonLdSchema[] = [
     description,
     pubDate,
     updatedDate,
-    author,
+    authorPerson: {
+      name: authorData.name,
+      jobTitle: authorData.jobTitle,
+      url: authorData.url,
+      sameAs: authorSameAs,
+    },
     url: Astro.url.href,
     lang,
     image: ogImage,
+    keywords: tags,
+    articleSection: category,
   }),
 ];
 
@@ -97,6 +109,7 @@ if (category === "tutorial" && headings.length > 0) {
   lang={lang}
   alternates={alternates}
   ogImage={ogImage}
+  ogType="article"
   schemas={schemas}
 >
   <!-- Scroll progress bar -->

@@ -330,35 +330,6 @@ html {
   50% { opacity: 0; }
 }
 
-/* ---- Copy code button ---- */
-.copy-btn {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 0.375rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(0, 0, 0, 0.4);
-  color: rgba(255, 255, 255, 0.5);
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.2s, color 0.2s, border-color 0.2s;
-  backdrop-filter: blur(8px);
-  z-index: 10;
-}
-
-pre:hover .copy-btn {
-  opacity: 1;
-}
-
-.copy-btn:hover {
-  color: rgba(255, 255, 255, 0.9);
-  border-color: rgba(255, 255, 255, 0.2);
-}
 
 /* ---- Micro-interactions ---- */
 

@@ -1,0 +1,187 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import OssFooter from '../../components/oss/OssFooter.astro';
+import Breadcrumbs from '../../components/shared/Breadcrumbs.astro';
+import { translations, defaultLang } from '../../i18n/translations';
+import { getTermsGroupedByLetter, glossaryTerms, categoryLabels, categoryColors } from '../../data/glossary';
+import { definedTermSetSchema, SITE_URL } from '../../lib/schemas';
+
+const lang = defaultLang;
+const t = translations[lang];
+
+const grouped = getTermsGroupedByLetter();
+const letters = Array.from(grouped.keys()).sort();
+---
+
+<Layout
+  title="AI & ML Glossary — Vstorm OSS"
+  description="A comprehensive glossary of AI, machine learning, LLM, RAG, and agent terminology. Technical definitions for developers building production AI systems."
+  keywords="ai glossary, machine learning terms, llm terminology, rag glossary, ai agent definitions, deep learning glossary, nlp terms"
+  lang={lang}
+  schemas={[definedTermSetSchema({ name: "AI & ML Glossary", description: "A comprehensive glossary of AI, machine learning, LLM, RAG, and agent terminology for developers.", url: SITE_URL + "/glossary/", terms: glossaryTerms.map((t) => ({ name: t.term, url: SITE_URL + `/glossary/${t.slug}/` })) })]}
+  theme="light"
+>
+  <Navbar currentLang={lang} />
+
+  <Breadcrumbs items={[
+    { label: "Home", href: "/" },
+    { label: "Glossary" },
+  ]} />
+
+  <main class="mx-auto max-w-4xl px-4 py-16 sm:py-24">
+    <!-- Header -->
+    <div class="mb-12 text-center reveal">
+      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl heading-accent">
+        AI & ML Glossary
+      </h1>
+      <p class="mt-4 text-lg text-text-secondary max-w-2xl mx-auto">
+        Technical definitions for developers building production AI systems — from fundamentals to advanced agent patterns.
+      </p>
+    </div>
+
+    <!-- Search & Filter -->
+    <div class="mb-10 reveal">
+      <div class="flex flex-col sm:flex-row gap-3">
+        <div class="relative flex-1">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <input
+            type="text"
+            id="glossary-search"
+            placeholder="Search terms..."
+            class="w-full rounded-xl border border-border bg-white pl-10 pr-4 py-2.5 text-sm text-text placeholder:text-text-tertiary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+          />
+        </div>
+        <select
+          id="glossary-filter"
+          class="rounded-xl border border-border bg-white px-4 py-2.5 text-sm text-text focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+        >
+          <option value="all">All Categories</option>
+          {Object.entries(categoryLabels).map(([key, label]) => (
+            <option value={key}>{label}</option>
+          ))}
+        </select>
+      </div>
+    </div>
+
+    <!-- Letter Navigation -->
+    <div class="mb-8 flex flex-wrap gap-1.5 justify-center reveal" id="letter-nav">
+      {letters.map((letter) => (
+        <a
+          href={`#letter-${letter}`}
+          class="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-sm font-medium text-text-secondary transition-colors hover:bg-accent hover:text-white hover:border-accent"
+        >
+          {letter}
+        </a>
+      ))}
+    </div>
+
+    <!-- No results -->
+    <div id="no-results" class="hidden py-16 text-center">
+      <p class="text-text-secondary text-lg">No terms match your search.</p>
+      <button
+        id="clear-search"
+        class="mt-4 text-sm text-accent hover:text-accent-hover transition-colors"
+      >
+        Clear search
+      </button>
+    </div>
+
+    <!-- Term Groups -->
+    <div id="glossary-list" class="space-y-10 reveal-group">
+      {letters.map((letter) => (
+        <section id={`letter-${letter}`} data-letter-section>
+          <div class="sticky top-0 z-10 -mx-4 px-4 py-2 backdrop-blur-md bg-white/80">
+            <h2 class="text-2xl font-bold text-accent">{letter}</h2>
+          </div>
+          <div class="mt-3 grid gap-3">
+            {grouped.get(letter)!.map((term) => {
+              const firstSentence = term.definition.split(". ")[0] + ".";
+              return (
+                <a
+                  href={`/glossary/${term.slug}/`}
+                  class="glossary-card group glass-card rounded-xl p-5 hover:border-accent/30 transition-all relative overflow-hidden block"
+                  data-term={term.term.toLowerCase()}
+                  data-category={term.category}
+                  data-definition={term.definition.toLowerCase()}
+                >
+                  <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/0 to-transparent group-hover:via-accent/50 transition-all duration-500" />
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0 flex-1">
+                      <div class="flex items-center gap-2 mb-1.5">
+                        <h3 class="text-base font-semibold text-text group-hover:text-accent transition-colors truncate">
+                          {term.term}
+                        </h3>
+                        <span class={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${categoryColors[term.category]}`}>
+                          {categoryLabels[term.category]}
+                        </span>
+                      </div>
+                      <p class="text-sm text-text-secondary line-clamp-2">{firstSentence}</p>
+                    </div>
+                    <svg class="w-4 h-4 shrink-0 mt-1 text-text-tertiary group-hover:text-accent transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+      ))}
+    </div>
+  </main>
+
+  <OssFooter t={t} />
+</Layout>
+
+<script is:inline>
+document.addEventListener('astro:page-load', function () {
+  const searchInput = document.getElementById('glossary-search');
+  const filterSelect = document.getElementById('glossary-filter');
+  const cards = document.querySelectorAll('.glossary-card');
+  const sections = document.querySelectorAll('[data-letter-section]');
+  const noResults = document.getElementById('no-results');
+  const glossaryList = document.getElementById('glossary-list');
+  const clearBtn = document.getElementById('clear-search');
+  const letterNav = document.getElementById('letter-nav');
+
+  function filterCards() {
+    const query = (searchInput?.value || '').toLowerCase().trim();
+    const category = filterSelect?.value || 'all';
+    let visibleCount = 0;
+
+    cards.forEach(function (card) {
+      const term = card.getAttribute('data-term') || '';
+      const cat = card.getAttribute('data-category') || '';
+      const def = card.getAttribute('data-definition') || '';
+      const matchSearch = !query || term.includes(query) || def.includes(query);
+      const matchCat = category === 'all' || cat === category;
+      const visible = matchSearch && matchCat;
+      card.style.display = visible ? '' : 'none';
+      if (visible) visibleCount++;
+    });
+
+    // Hide empty letter sections
+    sections.forEach(function (section) {
+      const visCards = section.querySelectorAll('.glossary-card:not([style*="display: none"])');
+      section.style.display = visCards.length > 0 ? '' : 'none';
+    });
+
+    if (noResults) noResults.style.display = visibleCount === 0 ? '' : 'none';
+    if (glossaryList) glossaryList.style.display = visibleCount === 0 ? 'none' : '';
+    if (letterNav) letterNav.style.display = (query || category !== 'all') ? 'none' : '';
+  }
+
+  if (searchInput) searchInput.addEventListener('input', filterCards);
+  if (filterSelect) filterSelect.addEventListener('change', filterCards);
+  if (clearBtn) {
+    clearBtn.addEventListener('click', function () {
+      if (searchInput) searchInput.value = '';
+      if (filterSelect) filterSelect.value = 'all';
+      filterCards();
+    });
+  }
+});
+</script>

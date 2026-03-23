@@ -1,0 +1,16 @@
+---
+title: "Why Reading PDFs is Hard"
+description: "LlamaIndex explains why PDF parsing remains fundamentally difficult: PDFs store drawing instructions for glyph shapes at coordinates rather than semantic text."
+pubDate: 2026-03-22
+updatedDate: 2026-03-22
+author: "Kacper Włodarczyk"
+lang: en
+translationKey: why-reading-pdfs-is-hard
+tags: ["llm", "pdf-parsing", "rag", "llamaindex", "document-processing"]
+category: news
+draft: false
+---
+
+This LlamaIndex article explains why PDF parsing remains fundamentally difficult: PDFs store drawing instructions for glyph shapes at coordinates rather than semantic text, meaning there is no inherent concept of characters, words, tables, or reading order. The article details three core problems -- text is glyph shapes mapped through font-specific encodings (not Unicode), tables are just independent line drawings and text coordinates with no semantic connection, and reading order in the content stream is arbitrary and must be heuristically reconstructed. It traces the history of document parsing from 1950s OCR through pipeline-based approaches (Tesseract, cloud APIs) to the current model era of VLMs, arguing that "just screenshot it and send to a VLM" doesn't scale due to token costs, hallucinations, and lack of metadata. The recommended architecture combines text extraction from the PDF binary for standard content with VLMs for visually complex regions like tables and charts -- the approach behind LlamaParse.
+
+Source: [Why Reading PDFs is Hard](https://www.llamaindex.ai/blog/why-reading-pdfs-is-hard)

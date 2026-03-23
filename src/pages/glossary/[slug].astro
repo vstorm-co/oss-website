@@ -1,0 +1,130 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import OssFooter from '../../components/oss/OssFooter.astro';
+import Breadcrumbs from '../../components/shared/Breadcrumbs.astro';
+import { translations, defaultLang } from '../../i18n/translations';
+import {
+  getAllGlossarySlugs,
+  getGlossaryTermBySlug,
+  getRelatedTerms,
+  categoryLabels,
+  categoryColors,
+  termToProjectMap,
+} from '../../data/glossary';
+import { definedTermSchema, SITE_URL } from '../../lib/schemas';
+
+export function getStaticPaths() {
+  return getAllGlossarySlugs().map((slug) => ({ params: { slug } }));
+}
+
+const lang = defaultLang;
+const t = translations[lang];
+const { slug } = Astro.params;
+const term = getGlossaryTermBySlug(slug!)!;
+const related = getRelatedTerms(term);
+const projects = termToProjectMap[slug!] ?? [];
+---
+
+<Layout
+  title={`${term.term} — AI Glossary — Vstorm OSS`}
+  description={term.definition.split(". ").slice(0, 2).join(". ") + "."}
+  keywords={`${term.term}, ${categoryLabels[term.category]}, ai glossary, definition, ${term.relatedTerms.join(", ")}`}
+  lang={lang}
+  schemas={[definedTermSchema({ name: term.term, description: term.definition, url: SITE_URL + `/glossary/${slug}/`, inDefinedTermSet: "AI & ML Glossary" })]}
+  theme="light"
+>
+  <Navbar currentLang={lang} />
+
+  <Breadcrumbs items={[
+    { label: "Home", href: "/" },
+    { label: "Glossary", href: "/glossary/" },
+    { label: term.term },
+  ]} />
+
+  <main class="mx-auto max-w-4xl px-4 py-16 sm:py-24">
+    <!-- Hero -->
+    <div class="mb-12 text-center reveal">
+      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl heading-accent">
+        {term.term}
+      </h1>
+      <p class="mt-4 text-lg text-text-secondary max-w-2xl mx-auto">
+        {term.definition}
+      </p>
+    </div>
+
+    <!-- Vstorm OSS Tools -->
+    {projects.length > 0 && (
+      <section class="mb-12 reveal">
+        <h2 class="text-xl font-bold tracking-tight sm:text-2xl mb-4">
+          Vstorm OSS Tools for This
+        </h2>
+        <div class="grid gap-3 sm:grid-cols-2">
+          {projects.map((project) => (
+            <a
+              href={`/projects/${project.slug}/`}
+              class="group glass-card rounded-xl p-5 hover:border-accent/30 transition-all relative overflow-hidden flex items-center justify-between gap-3"
+            >
+              <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/0 to-transparent group-hover:via-accent/50 transition-all duration-500" />
+              <div>
+                <h3 class="font-semibold text-text group-hover:text-accent transition-colors">
+                  {project.name}
+                </h3>
+                <p class="text-xs text-text-tertiary mt-0.5">View project &rarr;</p>
+              </div>
+              <svg class="w-5 h-5 shrink-0 text-text-tertiary group-hover:text-accent transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- Related Terms -->
+    {related.length > 0 && (
+      <section class="mb-12 reveal">
+        <h2 class="text-xl font-bold tracking-tight sm:text-2xl mb-4">
+          Related Terms
+        </h2>
+        <div class="grid gap-3 sm:grid-cols-2">
+          {related.map((rel) => {
+            const firstSentence = rel.definition.split(". ")[0] + ".";
+            return (
+              <a
+                href={`/glossary/${rel.slug}/`}
+                class="group glass-card rounded-xl p-5 hover:border-accent/30 transition-all relative overflow-hidden block"
+              >
+                <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/0 to-transparent group-hover:via-accent/50 transition-all duration-500" />
+                <div class="flex items-center gap-2 mb-1.5">
+                  <h3 class="text-sm font-semibold text-text group-hover:text-accent transition-colors truncate">
+                    {rel.term}
+                  </h3>
+                  <span class={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${categoryColors[rel.category]}`}>
+                    {categoryLabels[rel.category]}
+                  </span>
+                </div>
+                <p class="text-xs text-text-secondary line-clamp-2">{firstSentence}</p>
+              </a>
+            );
+          })}
+        </div>
+      </section>
+    )}
+
+    <!-- Back to Glossary -->
+    <div class="text-center reveal">
+      <a
+        href="/glossary/"
+        class="inline-flex items-center gap-2 rounded-full border border-border px-6 py-2.5 text-sm font-semibold text-text transition-colors hover:border-accent/40 hover:bg-accent/5 hover:text-accent"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+        </svg>
+        Back to Glossary
+      </a>
+    </div>
+  </main>
+
+  <OssFooter t={t} />
+</Layout>

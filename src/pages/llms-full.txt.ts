@@ -60,7 +60,7 @@ ${entries}`;
 
 ## What is Vstorm OSS?
 
-Vstorm OSS is a collection of ${projects.length} open-source repositories (1,270+ GitHub stars, 285K+ PyPI downloads) for building production AI agent applications in Python. The projects span four categories: project templates, agent frameworks, specialized toolsets, and community resources.
+Vstorm OSS is a collection of ${projects.length} open-source repositories (1,730+ GitHub stars, 830K+ PyPI downloads) for building production AI agent applications in Python. The projects span four categories: project templates, agent frameworks, specialized toolsets, and community resources.
 
 All projects are MIT licensed and built by Vstorm (vstorm.co), an Applied Agentic AI Engineering Consultancy with 30+ production AI agent implementations.
 

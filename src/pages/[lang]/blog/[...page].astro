@@ -19,7 +19,7 @@ export async function getStaticPaths({ paginate }: { paginate: Function }) {
       await getCollection('blog', ({ data }) => data.lang === locale && !data.draft)
     ).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
-    const pages = paginate(posts, { pageSize: 50, params: { lang: locale } });
+    const pages = paginate(posts, { pageSize: 20, params: { lang: locale } });
     paths.push(...pages);
   }
 
@@ -95,6 +95,7 @@ const alternates = [
                 tags={post.data.tags}
                 lang={lang}
                 category={post.data.category}
+                author={post.data.author}
               />
             </div>
           );

@@ -1,0 +1,16 @@
+---
+title: "From Model to Agent: Equipping the Responses API with a Computer Environment"
+description: "OpenAI describes how they built an agent runtime using the Responses API, shell tool, and hosted containers to run secure, scalable agents."
+pubDate: 2026-03-22
+updatedDate: 2026-03-22
+author: "Kacper Włodarczyk"
+lang: en
+translationKey: from-model-to-agent-responses-api-computer-env
+tags: ["ai-agents", "openai", "agent-runtime", "coding-agents"]
+category: news
+draft: false
+---
+
+OpenAI describes how they built an agent runtime by equipping the Responses API with a shell tool and hosted container workspace, enabling models to execute shell commands, manage files, query databases, and access external systems in isolated environments. The architecture uses an orchestration loop where the model proposes actions, the platform executes them in sandboxed containers, and results feed back into the model's context. Key components include concurrent command execution, bounded output to manage context budgets, native context compaction for long-running tasks, network egress proxies with domain-scoped secret injection for security, and reusable "agent skills" packaged as versioned bundles. The system effectively turns a language model into a full agent capable of end-to-end workflows by combining orchestration, execution, persistent state, composable skills, and compaction.
+
+Source: [From model to agent: Equipping the Responses API with a computer environment](https://openai.com/index/equip-responses-api-computer-environment/)

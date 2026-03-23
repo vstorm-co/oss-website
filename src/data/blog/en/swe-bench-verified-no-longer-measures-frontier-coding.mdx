@@ -1,0 +1,16 @@
+---
+title: "Why SWE-bench Verified No Longer Measures Frontier Coding"
+description: "OpenAI argues that SWE-bench Verified is no longer reliable due to flawed test cases and training data contamination across all frontier models."
+pubDate: 2026-03-22
+updatedDate: 2026-03-22
+author: "Kacper Włodarczyk"
+lang: en
+translationKey: swe-bench-verified-no-longer-measures-frontier-coding
+tags: ["benchmarks", "coding-agents", "openai", "swe-bench", "evals"]
+category: news
+draft: false
+---
+
+OpenAI argues that SWE-bench Verified is no longer a reliable measure of frontier coding capabilities due to two critical issues. First, an audit of 138 problems found that 59.4% contain flawed test cases -- either too narrow (enforcing specific implementation details) or too wide (testing functionality not described in the problem statement) -- that reject functionally correct solutions. Second, all tested frontier models (GPT-5.2, Claude Opus 4.5, Gemini 3 Flash) show signs of training data contamination, being able to reproduce verbatim gold patches and problem descriptions from the benchmark's open-source repositories. As a result, score improvements increasingly reflect training exposure rather than genuine coding ability, leading OpenAI to recommend SWE-bench Pro as a replacement and calling for privately authored benchmarks.
+
+Source: [Why SWE-bench Verified no longer measures frontier coding capabilities](https://openai.com/index/why-we-no-longer-evaluate-swe-bench-verified/)

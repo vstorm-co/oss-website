@@ -46,6 +46,7 @@ function difficultyColor(d: string) {
   lang={lang}
   alternates={alternates}
   schemas={[howToSchema({ name: useCase.title[lang], description: useCase.description[lang], steps: useCase.steps.map((s) => ({ name: s.title[lang], text: s.description[lang] })) })]}
+  theme="light"
 >
   <Navbar currentLang={lang} />
 
@@ -56,21 +57,12 @@ function difficultyColor(d: string) {
   ]} />
 
   <!-- Hero -->
-  <section class="relative mx-auto max-w-4xl px-4 pt-28 pb-12 sm:px-6 sm:pt-36 sm:pb-16 lg:px-8 text-center">
-    <div class="pointer-events-none absolute inset-0 -top-24 flex items-center justify-center" aria-hidden="true">
-      <div class="h-[200px] w-[300px] sm:h-[340px] sm:w-[540px] rounded-full bg-accent/[0.07] blur-[60px] sm:blur-[100px]"></div>
+  <section class="mx-auto max-w-4xl px-4 py-16 sm:py-24">
     </div>
-    <div class="reveal relative">
-      <div class="flex items-center justify-center gap-3 mb-6">
-        <span class={`rounded-full px-3 py-1 text-xs font-medium ${difficultyColor(useCase.difficulty)}`}>
-          {useCase.difficulty}
-        </span>
-        <span class="text-sm text-text-tertiary">{useCase.timeToComplete}</span>
-      </div>
-      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+    <div class="mb-12 text-center reveal">      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl heading-accent">
         {useCase.title[lang]}
       </h1>
-      <p class="mt-6 text-lg sm:text-xl text-text-secondary max-w-2xl mx-auto leading-relaxed">
+      <p class="mt-4 text-lg text-text-secondary max-w-2xl mx-auto">
         {useCase.heroSubtitle[lang]}
       </p>
       <div class="mt-8 flex flex-wrap items-center justify-center gap-2">
@@ -82,7 +74,7 @@ function difficultyColor(d: string) {
   </section>
 
   <!-- Problem -->
-  <section class="section-stack px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+  <section class="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
     <div class="mx-auto max-w-3xl">
       <div class="reveal">
         <h2 class="text-2xl font-bold tracking-tight sm:text-3xl mb-6">
@@ -96,7 +88,7 @@ function difficultyColor(d: string) {
   </section>
 
   <!-- Solution -->
-  <section class="section-stack px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+  <section class="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
     <div class="mx-auto max-w-3xl">
       <div class="reveal">
         <h2 class="text-2xl font-bold tracking-tight sm:text-3xl mb-6">
@@ -110,7 +102,7 @@ function difficultyColor(d: string) {
   </section>
 
   <!-- Code Example -->
-  <section class="section-stack px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+  <section class="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
     <div class="mx-auto max-w-4xl">
       <div class="mb-10 text-center reveal">
         <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
@@ -124,7 +116,7 @@ function difficultyColor(d: string) {
   </section>
 
   <!-- Steps -->
-  <section class="section-stack px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+  <section class="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
     <div class="mx-auto max-w-4xl">
       <div class="mb-10 text-center reveal">
         <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
@@ -149,7 +141,7 @@ function difficultyColor(d: string) {
 
   <!-- Related Use Cases -->
   {relatedUseCases.length > 0 && (
-    <section class="section-stack px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+    <section class="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
       <div class="mx-auto max-w-4xl">
         <div class="mb-10 text-center reveal">
           <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
@@ -185,11 +177,8 @@ function difficultyColor(d: string) {
   )}
 
   <!-- CTA -->
-  <section class="relative section-stack px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
-    <div class="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden="true">
-      <div class="h-[180px] w-[300px] sm:h-[280px] sm:w-[480px] rounded-full bg-accent/[0.06] blur-[60px] sm:blur-[90px]"></div>
-    </div>
-    <div class="mx-auto max-w-3xl text-center reveal relative">
+  <section class="px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
+    <div class="mx-auto max-w-3xl text-center reveal">
       <div class="glass-card glow-card rounded-2xl p-6 sm:p-10 lg:p-14">
         <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
           {t["usecases.cta.title"] ?? "Ready to build this?"}

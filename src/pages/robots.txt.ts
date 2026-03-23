@@ -27,6 +27,15 @@ Allow: /
 User-agent: Bytespider
 Allow: /
 
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
 Sitemap: ${siteUrl}/sitemap-index.xml
 
 # Machine-readable site descriptions for LLMs

@@ -13,7 +13,14 @@ export default defineConfig({
       themes: ["github-dark", "github-light"],
     }),
     mdx(),
-    sitemap(),
+    sitemap({
+      serialize(item) {
+        // Add lastmod to all URLs based on current build date
+        // Blog posts will get their actual pubDate via the sitemap filter
+        item.lastmod = new Date().toISOString();
+        return item;
+      },
+    }),
   ],
   vite: {
     plugins: [tailwindcss()],

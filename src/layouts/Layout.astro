@@ -22,17 +22,19 @@ interface Props {
   alternates?: Alternate[];
   schemas?: JsonLdSchema[];
   ogImage?: string;
+  ogType?: "website" | "article";
   theme?: "light" | "dark";
 }
 
 const {
   title,
-  description = "Open-source tools for building production AI agents with Python. 20 repos, 1,270+ stars, 285K+ PyPI downloads. By Vstorm.",
+  description = "Open-source tools for building production AI agents with Python. 13 repos, 1,730+ stars, 830K+ PyPI downloads. By Vstorm.",
   keywords: keywordsOverride,
   lang = "en",
   alternates = [],
   schemas = [],
   ogImage,
+  ogType = "website",
   theme = "light",
 } = Astro.props;
 
@@ -93,12 +95,15 @@ const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbItems);
       <link rel="alternate" hreflang={alt.lang} href={new URL(alt.href, siteUrl).href} />
     ))}
     {alternates.length > 0 && (
-      <link rel="alternate" hreflang="x-default" href={new URL("/", siteUrl).href} />
+      <link rel="alternate" hreflang="x-default" href={(() => {
+        const enAlt = alternates.find(a => a.lang === "en");
+        return enAlt ? new URL(enAlt.href, siteUrl).href : canonicalURL;
+      })()} />
     )}
 
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:image" content={ogImageURL} />
     <meta property="og:site_name" content="Vstorm OSS" />
@@ -175,26 +180,6 @@ const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbItems);
         var cio=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting&&!seen.has(x.target)){seen.add(x.target);var el=x.target,raw=el.getAttribute('data-count-target')||el.textContent.trim(),suffix=raw.replace(/[\d,.]+/,''),target=parseFloat(raw.replace(/[^\d.]/g,'')),st=null;el.textContent='0'+suffix;function step(ts){if(!st)st=ts;var p=Math.min((ts-st)/1500,1),eased=1-Math.pow(1-p,3);el.textContent=Math.floor(eased*target).toLocaleString()+suffix;if(p<1)requestAnimationFrame(step);else el.textContent=raw}requestAnimationFrame(step)}})},{threshold:.3});
         document.querySelectorAll('[data-count-up]').forEach(function(el){el.setAttribute('data-count-target',el.textContent.trim());cio.observe(el)});
 
-        /* Copy code button */
-        document.querySelectorAll('pre').forEach(function(pre) {
-          if (pre.querySelector('.copy-btn')) return;
-          var btn = document.createElement('button');
-          btn.className = 'copy-btn';
-          btn.setAttribute('aria-label', 'Copy code');
-          btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
-          pre.style.position = 'relative';
-          pre.appendChild(btn);
-          btn.addEventListener('click', function() {
-            var code = pre.querySelector('code');
-            var text = code ? code.textContent : pre.textContent;
-            navigator.clipboard.writeText(text || '').then(function() {
-              btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-              setTimeout(function() {
-                btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
-              }, 2000);
-            });
-          });
-        });
       });
     </script>
   </body>

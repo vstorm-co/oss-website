@@ -19,6 +19,10 @@ const PUBLISHER = {
   "@type": "Organization",
   name: "Vstorm",
   url: "https://vstorm.co",
+  logo: {
+    "@type": "ImageObject",
+    url: "https://oss.vstorm.co/favicon.svg",
+  },
 };
 
 const FREE_OFFER = {
@@ -28,13 +32,16 @@ const FREE_OFFER = {
 };
 
 const ORG_DESCRIPTION =
-  "Open-source tools for building production AI agents with Python. 20 repos, 1,270+ stars, 285K+ PyPI downloads. By Vstorm.";
+  "Open-source tools for building production AI agents with Python. 13 repos, 1,730+ stars, 830K+ PyPI downloads. By Vstorm.";
 
 const SAME_AS = [
   "https://github.com/vstorm-co",
   "https://vstorm.co",
   "https://www.linkedin.com/company/vstormco/",
   "https://pypi.org/user/kacperwlodarczyk-vstorm/",
+  "https://twitter.com/VstormCommunity",
+  "https://www.crunchbase.com/organization/vstorm",
+  "https://www.youtube.com/@vstorm-ai-consultancy",
 ];
 
 // ── Builder functions ──
@@ -53,8 +60,16 @@ export function organizationSchema(params?: OrganizationParams): JsonLdSchema {
     name: "Vstorm OSS",
     description: params?.description ?? ORG_DESCRIPTION,
     url: SITE_URL,
+    logo: {
+      "@type": "ImageObject",
+      url: `${SITE_URL}/favicon.svg`,
+    },
     sameAs: params?.extraSameAs ? [...SAME_AS, ...params.extraSameAs] : SAME_AS,
-    author: PUBLISHER,
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "technical support",
+      url: "https://github.com/vstorm-co",
+    },
     ...(params?.foundingDate && { foundingDate: params.foundingDate }),
     ...(params?.numberOfEmployees && {
       numberOfEmployees: {
@@ -94,18 +109,55 @@ export function softwareApplicationSchema(params: SoftwareApplicationParams): Js
   };
 }
 
+// ── Person schema for authors ──
+
+export interface PersonParams {
+  name: string;
+  jobTitle?: string;
+  url?: string;
+  sameAs?: string[];
+}
+
+export function personSchema(params: PersonParams): JsonLdSchema {
+  return {
+    "@context": CONTEXT,
+    "@type": "Person",
+    name: params.name,
+    ...(params.jobTitle && { jobTitle: params.jobTitle }),
+    ...(params.url && { url: params.url }),
+    worksFor: PUBLISHER,
+    ...(params.sameAs && params.sameAs.length > 0 && { sameAs: params.sameAs }),
+  };
+}
+
+// ── BlogPosting ──
+
 export interface BlogPostingParams {
   title: string;
   description: string;
   pubDate: Date;
   updatedDate?: Date;
   author?: string;
+  authorPerson?: PersonParams;
   url: string;
   lang: Lang;
   image?: string;
+  wordCount?: number;
+  keywords?: string[];
+  articleSection?: string;
 }
 
 export function blogPostingSchema(params: BlogPostingParams): JsonLdSchema {
+  const authorSchema = params.authorPerson
+    ? {
+        "@type": "Person" as const,
+        name: params.authorPerson.name,
+        ...(params.authorPerson.jobTitle && { jobTitle: params.authorPerson.jobTitle }),
+        ...(params.authorPerson.url && { url: params.authorPerson.url }),
+        ...(params.authorPerson.sameAs && params.authorPerson.sameAs.length > 0 && { sameAs: params.authorPerson.sameAs }),
+      }
+    : { "@type": "Organization" as const, name: params.author ?? "Vstorm" };
+
   return {
     "@context": CONTEXT,
     "@type": "BlogPosting",
@@ -113,11 +165,14 @@ export function blogPostingSchema(params: BlogPostingParams): JsonLdSchema {
     description: params.description,
     datePublished: params.pubDate.toISOString(),
     ...(params.updatedDate && { dateModified: params.updatedDate.toISOString() }),
-    author: { "@type": "Organization", name: params.author ?? "Vstorm" },
+    author: authorSchema,
     publisher: PUBLISHER,
     mainEntityOfPage: { "@type": "WebPage", "@id": params.url },
     inLanguage: params.lang,
     ...(params.image && { image: params.image }),
+    ...(params.wordCount && { wordCount: params.wordCount }),
+    ...(params.keywords && params.keywords.length > 0 && { keywords: params.keywords.join(", ") }),
+    ...(params.articleSection && { articleSection: params.articleSection }),
   };
 }
 
@@ -140,6 +195,54 @@ export function howToSchema(params: HowToParams): JsonLdSchema {
       ...(s.text && { text: s.text }),
       ...(s.url && { url: s.url }),
     })),
+  };
+}
+
+// ── DefinedTerm (Glossary) ──
+
+export interface DefinedTermSetParams {
+  name: string;
+  description: string;
+  url: string;
+  terms: { name: string; url: string }[];
+}
+
+export function definedTermSetSchema(params: DefinedTermSetParams): JsonLdSchema {
+  return {
+    "@context": CONTEXT,
+    "@type": "DefinedTermSet",
+    name: params.name,
+    description: params.description,
+    url: params.url,
+    hasDefinedTerm: params.terms.map((t) => ({
+      "@type": "DefinedTerm",
+      name: t.name,
+      url: t.url,
+    })),
+  };
+}
+
+export interface DefinedTermParams {
+  name: string;
+  description: string;
+  url: string;
+  inDefinedTermSet?: string;
+}
+
+export function definedTermSchema(params: DefinedTermParams): JsonLdSchema {
+  return {
+    "@context": CONTEXT,
+    "@type": "DefinedTerm",
+    name: params.name,
+    description: params.description,
+    url: params.url,
+    ...(params.inDefinedTermSet && {
+      inDefinedTermSet: {
+        "@type": "DefinedTermSet",
+        name: params.inDefinedTermSet,
+        url: `${SITE_URL}/glossary/`,
+      },
+    }),
   };
 }
 
@@ -202,6 +305,15 @@ export function websiteSchema(): JsonLdSchema {
     name: "Vstorm OSS",
     url: SITE_URL,
     publisher: PUBLISHER,
+    inLanguage: "en",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${SITE_URL}/blog/?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
   };
 }
 
