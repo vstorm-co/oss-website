@@ -19,6 +19,7 @@ const letters = Array.from(grouped.keys()).sort();
   description="A comprehensive glossary of AI, machine learning, LLM, RAG, and agent terminology. Technical definitions for developers building production AI systems."
   keywords="ai glossary, machine learning terms, llm terminology, rag glossary, ai agent definitions, deep learning glossary, nlp terms"
   lang={lang}
+  alternates={[{ lang: "en", href: "/glossary/" }]}
   schemas={[definedTermSetSchema({ name: "AI & ML Glossary", description: "A comprehensive glossary of AI, machine learning, LLM, RAG, and agent terminology for developers.", url: SITE_URL + "/glossary/", terms: glossaryTerms.map((t) => ({ name: t.term, url: SITE_URL + `/glossary/${t.slug}/` })) })]}
   theme="light"
 >

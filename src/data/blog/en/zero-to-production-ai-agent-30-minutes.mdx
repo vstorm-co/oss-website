@@ -1,5 +1,5 @@
 ---
-title: "From 0 to Production AI Agent in 30 Minutes — Full-Stack Template with 5 AI Frameworks"
+title: "Zero to Production AI Agent in 30 Minutes with 5 AI Frameworks"
 description: "Step-by-step walkthrough: web configurator, pick a preset, choose your AI framework, configure 75+ options, docker-compose up — working production AI app."
 pubDate: 2026-03-16
 updatedDate: 2026-03-16
@@ -7,9 +7,11 @@ author: "Kacper Włodarczyk"
 lang: en
 translationKey: zero-to-production-ai-agent-30-minutes
 tags: ["ai-agents", "fastapi", "full-stack", "python", "pydantic-ai"]
-category: open-source
+category: tutorial
 draft: false
 ---
+
+> **TL;DR:** The full-stack-ai-agent-template lets you go from zero to a running production AI agent in 30 minutes, with 614 GitHub stars and adoption by teams at NVIDIA, Pfizer, TikTok, and others. A single command (`fastapi-fullstack create my_ai_app --preset ai-agent --ai-framework pydantic_ai --frontend nextjs`) generates a complete stack: FastAPI backend with async PostgreSQL and Alembic migrations, JWT auth with user management, Pydantic AI agent with WebSocket streaming and conversation persistence, Redis caching, Next.js 15 frontend with React 19, Docker Compose, GitHub Actions CI/CD, and Logfire observability. The template supports 5 AI frameworks (Pydantic AI, LangChain, LangGraph, CrewAI, DeepAgents) behind the same infrastructure, so switching frameworks means regenerating with a different `--ai-framework` flag without rewriting your backend. Generated projects include CLAUDE.md and AGENTS.md files optimized for AI coding assistants, and the 75+ configuration options cover databases, ORMs, auth methods, background tasks, observability, Kubernetes, and frontend i18n. Your customization focus is one directory: `app/agents/`.
 
 Every AI project starts the same way.
 
@@ -255,6 +257,8 @@ Every option is a boolean flag. No Jinja template hacking. No post-generation cl
 - **5 AI frameworks share the same infrastructure** — switch frameworks without rewriting your backend.
 - **The generated code is production-grade, not a prototype** — layered architecture, async everywhere, type-safe.
 - **You modify `app/agents/` and nothing else** — auth, streaming, persistence, frontend are done.
+
+**Built with:** [Pydantic AI](https://ai.pydantic.dev/) (default), [LangChain](https://python.langchain.com/), [LangGraph](https://langchain-ai.github.io/langgraph/), [CrewAI](https://docs.crewai.com/), [FastAPI](https://fastapi.tiangolo.com/), [Next.js](https://nextjs.org/), [Docker](https://docs.docker.com/).
 
 ---
 

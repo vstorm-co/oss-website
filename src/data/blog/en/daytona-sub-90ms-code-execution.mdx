@@ -11,6 +11,8 @@ category: open-source
 draft: false
 ---
 
+> **TL;DR:** Daytona replaces Docker as the code execution sandbox for AI agents, cutting cold start latency from 2-5 seconds per container to sub-90ms per cloud sandbox. For agents making 10-20 tool calls per task, this reduces total overhead from 30-100 seconds of container startup to roughly 1.3 seconds. The integration ships as `DaytonaSandbox` in pydantic-ai-backend v0.1.12, inheriting from the same `BaseSandbox` abstract class as `DockerSandbox` -- switching requires changing 3 lines of code and needs only an API key, no Docker daemon. Daytona's native file APIs upload and download files directly through its SDK rather than piping through shell commands like Docker does. The `CompositeBackend` pattern enables hybrid setups: read source files locally with zero overhead, execute untrusted code in Daytona with full isolation. Docker remains the right choice for local development and self-hosted setups, while Daytona excels in CI/CD pipelines where Docker-in-Docker is painful and cloud deployments where startup latency compounds across sequential tool calls.
+
 Every AI agent that writes code needs somewhere to run it. The agent generates a Python script, a shell command, a data pipeline — and something has to execute that code safely, isolated from your production environment.
 
 For the last year, we used [Docker](https://docs.docker.com/). Spin up a container, run the code, tear it down. It works. But "works" comes with a cost: 2-5 seconds of cold start latency per sandbox. When your agent is making 10-20 tool calls per task, that's 30-100 seconds of just waiting for containers to start.
@@ -19,7 +21,7 @@ Then we tried Daytona. Sub-90ms startup. No Docker daemon. Ephemeral cloud sandb
 
 ## The Problem: Docker Cold Starts Kill Agent UX
 
-Our AI agents use [pydantic-ai-backend](https://github.com/vstorm-co/pydantic-ai-backend) — a Python library that provides file storage and code execution backends for [Pydantic AI](https://ai.pydantic.dev/) agents. Before Daytona, we had three backends:
+Our AI agents use [pydantic-ai-backend](/projects/pydantic-ai-backend/) — a Python library that provides file storage and code execution backends for [Pydantic AI](https://ai.pydantic.dev/) agents. Before Daytona, we had three backends:
 
 | Backend | Storage | Execution | Use Case |
 |---------|---------|-----------|----------|
@@ -138,11 +140,11 @@ pip install pydantic-ai-backend[daytona]
 
 The raw number is impressive, but the real impact is on agent workflows:
 
-**Sequential tool calls compound.** An agent solving a coding task might: read 5 files, plan, write 3 files, run tests, fix 2 files, run tests again. That's ~15 tool calls. With Docker's 2-second overhead per sandbox operation: 30 seconds of waiting. With Daytona: ~1.3 seconds total overhead.
+**Sequential tool calls compound.** An agent solving a coding task might: read 5 files, plan, write 3 files, run tests, fix 2 files, run tests again. That's ~15 tool calls. With Docker's 2-second overhead per sandbox operation: 30 seconds of waiting. With Daytona: ~1.3 seconds total overhead. We explored the Docker sandbox pattern in depth in our [predictive AI Docker sandbox](/blog/predictive-ai-docker-sandbox/) post.
 
 **Interactive agents need responsiveness.** When a user watches the agent work in a terminal, every second of latency feels like lag. Sub-100ms makes execution feel instant.
 
-**CI/CD pipelines benefit most.** In CI, you typically can't run Docker-in-Docker easily. Daytona needs only an API key — no daemon, no privileged containers, no socket mounts.
+**CI/CD pipelines benefit most.** In CI, you typically can't run Docker-in-Docker easily. Daytona needs only an API key — no daemon, no privileged containers, no socket mounts. This is especially relevant for [open-source Claude Code alternatives](/blog/open-source-claude-code-alternative/) that need sandboxed execution in diverse environments.
 
 ## The Composite Pattern: Best of Both
 

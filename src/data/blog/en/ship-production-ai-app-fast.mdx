@@ -1,15 +1,17 @@
 ---
 title: "Ship a Production AI App in 5 Minutes: FastAPI + Next.js + 20 Integrations"
-description: "One CLI command, one production-ready stack: JWT auth, WebSocket streaming, Pydantic AI agents, PostgreSQL, Redis, Docker, and 20+ more integrations out of the box."
+description: "One CLI command, one production-ready stack: JWT auth, WebSocket streaming, Pydantic AI, PostgreSQL, Redis, Docker, and 20+ integrations."
 pubDate: 2026-02-18
 updatedDate: 2026-02-18
 author: "Kacper Włodarczyk"
 lang: en
 translationKey: ship-production-ai-app-fast
 tags: ["fastapi", "nextjs", "pydantic-ai", "python", "ai-template", "docker"]
-category: open-source
+category: tutorial
 draft: false
 ---
+
+> **TL;DR:** The command `fastapi-fullstack create my_app --preset ai-agent` generates a complete production stack in 5 minutes -- FastAPI backend with Pydantic AI agent, JWT auth with refresh tokens and session tracking, async PostgreSQL with Alembic migrations, WebSocket streaming with token-by-token delivery, Redis caching, Next.js 15 frontend with Tailwind CSS v4 and dark mode, Docker multi-stage builds, and GitHub Actions CI/CD. The template includes 20+ integrations covering 4 AI frameworks, 3 LLM providers, 3 auth methods, 2 databases, observability (Logfire, Sentry, Prometheus), background tasks (Celery, Taskiq), Kubernetes manifests, and an admin panel. Everything is swappable: start with SQLite and switch to PostgreSQL, start with Pydantic AI and add LangChain. The generated project includes a Django-style CLI (`uv run my_app server run`, `uv run my_app db migrate`), a Makefile for common operations, and multi-stage Docker builds with non-root user and health checks. The template was extracted from production deployments -- every integration exists because a client needed it.
 
 You're starting a new AI project. You need a [FastAPI](https://fastapi.tiangolo.com/) backend with auth, a [Next.js](https://nextjs.org/) frontend with streaming chat, WebSocket support, database migrations, Redis caching, [Docker](https://docs.docker.com/) deployment, and a [Pydantic AI](https://ai.pydantic.dev/) agent with tool support.
 
@@ -284,9 +286,9 @@ The frontend is a modern Next.js setup:
 
 ## Key Takeaways
 
-- **Don't build boilerplate.** JWT auth, WebSocket streaming, Docker configs, CI pipelines -- these are solved problems. Use a template that gets them right so you can focus on business logic.
-- **Presets match common architectures.** `--preset ai-agent` gives you exactly what AI chat apps need. `--preset production` adds enterprise integrations.
-- **The CLI generates, not scaffolds.** You get a complete, runnable project -- not empty files with TODO comments. Tests pass. Docker builds. The server starts.
+- **Don't build boilerplate.** JWT auth, WebSocket streaming, Docker configs, CI pipelines -- these are solved problems. Use a template that gets them right so you can focus on business logic. Our [step-by-step template guide](/blog/fastapi-nextjs-ai-template-guide/) walks through the entire process.
+- **Presets match common architectures.** `--preset ai-agent` gives you exactly what AI chat apps need. `--preset production` adds enterprise integrations. Use the [web configurator](/blog/web-configurator-ai-agent-template/) for a visual setup experience.
+- **The CLI generates, not scaffolds.** You get a complete, runnable project -- not empty files with TODO comments. Tests pass. Docker builds. The server starts. See [from zero to production AI agent in 30 minutes](/blog/zero-to-production-ai-agent-30-minutes/) for a full walkthrough.
 - **Everything is swappable.** Start with SQLite, switch to PostgreSQL. Start with Pydantic AI, add LangChain. The architecture supports incremental migration.
 - **Real projects taught us what's needed.** This template isn't theoretical -- it's extracted from production deployments. Every integration is there because a client needed it.
 

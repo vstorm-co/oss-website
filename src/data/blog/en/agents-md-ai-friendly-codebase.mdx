@@ -7,9 +7,11 @@ author: "Kacper Włodarczyk"
 lang: en
 translationKey: agents-md-ai-friendly-codebase
 tags: ["ai-agents", "developer-tools", "python", "fastapi", "open-source"]
-category: open-source
+category: tutorial
 draft: false
 ---
+
+> **TL;DR:** AGENTS.md is an emerging tool-agnostic standard for making codebases AI-agent friendly. While every major AI coding tool reads its own config file -- GitHub Copilot uses `.github/copilot-instructions.md`, Cursor uses `.cursor/rules/`, Claude Code reads `CLAUDE.md`, and OpenAI Codex reads `AGENTS.md` -- the AGENTS.md format is converging as the single file that works across at least 5 tools including Copilot, Codex, Zed, Claude Code, and Cursor. The file takes about 15 minutes to write and contains project overview, commands, structure, conventions, and off-limits sections. The most impactful sections are Commands (preventing wrong build tools) and Conventions (preventing wrong architectural patterns). Auto-generation is also possible: the full-stack-ai-agent-template generates both AGENTS.md and CLAUDE.md tailored to each project's exact configuration from 75+ options, so AI coding agents get project-specific context without manual effort.
 
 Your README explains your project to humans. Your `.gitignore` tells Git what to skip. Your `pyproject.toml` tells Python how to build.
 
@@ -21,7 +23,7 @@ The fix is a file that takes 15 minutes to write. The ecosystem just hasn't agre
 
 ## The Problem: AI Agents Are Powerful but Clueless
 
-Every major AI coding tool — [GitHub Copilot](https://github.com/features/copilot), [Cursor](https://cursor.sh/), [OpenAI Codex](https://openai.com/index/codex/), [Claude Code](https://docs.anthropic.com/en/docs/claude-code) — can now read, understand, and modify entire repositories. They're not autocompleting single lines anymore. They're refactoring modules, writing tests, creating new features from natural language descriptions.
+Every major AI coding tool — [GitHub Copilot](https://github.com/features/copilot), [Cursor](https://cursor.sh/), [OpenAI Codex](https://openai.com/index/codex/), [Claude Code](https://docs.anthropic.com/en/docs/claude-code) — can now read, understand, and modify entire repositories. We explored this architecture in depth in our post on [building an open-source Claude Code alternative](/blog/open-source-claude-code-alternative/). They're not autocompleting single lines anymore. They're refactoring modules, writing tests, creating new features from natural language descriptions.
 
 But here's the gap: **they understand code syntax perfectly and project conventions not at all.**
 
@@ -152,7 +154,7 @@ This creates a two-tier system: AGENTS.md for quick context, deeper docs for whe
 
 Here's where it gets meta.
 
-Our [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template) is a CLI that generates production-ready FastAPI + [Next.js](https://nextjs.org/) projects with 75+ configuration options — database, auth, AI framework ([Pydantic AI](https://ai.pydantic.dev/), [LangChain](https://python.langchain.com/), [LangGraph](https://langchain-ai.github.io/langgraph/), [CrewAI](https://docs.crewai.com/), DeepAgents), background tasks, [Docker](https://docs.docker.com/), CI/CD.
+Our [full-stack-ai-agent-template](/projects/full-stack-ai-agent-template/) is a CLI that generates production-ready FastAPI + [Next.js](https://nextjs.org/) projects with 75+ configuration options — database, auth, AI framework ([Pydantic AI](https://ai.pydantic.dev/), [LangChain](https://python.langchain.com/), [LangGraph](https://langchain-ai.github.io/langgraph/), [CrewAI](https://docs.crewai.com/), DeepAgents), background tasks, [Docker](https://docs.docker.com/), CI/CD.
 
 Every generated project includes **both** `AGENTS.md` and `CLAUDE.md` — auto-generated based on your configuration choices.
 
@@ -221,7 +223,7 @@ Copy that template, fill in the blanks, commit. Every AI coding tool that reads 
 - **Different tools use different files** (`.github/copilot-instructions.md`, `.cursor/rules/`, `CLAUDE.md`), but `AGENTS.md` is emerging as the tool-agnostic standard.
 - **The most impactful sections are Commands and Conventions.** These prevent the most common AI mistakes: wrong build tools and wrong architectural patterns.
 - **It takes 15 minutes to write** and saves hours of reviewing AI-generated code that breaks your patterns.
-- **Auto-generation is possible** — our template generates AGENTS.md and CLAUDE.md tailored to each project's exact configuration.
+- **Auto-generation is possible** — our template generates AGENTS.md and CLAUDE.md tailored to each project's exact configuration. See our [framework comparison guide](/blog/choosing-ai-framework/) for how different tools use these files.
 
 ---
 

@@ -7,13 +7,15 @@ author: "Kacper Włodarczyk"
 lang: en
 translationKey: fastapi-nextjs-ai-template-guide
 tags: ["fastapi", "nextjs", "tutorial", "python", "ai-agents"]
-category: open-source
+category: tutorial
 draft: false
 ---
 
+> **TL;DR:** The full-stack AI agent template generates a complete production AI application -- FastAPI backend, Next.js 15 frontend, authentication, database, WebSocket streaming, Docker, and CI/CD -- from a single CLI command (`pip install fastapi-fullstack`), reducing the typical 2-4 weeks of setup to 30 minutes. It supports 5 AI frameworks out of the box (Pydantic AI, LangChain, LangGraph, CrewAI, and DeepAgents), 3 database options (PostgreSQL, MongoDB, SQLite), 3 auth methods (JWT, API keys, Google OAuth), and 75+ total configuration options across 9 categories. Three presets cover common setups: minimal for prototyping, ai-agent for chat apps with streaming, and production for enterprise deployments. A web configurator at oss.vstorm.co provides a 9-step visual wizard with real-time validation and ZIP download. The template has been extracted from 30+ production client deployments, ensuring every generated project includes tested, working code rather than empty files with TODO comments.
+
 ## The Problem
 
-Building a production AI app from scratch means solving the same problems every time: API structure, authentication, database setup, WebSocket streaming, frontend scaffolding, [Docker](https://docs.docker.com/) configuration, CI/CD pipelines. We've done this 30+ times for clients and ourselves. It takes 2-4 weeks each time.
+Building a production AI app from scratch means solving the same problems every time: API structure, authentication, database setup, [WebSocket streaming](/blog/websocket-streaming-ai-agents/), frontend scaffolding, [Docker](https://docs.docker.com/) configuration, CI/CD pipelines. We've done this 30+ times for clients and ourselves. It takes 2-4 weeks each time.
 
 The Full-Stack AI Agent Template reduces that to **30 minutes**.
 
@@ -195,6 +197,8 @@ Once your project is running, you can:
 - Add more API endpoints
 - Customize the frontend UI
 - Set up monitoring dashboards
+
+For a more detailed walkthrough, see [from zero to production AI agent in 30 minutes](/blog/zero-to-production-ai-agent-30-minutes/) or jump straight to [shipping a production AI app fast](/blog/ship-production-ai-app-fast/).
 
 The template gives you the foundation. You focus on what makes your app unique.
 

@@ -110,6 +110,7 @@ if (category === "tutorial" && headings.length > 0) {
   alternates={alternates}
   ogImage={ogImage}
   ogType="article"
+  articleDates={{ published: pubDate.toISOString(), modified: updatedDate?.toISOString() }}
   schemas={schemas}
 >
   <!-- Scroll progress bar -->

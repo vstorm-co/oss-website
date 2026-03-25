@@ -1,6 +1,6 @@
 ---
 title: "Observability for AI Agents Is Broken. Here's What We Built Instead."
-description: "Standard dashboards don't work for LLM traces. We built an AI assistant that lets you ask questions about your agent's behavior in plain English - natural language to SQL queries against Logfire data."
+description: "Standard dashboards fail for LLM traces. We built a natural-language-to-SQL assistant for debugging AI agents with Pydantic Logfire."
 pubDate: 2026-02-19
 updatedDate: 2026-02-19
 author: "Kacper Włodarczyk"
@@ -10,6 +10,8 @@ tags: ["ai-agents", "observability", "logfire", "pydantic-ai", "python", "monito
 category: open-source
 draft: false
 ---
+
+> **TL;DR:** Standard observability dashboards built for HTTP request/response patterns fail for AI agents, whose traces are nested, branching, and context-dependent -- a single user message can spawn 15 spans across 3 sub-agents. The solution is a natural language debugging layer on top of Pydantic Logfire: an AI-powered assistant that translates questions like "show me all runs where the agent called the same tool more than 5 times" into SQL queries against Logfire's trace data. A Chrome extension injects the current trace context from Logfire's web UI into the assistant's system prompt, eliminating copy-pasting of trace IDs. Multi-span selection lets you compare token usage, latency, or tool call patterns across multiple agent runs. The backend streams responses via WebSocket with real-time tool visualization, supports multiple LLM providers, and validates every generated SQL query to prevent write operations against production observability data.
 
 You deploy an AI agent to production. It starts making weird decisions. Customer says "the agent told me the wrong price." You open your observability dashboard and see... 50,000 spans. Nested traces. Tool calls inside tool calls. Token counts. Latencies. An ocean of data with no obvious way to find what went wrong.
 
@@ -176,7 +178,7 @@ Select 3 spans, ask "compare the token usage across these three agent runs" - th
 
 ## WebSocket Streaming with Tool Visualization
 
-The backend streams responses via WebSocket, including tool call events:
+The backend streams responses via WebSocket, including tool call events. For a deeper guide on implementing this pattern, see our post on [real-time AI agent streaming with WebSockets](/blog/websocket-streaming-ai-agents/).
 
 ```python
 async with logfire_agent.agent.iter(
@@ -255,8 +257,8 @@ Each question gets translated to SQL, executed against Logfire, and returned as 
 - **Natural language to SQL is the right abstraction.** Your Logfire data is already SQL-queryable. The AI assistant bridges the gap between "why did the agent do X" and the SQL needed to answer that.
 - **Browser context makes debugging effortless.** The Chrome extension injects the current trace into the assistant's context. No copy-pasting. No context switching.
 - **Multi-span selection enables comparative analysis.** Select multiple spans and ask the assistant to compare them - token usage, latency, tool call patterns.
-- **This is observability for humans, not dashboards.** The goal isn't more charts. It's answering "what went wrong?" in natural language.
+- **This is observability for humans, not dashboards.** The goal isn't more charts. It's answering "what went wrong?" in natural language. Pair this with proper [memory management](/blog/ai-agent-memory-management/) and you'll catch both real-time issues and long-term context drift.
 
 ## Try It Yourself
 
-[logfire-assistant](https://github.com/vstorm.co/projects/logfire-assistant) - AI-powered Logfire assistant with natural language to SQL queries, Chrome extension, and multi-span analysis.
+[logfire-assistant](/projects/logfire-assistant/) - AI-powered Logfire assistant with natural language to SQL queries, Chrome extension, and multi-span analysis.

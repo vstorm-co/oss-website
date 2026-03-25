@@ -11,6 +11,8 @@ category: open-source
 draft: false
 ---
 
+> **TL;DR:** pydantic-deepagents is an open-source Python framework for building Claude Code-style deep agents -- the kind that plan, delegate, remember, and self-correct -- built on Pydantic AI as 5 modular, independently usable packages: pydantic-deep (core + CLI), pydantic-ai-backend (file storage with local, Docker, and Daytona backends), pydantic-ai-todo (task planning with dependencies), subagents-pydantic-ai (agent delegation), summarization-pydantic-ai (context management), and pydantic-ai-middleware (lifecycle hooks and cost tracking). The one-function API `create_deep_agent()` toggles 30+ features via boolean flags including checkpointing (save/rewind conversation state like git commits), agent teams with shared todo lists and peer messaging, lifecycle hooks that intercept every tool call, custom slash commands from markdown files, and persistent MEMORY.md that survives across sessions. The CLI provides a full terminal UX with colored diff viewer for file approvals, context usage progress bar, and @file mentions with tab completion. The hashline edit format improves file editing accuracy by up to 64 percentage points compared to standard str_replace.
+
 Claude Code changed how developers think about AI coding assistants. An agent that lives in your terminal, reads your codebase, edits files, runs commands — no browser tab, no copy-pasting, no context window gymnastics.
 
 But here's the thing: it's a closed-source monolith. You can't swap the model. You can't extend the toolset. You can't deploy it in your own infrastructure. And if you're building agents for clients — you can't ship Claude Code as your product.
@@ -37,7 +39,7 @@ pydantic-deep              — core agent + CLI
 └── pydantic-ai-middleware — lifecycle hooks, permissions, cost tracking
 ```
 
-Each package works standalone. You can use [`pydantic-ai-todo`](https://github.com/vstorm-co/pydantic-ai-todo) without the rest. You can swap [`pydantic-ai-backend`](https://github.com/vstorm-co/pydantic-ai-backend) for your own storage layer. The framework composes them — you pick what you need.
+Each package works standalone. You can use [`pydantic-ai-todo`](https://github.com/vstorm-co/pydantic-ai-todo) for [task planning](/blog/task-planning-ai-agents/) without the rest. You can swap [`pydantic-ai-backend`](https://github.com/vstorm-co/pydantic-ai-backend) for your own storage layer. The framework composes them — you pick what you need.
 
 ## The One-Function API
 
@@ -113,7 +115,7 @@ task_b = await team.todos.add("Implement endpoints",
                                blocked_by=[task_a], created_by="lead")
 ```
 
-Each team member shares a `SharedTodoList` (asyncio-safe task claiming with dependencies) and a `TeamMessageBus` for peer-to-peer messaging. No hierarchical subagent chains — agents coordinate as peers, claim tasks, and message each other when they need input.
+Each team member shares a `SharedTodoList` (asyncio-safe task claiming with dependencies) and a `TeamMessageBus` for peer-to-peer messaging. No hierarchical subagent chains — agents coordinate as peers, claim tasks, and message each other when they need input. For a practical example, see how we built an [AI PR reviewer with parallel subagents](/blog/ai-pr-reviewer-parallel-subagents/).
 
 ## Hooks — Claude Code-Style Lifecycle Events
 
@@ -177,7 +179,7 @@ The CLI (`pydantic-deep chat`) is where everything comes together:
 
 ## Persistent Memory
 
-The agent maintains a `MEMORY.md` file — persistent notes that survive across sessions:
+The agent maintains a `MEMORY.md` file — persistent notes that survive across sessions. We wrote extensively about why [selective memory beats total recall](/blog/ai-agent-memory-management/) and how to implement [file-based persistent memory](/blog/ai-agent-selective-memory/) for agents.
 
 ```python
 agent = create_deep_agent(include_memory=True)
@@ -193,6 +195,7 @@ In the CLI, use `/remember` to save preferences: "always use pytest, never use u
 - **Modularity wins** — 5 packages that compose vs 1 monolith means you can swap any layer without rewriting everything
 - **Checkpointing changes the workflow** — treating agent sessions like git branches (save, rewind, fork) makes AI coding assistants dramatically more useful
 - **The CLI is the interface** — for coding tasks, a terminal agent beats a chat window every time
+- **File editing accuracy matters** — our [hashline edit format](/blog/hashline-file-editing/) improved editing accuracy by up to 64 percentage points
 
 ---
 

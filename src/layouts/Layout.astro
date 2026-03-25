@@ -23,6 +23,7 @@ interface Props {
   schemas?: JsonLdSchema[];
   ogImage?: string;
   ogType?: "website" | "article";
+  articleDates?: { published: string; modified?: string };
   theme?: "light" | "dark";
 }
 
@@ -35,6 +36,7 @@ const {
   schemas = [],
   ogImage,
   ogType = "website",
+  articleDates,
   theme = "light",
 } = Astro.props;
 
@@ -104,6 +106,12 @@ const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbItems);
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content={ogType} />
+    {articleDates && (
+      <>
+        <meta property="article:published_time" content={articleDates.published} />
+        {articleDates.modified && <meta property="article:modified_time" content={articleDates.modified} />}
+      </>
+    )}
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:image" content={ogImageURL} />
     <meta property="og:site_name" content="Vstorm OSS" />

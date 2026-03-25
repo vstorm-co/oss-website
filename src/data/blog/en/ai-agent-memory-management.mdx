@@ -1,5 +1,5 @@
 ---
-title: "Your AI Agent Forgets Everything After 50 Messages. Here's the Fix."
+title: "AI Agent Memory: Why Your Agent Forgets After 50 Messages (And the Fix)"
 description: "SummarizationProcessor vs SlidingWindowProcessor - two strategies for keeping your agent's memory alive when the context window fills up."
 pubDate: 2026-02-16
 updatedDate: 2026-02-16
@@ -10,6 +10,8 @@ tags: ["ai-agents", "memory-management", "pydantic-ai", "python", "context-windo
 category: open-source
 draft: false
 ---
+
+> **TL;DR:** When a Pydantic AI agent runs for 50+ messages, early context silently disappears as the context window fills up -- and tool-heavy agents hit this limit even faster, since a 20-turn conversation with 3 tool calls per turn consumes 80+ messages. The summarization-pydantic-ai library provides two drop-in processors: SummarizationProcessor, which uses an LLM to intelligently compress older messages into a summary while preserving tool call pairs, and SlidingWindowProcessor, which simply trims old messages at zero cost. Both support three trigger types -- message count, token count, and fraction-based (e.g., 80% of context window) -- with fraction-based being the most portable across models. The critical implementation detail both processors handle is tool call pair preservation: cutting between a tool call and its response creates orphaned calls that break the model, so the cutoff algorithm searches 5 messages in each direction to keep pairs intact.
 
 Run a [Pydantic AI](https://ai.pydantic.dev/) agent for 50 messages and ask it about something from message #3. It won't remember. Not because the model is bad - because the conversation got too long, the context window filled up, and the early messages fell off.
 
@@ -25,7 +27,7 @@ This isn't a model problem. It's an infrastructure problem. And it gets worse wi
 
 We hit this wall in every long-running agent deployment. Customer support bots that forget the customer's name. Code assistants that lose track of which files they've already modified. Research agents that re-investigate topics they covered 30 messages ago.
 
-So we built [`summarization-pydantic-ai`](https://github.com/vstorm-co/summarization-pydantic-ai) - two processors that manage your agent's conversation history: one that summarizes intelligently using an LLM, and one that simply trims old messages for zero cost.
+So we built [`summarization-pydantic-ai`](/projects/summarization-pydantic-ai/) - two processors that manage your agent's conversation history: one that summarizes intelligently using an LLM, and one that simply trims old messages for zero cost.
 
 ## Two Processors, Two Trade-offs
 
@@ -108,7 +110,7 @@ processor = SummarizationProcessor(
 )
 ```
 
-Fraction-based triggers are the most robust for production - they adapt automatically when you switch between models with different context windows.
+Fraction-based triggers are the most robust for production - they adapt automatically when you switch between models with different context windows. If you're deciding which framework to build your agent with, our [framework comparison](/blog/choosing-ai-framework/) covers how each one handles context management.
 
 ## Tool Call Pair Preservation
 
@@ -287,7 +289,7 @@ The history processor runs automatically before each `agent.run()` call. You pas
 
 ## Key Takeaways
 
-- **Context overflow is an infrastructure problem, not a model problem.** Every long-running agent needs a context management strategy. Choose between intelligent summarization (higher quality, LLM cost) and sliding window (zero cost, context loss).
+- **Context overflow is an infrastructure problem, not a model problem.** Every long-running agent needs a context management strategy. Choose between intelligent summarization (higher quality, LLM cost) and sliding window (zero cost, context loss). For a deeper dive into what agents should and shouldn't remember, see [why your AI agent remembers too much](/blog/ai-agent-selective-memory/).
 - **Tool call pair preservation is critical.** Never cut between a tool call and its response. Both our processors handle this automatically - search 5 messages in each direction for orphaned pairs.
 - **Fraction-based triggers are the most portable.** `("fraction", 0.8)` works regardless of which model you use or how long your messages are. Token and message counts are model- and content-specific.
 - **The ~4 chars/token heuristic is good enough.** For production precision, use `tiktoken`. For everything else, the default counter keeps things fast without adding a dependency.

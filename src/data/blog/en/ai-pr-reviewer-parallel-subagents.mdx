@@ -7,9 +7,11 @@ author: "Kacper Wlodarczyk"
 lang: en
 translationKey: ai-pr-reviewer-parallel-subagents
 tags: ["pydantic-ai", "ai-agents", "python", "code-review", "open-source"]
-category: case-study
+category: article
 draft: false
 ---
+
+> **TL;DR:** An AI PR reviewer built with pydantic-deepagents uses 3 parallel subagents -- security, style, and performance -- to produce a structured, priority-sorted code review in approximately 30 seconds, compared to roughly 90 seconds for sequential execution. The entire implementation is under 40 lines of actual logic using `create_deep_agent()` with three `SubAgentConfig` definitions. Each subagent receives the same git diff and reviews through its specialized lens: the security reviewer checks for SQL injection, XSS, and hardcoded secrets; the style reviewer catches naming violations, missing type hints, and dead code; the performance reviewer flags N+1 queries, blocking I/O in async contexts, and unoptimized loops. The parent coordinator aggregates, deduplicates, and sorts findings by severity -- critical first, then warnings, then informational. This deep agent pattern of plan-delegate-execute-synthesize is the same architecture used by Claude Code and OpenAI Codex, but open-source and built on Pydantic AI.
 
 Code reviews are one of the most valuable — and most expensive — activities in software engineering.
 
@@ -53,7 +55,7 @@ The core idea is simple: instead of one monolithic "review this code" prompt, we
 
 Each subagent receives the same git diff, reviews it through its specialized lens, and returns structured findings. A parent agent coordinates them — dispatching all three in parallel, then aggregating the results into a unified review sorted by severity.
 
-This is the deep agent pattern: a coordinator that plans, delegates to specialists, and synthesizes results. It's the same architecture used by Claude Code, Codex, and other production coding agents — but open-source and built on [Pydantic AI](https://ai.pydantic.dev/).
+This is the deep agent pattern: a coordinator that plans, delegates to specialists, and synthesizes results. It's the same architecture used by Claude Code, Codex, and other production coding agents — but open-source and built on [Pydantic AI](https://ai.pydantic.dev/). We explored this architecture in depth in our post on [building an open-source Claude Code alternative](/blog/open-source-claude-code-alternative/).
 
 ## The Code: ~40 Lines, Fully Working
 
@@ -292,7 +294,7 @@ Three reasons:
 
 This PR reviewer is one example of the deep agent pattern — the same architecture powering Claude Code, OpenAI Codex, and Cursor behind the scenes.
 
-The pattern:
+The pattern — which we break down further in [task planning for AI agents](/blog/task-planning-ai-agents/):
 1. **Plan** — break a complex task into subtasks
 2. **Delegate** — dispatch subtasks to specialists (subagents)
 3. **Execute** — each specialist works independently with its own tools
@@ -304,7 +306,7 @@ The pattern:
 
 - **Repository:** [pydantic-deepagents on GitHub](https://github.com/vstorm.co/projects/pydantic-deepagents)
 - **Install:** `pip install pydantic-deep`
-- **Subagents package:** [subagents-pydantic-ai](https://github.com/vstorm-co/subagents-pydantic-ai)
+- **Subagents package:** [subagents-pydantic-ai](/projects/subagents-pydantic-ai/)
 - **Docs:** [pydantic-deep.vstorm.co](https://pydantic-deep.vstorm.co)
 
 The PR reviewer code from this article is in the `examples/` directory. Clone it, point it at your repo, and see what it finds.

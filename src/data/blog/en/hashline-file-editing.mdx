@@ -1,6 +1,6 @@
 ---
 title: "Hashline Edit Format: How 2-Character Hashes Fixed AI File Editing"
-description: "How hashline edit format replaces error-prone str_replace with 2-character content hashes for reliable AI file editing. Benchmark results across 16 models and our Pydantic AI implementation."
+description: "Hashline replaces error-prone str_replace with 2-character content hashes. Benchmark: +5 to +64pp accuracy across 16 models."
 pubDate: 2026-02-25
 updatedDate: 2026-02-25
 author: "Kacper Włodarczyk"
@@ -11,13 +11,15 @@ category: open-source
 draft: false
 ---
 
+> **TL;DR:** Hashline is a file editing format that replaces error-prone str_replace text matching with 2-character content hashes, delivering +5 to +64 percentage point accuracy improvements across 16 models by changing only the harness, not the model. In Can Boluk's benchmark of 180 tasks, the weakest model (Grok Code Fast 1) jumped from 6.7% to 68.3% accuracy -- a 61.6pp gain -- and Grok 4 Fast saw a 61% reduction in output tokens because models no longer waste tokens reproducing old text to identify edit locations. Each file line gets a `{line_number}:{hash}|` prefix where the hash is a deterministic 2-character content fingerprint. The model references lines by their hash anchor instead of reproducing exact text, eliminating whitespace mismatches and non-unique match failures. Hash validation also catches stale files: unlike str_replace's silent failures, hashline explicitly rejects edits when the file has changed since last read. In pydantic-ai-backend, enabling it requires one parameter: `create_console_toolset(edit_format="hashline")`.
+
 Every AI coding agent has the same Achilles heel: file editing.
 
 The agent reads a file, decides what to change, and then... needs to reproduce the exact text it wants to replace. Character by character. Including tabs, spaces, trailing whitespace.
 
 One wrong space and the edit silently fails. Or worse - it edits the wrong line.
 
-We've been building production AI agents for 2 years. File editing accuracy was always the thing that made us cringe during demos. Then Can Boluk published a benchmark that changed how we think about this problem entirely.
+We've been building production AI agents for 2 years — including our [open-source Claude Code alternative](/blog/open-source-claude-code-alternative/). File editing accuracy was always the thing that made us cringe during demos. Then Can Boluk published a benchmark that changed how we think about this problem entirely.
 
 ## TL;DR
 
@@ -96,7 +98,7 @@ The conclusion: "The harness - not the model - is one of the bottlenecks in LLM 
 
 ## Our Implementation in pydantic-ai-backend
 
-We shipped hashline support in [pydantic-ai-backend](https://github.com/vstorm-co/pydantic-ai-backend) v0.1.9, inspired directly by Can Boluk's research. Here's how it works in our [Pydantic AI](https://ai.pydantic.dev/) implementation.
+We shipped hashline support in [pydantic-ai-backend](/projects/pydantic-ai-backend/) v0.1.9, inspired directly by Can Boluk's research. The same backend also supports [sub-90ms cloud code execution with Daytona](/blog/daytona-sub-90ms-code-execution/). Here's how it works in our [Pydantic AI](https://ai.pydantic.dev/) implementation.
 
 ### Reading Files
 

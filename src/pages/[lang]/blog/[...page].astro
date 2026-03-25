@@ -19,7 +19,7 @@ export async function getStaticPaths({ paginate }: { paginate: Function }) {
       await getCollection('blog', ({ data }) => data.lang === locale && !data.draft)
     ).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
-    const pages = paginate(posts, { pageSize: 20, params: { lang: locale } });
+    const pages = paginate(posts, { pageSize: 50, params: { lang: locale } });
     paths.push(...pages);
   }
 
@@ -29,7 +29,7 @@ export async function getStaticPaths({ paginate }: { paginate: Function }) {
 const lang = Astro.params.lang as Lang;
 const t = translations[lang];
 const { page } = Astro.props;
-const categories = ["open-source", "news"] as const;
+const categories = ["open-source", "tutorial", "article", "news"] as const;
 
 const alternates = [
   { lang: "en", href: "/blog/" },
@@ -134,30 +134,34 @@ const alternates = [
 </style>
 
 <script>
-  const tabs = document.querySelectorAll<HTMLButtonElement>('.category-tab');
-  const posts = document.querySelectorAll<HTMLElement>('[data-post-category]');
-  const pagination = document.querySelector('.pagination-nav');
-  const noPosts = document.getElementById('no-filtered-posts');
+  function initCategoryFilter() {
+    const tabs = document.querySelectorAll<HTMLButtonElement>('.category-tab');
+    const posts = document.querySelectorAll<HTMLElement>('[data-post-category]');
+    const pagination = document.querySelector('.pagination-nav');
+    const noPosts = document.getElementById('no-filtered-posts');
 
-  tabs.forEach((tab) => {
-    tab.addEventListener('click', () => {
-      tabs.forEach((t) => t.classList.remove('active'));
-      tab.classList.add('active');
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        tabs.forEach((t) => t.classList.remove('active'));
+        tab.classList.add('active');
 
-      const cat = tab.dataset.category;
-      let visible = 0;
-      posts.forEach((post) => {
-        if (cat === 'all' || post.dataset.postCategory === cat) {
-          post.style.display = '';
-          visible++;
-        } else {
-          post.style.display = 'none';
-        }
+        const cat = tab.dataset.category;
+        let visible = 0;
+        posts.forEach((post) => {
+          if (cat === 'all' || post.dataset.postCategory === cat) {
+            post.style.display = '';
+            visible++;
+          } else {
+            post.style.display = 'none';
+          }
+        });
+
+        if (pagination) pagination.style.display = cat === 'all' ? '' : 'none';
+        if (noPosts) noPosts.style.display = visible === 0 ? '' : 'none';
       });
-
-      // Hide pagination when filtering by category
-      if (pagination) pagination.style.display = cat === 'all' ? '' : 'none';
-      if (noPosts) noPosts.style.display = visible === 0 ? '' : 'none';
     });
-  });
+  }
+
+  initCategoryFilter();
+  document.addEventListener('astro:page-load', initCategoryFilter);
 </script>

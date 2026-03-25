@@ -2817,3 +2817,145 @@ export const termToProjectMap: Record<string, { slug: string; name: string }[]> 
     { slug: "pydantic-deepagents", name: "Pydantic Deep Agents" },
   ],
 };
+
+export const termToBlogMap: Record<string, { slug: string; title: string }[]> = {
+  "rag-retrieval-augmented-generation": [
+    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+  ],
+  "vector-database": [
+    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+  ],
+  "hybrid-search": [
+    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+  ],
+  "semantic-search": [
+    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+  ],
+  "re-ranking": [
+    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+  ],
+  "document-chunking": [
+    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+  ],
+  "pydantic-ai": [
+    { slug: "choosing-ai-framework", title: "Pydantic AI vs LangChain vs LangGraph vs CrewAI: Which to Choose?" },
+    { slug: "pydantic-ai-vs-langchain", title: "Pydantic AI vs LangChain for Production AI Agents" },
+  ],
+  "langchain": [
+    { slug: "choosing-ai-framework", title: "Pydantic AI vs LangChain vs LangGraph vs CrewAI: Which to Choose?" },
+    { slug: "same-chat-app-4-frameworks", title: "Same Chat App, 4 AI Frameworks" },
+  ],
+  "langgraph": [
+    { slug: "choosing-ai-framework", title: "Pydantic AI vs LangChain vs LangGraph vs CrewAI: Which to Choose?" },
+    { slug: "same-chat-app-4-frameworks", title: "Same Chat App, 4 AI Frameworks" },
+  ],
+  "crewai": [
+    { slug: "choosing-ai-framework", title: "Pydantic AI vs LangChain vs LangGraph vs CrewAI: Which to Choose?" },
+    { slug: "same-chat-app-4-frameworks", title: "Same Chat App, 4 AI Frameworks" },
+  ],
+  "ai-agent": [
+    { slug: "open-source-claude-code-alternative", title: "Building an Open-Source Claude Code Alternative" },
+    { slug: "choosing-ai-framework", title: "Which AI Agent Framework to Choose?" },
+  ],
+  "agentic-ai": [
+    { slug: "open-source-claude-code-alternative", title: "Building an Open-Source Claude Code Alternative" },
+  ],
+  "multi-agent-system": [
+    { slug: "ai-pr-reviewer-parallel-subagents", title: "AI PR Reviewer with 3 Parallel Subagents" },
+  ],
+  "agent-memory": [
+    { slug: "ai-agent-memory-management", title: "AI Agent Memory: Why Your Agent Forgets After 50 Messages" },
+    { slug: "ai-agent-selective-memory", title: "AI Agent Selective Memory: Stop Storing Everything" },
+  ],
+  "agent-observability": [
+    { slug: "ai-agent-observability", title: "Observability for AI Agents Is Broken. Here's What We Built." },
+  ],
+  "agent-planning": [
+    { slug: "task-planning-ai-agents", title: "Task Planning for AI Agents: Dependencies and Hierarchical Todos" },
+  ],
+  "websocket-streaming": [
+    { slug: "websocket-streaming-ai-agents", title: "Real-Time AI Agent Streaming with WebSockets and FastAPI" },
+  ],
+  "fastapi": [
+    { slug: "fastapi-nextjs-ai-template-guide", title: "Build a Full-Stack AI App with FastAPI and Next.js" },
+    { slug: "ship-production-ai-app-fast", title: "Ship a Production AI App in 5 Minutes" },
+  ],
+  "docker": [
+    { slug: "predictive-ai-docker-sandbox", title: "Give Your Agent a Docker Lab to Run Models" },
+    { slug: "daytona-sub-90ms-code-execution", title: "Sub-90ms Cloud Code Execution with Daytona" },
+  ],
+  "agent-sandbox": [
+    { slug: "predictive-ai-docker-sandbox", title: "Give Your Agent a Docker Lab to Run Models" },
+    { slug: "daytona-sub-90ms-code-execution", title: "Sub-90ms Cloud Code Execution with Daytona" },
+  ],
+  "human-in-the-loop": [
+    { slug: "open-source-claude-code-alternative", title: "Building an Open-Source Claude Code Alternative" },
+  ],
+  "tool-calling": [
+    { slug: "choosing-ai-framework", title: "Which AI Agent Framework to Choose?" },
+  ],
+  "function-calling": [
+    { slug: "choosing-ai-framework", title: "Which AI Agent Framework to Choose?" },
+  ],
+  "prompt-engineering": [
+    { slug: "agents-md-ai-friendly-codebase", title: "AGENTS.md: Making Your Codebase AI-Agent Friendly" },
+  ],
+  "guardrails": [
+    { slug: "open-source-claude-code-alternative", title: "Building an Open-Source Claude Code Alternative" },
+  ],
+  "prompt-injection": [
+    { slug: "open-source-claude-code-alternative", title: "Building an Open-Source Claude Code Alternative" },
+  ],
+  "knowledge-distillation": [
+    { slug: "ai-agent-memory-management", title: "AI Agent Memory Management" },
+  ],
+  "transformer": [
+    { slug: "choosing-ai-framework", title: "Which AI Agent Framework to Choose?" },
+  ],
+  "fine-tuning": [
+    { slug: "choosing-ai-framework", title: "Which AI Agent Framework to Choose?" },
+  ],
+  "hallucination": [
+    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+  ],
+  "milvus": [
+    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+  ],
+  "qdrant": [
+    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+  ],
+  "chromadb": [
+    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+  ],
+  "pgvector": [
+    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+  ],
+  "pinecone": [
+    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+  ],
+  "embedding-model": [
+    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+  ],
+  "vector-embedding": [
+    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+  ],
+  "subagent-delegation": [
+    { slug: "ai-pr-reviewer-parallel-subagents", title: "AI PR Reviewer with 3 Parallel Subagents" },
+  ],
+  "task-decomposition": [
+    { slug: "task-planning-ai-agents", title: "Task Planning for AI Agents" },
+  ],
+  "cost-tracking": [
+    { slug: "ai-agent-observability", title: "Observability for AI Agents" },
+  ],
+  "nextjs": [
+    { slug: "fastapi-nextjs-ai-template-guide", title: "Build a Full-Stack AI App with FastAPI and Next.js" },
+    { slug: "zero-to-production-ai-agent-30-minutes", title: "Zero to Production AI Agent in 30 Minutes" },
+  ],
+  "kubernetes": [
+    { slug: "ship-production-ai-app-fast", title: "Ship a Production AI App in 5 Minutes" },
+  ],
+  "containerization": [
+    { slug: "ship-production-ai-app-fast", title: "Ship a Production AI App in 5 Minutes" },
+  ],
+};

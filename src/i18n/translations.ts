@@ -106,7 +106,8 @@ export const translations = {
     "blog.allCategories": "All",
     "blog.category.open-source": "Open Source",
     "blog.category.news": "News",
-    "blog.category.case-study": "Case Study",
+    "blog.category.article": "Article",
+    "blog.category.tutorial": "Tutorial",
 
     // FAQ
     "faq.title": "Frequently Asked Questions",
@@ -123,6 +124,7 @@ export const translations = {
     "oss.hero.title.highlight": "Production AI Agents",
     "oss.hero.title.line2": "Not Infrastructure",
     "oss.hero.description": "Open-source Python tools battle-tested across 30+ deployments. Frameworks, templates, and libraries so you ship agents — not boilerplate.",
+    "oss.hero.definition": "Vstorm OSS is a collection of 13 open-source Python packages for building production AI agents. It includes a full-stack project generator (FastAPI + Next.js), a deep agent framework (planning, sandboxed execution, subagents), RAG pipeline with 4 vector stores, middleware with lifecycle hooks, task planning, context summarization, and database tooling. Used by 50,000+ developers with 1,730+ GitHub stars and 830K+ PyPI downloads.",
     "oss.hero.cta.configure": "Build Your AI App",
     "oss.hero.cta.explore": "Explore Projects",
     "oss.hero.consultancy.title": "Need help building production AI agents?",
@@ -707,7 +709,7 @@ export const translations = {
     "blog.allCategories": "Wszystkie",
     "blog.category.open-source": "Open Source",
     "blog.category.news": "Aktualności",
-    "blog.category.case-study": "Case Study",
+    "blog.category.article": "Artykuł",
 
     // FAQ
     "faq.title": "Często zadawane pytania",
@@ -724,6 +726,8 @@ export const translations = {
     "oss.hero.title.highlight": "produkcyjne agenty AI",
     "oss.hero.title.line2": "Nie infrastrukturę",
     "oss.hero.description": "Open-source'owe narzędzia Python sprawdzone w 30+ wdrożeniach. Frameworki, szablony i biblioteki — buduj agentów, nie boilerplate.",
+    "oss.hero.definition": "Vstorm OSS to zbiór 13 open-sourcex27owych pakietów Python do budowania produkcyjnych agentów AI. Zawiera generator projektów full-stack (FastAPI + Next.js), framework deep agent (planowanie, sandbox, subagenty), pipeline RAG z 4 bazami wektorowymi, middleware z lifecycle hooks, planowanie zadań, kompresję kontekstu i narzędzia bazodanowe. Używany przez 50 000+ deweloperów, 1 730+ gwiazdek na GitHub i 830K+ pobrań z PyPI.",
+    "oss.hero.definition": "Vstorm OSS is a collection of 13 open-source Python packages for building production AI agents. It includes a full-stack project generator (FastAPI + Next.js), a deep agent framework (planning, sandboxed execution, subagents), RAG pipeline with 4 vector stores, middleware with lifecycle hooks, task planning, context summarization, and database tooling. Used by 50,000+ developers with 1,730+ GitHub stars and 830K+ PyPI downloads.",
     "oss.hero.cta.configure": "Zbuduj swoją aplikację AI",
     "oss.hero.cta.explore": "Przeglądaj projekty",
     "oss.hero.consultancy.title": "Potrzebujesz pomocy z produkcyjnymi agentami AI?",
@@ -1299,7 +1303,7 @@ export const translations = {
     "blog.allCategories": "Alle",
     "blog.category.open-source": "Open Source",
     "blog.category.news": "Neuigkeiten",
-    "blog.category.case-study": "Fallstudie",
+    "blog.category.article": "Artikel",
 
     // FAQ
     "faq.title": "Häufig gestellte Fragen",
@@ -1316,6 +1320,8 @@ export const translations = {
     "oss.hero.title.highlight": "produktionsreife KI-Agenten",
     "oss.hero.title.line2": "Keine Infrastruktur",
     "oss.hero.description": "Open-Source-Python-Tools aus 30+ realen Deployments. Frameworks, Templates und Bibliotheken — baue Agenten, nicht Boilerplate.",
+    "oss.hero.definition": "Vstorm OSS is a collection of 13 open-source Python packages for building production AI agents. It includes a full-stack project generator (FastAPI + Next.js), a deep agent framework (planning, sandboxed execution, subagents), RAG pipeline with 4 vector stores, middleware with lifecycle hooks, task planning, context summarization, and database tooling. Used by 50,000+ developers with 1,730+ GitHub stars and 830K+ PyPI downloads.",
+    "oss.hero.definition": "Vstorm OSS ist eine Sammlung von 13 Open-Source-Python-Paketen für produktionsreife KI-Agenten. Enthält einen Full-Stack-Projektgenerator (FastAPI + Next.js), ein Deep-Agent-Framework (Planung, Sandbox, Subagenten), RAG-Pipeline mit 4 Vektordatenbanken, Middleware mit Lifecycle-Hooks, Aufgabenplanung, Kontextzusammenfassung und Datenbanktools. Genutzt von 50.000+ Entwicklern, 1.730+ GitHub-Sterne und 830K+ PyPI-Downloads.",
     "oss.hero.cta.configure": "Deine KI-App bauen",
     "oss.hero.cta.explore": "Projekte erkunden",
     "oss.hero.consultancy.title": "Brauchen Sie Hilfe beim Aufbau von KI-Agenten für die Produktion?",
@@ -1891,7 +1897,7 @@ export const translations = {
     "blog.allCategories": "Todos",
     "blog.category.open-source": "Open Source",
     "blog.category.news": "Noticias",
-    "blog.category.case-study": "Caso de Estudio",
+    "blog.category.article": "Artículo",
 
     // FAQ
     "faq.title": "Preguntas frecuentes",
@@ -1908,6 +1914,8 @@ export const translations = {
     "oss.hero.title.highlight": "agentes IA de producción",
     "oss.hero.title.line2": "No infraestructura",
     "oss.hero.description": "Herramientas Python open source probadas en 30+ despliegues reales. Frameworks, plantillas y bibliotecas — construye agentes, no boilerplate.",
+    "oss.hero.definition": "Vstorm OSS is a collection of 13 open-source Python packages for building production AI agents. It includes a full-stack project generator (FastAPI + Next.js), a deep agent framework (planning, sandboxed execution, subagents), RAG pipeline with 4 vector stores, middleware with lifecycle hooks, task planning, context summarization, and database tooling. Used by 50,000+ developers with 1,730+ GitHub stars and 830K+ PyPI downloads.",
+    "oss.hero.definition": "Vstorm OSS es una colección de 13 paquetes Python open-source para construir agentes de IA en producción. Incluye un generador de proyectos full-stack (FastAPI + Next.js), un framework de agentes profundos (planificación, sandbox, subagentes), pipeline RAG con 4 bases vectoriales, middleware con lifecycle hooks, planificación de tareas, compresión de contexto y herramientas de base de datos. Usado por más de 50.000 desarrolladores, 1.730+ estrellas en GitHub y 830K+ descargas de PyPI.",
     "oss.hero.cta.configure": "Crea tu app de IA",
     "oss.hero.cta.explore": "Explorar proyectos",
     "oss.hero.consultancy.title": "¿Necesitas ayuda para construir agentes IA en producción?",

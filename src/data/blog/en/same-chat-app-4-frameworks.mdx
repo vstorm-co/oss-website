@@ -1,6 +1,6 @@
 ---
-title: "Same Chat App, 4 Frameworks: Pydantic AI vs LangChain vs LangGraph vs CrewAI (Code Comparison)"
-description: "I built the same chat app 4 times with 4 different AI frameworks. Same FastAPI backend, same Next.js frontend, same PostgreSQL. Here's what the code actually looks like."
+title: "Same Chat App, 4 AI Frameworks: Pydantic AI vs LangChain vs LangGraph vs CrewAI"
+description: "I built the same chat app 4 times with 4 different AI frameworks. Same backend, same frontend, same DB. Here's what the code looks like."
 pubDate: 2026-03-13
 updatedDate: 2026-03-13
 author: "Kacper Włodarczyk"
@@ -11,7 +11,9 @@ category: open-source
 draft: false
 ---
 
-Everyone has opinions about AI frameworks. Few people show code.
+> **TL;DR:** The same chat application -- identical FastAPI backend, Next.js frontend, PostgreSQL database, JWT authentication, and WebSocket streaming -- was built 4 times using the full-stack-ai-agent-template, with only the AI layer differing across Pydantic AI, LangChain, LangGraph, and CrewAI. The code differences are concrete: Pydantic AI is the most concise at approximately 160 lines with full generic types and native async; LangChain is similar at roughly 170 lines but requires manual message conversion between HumanMessage/AIMessage formats; LangGraph is the most explicit at about 280 lines with a hand-built StateGraph of nodes and conditional edges; CrewAI is the largest at around 420 lines but provides multi-agent orchestration with Research Analyst and Content Writer roles out of the box. Key architectural differences include streaming approaches (Pydantic AI uses `agent.iter()`, CrewAI needs a background thread with event bus), async support (CrewAI is synchronous requiring `run_in_executor`), and tool registration patterns (`@agent.tool` decorator vs config-based). The template lets teams generate and compare all four implementations directly.
+
+Everyone has opinions about AI frameworks. Few people show code. (If you want the strategic comparison first, see our [framework comparison guide](/blog/choosing-ai-framework/).)
 
 We maintain [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template) -- a production template for AI/LLM applications with FastAPI, Next.js, and 75+ configuration options. One of those options is the AI framework. You pick from Pydantic AI, LangChain, LangGraph, or CrewAI during setup, and the template generates the exact same chat application with the exact same API, database schema, WebSocket streaming, and frontend. Only the AI layer differs.
 
@@ -27,11 +29,11 @@ Every generated project has the same structure:
 - **JWT authentication** for WebSocket connections
 - One agent file in `app/agents/` that handles the AI logic
 
-The agent must accept a user message and conversation history, support tool calling, return a response as `(output_text, tool_events, context)`, and support streaming for real-time token delivery.
+The agent must accept a user message and conversation history, support tool calling, return a response as `(output_text, tool_events, context)`, and support [streaming for real-time token delivery](/blog/websocket-streaming-ai-agents/).
 
 ## Pydantic AI (~160 lines)
 
-The most concise implementation. Full generic types with `Agent[Deps, str]`, typed dependency injection via `RunContext[Deps]`, and native async.
+The most concise implementation. Full generic types with `Agent[Deps, str]`, typed dependency injection via `RunContext[Deps]`, and native async. For a detailed [Pydantic AI](https://ai.pydantic.dev/) vs [LangChain](https://python.langchain.com/) analysis beyond just code, see our [head-to-head comparison](/blog/pydantic-ai-vs-langchain/).
 
 ```python
 from pydantic_ai import Agent, RunContext

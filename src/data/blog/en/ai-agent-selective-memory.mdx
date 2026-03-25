@@ -1,6 +1,6 @@
 ---
-title: "Why Your AI Agent Remembers Too Much (And How to Fix It)"
-description: "Every memory system stores garbage. Here's how we solved it with file-based persistent memory, context window limits, and a save immediately or lose it philosophy."
+title: "AI Agent Selective Memory: Stop Storing Everything, Start Remembering What Matters"
+description: "Every memory system stores garbage. Here's how we solved it with file-based persistent memory, context window limits, and a save-immediately philosophy."
 pubDate: 2026-02-20
 updatedDate: 2026-02-20
 author: "Kacper Włodarczyk"
@@ -10,6 +10,8 @@ tags: ["ai-agents", "memory", "memv", "pydantic-ai", "python"]
 category: open-source
 draft: false
 ---
+
+> **TL;DR:** Most AI agent memory systems store everything and retrieve badly -- vector databases saving every message including "yes" and "ok" produce megabytes of noise where RAG retrieval returns 10 irrelevant snippets for every useful one. The alternative is file-based persistent memory with a "save immediately" philosophy: the agent's system prompt explicitly states "your context window only holds the last 10 messages" and instructs it to write important facts to structured markdown files the moment it learns them. The architecture combines 4 layers -- context window (10-20 recent messages managed by summarization), persistent memory (markdown files updated intentionally by the agent), history search (database queries without loading full history), and skills (learned workflows loaded on-demand). This selective approach lets the LLM itself decide what is worth remembering, producing debuggable memory you can read, edit, and version with git -- unlike opaque vector databases where inspecting what the agent "knows" requires embedding queries.
 
 We tried 4 different memory systems for our AI agents. All of them stored too much garbage.
 
@@ -27,7 +29,7 @@ Vector databases saved every message - including "yes," "ok," and "can you repea
 
 The fundamental problem: most AI memory systems are designed to *remember everything*. But the best human memory works by *forgetting almost everything* and keeping only what matters.
 
-After years of production agent work at Vstorm, we converged on a different approach using [Pydantic AI](https://ai.pydantic.dev/). Instead of storing every message in a vector database, we give the agent a structured file system for persistent memory - and teach it to decide *what's worth saving*.
+After years of production agent work at Vstorm, we converged on a different approach using [Pydantic AI](https://ai.pydantic.dev/). Instead of storing every message in a vector database, we give the agent a structured file system for persistent memory - and teach it to decide *what's worth saving*. For the complementary problem of handling context overflow when conversations get too long, see our post on [AI agent memory management](/blog/ai-agent-memory-management/).
 
 ## The Problem: Context Windows Are Finite
 
@@ -105,7 +107,7 @@ This is cheap - reading 3-4 small markdown files costs a few hundred tokens. But
 
 ## AGENTS.md: The Agent's Core Memory
 
-The `AGENTS.md` file serves as the agent's identity and learned behaviors:
+The `AGENTS.md` file serves as the agent's identity and learned behaviors. We cover the broader role of AGENTS.md files for AI coding tools in [making your codebase AI-agent friendly](/blog/agents-md-ai-friendly-codebase/).
 
 ```markdown
 # Winston - Core Instructions
@@ -243,7 +245,7 @@ Each layer handles different retention needs. You don't embed every message into
 
 ## Try It Yourself
 
-[memv](https://github.com/vstorm-co/memv) - Persistent memory system for AI agents with structured file storage and selective retention.
+[memv](https://github.com/vstorm-co/memv) - Persistent memory system for AI agents with structured file storage and selective retention. This memory approach is used in [pydantic-deepagents](/projects/pydantic-deepagents/), our open-source Claude Code alternative.
 
 ```
 pip install memvee

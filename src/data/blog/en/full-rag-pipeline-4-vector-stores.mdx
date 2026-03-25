@@ -1,0 +1,210 @@
+---
+title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking in One Template"
+description: "One template, every RAG decision already made — from vector store to reranking strategy. 4 vector stores, 4 embedding providers, hybrid search, and reranking."
+pubDate: 2026-03-24
+updatedDate: 2026-03-24
+author: "Kacper Włodarczyk"
+lang: en
+translationKey: full-rag-pipeline-4-vector-stores
+tags: ["rag", "vector-database", "python", "fastapi", "ai-agents"]
+category: tutorial
+draft: false
+---
+
+> **TL;DR:** Version 0.2.2 of the full-stack AI agent template adds a complete production RAG pipeline with 4 swappable vector stores (Milvus, Qdrant, ChromaDB, pgvector), 4 embedding providers (OpenAI, Voyage, Gemini multimodal, SentenceTransformers local), hybrid search combining BM25 keyword matching with vector similarity via Reciprocal Rank Fusion, and optional reranking through Cohere's API or local CrossEncoder models. Each of the 5 pipeline steps -- parse, chunk, embed, store, search -- is a pluggable abstraction configurable via environment variables: `VECTOR_STORE=qdrant`, `RAG_HYBRID_SEARCH=true`, `EMBEDDING_MODEL=voyage-3`. The reranking strategy retrieves 3x more results than needed and re-scores them, consistently improving precision without touching embeddings. Document versioning uses SHA256 content hashing to prevent duplicate chunks on re-ingestion. The RAG tool integrates with all 5 supported AI frameworks and includes source attribution with filename, page number, chunk number, and similarity score for agent citations.
+
+You know the drill. You want to add RAG to your AI app. So you start: pick a vector database, write an embedding pipeline, figure out chunking, wire up retrieval, add it to your agent as a tool, build a frontend to manage documents...
+
+Three weeks later you have a working prototype. Then someone asks "can we try Qdrant instead of Milvus?" and you realize your vector store is hardcoded in 14 places.
+
+We just shipped v0.2.2 of our open-source [full-stack AI template](/blog/fastapi-nextjs-ai-template-guide/), and [RAG](/glossary/rag-retrieval-augmented-generation/) was the biggest addition. Not a toy demo — a production pipeline with 4 vector stores, 4 embedding providers, hybrid search, reranking, document versioning, and a management dashboard. All configurable. All swappable.
+
+Here's what we built and why.
+
+## The Architecture: 5 Steps, Every One Configurable
+
+Every RAG system does the same thing: **parse → chunk → embed → store → search**. The difference is how many decisions you have to make at each step.
+
+In our template, each step is a pluggable abstraction:
+
+```
+Document Upload
+  │
+  ├── Parse: PyMuPDF (default) | LlamaParse (130+ formats) | python-docx
+  │
+  ├── Chunk: recursive (default) | markdown | fixed
+  │     └── chunk_size=512, overlap=50 (configurable via env vars)
+  │
+  ├── Embed: OpenAI | Voyage | Gemini (multimodal) | SentenceTransformers (local)
+  │     └── dimensions auto-derived from model name
+  │
+  ├── Store: Milvus | Qdrant | ChromaDB | pgvector
+  │
+  └── Search: vector | hybrid (BM25 + vector + RRF) | + reranking (Cohere | CrossEncoder)
+```
+
+You pick your stack during project generation. The template wires everything up. No glue code.
+
+## 4 Vector Stores, 1 Interface
+
+The biggest design decision was making vector stores swappable. We implemented `BaseVectorStore` with four backends:
+
+```python
+class BaseVectorStore(ABC):
+    async def insert_document(self, collection_name: str, document: Document) -> None
+    async def search(self, collection_name: str, query: str, limit: int = 4) -> list[SearchResult]
+    async def delete_document(self, collection_name: str, document_id: str) -> None
+    async def get_collection_info(self, collection_name: str) -> CollectionInfo
+```
+
+**Milvus** — production-grade, runs as 3 Docker services (etcd + MinIO + Milvus). Best for large-scale deployments. Cosine similarity with IVF_FLAT indexing. See [Milvus documentation](https://milvus.io/docs/) for details.
+
+**Qdrant** — single Docker service, great balance of performance and simplicity. Our default recommendation for most teams. See [Qdrant documentation](https://docs.qdrant.tech/) for details.
+
+**ChromaDB** — embedded mode, zero Docker required. Perfect for prototyping and local development. Just `pip install chromadb`.
+
+**pgvector** — uses your existing PostgreSQL. No new infrastructure. HNSW indexing. If you already have Postgres, this is the lowest-friction option.
+
+Switching between them? One environment variable:
+
+```bash
+# In your .env:
+VECTOR_STORE=qdrant    # or: milvus, chromadb, pgvector
+```
+
+The template handles connection strings, Docker services, schema creation, and index configuration automatically.
+
+## Hybrid Search: Why Vector-Only Isn't Enough
+
+Pure vector search works well for semantic queries ("documents about building safety"). It fails on exact matches ("find contract #2024-0847") because embeddings don't preserve exact strings.
+
+Our hybrid search combines both:
+
+```python
+async def retrieve(self, query: str, collection_name: str, limit: int = 5):
+    # Step 1: Vector search (semantic)
+    raw_results = await self.store.search(collection_name, query, limit=limit * fetch_multiplier)
+
+    # Step 2: BM25 keyword search
+    if self._hybrid_enabled:
+        bm25_results = await self._bm25_search(query, collection_name, limit * fetch_multiplier)
+        if bm25_results:
+            raw_results = self._rrf_fuse(raw_results, bm25_results)
+
+    # Step 3: Rerank (optional)
+    if should_rerank and self.rerank_service:
+        results = await self.rerank_service.rerank(query=query, results=raw_results, top_k=limit * 2)
+
+    return results[:limit]
+```
+
+The fusion uses **Reciprocal Rank Fusion (RRF)** — a simple but effective algorithm that combines rankings from multiple sources:
+
+```python
+@staticmethod
+def _rrf_fuse(vector_results, bm25_results, k=60):
+    scores = {}
+    for rank, r in enumerate(vector_results):
+        key = r.content[:100]
+        scores[key] = scores.get(key, 0) + 1.0 / (k + rank + 1)
+    for rank, r in enumerate(bm25_results):
+        key = r.content[:100]
+        scores[key] = scores.get(key, 0) + 1.0 / (k + rank + 1)
+    return sorted_by_score(scores)
+```
+
+Enable it with one env var: `RAG_HYBRID_SEARCH=true`.
+
+## Reranking: The Quality Multiplier
+
+Initial retrieval casts a wide net. Reranking narrows it down. We support two options:
+
+**Cohere Reranker** (API) — the fastest way to improve retrieval quality. Send your results + query, get them re-scored by a model trained specifically for relevance ranking:
+
+```python
+response = await self.client.rerank(
+    query=query,
+    documents=[result.content for result in results],
+    model="rerank-v3.5",
+    top_n=top_k,
+)
+```
+
+**CrossEncoder** (local) — runs a SentenceTransformers cross-encoder model locally. No API calls, no data leaves your infrastructure:
+
+```python
+pairs = [[query, result.content] for result in results]
+scores = self.model.predict(pairs)  # Runs locally on CPU/GPU
+```
+
+The pipeline is: retrieve 3x more results than needed, rerank, return top-k. This consistently improves precision without touching your embeddings or vector store.
+
+## Document Versioning: SHA256 Dedup
+
+Re-ingesting a document shouldn't create duplicates. Our pipeline uses content hashing:
+
+```python
+async def ingest_file(self, filepath, collection_name, replace=True):
+    document = await self.processor.process_file(filepath)
+
+    # Check for existing version by source path or content hash
+    existing_id = await self._find_existing_by_source(collection_name, source_path)
+    if not existing_id:
+        existing_id = await self._find_existing_by_hash(collection_name, document.metadata.content_hash)
+
+    # Replace old chunks with new ones
+    if existing_id:
+        await self.store.delete_document(collection_name, existing_id)
+
+    await self.store.insert_document(collection_name, document)
+```
+
+Google Drive sync? Same logic — changed files get re-embedded, unchanged files skip.
+
+## 4 Embedding Providers
+
+| Provider | Model | Dimensions | API Key? |
+|----------|-------|-----------|----------|
+| OpenAI | text-embedding-3-small | 1536 | Yes |
+| Voyage | voyage-3 | 1024 | Yes |
+| Gemini | gemini-embedding-exp-03-07 | 3072 | Yes |
+| SentenceTransformers | all-MiniLM-L6-v2 | 384 | No (local) |
+
+Dimensions are auto-derived from the model name — no manual configuration:
+
+```python
+EMBEDDING_DIMENSIONS = {
+    "text-embedding-3-small": 1536,
+    "voyage-3": 1024,
+    "gemini-embedding-exp-03-07": 3072,
+    "all-MiniLM-L6-v2": 384,
+}
+```
+
+Gemini is the interesting one — it supports **multimodal embeddings**. Text and images in the same vector space. We use it for image description extraction from PDFs.
+
+## The Agent Integration
+
+RAG becomes an agent tool — `search_knowledge_base` — available to all 5 AI frameworks (Pydantic AI, LangChain, LangGraph, CrewAI, DeepAgents):
+
+```python
+async def search_knowledge_base(
+    query: str,
+    collection: str = "documents",
+    collections: list[str] | None = None,  # Multi-collection search
+    top_k: int = 5,
+) -> str:
+    """Search with automatic reranking & hybrid search if enabled."""
+```
+
+Results include source attribution: filename, page number, chunk number, and similarity score. The agent's system prompt instructs it to cite sources with `[1]`, `[2]` references.
+
+## Key Takeaways
+
+- **RAG is a pipeline of 5 decisions** (parse, chunk, embed, store, search) — our template makes each one configurable without code changes
+- **Vector-only search misses exact matches** — hybrid (BM25 + vector + RRF) catches both semantic and keyword queries
+- **Reranking is the cheapest quality improvement** — 3x over-retrieve + rerank consistently beats tuning embeddings
+- **Document versioning prevents duplicate chunks** — SHA256 content hash + source path tracking
+- **One env var switches everything** — `VECTOR_STORE=pgvector`, `RAG_HYBRID_SEARCH=true`, `EMBEDDING_MODEL=voyage-3`
+
+If you're choosing which AI framework to pair with your RAG pipeline, our [framework comparison guide](/blog/choosing-ai-framework/) covers the trade-offs. And to get a full production stack running quickly, see [how to ship a production AI app fast](/blog/ship-production-ai-app-fast/).

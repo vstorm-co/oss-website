@@ -11,6 +11,8 @@ category: open-source
 draft: false
 ---
 
+> **TL;DR:** Without structured task planning, AI agents skip steps, repeat work, and lose track of progress -- asking an agent to "build a REST API with authentication" results in it jumping to code before database design, forgetting migrations, and implementing auth middleware before the user model exists. The pydantic-ai-todo package provides a standalone planning toolset for Pydantic AI with in-memory, async memory, and PostgreSQL backends. Agents get tools to create, track, and manage structured tasks with statuses (pending, in_progress, completed, blocked), hierarchical subtasks, and dependency chains where "auth system needs user model" becomes a hard constraint enforced by the system. Cycle detection via depth-first search prevents deadlocks from circular dependencies. The PostgreSQL backend supports multi-tenant production deployments with session-scoped storage, connection pooling, and auto-schema creation. An event system fires notifications for task creation, completion, and status changes, enabling dashboards and audit logging. The package integrates via a single line: `create_todo_toolset()` added to the agent's toolsets.
+
 Ask an AI agent to "build a REST API with authentication" and watch what happens. Without structured planning, it'll jump straight to writing code - skipping database design, forgetting to create migrations, and implementing the auth middleware before the user model exists.
 
 The problem isn't intelligence. It's that the agent has no way to break complex tasks into steps, track progress, or understand dependencies. It just executes whatever seems right in the moment.
@@ -23,7 +25,7 @@ The problem isn't intelligence. It's that the agent has no way to break complex 
 - **Cycle detection** via depth-first search prevents deadlocks when the agent creates circular dependencies.
 - **PostgreSQL multi-tenancy** with session-scoped storage makes it production-ready for web applications with concurrent users.
 
-We've seen this pattern kill agent reliability at Vstorm. The fix is surprisingly simple: give the agent a todo list. Not a metaphorical one - an actual tool that creates, tracks, and manages structured tasks with statuses, subtasks, and dependencies.
+We've seen this pattern kill agent reliability at Vstorm. The fix is surprisingly simple: give the agent a todo list. Not a metaphorical one - an actual tool that creates, tracks, and manages structured tasks with statuses, subtasks, and dependencies. This is a core component of our [open-source Claude Code alternative](/blog/open-source-claude-code-alternative/).
 
 That's what [`pydantic-ai-todo`](https://github.com/vstorm-co/pydantic-ai-todo) does. It's a standalone task planning toolset for [Pydantic AI](https://ai.pydantic.dev/) with in-memory, async memory, and PostgreSQL backends.
 
@@ -272,7 +274,7 @@ This injects the current todo list into the agent's system prompt, so it knows w
 
 ## Key Takeaways
 
-- **Structured planning reduces hallucinated steps.** Without a todo list, agents skip steps, repeat work, and lose track of progress. With one, they plan systematically and execute in order.
+- **Structured planning reduces hallucinated steps.** Without a todo list, agents skip steps, repeat work, and lose track of progress. With one, they plan systematically and execute in order. Combine this with proper [memory management](/blog/ai-agent-memory-management/) to ensure long-running agents don't forget their progress.
 - **Dependencies prevent ordering errors.** "Auth system needs user model" is a dependency, not a suggestion. The agent sees `blocked` status and works on available tasks first.
 - **Cycle detection is automatic.** DFS-based cycle detection prevents deadlocks when the agent creates circular dependencies. The error message explains what went wrong.
 - **PostgreSQL multi-tenancy is production-ready.** Session-scoped storage, connection pooling, auto-schema creation, and external pool support - the boring infrastructure that web applications need.
@@ -280,7 +282,7 @@ This injects the current todo list into the agent's system prompt, so it knows w
 
 ## Try It Yourself
 
-[pydantic-ai-todo](https://github.com/vstorm-co/pydantic-ai-todo) - Task planning toolset for Pydantic AI agents with subtasks, dependencies, events, and PostgreSQL multi-tenant support.
+[pydantic-ai-todo](/projects/pydantic-ai-todo/) - Task planning toolset for Pydantic AI agents with subtasks, dependencies, events, and PostgreSQL multi-tenant support.
 
 ```bash
 pip install pydantic-ai-todo

@@ -36,6 +36,9 @@ Allow: /
 User-agent: CCBot
 Allow: /
 
+User-agent: bingbot
+Allow: /
+
 Sitemap: ${siteUrl}/sitemap-index.xml
 
 # Machine-readable site descriptions for LLMs

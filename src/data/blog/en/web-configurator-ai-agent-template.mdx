@@ -1,19 +1,21 @@
 ---
 title: "We Built a Web Configurator for AI Agent Apps — 75+ Options, Download as ZIP"
-description: "246 template files, 5 AI frameworks, client-side rendering with Nunjucks — zero server, everything in your browser."
+description: "Web configurator for AI agent apps: 246 templates, 5 AI frameworks, client-side Nunjucks rendering. 75+ options, download as ZIP — zero server needed."
 pubDate: 2026-03-06
 updatedDate: 2026-03-06
 author: "Kacper Włodarczyk"
 lang: en
 translationKey: web-configurator-ai-agent-template
 tags: ["pydantic-ai", "fastapi", "ai-agents", "python", "template"]
-category: open-source
+category: tutorial
 draft: false
 ---
 
+> **TL;DR:** The web configurator for the full-stack-ai-agent-template provides a 9-step visual wizard that configures 75+ options -- database, auth, AI framework (Pydantic AI, LangChain, LangGraph, CrewAI, DeepAgents), infrastructure, observability, CI/CD, and frontend -- and generates a production-ready project as a ZIP file entirely client-side with zero server involved. The full pipeline of fetching 246 bundled templates, rendering them with Nunjucks (a browser-compatible Jinja2 engine), excluding unused files, and generating a DEFLATE-compressed ZIP takes 1-2 seconds. Three presets (minimal, production, AI agent) let users go from landing page to downloaded project in under 10 seconds. The auto-fix dependency system silently enables Redis when caching is turned on and disables Logfire database instrumentation when no database is selected, ensuring the user never sees an invalid configuration state. Zod validation mirrors the Python CLI's Pydantic models with the same constraints: 14 enum types, 28 boolean toggles, and 12 visibility functions for cross-field conditional rendering.
+
 CLIs are powerful. But they're also intimidating.
 
-Our [full-stack-ai-agent-template](https://github.com/vstorm.co/projects/full-stack-ai-agent-template) has 75+ configuration options. Database, auth, AI framework, background tasks, caching, rate limiting, observability, Docker, Kubernetes, CI/CD, frontend, i18n — the list goes on. The CLI works great for developers who already know what they want. For everyone else, it's a wall of flags and prompts.
+Our full-stack-ai-agent-template — which we think of as the [create-ai-app moment for AI applications](/blog/create-ai-app-new-default/) — has 75+ configuration options. Database, auth, AI framework, background tasks, caching, rate limiting, observability, Docker, Kubernetes, CI/CD, frontend, i18n — the list goes on. The CLI works great for developers who already know what they want. For everyone else, it's a wall of flags and prompts.
 
 So we built a web configurator. A 9-step visual wizard that walks you through every option, validates dependencies in real-time, and generates a production-ready project as a ZIP file — downloaded directly from your browser.
 
@@ -142,6 +144,8 @@ This means the web configurator and CLI are interoperable. Configure visually, e
 - **Auto-fix > validation errors** — silently enabling Redis when caching is turned on is better UX than showing "Redis is required for caching"
 - **Presets + progressive disclosure** — 3 presets cover 80% of users, the 9-step wizard serves the other 20%
 - **Build-time bundling** — serializing 246 files into a single JSON avoids 246 HTTP requests
+
+For a detailed guide on what the generated project includes, see [how to build a full-stack AI app with FastAPI and Next.js](/blog/fastapi-nextjs-ai-template-guide/), or jump straight to [shipping a production AI app fast](/blog/ship-production-ai-app-fast/).
 
 ---
 

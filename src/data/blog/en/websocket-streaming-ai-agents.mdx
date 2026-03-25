@@ -11,6 +11,8 @@ category: open-source
 draft: false
 ---
 
+> **TL;DR:** WebSocket streaming eliminates the 5-30 second loading spinner problem for AI agent responses by delivering tokens in real-time -- the same experience as ChatGPT or Claude. The implementation in FastAPI with Pydantic AI uses structured event types (`text_delta`, `tool_call`, `tool_result`, `complete`) that enable rich frontend rendering where text streams token-by-token while tool calls show visual indicators. Authentication works via JWT tokens passed as query parameters since WebSocket does not support headers, validated during the connection handshake. Production patterns include a ConnectionManager class that tracks active connections with a configurable limit (e.g., 100 max), closes duplicate connections for the same user, and handles graceful disconnects. Conversation history persists to the database after each exchange using `response.all_messages()` and is loaded on reconnect. The full-stack-ai-agent-template includes all these patterns pre-configured -- authenticated, persistent, error-handled WebSocket streaming with both backend and frontend hooks -- selectable as a single configuration option.
+
 ## Why WebSocket Streaming?
 
 HTTP request-response is fine for quick API calls, but AI agent responses can take 5-30 seconds. Without streaming, users stare at a loading spinner. With WebSocket streaming, they see tokens appear in real-time — the same experience as ChatGPT or Claude.
@@ -238,8 +240,8 @@ class ConnectionManager:
 2. **Batch small chunks** — if tokens arrive faster than the WebSocket can send, buffer them
 3. **Set timeouts** — disconnect idle connections after 5-10 minutes
 4. **Use connection pooling** — reuse LLM provider connections across requests
-5. **Monitor with [Logfire](https://logfire.pydantic.dev/)** — trace every WebSocket message for debugging
+5. **Monitor with [Logfire](https://logfire.pydantic.dev/)** — trace every WebSocket message for debugging. See our post on [AI agent observability](/blog/ai-agent-observability/) for how we built an AI-powered assistant on top of Logfire.
 
 ## Skip the Boilerplate
 
-All of these patterns come pre-configured in the [Full-Stack AI Agent Template](https://template.vstorm.co/). Select "WebSocket streaming" in the configurator and get authenticated, persistent, error-handled streaming out of the box.
+All of these patterns come pre-configured in the [Full-Stack AI Agent Template](https://template.vstorm.co/). Select "WebSocket streaming" in the configurator and get authenticated, persistent, error-handled streaming out of the box. See our guides on [shipping a production AI app fast](/blog/ship-production-ai-app-fast/) and [building a full-stack AI app with FastAPI and Next.js](/blog/fastapi-nextjs-ai-template-guide/) for the complete setup.

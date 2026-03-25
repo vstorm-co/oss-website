@@ -1,15 +1,17 @@
 ---
 title: "GPT-5.4 Is Here — What It Means for AI Agent Developers"
-description: "OpenAI released GPT-5.4 with native computer use, 1M context, tool search, and state-of-the-art coding. Here's what matters for teams building AI agents in production."
+description: "OpenAI released GPT-5.4 with native computer use, 1M context, and tool search. Here's what matters for teams building AI agents."
 pubDate: 2026-03-06
 updatedDate: 2026-03-06
 author: "Kacper Włodarczyk"
 lang: en
 translationKey: gpt-5-4-release-what-it-means-for-ai-agents
 tags: ["gpt-5.4", "openai", "ai-agents", "llm", "news"]
-category: news
+category: article
 draft: false
 ---
+
+> **TL;DR:** GPT-5.4 introduces three features that significantly impact AI agent developers: native computer-use capabilities (scoring 75.0% on OSWorld-Verified, surpassing human performance at 72.4%), a 1 million token context window for long-running agents, and tool search that reduces token consumption by 47% on tool-heavy workloads by letting the model look up tool definitions on demand instead of including all definitions in every request. On coding benchmarks, it matches GPT-5.3-Codex (57.7% on SWE-Bench Pro) while being more token-efficient, and its Toolathlon score of 54.6% (vs 45.7% for GPT-5.2) shows improved multi-step tool calling with fewer turns. Pricing is $2.50/M input and $15/M output -- higher per-token than GPT-5.2 but potentially cheaper per-task due to efficiency gains. For frameworks like pydantic-deepagents where a single agent can have 30+ tools, tool search alone could reduce prompt overhead by 40% or more. The model works as a drop-in replacement by changing the model string.
 
 [OpenAI just released GPT-5.4](https://openai.com/index/introducing-gpt-5-4/) — their most capable model to date. It combines the coding strengths of GPT-5.3-Codex with major improvements in reasoning, computer use, and tool calling. Available now in the API as `gpt-5.4` and in ChatGPT as GPT-5.4 Thinking.
 
@@ -23,13 +25,13 @@ The numbers are impressive:
 - **OSWorld-Verified**: 75.0% (up from 47.3% with GPT-5.2, surpassing human performance at 72.4%)
 - **WebArena-Verified**: 67.3% for browser-based tasks
 
-For agent frameworks like [Pydantic AI](https://ai.pydantic.dev/) and [LangChain](https://python.langchain.com/), this opens up a new class of workflows — agents that don't just call APIs but interact with actual software interfaces. Combined with sandboxed environments (like [Docker](https://docs.docker.com/) or [Daytona](https://daytona.io/)), computer-use agents become viable for production.
+For agent frameworks like [Pydantic AI](https://ai.pydantic.dev/) and [LangChain](https://python.langchain.com/), this opens up a new class of workflows — agents that don't just call APIs but interact with actual software interfaces. Combined with sandboxed environments (like [Docker](https://docs.docker.com/) or [Daytona](/blog/daytona-sub-90ms-code-execution/)), computer-use agents become viable for production.
 
 ## 1M Token Context Window
 
 GPT-5.4 supports up to **1 million tokens of context** in the API. For long-running agents, this is transformative — an agent can hold an entire codebase, a full document set, or hours of conversation history without hitting context limits.
 
-That said, context management still matters. Our experience with [summarization-pydantic-ai](https://github.com/vstorm-co/summarization-pydantic-ai) shows that even with large context windows, intelligent compression (LLM summarization + sliding window) produces better results than dumping everything into context. The model attends more carefully to recent, relevant information.
+That said, context management still matters. Our experience with [summarization-pydantic-ai](https://github.com/vstorm-co/summarization-pydantic-ai) shows that even with large context windows, intelligent compression (LLM summarization + sliding window) produces better results than dumping everything into context. We covered the details in [AI agent memory management](/blog/ai-agent-memory-management/). The model attends more carefully to recent, relevant information.
 
 ## Tool Search — The Biggest API Change
 
@@ -68,7 +70,7 @@ With tool search and more efficient reasoning, the total cost per task may actua
 
 We're already testing GPT-5.4 across our tooling:
 
-- **[pydantic-deepagents](https://github.com/vstorm.co/projects/pydantic-deepagents)**: The 1M context window means fewer summarization triggers and longer autonomous runs. Tool search could reduce prompt overhead by 40%+ for our full toolset.
+- **[pydantic-deepagents](https://github.com/vstorm.co/projects/pydantic-deepagents)**: The 1M context window means fewer summarization triggers and longer autonomous runs. Tool search could reduce prompt overhead by 40%+ for our full toolset. See our [open-source Claude Code alternative](/blog/open-source-claude-code-alternative/) post for the full architecture.
 - **[pydantic-ai-backend](https://github.com/vstorm-co/pydantic-ai-backend)**: Computer-use capabilities open the door for browser-based testing within sandboxes.
 - **[Full-Stack AI Agent Template](https://github.com/vstorm.co/projects/full-stack-ai-agent-template)**: GPT-5.4 works as a drop-in replacement — just change the model string. Try it in the [web configurator](https://template.vstorm.co/configurator/).
 

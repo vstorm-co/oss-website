@@ -18,7 +18,7 @@ const blog = defineCollection({
       coverAlt: z.string().optional(),
       draft: z.boolean().default(false),
       category: z
-        .enum(["open-source", "news", "case-study"])
+        .enum(["open-source", "article", "news", "tutorial"])
         .default("open-source"),
     }),
 });

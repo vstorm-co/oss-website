@@ -1,6 +1,6 @@
 ---
 title: "Predictive AI: Give Your Agent a Docker Lab to Run Models"
-description: "How to build an AI agent that runs sklearn predictions inside an isolated [Docker](https://docs.docker.com/) sandbox. Environment-as-a-tool pattern, sub-agent delegation, and structured chart output with Pydantic AI."
+description: "How to build an AI agent that runs sklearn predictions inside an isolated Docker sandbox. Environment-as-a-tool pattern with Pydantic AI."
 pubDate: 2026-02-24
 updatedDate: 2026-02-24
 author: "Kacper Włodarczyk"
@@ -11,11 +11,13 @@ category: open-source
 draft: false
 ---
 
+> **TL;DR:** The "environment as a tool" pattern lets an AI agent selectively spin up a Docker sandbox only when it needs to execute code, rather than running inside Docker by default. In this predictive analytics demo built with Pydantic AI, the main agent has 3 tools -- query data (reads JSON, no Docker), predict (delegates to a sub-agent with full Docker access that writes and runs sklearn/pandas scripts), and generate chart (returns structured Pydantic LineChartData for Chart.js rendering). The sub-agent delegation approach keeps the main agent clean: it describes what to predict, and the sub-agent writes the Python code, executes it in Docker at `/workspace/`, and returns results. WebSocket streaming via `agent.iter()` provides real-time visibility into text, tool calls, and chart data over a single connection. The key design insight is that Docker overhead only applies to prediction tasks -- simple data queries run instantly. For agents whose entire job is code execution (like Claude Code), the default-environment pattern makes more sense, but for domain-specific agents that only sometimes need computation, environment-as-a-tool avoids unnecessary latency.
+
 Every AI agent demo shows the same thing: "ask your agent about your data." The agent queries a database, summarizes results, maybe makes a chart.
 
 But try asking it to *run a polynomial regression on 24 months of sales data and forecast the next 6 months.* Suddenly your chat-based agent hits a wall. It can't `import sklearn`. It can't execute Python. It can reason about what model to use, but it can't actually run one.
 
-The obvious fix: give it a Python environment. But here's the question nobody talks about - should that environment be the agent's *default runtime* (like Claude Code), or should it be *a tool the agent chooses to use*?
+The obvious fix: give it a Python environment. But here's the question nobody talks about - should that environment be the agent's *default runtime* (like Claude Code), or should it be *a tool the agent chooses to use*? For cloud-hosted sandboxes with sub-90ms startup, see our post on [Daytona replacing Docker](/blog/daytona-sub-90ms-code-execution/) in our agent stack.
 
 We built a demo that answers this question.
 
@@ -224,12 +226,12 @@ Small thing, but it's the kind of bug that makes your forecast look completely w
 - **"Environment as a tool"** is the right pattern when your agent only sometimes needs code execution. Don't pay Docker overhead on every interaction.
 - **Sub-agent delegation** keeps the main agent clean. The main agent describes *what* to predict. The sub-agent figures out *how* to write the Python code.
 - **Structured Pydantic output** for charts beats generating images. Send data, let the frontend render. Easier to style, interactive, and no base64 blobs.
-- **WebSocket streaming** with `agent.iter()` gives you real-time visibility into what the agent is doing - text, tool calls, and results.
+- **WebSocket streaming** with `agent.iter()` gives you real-time visibility into what the agent is doing - text, tool calls, and results. For a deeper dive into this pattern, see our guide on [real-time AI agent streaming with WebSockets](/blog/websocket-streaming-ai-agents/).
 - The hardest part isn't the agent - it's the **frontend integration** (merging chart series with different date ranges, intercepting tool outputs, streaming over WebSocket).
 
 ## Try It Yourself
 
-[pydantic-ai-backend](https://github.com/vstorm-co/pydantic-ai-backend) - Docker sandbox, console toolset, and backend abstractions for Pydantic AI agents
+[pydantic-ai-backend](/projects/pydantic-ai-backend/) - Docker sandbox, console toolset, and backend abstractions for Pydantic AI agents
 
 The full demo is in `examples/predictive_analytics/`:
 

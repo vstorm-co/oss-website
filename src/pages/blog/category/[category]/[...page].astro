@@ -1,48 +1,55 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import Navbar from '../../components/Navbar.astro';
-import Footer from '../../components/landing/Footer.astro';
-import BlogCard from '../../components/blog/BlogCard.astro';
-import Pagination from '../../components/blog/Pagination.astro';
+import Layout from '../../../../layouts/Layout.astro';
+import Navbar from '../../../../components/Navbar.astro';
+import Footer from '../../../../components/landing/Footer.astro';
+import BlogCard from '../../../../components/blog/BlogCard.astro';
+import Pagination from '../../../../components/blog/Pagination.astro';
 import { getCollection } from 'astro:content';
-import Breadcrumbs from '../../components/shared/Breadcrumbs.astro';
-import BlogSearch from '../../components/blog/BlogSearch.astro';
-import { translations, languages, defaultLang } from '../../i18n/translations';
-import { collectionPageSchema, SITE_URL } from '../../lib/schemas';
+import Breadcrumbs from '../../../../components/shared/Breadcrumbs.astro';
+import BlogSearch from '../../../../components/blog/BlogSearch.astro';
+import { translations, defaultLang } from '../../../../i18n/translations';
+import { collectionPageSchema, SITE_URL } from '../../../../lib/schemas';
 
 export async function getStaticPaths({ paginate }: { paginate: Function }) {
   const allPosts = (
     await getCollection('blog', ({ data }) => data.lang === 'en' && !data.draft)
   ).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
-  return paginate(allPosts, { pageSize: 20 });
+  const categories = ["open-source", "tutorial", "article", "news"] as const;
+
+  return categories.flatMap((cat) => {
+    const filtered = allPosts.filter((p) => p.data.category === cat);
+    return paginate(filtered, {
+      pageSize: 20,
+      params: { category: cat },
+    });
+  });
 }
 
 const lang = defaultLang;
 const t = translations[lang];
 const { page } = Astro.props;
+const { category } = Astro.params;
 const categories = ["open-source", "tutorial", "article", "news"] as const;
 
-const alternates = [
-  { lang: "en", href: "/blog/" },
-  ...Object.keys(languages)
-    .filter((l) => l !== defaultLang)
-    .map((l) => ({ lang: l, href: `/${l}/blog/` })),
-];
+const categoryKey = `blog.category.${category}` as keyof typeof t;
+const categoryLabel = t[categoryKey] || category;
 ---
 
 <Layout
-  title={`${t["blog.title"]}${page.currentPage > 1 ? ` — Page ${page.currentPage}` : ""} — Vstorm OSS`}
+  title={`${categoryLabel} — ${t["blog.title"]} — Vstorm OSS`}
   description={t["blog.subtitle"]}
-  keywords="ai agent blog, pydantic ai tutorials, python ai guides, ai framework comparison, llm engineering"
+  keywords="ai agent blog, pydantic ai tutorials, python ai guides, ai framework comparison"
   lang={lang}
-  alternates={alternates}
-  schemas={[collectionPageSchema({ name: t["blog.title"], description: t["blog.subtitle"], url: SITE_URL + "/blog/" })]}
+  schemas={[collectionPageSchema({ name: `${categoryLabel} — ${t["blog.title"]}`, description: t["blog.subtitle"], url: SITE_URL + `/blog/category/${category}/` })]}
+  theme="light"
 >
   <Navbar currentLang={lang} />
+
   <Breadcrumbs items={[
     { label: "Home", href: "/" },
-    { label: t["nav.blog"] },
+    { label: t["blog.title"], href: "/blog/" },
+    { label: categoryLabel },
   ]} />
 
   <main class="mx-auto max-w-3xl px-4 py-16 sm:py-24">
@@ -55,21 +62,19 @@ const alternates = [
     <div class="mb-8 flex flex-wrap justify-center gap-2">
       <a
         href="/blog/"
-        class="category-tab active rounded-full px-4 py-1.5 text-sm font-medium transition-colors"
+        class="category-tab rounded-full px-4 py-1.5 text-sm font-medium transition-colors"
       >
         {t["blog.allCategories"]}
       </a>
       {categories.map((cat) => (
         <a
           href={`/blog/category/${cat}/`}
-          class="category-tab rounded-full px-4 py-1.5 text-sm font-medium transition-colors"
+          class:list={["category-tab rounded-full px-4 py-1.5 text-sm font-medium transition-colors", cat === category && "active"]}
         >
           {t[`blog.category.${cat}` as keyof typeof t]}
         </a>
       ))}
     </div>
-
-    <BlogSearch placeholder={t["blog.search"]} />
 
     {page.data.length === 0 ? (
       <p class="text-center text-text-secondary">{t["blog.noPosts"]}</p>
@@ -78,27 +83,25 @@ const alternates = [
         {page.data.map((post) => {
           const slug = post.id.split('/').slice(1).join('/');
           return (
-              <BlogCard
-                title={post.data.title}
-                description={post.data.description}
-                pubDate={post.data.pubDate}
-                href={`/blog/${slug}/`}
-                tags={post.data.tags}
-                lang={lang}
-                category={post.data.category}
-                author={post.data.author}
-              />
+            <BlogCard
+              title={post.data.title}
+              description={post.data.description}
+              pubDate={post.data.pubDate}
+              href={`/blog/${slug}/`}
+              tags={post.data.tags}
+              lang={lang}
+              category={post.data.category}
+              author={post.data.author}
+            />
           );
         })}
       </div>
     )}
 
-    <p id="no-filtered-posts" class="text-center text-text-secondary py-8" style="display:none;">{t["blog.noPosts"]}</p>
-
     <Pagination
       currentPage={page.currentPage}
       lastPage={page.lastPage}
-      basePath="/blog"
+      basePath={`/blog/category/${category}`}
       t={t}
     />
   </main>
@@ -122,4 +125,3 @@ const alternates = [
     border-color: var(--color-accent);
   }
 </style>
-

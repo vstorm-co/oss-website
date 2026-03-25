@@ -1,15 +1,17 @@
 ---
-title: "What I Learned at PyAI Conf in San Francisco — Where Python Meets Production AI Agents"
-description: "Same-day recap from PyAI Conf — a 1-day conference hosted by Pydantic, FastMCP, and Theory Ventures, featuring Samuel Colvin, Sebastián Ramírez Montaño, Jeremiah Lowin, Armin Ronacher, and Guido van Rossum on the future of Python and production AI agents."
+title: "PyAI Conf SF Recap: Where Python Meets Production AI Agents"
+description: "Same-day recap from PyAI Conf — talks by Samuel Colvin, Guido van Rossum, hallway conversations, and what it means for production AI agents."
 pubDate: 2026-03-10
 updatedDate: 2026-03-10
 author: "Kacper Włodarczyk"
 lang: en
 translationKey: pyai-conference-sf-recap
 tags: ["ai-agents", "conference", "pydantic-ai", "python", "open-source", "multi-agent"]
-category: open-source
+category: article
 draft: false
 ---
+
+> **TL;DR:** PyAI Conf in San Francisco brought together Samuel Colvin (Pydantic), Sebastian Ramirez Montano (FastAPI), Jeremiah Lowin (Prefect/FastMCP), Armin Ronacher, and Guido van Rossum for a one-day conference hosted by Pydantic, FastMCP, and Theory Ventures. The key panel takeaways: Python's role in AI is intentional, not accidental, but the language needs better async primitives and performance for long-running agents; AI coding agents are reshaping open source maintenance as agent-generated PRs look fundamentally different; and type safety in LLM interactions is what separates prototype from production code. Hallway conversations revealed convergence across frameworks -- teams using Pydantic AI, LangChain, LangGraph, and CrewAI are all arriving at the same patterns (typed tools, structured outputs, sub-agent delegation) despite different APIs. The consensus on multi-agent: bounded sub-agent delegation with 2-3 specialists works in production, while "swarms of 15 autonomous agents" remains aspirational. The shift in community conversation was from "can your framework do X?" to "what happens when X fails at 3am?"
 
 *One day. The creators of Python, Pydantic, FastAPI, and FastMCP in one room. Here's what happened.*
 
@@ -37,7 +39,7 @@ A few things that stood out:
 
 **The open source challenge with AI coding agents.** Jeremiah raised a point I hadn't thought about deeply: when AI coding agents can generate code at scale, what happens to open source maintenance? Pull requests from agents look different. Issue reports from agents look different. The social contract of open source is shifting, and framework maintainers need to adapt.
 
-**Type safety is the foundation, not the feature.** Samuel made the case that type safety in LLM interactions isn't a nice-to-have — it's what makes the difference between prototype code and production code. When your agent returns validated, typed data, you can build reliable systems on top of it. When it returns `Any`, you're writing parsing code forever.
+**Type safety is the foundation, not the feature.** Samuel made the case that type safety in LLM interactions isn't a nice-to-have — it's what makes the difference between prototype code and production code. When your agent returns validated, typed data, you can build reliable systems on top of it. When it returns `Any`, you're writing parsing code forever. This aligns with what we've seen in our own [Pydantic AI vs LangChain](/blog/pydantic-ai-vs-langchain/) comparison — type safety is the single biggest differentiator.
 
 ## What I Heard in the Hallways
 
@@ -45,7 +47,7 @@ The real conference happened between sessions — in conversations over coffee a
 
 **Everyone is building agents, but the "how" varies wildly.** Some teams are all-in on multi-agent orchestration. Others are sticking with single agents and good tools. The consensus: bounded sub-agent delegation works (one parent, 2-3 specialist sub-agents), but the "swarm of 15 autonomous agents" is still more aspiration than production.
 
-**Framework convergence is real.** I talked to engineers using different frameworks — Pydantic AI, LangChain, LangGraph, CrewAI — and they're all converging on the same patterns: typed tool definitions, structured outputs, pluggable model providers, sub-agent delegation. The APIs look different, but the architecture underneath is aligning.
+**Framework convergence is real.** I talked to engineers using different frameworks — [Pydantic AI](https://ai.pydantic.dev/), LangChain, LangGraph, CrewAI — and they're all converging on the same patterns: typed tool definitions, structured outputs, pluggable model providers, sub-agent delegation. The APIs look different, but the architecture underneath is aligning. We documented this convergence in our [framework comparison guide](/blog/choosing-ai-framework/).
 
 **Production readiness is the new benchmark.** Nobody asked "can your framework do X?" — they asked "what happens when X fails at 3am?" Error handling, cost monitoring, failure recovery, observability. These are the conversations that matter now.
 
@@ -55,7 +57,7 @@ The real conference happened between sessions — in conversations over coffee a
 
 I came to PyAI Conf as someone building open-source AI agent tooling at Vstorm. Two things resonated particularly with what we're working on:
 
-**The "plan, execute, delegate" pattern keeps showing up.** Multiple people I talked to — independently of each other — described the same architecture for production agents: an LLM that plans, tools that execute, sub-agents that specialize. It's the pattern behind Claude Code, and it's what we implement in [pydantic-deepagents](https://github.com/vstorm.co/projects/pydantic-deepagents). When multiple teams converge on the same architecture from different directions, that's a signal.
+**The "plan, execute, delegate" pattern keeps showing up.** Multiple people I talked to — independently of each other — described the same architecture for production agents: an LLM that plans, tools that execute, sub-agents that specialize. It's the pattern behind Claude Code, and it's what we implement in our [open-source Claude Code alternative](/blog/open-source-claude-code-alternative/) using [pydantic-deepagents](https://github.com/vstorm.co/projects/pydantic-deepagents). When multiple teams converge on the same architecture from different directions, that's a signal.
 
 **Framework choice shouldn't be a commitment.** Several engineers shared frustration about being locked into one framework. The idea of supporting multiple frameworks behind the same infrastructure — which is what our [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template) does with 5 different AI frameworks — got genuine interest in conversations. People want the freedom to switch without rewriting everything.
 
@@ -79,5 +81,7 @@ See you at the next one.
 
 **Resources:**
 
+- [Pydantic AI documentation](https://ai.pydantic.dev/) — The framework discussed throughout the conference
+- [FastAPI documentation](https://fastapi.tiangolo.com/) — Sebastian's framework, the backbone of most Python AI backends
 - [pydantic-deepagents](https://github.com/vstorm.co/projects/pydantic-deepagents) — Modular AI agent framework (Claude Code architecture, open-source)
 - [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template) — Zero to production AI app (5 frameworks, 75+ options)
