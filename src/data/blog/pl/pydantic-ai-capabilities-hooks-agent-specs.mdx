@@ -1,0 +1,212 @@
+---
+title: "Pydantic AI Capabilities, Hooks i Agent Specs -- co sie zmienilo i jak zmigrowalismy nasze biblioteki"
+description: "Pydantic AI wydalo capabilities, hooks i agent specs. Zmigrowalismy 5 bibliotek open-source. Oto co sie zmienilo, kod przed/po i wnioski."
+pubDate: 2026-03-30
+updatedDate: 2026-03-30
+author: "Kacper Włodarczyk"
+lang: pl
+translationKey: pydantic-ai-capabilities-hooks-agent-specs
+tags: ["pydantic-ai", "capabilities", "hooks", "agent-specs", "python", "ai-agents"]
+category: open-source
+draft: false
+---
+
+Pydantic AI wlasnie wydalo najwieksza zmiane API od momentu premiery. Capabilities, hooks i agent specs pojawily sie w wersji v1.71+ i zasadniczo zmieniaja sposob rozszerzania agentow.
+
+Utrzymujemy 5 bibliotek open-source zbudowanych na [Pydantic AI](https://ai.pydantic.dev/): pydantic-ai-shields (wczesniej pydantic-ai-middleware), pydantic-ai-subagents, pydantic-ai-summarization, pydantic-ai-backend oraz [full-stack AI agent template](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template). Wszystkie piec zostaly zmigowane. Ten artykul opisuje co sie zmienilo, dlaczego to wazne i pokazuje prawdziwy kod przed/po z naszych repozytoriow.
+
+## Czym sa Capabilities?
+
+Capabilities to wielokrotnego uzytku, kompozytowalne jednostki zachowania agenta. Zamiast przekazywac osobno narzedzia, instrukcje i ustawienia modelu, capability pakuje wszystko w jeden parametr `capabilities` konstruktora `Agent`.
+
+Kazda capability moze dostarczac:
+
+- **Narzedzia** (przez `get_toolset()`)
+- **Instrukcje** (statyczne stringi lub dynamiczne callbacki)
+- **Ustawienia modelu** (konfiguracja per krok)
+- **Lifecycle hooks** (wzorce before/after/wrap dla runow, requestow do modelu, wywolan narzedzi)
+- **Przygotowanie narzedzi** (filtrowanie lub modyfikacja definicji narzedzi per krok)
+
+Klasa bazowa to `AbstractCapability`. Dziedziczysz po niej, nadpisujesz potrzebne metody i przekazujesz instancje do agenta:
+
+```python
+from pydantic_ai import Agent
+from pydantic_ai.capabilities import AbstractCapability
+
+agent = Agent(
+    "openai:gpt-4.1",
+    capabilities=[MyCapability(), AnotherCapability()],
+)
+```
+
+Wiele capabilities sklada sie automatycznie. Before-hooki odpalaja w kolejnosci (cap1 potem cap2), after-hooki w odwrotnej kolejnosci (cap2 potem cap1), a wrap-hooki zagniezdzaja sie jako warstwy middleware.
+
+## Czym sa Hooks?
+
+Hooks to punkty przechwytywania cyklu zycia w ramach capabilities. Pydantic AI dostarcza hooki na czterech poziomach:
+
+1. **Run hooks** -- `before_run`, `wrap_run`, `after_run`, `on_run_error`
+2. **Node hooks** -- `before_node_run`, `wrap_node_run`, `after_node_run`, `on_node_run_error`
+3. **Model request hooks** -- `before_model_request`, `wrap_model_request`, `after_model_request`, `on_model_request_error`
+4. **Tool hooks** -- podzielone na walidacje i wykonanie, kazdy z wariantami before/wrap/after/error
+
+Plus `prepare_tools` do filtrowania widocznosci narzedzi per krok.
+
+To okolo 20 punktow hookow na 4 poziomach cyklu zycia. Error hooki uzywaja eleganckiego wzorca: **raise zeby propagowac, return zeby odzyskac**.
+
+Dla prostych przypadkow, capability `Hooks` daje rejestracje na dekoratorach bez subclassowania:
+
+```python
+from pydantic_ai.capabilities import Hooks
+
+hooks = Hooks()
+
+@hooks.on.before_model_request
+async def log_request(ctx, request_context):
+    print(f"Wysylanie {len(request_context.messages)} wiadomosci")
+    return request_context
+
+agent = Agent("openai:gpt-4.1", capabilities=[hooks])
+```
+
+## Czym sa Agent Specs?
+
+Agent specs oddzielaja konfiguracje agenta od kodu calkowicie. Definiujesz agenta w YAML lub JSON:
+
+```yaml
+model: anthropic:claude-opus-4-6
+instructions: You are a helpful assistant.
+capabilities:
+  - WebSearch
+  - Thinking:
+      effort: high
+```
+
+Nastepnie ladujesz go:
+
+```python
+agent = Agent.from_file("agent.yaml")
+```
+
+Capabilities implementujace `get_serialization_name()` i `from_spec()` sa automatycznie dostepne. Twoje wlasne capabilities tez moga byc sterowane z YAML.
+
+## Jak zmigrowaly nasze biblioteki
+
+### pydantic-ai-middleware na pydantic-ai-shields
+
+To byla najbardziej drastyczna zmiana. Nasza biblioteka middleware urosla do `MiddlewareAgent`, `MiddlewareChain`, `ParallelMiddleware`, `ConditionalMiddleware`, `PipelineSpec`, loaderow konfiguracji, kompilatora -- calej rownoleglej warstwy abstrakcji.
+
+**Usunelismy to wszystko.**
+
+Wydanie v0.3.0 zmienilo nazwe pakietu na `pydantic-ai-shields` i przebudowalo wszystko jako capabilities.
+
+**Przed (era middleware):**
+
+```python
+from pydantic_ai_middleware import MiddlewareAgent, CostTrackingMiddleware
+
+middleware_agent = MiddlewareAgent(
+    agent,
+    middlewares=[CostTrackingMiddleware(budget_limit_usd=5.0)]
+)
+result = await middleware_agent.run("Hello")
+```
+
+**Po (era capabilities):**
+
+```python
+from pydantic_ai import Agent
+from pydantic_ai_shields import CostTracking, PromptInjection, PiiDetector
+
+agent = Agent(
+    "openai:gpt-4.1",
+    capabilities=[
+        CostTracking(budget_usd=5.0),
+        PromptInjection(sensitivity="high"),
+        PiiDetector(detect=["email", "ssn", "credit_card"]),
+    ],
+)
+result = await agent.run("Hello")
+```
+
+Bez agenta-wrappera. Bez lancucha middleware. Shields to po prostu capabilities hookujace sie w `before_run`, `after_run`, `prepare_tools` i `before_tool_execute`.
+
+Nowy pakiet dostarcza 10 capabilities: `CostTracking`, `ToolGuard`, `InputGuard`, `OutputGuard`, `AsyncGuardrail` dla infrastruktury, plus `PromptInjection`, `PiiDetector`, `SecretRedaction`, `BlockedKeywords` i `NoRefusals` jako content shields bez zewnetrznych zaleznosci.
+
+### pydantic-ai-subagents
+
+Biblioteka subagentow udostepnia teraz `SubAgentCapability` pakujacy toolset i dynamiczne instrukcje:
+
+```python
+from pydantic_ai import Agent
+from subagents_pydantic_ai import SubAgentCapability, SubAgentConfig
+
+agent = Agent(
+    "openai:gpt-4.1",
+    capabilities=[SubAgentCapability(
+        subagents=[
+            SubAgentConfig(
+                name="researcher",
+                description="Researches topics",
+                instructions="You are a research assistant.",
+            ),
+        ],
+    )],
+)
+```
+
+### pydantic-ai-summarization
+
+Cztery capabilities zastepuja stare zarzadzanie kontekstem oparte na middleware:
+
+- **`SummarizationCapability`** -- uruchamia sumaryzacje LLM po przekroczeniu progow
+- **`SlidingWindowCapability`** -- bezkosztowa alternatywa usuwajaca najstarsze wiadomosci
+- **`LimitWarnerCapability`** -- wstrzykuje ostrzezenia gdy limity sie zblizaja
+- **`ContextManagerCapability`** -- pelny pakiet: sledzenie tokenow, auto-kompresja, obcinanie outputow narzedzi
+
+```python
+from pydantic_ai import Agent
+from pydantic_ai_summarization.capability import ContextManagerCapability
+
+agent = Agent(
+    "openai:gpt-4.1",
+    capabilities=[ContextManagerCapability(max_tokens=100_000)],
+)
+```
+
+### pydantic-ai-backend
+
+Nasz toolkit konsolowy stal sie `ConsoleCapability` -- pakujac narzedzia, instrukcje i egzekwowanie uprawnien:
+
+```python
+from pydantic_ai import Agent
+from pydantic_ai_backends import ConsoleCapability
+from pydantic_ai_backends.permissions import READONLY_RULESET
+
+agent = Agent(
+    "openai:gpt-4.1",
+    capabilities=[ConsoleCapability(permissions=READONLY_RULESET)],
+)
+```
+
+## Kluczowe wnioski
+
+**1. Usun swoje warstwy abstrakcji.** Usunelismy tysiace linii kodu middleware. Framework robi to lepiej.
+
+**2. Kompozycja jest darmowa.** Wiele capabilities sklada sie bez pisania logiki laczenia.
+
+**3. Agent specs zmieniaja deployment.** Definiuj zachowanie agenta w YAML, wdrazaj zmieniajac plik konfiguracyjny.
+
+**4. Migracja jest mechaniczna.** Dla kazdego hooka middleware istnieje bezposredni odpowiednik w capabilities.
+
+**5. Mysl w capabilities, nie w agentach.** Stary wzorzec: buduj wyspecjalizowanego agenta. Nowy: buduj capability, dolacz do dowolnego agenta.
+
+## Linki
+
+- [Dokumentacja capabilities Pydantic AI](https://ai.pydantic.dev/capabilities/)
+- [Dokumentacja hooks Pydantic AI](https://ai.pydantic.dev/hooks/)
+- [pydantic-ai-shields](https://github.com/vstorm-co/pydantic-ai-middleware) (GitHub)
+- [pydantic-ai-subagents](https://github.com/vstorm-co/pydantic-ai-subagents) (GitHub)
+- [pydantic-ai-summarization](https://github.com/vstorm-co/pydantic-ai-summarization) (GitHub)
+- [pydantic-ai-backend](https://github.com/vstorm-co/pydantic-ai-backend) (GitHub)
+- [full-stack AI agent template](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template) (GitHub)
