@@ -1,0 +1,216 @@
+---
+title: "Pydantic Deep Agents 0.3.3: ACP, Thinking, Lifecycle Hooks y Defaults con Opinión"
+description: "Ejecuta tu agente IA en Zed con ACP. Los subagentes ahora son deep agents completos. Thinking y caché de Anthropic activados por defecto."
+pubDate: 2026-04-02
+updatedDate: 2026-04-02
+author: "Kacper Włodarczyk"
+lang: es
+translationKey: pydantic-deep-agents-0-3-3-acp-thinking-hooks
+tags: ["pydantic-ai", "pydantic-deep", "acp", "ai-agents", "python", "open-source"]
+category: open-source
+draft: false
+---
+
+> **TL;DR:** La version 0.3.3 trae un adaptador ACP (Agent Client Protocol) que permite a los agentes pydantic-deep funcionar en editores como Zed — con streaming, visibilidad de herramientas y cambio de modelo. Los subagentes ahora son deep agents completos con sistema de archivos, web, memoria y eviction. Thinking activado por defecto en nivel `"high"`, Anthropic prompt caching habilitado out-of-the-box. Cinco nuevos lifecycle hooks, skills como slash commands con discovery de 3 niveles y un asistente de configuración de proveedores en el primer inicio.
+
+## ACP: Tu agente en el editor
+
+La novedad más importante de 0.3.3 es el adaptador [Agent Client Protocol (ACP)](https://agentclientprotocol.com) en `apps/acp/`. ACP es un protocolo abierto que permite a los agentes de IA ejecutarse dentro de editores — Zed lo soporta de forma nativa.
+
+¿Por qué? Porque a veces no quieres alternar entre el terminal y el editor. Quieres que el agente vea tu código y responda en el mismo panel donde escribes.
+
+El adaptador ofrece:
+
+- **Streaming de texto** — deltas en tiempo real, como en el CLI
+- **Visibilidad de herramientas** — ves lo que hace el agente: `read_file: /src/main.py`, `grep: TODO`, argumentos y resultados inline
+- **Cambio de modelo** — cambia de modelo durante la sesión a través del selector en Zed
+- **Gestión de sesiones** — el historial de conversación se mantiene entre mensajes
+- **Auto-detección del proveedor** — el servidor detecta las claves API de `.env` y elige el proveedor correcto
+
+Configuración en Zed:
+
+```json
+{
+  "agent_servers": {
+    "pydantic-deep": {
+      "type": "custom",
+      "command": "/path/to/your/venv/bin/python",
+      "args": ["-m", "apps.acp"],
+      "cwd": "/path/to/pydantic-deep"
+    }
+  }
+}
+```
+
+También puedes proporcionar tu propia factory de agentes:
+
+```python
+from apps.acp.server import DeepAgentACP, AgentSessionContext
+from pydantic_deep import create_deep_agent
+
+def build_agent(ctx: AgentSessionContext):
+    return create_deep_agent(
+        model=ctx.model,
+        include_memory=True,
+        context_discovery=True,
+        thinking="high",
+    )
+
+server = DeepAgentACP(
+    agent=build_agent,
+    models=[
+        {"value": "anthropic:claude-opus-4-6", "name": "Claude Opus 4.6"},
+        {"value": "anthropic:claude-sonnet-4-6", "name": "Claude Sonnet 4.6"},
+    ],
+)
+```
+
+La arquitectura es sencilla — ACP se comunica por stdio, el adaptador traduce a `Agent.iter()` + `node.stream()`:
+
+```
+Editor (Zed)
+    |
+    |  ACP protocol (stdio)
+    |  - text deltas
+    |  - tool call start/complete with content
+    |  - model switching
+    |
+    v
+DeepAgentACP (apps/acp/server.py)
+    |
+    |  pydantic-ai Agent.iter() + node.stream()
+    |
+    v
+create_deep_agent() -- deep agent completo con todas las herramientas
+```
+
+Instalación: `pip install pydantic-deep[acp]`.
+
+## Los subagentes ahora son deep agents
+
+Este cambio amplía fundamentalmente las capacidades de delegación. Antes, los subagentes eran agentes Pydantic AI simples — tenían herramientas, pero no memoria, eviction, web search ni patch support.
+
+Ahora **cada subagente se crea mediante `create_deep_agent()`** con el conjunto completo:
+- Sistema de archivos (read, write, edit, ls, glob, grep)
+- Web search y web fetch
+- Memoria (MEMORY.md por subagente)
+- Eviction (las salidas grandes de herramientas se guardan automáticamente en archivos)
+- Patch support (los tool calls huérfanos se reparan automáticamente)
+
+Esto aplica tanto al subagente "research" integrado (`pydantic_deep/subagents.py`) como a los subagentes personalizados. Si tu `SubAgentConfig` no define `agent` ni `agent_factory`, recibe automáticamente la factory de deep agents.
+
+El parámetro `include_general_purpose_subagent` fue reemplazado por `include_builtin_subagents`, y la profundidad de anidamiento predeterminada (`max_nesting_depth`) aumentó de `0` a `1` — los subagentes ahora pueden crear sus propios subagentes.
+
+## Thinking activado por defecto
+
+La versión 0.3.3 añade el parámetro `thinking` a `create_deep_agent()` con valor predeterminado `"high"`. Esto utiliza la capability `Thinking` de Pydantic AI, que permite al modelo razonar internamente antes de responder.
+
+Hay 7 niveles disponibles:
+
+| Valor | Descripción |
+|-------|-------------|
+| `True` | Activado (nivel predeterminado del modelo) |
+| `False` | Desactivado |
+| `"minimal"` | Razonamiento mínimo |
+| `"low"` | Esfuerzo bajo |
+| `"medium"` | Esfuerzo medio |
+| `"high"` | Esfuerzo alto (predeterminado) |
+| `"xhigh"` | Esfuerzo máximo |
+
+Esto significa que los agentes piensan más profundamente antes de responder — planifican pasos, consideran edge cases y cometen menos errores en tareas complejas. Desactívalo con `thinking=False` si necesitas menor latencia.
+
+## Anthropic prompt caching activado por defecto
+
+Tres nuevos flags — `anthropic_cache_instructions`, `anthropic_cache_tool_definitions`, `anthropic_cache_messages` — todos `True` por defecto. Para modelos Anthropic, esto significa caché automático del system prompt, definiciones de herramientas y mensajes de conversación.
+
+El resultado: costos más bajos y respuestas más rápidas en los turnos siguientes. Para modelos que no son de Anthropic, los flags se ignoran silenciosamente — cero configuración.
+
+## 5 nuevos lifecycle hooks
+
+La versión 0.3.3 añade 5 nuevos eventos de hooks que se mapean a los lifecycle hooks de Pydantic AI:
+
+| Hook | Cuándo se dispara | Caso de uso |
+|------|-------------------|-------------|
+| `BEFORE_RUN` | Antes de iniciar el bucle del agente | Tracking de sesión, logging de inicio |
+| `AFTER_RUN` | Después de finalizar el bucle del agente | Guardado de resultados, métricas |
+| `RUN_ERROR` | Cuando el bucle del agente lanza una excepción | Alertas de error, lógica de retry |
+| `BEFORE_MODEL_REQUEST` | Antes de cada llamada al LLM | Logging de prompts, rate limiting |
+| `AFTER_MODEL_REQUEST` | Después de cada respuesta del LLM | Logging de respuestas, análisis de costos |
+
+Estos hooks complementan los existentes `PRE_TOOL_USE`, `POST_TOOL_USE` y `POST_TOOL_USE_FAILURE`, proporcionando visibilidad completa del ciclo de vida del agente — desde el inicio de la sesión, pasando por cada llamada al modelo, hasta el final o error.
+
+## Skills como slash commands
+
+Los skills en el CLI ahora están disponibles como slash commands. Escribes `/code-review` y el skill se activa directamente desde el selector.
+
+El discovery funciona en 3 capas, donde las fuentes posteriores sobrescriben las anteriores por nombre:
+
+1. **Integrados** (`apps/cli/skills/`) — skills predeterminados que vienen con pydantic-deep
+2. **Usuario** (`~/.pydantic-deep/skills/`) — globales, para todos los proyectos
+3. **Proyecto** (`.pydantic-deep/skills/`) — específicos del proyecto actual
+
+Esto significa que puedes sobrescribir el skill integrado `/commit` con tu propia versión en el directorio del proyecto, sin tocar el resto.
+
+El parámetro `skills` fue eliminado de `create_deep_agent()`. Ahora se pasan los skills precargados mediante `SkillsToolset(skills=[...])` en el parámetro `toolsets`.
+
+## Opinionated defaults
+
+La versión 0.3.3 cambia la filosofía: en lugar de requerir configuración manual de cada feature, el framework proporciona valores predeterminados sensatos. Esto es lo que cambió:
+
+| Parámetro | Antes (0.3.2) | Después (0.3.3) |
+|-----------|---------------|-----------------|
+| `include_memory` | `False` | `True` |
+| `max_nesting_depth` | `0` | `1` |
+| `thinking` | no existía | `"high"` |
+| `eviction_token_limit` | `None` | `20_000` |
+| `patch_tool_calls` | `False` | `True` |
+| `web_search` | no existía (era `include_web`) | `True` |
+| `web_fetch` | no existía (era `include_web`) | `True` |
+| `anthropic_cache_*` | no existía | `True` |
+| `image_support` | parámetro | siempre activado |
+| Archivos de contexto | DEEP.md, AGENTS.md, CLAUDE.md, SOUL.md | AGENTS.md, SOUL.md |
+
+Los modelos predeterminados también cambiaron:
+- Agente principal: `anthropic:claude-opus-4-6`
+- Subagentes: `anthropic:claude-sonnet-4-6`
+- Summarization: `anthropic:claude-haiku-4-5-20251001`
+
+`BASE_PROMPT` ahora siempre se incluye en el system prompt — el parámetro `instructions` añade en lugar de reemplazar.
+
+## Otros cambios
+
+### compact_conversation
+
+El agente ahora puede forzar manualmente la compresión de contexto mediante la herramienta `compact_conversation`. Útil cuando el agente sabe que parte de la conversación ya no es necesaria — opcionalmente con un tema en el que la compresión debe enfocarse.
+
+### Asistente de proveedores
+
+En el primer inicio, el CLI detecta automáticamente las claves API faltantes y guía a través de la selección de proveedor (Anthropic, OpenAI, Google, OpenRouter) con ingreso de clave. Las claves se guardan en `.pydantic-deep/.env`.
+
+### /config y /provider
+
+Dos nuevos slash commands en el CLI:
+- `/config` — ver y cambiar configuraciones interactivamente (ej. `/config set include_teams true`)
+- `/provider` — cambiar proveedor y modelo durante la sesión
+
+### approve_tools
+
+Configuración de qué herramientas requieren aprobación del usuario. Por defecto: `["execute"]`. Cambiar mediante `/config set approve_tools "execute,write_file,edit_file"` o en `config.toml`.
+
+## Instalación
+
+```bash
+pip install pydantic-deep==0.3.3
+```
+
+Con ACP:
+
+```bash
+pip install pydantic-deep[acp]==0.3.3
+```
+
+Repositorio: [github.com/vstorm-co/pydantic-deepagents](https://github.com/vstorm-co/pydantic-deepagents)
+
+Changelog completo: [CHANGELOG.md](https://github.com/vstorm-co/pydantic-deepagents/blob/main/CHANGELOG.md)
+
+Documentación: [pydantic-deep.vstorm.co](https://pydantic-deep.vstorm.co)

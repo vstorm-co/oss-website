@@ -1,0 +1,229 @@
+---
+title: "Pydantic Deep Agents 0.3.3: ACP, Thinking, Lifecycle Hooks, and Opinionated Defaults"
+description: "Run your AI agent inside Zed with ACP. Subagents are now full deep agents. Thinking and Anthropic caching on by default. The biggest pydantic-deep release yet."
+pubDate: 2026-04-02
+updatedDate: 2026-04-02
+author: "Kacper Włodarczyk"
+lang: en
+translationKey: pydantic-deep-agents-0-3-3-acp-thinking-hooks
+tags: ["pydantic-ai", "pydantic-deep", "acp", "ai-agents", "python", "open-source"]
+category: open-source
+draft: false
+---
+
+pydantic-deep 0.3.3 ships 40+ changes. ACP support, deep subagents, thinking by default, Anthropic prompt caching, lifecycle hooks, skills as slash commands, and a set of opinionated defaults that turn `create_deep_agent()` into a batteries-included experience. Here is everything that changed.
+
+## ACP: Your Agent in Any Editor
+
+The [Agent Client Protocol](https://github.com/nichochar/acp) (ACP) is an open protocol for connecting AI agents to editors. pydantic-deep now ships an ACP adapter in `apps/acp/` that exposes any deep agent as an ACP server -- usable inside editors like [Zed](https://zed.dev/).
+
+What you get out of the box:
+
+- **Streaming text deltas** -- responses appear token by token in the editor
+- **Tool call visibility** -- each tool call shows its name, arguments, and result (truncated at 500 chars for display)
+- **Model switching mid-session** -- change models from the editor's config panel without restarting
+- **Session management** -- each editor tab gets its own conversation history, deps, and working directory
+- **Auto-detect API keys** -- the provider setup wizard picks up your existing keys
+
+The key detail: your agent code does not change. The same `create_deep_agent()` call that powers the CLI works directly with the ACP adapter.
+
+```python
+from apps.acp.server import DeepAgentACP, AgentSessionContext
+from pydantic_deep import create_deep_agent
+
+def build_agent(ctx: AgentSessionContext):
+    return create_deep_agent(model=ctx.model)
+
+server = DeepAgentACP(
+    agent=build_agent,
+    models=[
+        {"value": "anthropic:claude-opus-4-6", "name": "Claude Opus 4.6"},
+        {"value": "anthropic:claude-sonnet-4-6", "name": "Claude Sonnet 4.6"},
+        {"value": "openai:gpt-4.1", "name": "GPT-4.1"},
+    ],
+)
+```
+
+Run it with `python -m apps.acp` and point your editor at the server. The `DeepAgentACP` class handles initialize, session creation, prompt streaming, model switching, and cancellation. Tool calls are categorized by kind (`read`, `edit`, `search`, `execute`, `fetch`) so the editor can display appropriate icons.
+
+## Subagents Are Now Deep Agents by Default
+
+Previously, subagents were plain Pydantic AI agents -- no filesystem tools, no memory, no web access. You had to configure each one manually.
+
+In 0.3.3, every subagent is created via `create_deep_agent()` with filesystem, web, memory, eviction, and patch support. This applies to both built-in and custom subagents. If your custom `SubAgentConfig` does not specify an `agent` or `agent_factory`, it automatically gets the deep agent factory.
+
+The practical result: when you delegate a task to a subagent, it can read files, search the web, write to its own memory, and even spawn its own subagents (since `max_nesting_depth` defaults to 1).
+
+There is also a new built-in "research" subagent that ships with `include_builtin_subagents=True` (the default). It is a full deep agent optimized for codebase exploration and web research:
+
+```python
+agent = create_deep_agent(
+    include_builtin_subagents=True,  # default
+    include_subagents=True,          # default
+    max_nesting_depth=1,             # default -- subagents can spawn their own
+)
+```
+
+The research subagent gets filesystem tools (ls, glob, grep, read_file, write_file, edit_file, execute), web tools (web_search, web_fetch), todo tools, and persistent memory. It is the subagent you would have built yourself -- now it ships out of the box.
+
+## Thinking Enabled by Default
+
+`create_deep_agent()` now ships with `thinking="high"` as the default. This enables model thinking/reasoning via Pydantic AI's `Thinking` capability.
+
+Seven levels are supported:
+
+| Value | Behavior |
+|-------|----------|
+| `True` | Enable with default budget |
+| `False` | Disable thinking |
+| `"minimal"` | Minimal reasoning |
+| `"low"` | Low effort |
+| `"medium"` | Medium effort |
+| `"high"` | High effort (default) |
+| `"xhigh"` | Maximum reasoning budget |
+
+The setting is silently ignored by models that do not support thinking (OpenAI, older Anthropic models). No conditional logic needed -- just set it once.
+
+```python
+# High thinking by default -- no change needed
+agent = create_deep_agent()
+
+# Override for cheaper runs
+agent = create_deep_agent(thinking="low")
+
+# Disable entirely
+agent = create_deep_agent(thinking=False)
+```
+
+## Anthropic Prompt Caching
+
+Three new cache flags are enabled by default:
+
+- `anthropic_cache_instructions` -- caches the system prompt
+- `anthropic_cache_tool_definitions` -- caches all tool schemas
+- `anthropic_cache_messages` -- caches conversation history
+
+For Anthropic models (Claude), this reduces input token costs on repeat turns. For non-Anthropic models, the flags are silently ignored. There is nothing to configure -- it just works.
+
+## 5 New Lifecycle Hooks
+
+The `HookEvent` enum gains 5 new events that map to Pydantic AI's capability lifecycle:
+
+```python
+from pydantic_deep import create_deep_agent, Hook, HookEvent
+
+agent = create_deep_agent(
+    hooks=[
+        # Log every agent run start
+        Hook(
+            event=HookEvent.BEFORE_RUN,
+            handler=log_session_start,
+        ),
+        # Track LLM calls for observability
+        Hook(
+            event=HookEvent.AFTER_MODEL_REQUEST,
+            handler=log_llm_call,
+        ),
+        # Alert on errors
+        Hook(
+            event=HookEvent.RUN_ERROR,
+            handler=send_error_alert,
+        ),
+    ],
+)
+```
+
+The full event list:
+
+| Event | When it fires | Use case |
+|-------|--------------|----------|
+| `BEFORE_RUN` | Start of `agent.run()` | Session tracking, setup |
+| `AFTER_RUN` | End of successful run | Cleanup, metrics |
+| `RUN_ERROR` | Run fails with exception | Error alerts, logging |
+| `BEFORE_MODEL_REQUEST` | Before each LLM call | Request logging, rate limiting |
+| `AFTER_MODEL_REQUEST` | After each LLM response | Token tracking, response logging |
+
+These complement the existing tool-level hooks (`PRE_TOOL_USE`, `POST_TOOL_USE`, `POST_TOOL_USE_FAILURE`). Together they give you full observability over the agent lifecycle -- from run start to individual tool calls to run completion.
+
+Each hook can be a shell command (via `command`) or an async Python function (via `handler`). Shell commands receive `HookInput` as JSON via stdin and use exit codes for decisions (0 = allow, 2 = deny).
+
+## Skills as Slash Commands
+
+Skills now double as slash commands in the CLI. Type `/code-review` and the skill activates directly from the picker.
+
+Discovery follows a 3-tier hierarchy where later sources override earlier ones by name:
+
+1. **Built-in** -- `apps/cli/skills/` (ships with the package)
+2. **User** -- `~/.pydantic-deep/skills/` (your personal skills)
+3. **Project** -- `.pydantic-deep/skills/` (per-project skills)
+
+This means you can override any built-in skill at the project level. A project-level `/code-review` skill replaces the built-in one for that project only.
+
+## Opinionated Defaults
+
+0.3.3 flips several defaults to production-ready values. The goal: `create_deep_agent()` with zero arguments should give you a capable agent.
+
+| Setting | Before (0.3.2) | After (0.3.3) |
+|---------|-----------------|----------------|
+| `include_memory` | `False` | `True` |
+| `thinking` | not available | `"high"` |
+| Anthropic caching | off | on (instructions, tools, messages) |
+| Subagent type | plain Pydantic AI agent | full deep agent |
+| `max_nesting_depth` | `0` | `1` |
+| `eviction_token_limit` | `None` | `20_000` |
+| `patch_tool_calls` | `False` | `True` |
+| `image_support` | opt-in | always on (removed flag) |
+| `BASE_PROMPT` | replaceable | always included (`instructions` appends) |
+| Default main model | `anthropic:claude-sonnet-4-6` | `anthropic:claude-opus-4-6` |
+| Default subagent model | `anthropic:claude-sonnet-4-6` | `anthropic:claude-sonnet-4-6` |
+| Default summarization model | `anthropic:claude-haiku-4-5-20251001` | `anthropic:claude-haiku-4-5-20251001` |
+
+The minimal agent that used to require 10+ flags now requires zero:
+
+```python
+from pydantic_deep import create_deep_agent, DeepAgentDeps, StateBackend
+
+# 0.3.3: memory, thinking, caching, deep subagents, eviction,
+# patch, web -- all on by default
+agent = create_deep_agent()
+
+deps = DeepAgentDeps(backend=StateBackend())
+result = await agent.run("Analyze the auth module", deps=deps)
+```
+
+## Other Changes
+
+**`compact_conversation` tool** -- the agent can now manually trigger context compression with an optional focus topic. Uses `ContextManagerCapability.request_compact()` under the hood.
+
+**Provider setup wizard** -- on first run, the CLI auto-detects missing API keys and guides you through provider selection (Anthropic, OpenAI, Google, OpenRouter). Keys are saved to `.pydantic-deep/.env`.
+
+**`/provider` slash command** -- switch AI provider and model mid-session without restarting.
+
+**`/config` slash command** -- view and change settings interactively. Example: `/config set include_teams true`.
+
+**`approve_tools` config** -- configure which tools require user approval. Default: `["execute"]`. Set via `/config set approve_tools "execute,write_file,edit_file"` or in `config.toml`.
+
+**Enhanced `BASE_PROMPT`** -- now includes Claude Code-inspired sections for code quality, executing actions with care, and tone/formatting. The `instructions` parameter appends to it instead of replacing it.
+
+**Context files simplified** -- discovery is now limited to `AGENTS.md` and `SOUL.md`. Subagents see only `AGENTS.md`; `SOUL.md` is main-agent-only. DEEP.md, AGENT.md, and CLAUDE.md are no longer discovered.
+
+**Web tools split** -- `include_web` replaced with separate `web_search` and `web_fetch` booleans (both default `True`), giving independent control over WebSearch and WebFetch capabilities.
+
+## Install
+
+```bash
+pip install pydantic-deep==0.3.3
+```
+
+Or with the CLI:
+
+```bash
+pip install "pydantic-deep[cli]==0.3.3"
+```
+
+## Links
+
+- [GitHub -- pydantic-deep](https://github.com/vstorm-co/pydantic-deepagents)
+- [Changelog](https://github.com/vstorm-co/pydantic-deepagents/blob/main/CHANGELOG.md)
+- [Documentation](https://vstorm-co.github.io/pydantic-deepagents/)
+- [PyPI](https://pypi.org/project/pydantic-deep/)
