@@ -9,9 +9,10 @@ interface Props {
   showLang?: boolean;
   project?: Project | null;
   pathSuffix?: string;
+  languageLinks?: { lang: Lang; href: string }[];
 }
 
-const { currentLang = "en", showLang = true, project, pathSuffix } = Astro.props;
+const { currentLang = "en", showLang = true, project, pathSuffix, languageLinks } = Astro.props;
 const t = translations[currentLang];
 const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith("/") ? rawBase : rawBase + "/";
@@ -137,7 +138,7 @@ const getProjectHref = (slug: string) =>
       >
         {t["footer.cta.button"]}
       </a>
-      {showLang && <div class="hidden lg:block"><LanguageSwitcher currentLang={currentLang} pathSuffix={pathSuffix} /></div>}
+      {showLang && <div class="hidden lg:block"><LanguageSwitcher currentLang={currentLang} pathSuffix={pathSuffix} languageLinks={languageLinks} /></div>}
       <!-- Hamburger (mobile only) -->
       <button
         id="mobile-menu-btn"
@@ -349,7 +350,7 @@ const getProjectHref = (slug: string) =>
       </a>
       {showLang && (
         <div class="px-3 pt-2">
-          <LanguageSwitcher currentLang={currentLang} pathSuffix={pathSuffix} />
+          <LanguageSwitcher currentLang={currentLang} pathSuffix={pathSuffix} languageLinks={languageLinks} />
         </div>
       )}
     </div>

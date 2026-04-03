@@ -47,7 +47,7 @@ const alternates = [
   alternates={alternates}
   schemas={[collectionPageSchema({ name: t["blog.title"], description: t["blog.subtitle"], url: SITE_URL + `/${lang}/blog/` })]}
 >
-  <Navbar currentLang={lang} />
+  <Navbar currentLang={lang} languageLinks={alternates} />
   <Breadcrumbs items={[
     { label: "Home", href: `/${lang}/` },
     { label: t["nav.blog"] },

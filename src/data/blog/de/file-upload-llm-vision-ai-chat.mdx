@@ -1,0 +1,166 @@
+---
+title: "Datei-Upload zu LLM Vision: Bilder, PDFs und DOCX in Ihrem AI-Chat"
+description: "Laden Sie Bilder, PDFs und DOCX in Ihren AI-Chat hoch. Das Backend parst Dokumente, Bilder werden durch LLM Vision verarbeitet. Vollständige Implementierung mit FastAPI und Pydantic AI."
+pubDate: 2026-04-01
+updatedDate: 2026-04-01
+author: "Kacper Włodarczyk"
+lang: de
+translationKey: file-upload-llm-vision-ai-chat
+tags: ["file-upload", "llm-vision", "python", "fastapi", "ai-agents"]
+category: tutorial
+draft: false
+---
+
+> **TL;DR:** Version 0.2.2 des Full-Stack AI Agent Templates fügt Datei-Upload mit LLM-Vision-Unterstützung hinzu. Bilder (PNG, JPG, WebP) werden als `BinaryContent` direkt an die LLM Vision API gesendet — das Modell sieht sie. PDFs werden serverseitig mit PyMuPDF geparst (Textblöcke + Tabellen in Markdown konvertiert). DOCX-Dateien werden mit python-docx geparst. Der gesamte geparste Inhalt wird in den Kontext des Agenten eingefügt. Der Upload-Flow nutzt REST für die Dateibehandlung (Validierung, Parsing, Speicherung) und WebSocket für Chat-Nachrichten (Referenzierung per File-IDs). Ein `ChatFile`-Datenbankmodell verfolgt Eigentümer, MIME-Typ, Speicherpfad und gecachten geparsten Inhalt. Der PDF-Parser ist über die Umgebungsvariable `CHAT_PDF_PARSER` konfigurierbar (PyMuPDF, LlamaParse oder LiteParse). Funktioniert mit allen 5 unterstützten AI-Frameworks.
+
+"Kann ich ein PDF in den Chat hochladen?"
+
+Das ist die zweite Frage, die jeder Benutzer stellt, nachdem er gefragt hat, ob sein LLM-Anbieter unterstützt wird. Und es ist die Funktion, die einen Spielzeug-Chatbot von einem produktionsreifen AI-Assistenten unterscheidet.
+
+Die meisten Tutorials hören bei Texteingabe auf. Aber echte Benutzer müssen Verträge besprechen, Rechnungen analysieren, Screenshots beschreiben und Dokumente überprüfen — alles im Chat. Der Agent muss Bilder sehen, PDFs lesen und Word-Dokumente parsen können.
+
+Genau das haben wir in Version 0.2.2 unseres Open-Source [Full-Stack AI Templates](https://github.com/vstorm-co/full-stack-ai-agent-template) ausgeliefert. Keine Demo — eine produktionsreife Datei-Upload-Pipeline mit MIME-Validierung, serverseitigem Parsing, LLM Vision für Bilder und datenbankgestützter Dateiverfolgung. Funktioniert mit allen [5 unterstützten AI-Frameworks](/blog/choosing-ai-framework/).
+
+So haben wir es gebaut.
+
+---
+
+*Ich bin Kacper, AI Engineer bei [Vstorm](https://vstorm.co) — einer Applied Agentic AI Engineering Consultancy. Wir haben über 30 produktive AI-Agent-Implementierungen ausgeliefert und stellen unsere Tools als Open Source auf [github.com/vstorm-co](https://github.com/vstorm-co) bereit. Verbinden Sie sich mit mir auf [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+
+---
+
+## Die Architektur: Drei Pfade für drei Dateitypen
+
+Wenn ein Benutzer eine Datei im Chat hochlädt, können je nach Dateityp drei Dinge passieren:
+
+```
+Benutzer lädt Datei hoch
+  │
+  ├── Bild (png/jpg/gif/webp)
+  │     → Speichern in media/
+  │     → Laden als BinaryContent
+  │     → Senden an LLM Vision API
+  │     → Agent "sieht" das Bild
+  │
+  ├── PDF
+  │     → Speichern in media/
+  │     → Parsen mit PyMuPDF (Text + Tabellen)
+  │     → Geparsten Text in Agent-Prompt einfügen
+  │     → Agent liest den Dokumentinhalt
+  │
+  └── DOCX
+        → Speichern in media/
+        → Parsen mit python-docx
+        → Geparsten Text in Agent-Prompt einfügen
+        → Agent liest den Dokumentinhalt
+```
+
+Die zentrale Designentscheidung: **Bilder und Dokumente nehmen unterschiedliche Wege**. Bilder benötigen multimodale LLM-Fähigkeiten (Vision API). Dokumente benötigen serverseitige Textextraktion. Beide landen im Kontext des Agenten, aber über grundlegend verschiedene Mechanismen.
+
+## Schritt 1: Upload-Endpoint mit Validierung
+
+```python
+@router.post("/upload", response_model=FileUploadResponse,
+             status_code=status.HTTP_201_CREATED)
+async def upload_file(
+    file: UploadFile = File(...),
+    file_upload_svc: FileUploadSvc = None,
+    current_user: CurrentUser = None,
+) -> Any:
+    data = await file.read()
+    is_valid, error = file_upload_svc.validate_upload(
+        file.content_type, len(data)
+    )
+    if not is_valid:
+        raise HTTPException(status_code=400, detail=error)
+
+    file_type = file_upload_svc.classify_file(
+        file.content_type or "", file.filename or "unknown"
+    )
+    parsed_content = await file_upload_svc.parse_content(
+        data, file_type, file.content_type or ""
+    )
+
+    storage = get_file_storage()
+    storage_path = await storage.save(
+        str(current_user.id), file.filename or "unknown", data
+    )
+
+    chat_file = await file_upload_svc.create_chat_file(
+        user_id=current_user.id,
+        filename=file.filename or "unknown",
+        mime_type=file.content_type or "application/octet-stream",
+        size=len(data),
+        storage_path=storage_path,
+        file_type=file_type,
+        parsed_content=parsed_content,
+    )
+    return FileUploadResponse(
+        id=chat_file.id, filename=chat_file.filename,
+        mime_type=chat_file.mime_type, size=chat_file.size,
+        file_type=chat_file.file_type,
+    )
+```
+
+## Schritt 2: PDF-Parsing mit PyMuPDF
+
+```python
+@staticmethod
+def _parse_pdf_content(data: bytes) -> str | None:
+    import pymupdf
+    doc = pymupdf.open(stream=data, filetype="pdf")
+    texts = []
+    for page in doc:
+        blocks = page.get_text("blocks")
+        for b in blocks:
+            if b[6] == 0:
+                text = b[4].strip()
+                if text:
+                    texts.append(text)
+        tables = page.find_tables()
+        if tables and tables.tables:
+            for table in tables.tables:
+                df = table.to_pandas()
+                if not df.empty:
+                    texts.append(df.to_markdown(index=False))
+    doc.close()
+    return "\n\n".join(texts) if texts else None
+```
+
+## Schritt 3: Bilder durch LLM Vision
+
+```python
+from pydantic_ai.messages import BinaryContent
+
+for fid in file_ids:
+    chat_file = await db.get(ChatFileModel, UUID(fid))
+    if chat_file.file_type == "image":
+        file_data = await storage.load(chat_file.storage_path)
+        image_parts.append(
+            BinaryContent(data=file_data, media_type=chat_file.mime_type)
+        )
+    elif chat_file.parsed_content:
+        file_context_parts.append(
+            f"\n---\nAttached file: {chat_file.filename}"
+            f"\n```\n{chat_file.parsed_content}\n```"
+        )
+```
+
+`BinaryContent` von [Pydantic AI](https://ai.pydantic.dev/) umhüllt Rohbytes mit einem MIME-Typ und lässt das Framework den multimodalen API-Aufruf übernehmen. Das LLM sieht das Bild buchstäblich.
+
+## Ausprobieren
+
+Die Datei-Upload-Funktion ist im [Full-Stack AI Agent Template](https://github.com/vstorm-co/full-stack-ai-agent-template) ab Version 0.2.2 enthalten.
+
+```bash
+pip install fastapi-fullstack
+fastapi-fullstack
+# Framework wählen → fertig
+```
+
+---
+
+*Mehr zum Template:*
+- *[Erste-Schritte-Anleitung](/blog/fastapi-nextjs-ai-template-guide/)*
+- *[Vollständige RAG-Pipeline: 4 Vector Stores](/blog/full-rag-pipeline-4-vector-stores/)*
+- *[Dieselbe Chat-App, 4 Frameworks](/blog/same-chat-app-4-frameworks/)*

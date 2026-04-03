@@ -34,7 +34,7 @@ const alternates = [
   theme="dark"
   schemas={[organizationSchema()]}
 >
-  <Navbar currentLang={lang} />
+  <Navbar currentLang={lang} languageLinks={alternates} />
   <OssHero t={t} />
   <TrustedBy t={t} />
   <FeaturedProjects lang={lang} t={t} />

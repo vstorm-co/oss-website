@@ -1,0 +1,102 @@
+---
+title: "5 AI-Frameworks, 1 Template: Architektur im Detail"
+description: "Wechseln Sie zwischen Pydantic AI, LangChain, LangGraph, CrewAI und DeepAgents mit einer Konfigurationsanderung. Architektur-Deep-Dive mit Code aus allen 5 Implementierungen."
+pubDate: 2026-04-03
+updatedDate: 2026-04-03
+author: "Kacper Włodarczyk"
+lang: de
+translationKey: 5-ai-frameworks-1-template-architecture
+tags: ["ai-frameworks", "python", "software-architecture", "fastapi", "ai-agents"]
+category: tutorial
+draft: false
+---
+
+> **TL;DR:** Unser Open-Source Full-Stack AI Template unterstutzt 5 Agent-Frameworks (Pydantic AI, LangChain, LangGraph, CrewAI, DeepAgents) hinter einer einzigen Schnittstelle. Die Agent-Schicht ist ein Plugin — WebSocket-Streaming, Konversationspersistenz, Datei-Upload, RAG-Pipeline, Auth und Admin-Panel sind gemeinsame Infrastruktur, die sich beim Framework-Wechsel nicht andert. Jedes Framework bekommt sein eigenes Assistenten-Modul. Der WebSocket-Handler importiert aus `app.agents` ohne zu wissen, welche Implementierung dahinter lauft. Die Framework-Auswahl erfolgt bei der Projektgenerierung uber `--ai-framework pydantic_ai`.
+
+"Welches AI-Framework soll ich verwenden?"
+
+Falsche Frage. Die richtige Frage ist: "Wie baue ich so, dass das Framework keine Rolle spielt?"
+
+Alle paar Monate bekommt das Python-AI-Okosystem einen neuen Kandidaten. LangChain dominierte 2024. Pydantic AI gewann 2025 ernsthaft an Bedeutung. LangGraph, CrewAI und DeepAgents haben sich jeweils Nischen erarbeitet. Jedes hat Kompromisse. Keines ist universell besser.
+
+Wir waren es leid, bei jedem Kunden, der ein anderes Framework wollte, dieselbe FastAPI + Next.js-Infrastruktur neu aufzubauen. Also haben wir ein Template gebaut, das alle funf unterstutzt — und das Framework wird zu einer einzigen Konfigurationsentscheidung.
+
+So funktioniert die Architektur, mit echtem Code aus dem [Open-Source Template](https://github.com/vstorm-co/full-stack-ai-agent-template).
+
+---
+
+*Ich bin Kacper, AI Engineer bei [Vstorm](https://vstorm.co) — einer Applied Agentic AI Engineering Consultancy. Wir haben uber 30 produktive AI-Agent-Implementierungen ausgeliefert und stellen unsere Tools als Open Source auf [github.com/vstorm-co](https://github.com/vstorm-co) bereit.*
+
+---
+
+## Das Prinzip: Agent-Schicht als Plugin
+
+```
+┌──────────────────────────────────────────┐
+│                 Frontend                  │
+│   Next.js 15 · React 19 · Tailwind v4    │
+├──────────────────────────────────────────┤
+│              WebSocket-Schicht            │
+│   Streaming · Events · Dateibehandlung   │
+├──────────────────────────────────────────┤
+│          Agent-Schicht  ← AUSTAUSCHBAR   │
+│   Pydantic AI | LangChain | LangGraph    │
+│   CrewAI | DeepAgents                     │
+├──────────────────────────────────────────┤
+│           Gemeinsame Dienste              │
+│   Auth · DB · RAG · Upload · Tools        │
+└──────────────────────────────────────────┘
+```
+
+Alles oberhalb und unterhalb der Agent-Schicht ist gemeinsam. Das Frontend weiss nicht, welches Framework lauft. Das Datenbankschema ist identisch. Das WebSocket-Protokoll ist dasselbe. [RAG-Pipeline](/blog/full-rag-pipeline-4-vector-stores/), [Datei-Upload](/blog/file-upload-llm-vision-ai-chat/), Auth — alles framework-agnostisch.
+
+## Framework-Auswahl
+
+```bash
+pip install fastapi-fullstack
+fastapi-fullstack --ai-framework pydantic_ai  # oder langchain, langgraph, crewai, deepagents
+```
+
+```python
+# Pydantic AI:
+from app.agents.assistant import AssistantAgent, Deps
+
+# LangChain:
+from app.agents.langchain_assistant import LangChainAssistant, AgentContext, AgentState
+
+# LangGraph:
+from app.agents.langgraph_assistant import LangGraphAssistant, AgentContext, AgentState
+
+# CrewAI:
+from app.agents.crewai_assistant import CrewAIAssistant, CrewConfig, CrewContext
+
+# DeepAgents:
+from app.agents.deepagents_assistant import DeepAgentsAssistant, DeepAgentsDeps
+```
+
+## Welches Framework wann
+
+| Framework | Am besten fur | Kompromiss |
+|-----------|--------------|------------|
+| **Pydantic AI** | Typisierte Agenten, Structured Output, Multimodal | Neueres Okosystem |
+| **LangChain** | Teams die LangChain kennen, LangSmith | Schwergewichtige Abstraktionen |
+| **LangGraph** | Komplexe Workflows, explizite Zustandsmaschinen | Steilere Lernkurve |
+| **CrewAI** | Multi-Agent-Zusammenarbeit, rollenbasierte Aufgaben | Overhead fur einfache Falle |
+| **DeepAgents** | Middleware-Muster, Human-in-the-Loop | Kleinstes Okosystem |
+
+Die ehrliche Antwort: Fur die meisten Projekte wahlen Sie das, was Ihr Team am besten kennt.
+
+## Ausprobieren
+
+```bash
+pip install fastapi-fullstack
+fastapi-fullstack
+# Framework wahlen → Produktions-App in 30 Sekunden
+```
+
+---
+
+*Mehr zum Template:*
+- *[Erste-Schritte-Anleitung](/blog/fastapi-nextjs-ai-template-guide/)*
+- *[Datei-Upload + LLM Vision](/blog/file-upload-llm-vision-ai-chat/)*
+- *[Vollstandige RAG-Pipeline: 4 Vector Stores](/blog/full-rag-pipeline-4-vector-stores/)*

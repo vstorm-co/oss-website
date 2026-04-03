@@ -1,0 +1,273 @@
+---
+title: "5 AI Frameworks, 1 Template: Architecture Deep Dive"
+description: "Switch between Pydantic AI, LangChain, LangGraph, CrewAI, and DeepAgents with one config change. Architecture deep dive with code from all 5 implementations."
+pubDate: 2026-04-03
+updatedDate: 2026-04-03
+author: "Kacper Włodarczyk"
+lang: en
+translationKey: 5-ai-frameworks-1-template-architecture
+tags: ["ai-frameworks", "python", "software-architecture", "fastapi", "ai-agents"]
+category: tutorial
+draft: false
+---
+
+> **TL;DR:** Our open-source full-stack AI template supports 5 agent frameworks (Pydantic AI, LangChain, LangGraph, CrewAI, DeepAgents) behind a single interface. The agent layer is a plugin — WebSocket streaming, conversation persistence, file upload, RAG pipeline, auth, and admin panel are all shared infrastructure that doesn't change when you switch frameworks. Each framework gets its own assistant module (`assistant.py`, `langchain_assistant.py`, `langgraph_assistant.py`, `crewai_assistant.py`, `deepagents_assistant.py`), and `agents/__init__.py` re-exports the right classes based on framework selection. The WebSocket handler imports from `app.agents` without knowing which implementation runs behind it. Tools like `search_knowledge_base` (RAG) and `get_current_datetime` are implemented once per framework with identical interfaces. Framework selection happens at project generation via `--ai-framework pydantic_ai` (or `langchain`, `langgraph`, `crewai`, `deepagents`). After deploying all 5 across 30+ projects: the framework choice matters less than the infrastructure around it.
+
+"Which AI framework should I use?"
+
+Wrong question. The right question is: "How do I build so the framework doesn't matter?"
+
+Every few months, the Python AI ecosystem gets a new contender. LangChain dominated 2024. Pydantic AI gained serious traction in 2025. LangGraph, CrewAI, and DeepAgents each carved out niches. Each has trade-offs. None is universally better.
+
+We got tired of rebuilding the same FastAPI + Next.js infrastructure every time a client wanted a different framework. So we built one template that supports all five — and the framework becomes a single configuration choice.
+
+Here's how the architecture works, with real code from the [open-source template](https://github.com/vstorm-co/full-stack-ai-agent-template).
+
+---
+
+*I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering Consultancy. We've shipped 30+ production AI agent implementations and open-source our tooling at [github.com/vstorm-co](https://github.com/vstorm-co). Connect with me on [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+
+---
+
+## The Principle: Agent Layer as a Plugin
+
+The core architecture separates the application into two layers:
+
+```
+┌──────────────────────────────────────────┐
+│                 Frontend                  │
+│   Next.js 15 · React 19 · Tailwind v4    │
+│   Chat UI · RAG Dashboard · Auth          │
+├──────────────────────────────────────────┤
+│              WebSocket Layer              │
+│   Streaming · Events · File handling      │
+├──────────────────────────────────────────┤
+│              Agent Layer  ← SWAPPABLE     │
+│   Pydantic AI | LangChain | LangGraph    │
+│   CrewAI | DeepAgents                     │
+├──────────────────────────────────────────┤
+│             Shared Services               │
+│   Auth · DB · RAG · File Upload · Tools   │
+└──────────────────────────────────────────┘
+```
+
+Everything above and below the Agent Layer is shared. The frontend doesn't know which framework is running. The database schema is identical. The WebSocket protocol is the same. The [RAG pipeline](/blog/full-rag-pipeline-4-vector-stores/), [file upload](/blog/file-upload-llm-vision-ai-chat/), auth — all framework-agnostic.
+
+The Agent Layer is the only thing that changes.
+
+## How Framework Selection Works
+
+When you create a project, you pick your framework:
+
+```bash
+pip install fastapi-fullstack
+fastapi-fullstack --ai-framework pydantic_ai  # or langchain, langgraph, crewai, deepagents
+```
+
+The template generator (Cookiecutter) uses this choice to include only the relevant agent module. The `agents/__init__.py` exports the right classes:
+
+```python
+# When pydantic_ai is selected:
+from app.agents.assistant import AssistantAgent, Deps
+__all__ = ["AssistantAgent", "Deps"]
+
+# When langchain is selected:
+from app.agents.langchain_assistant import LangChainAssistant, AgentContext, AgentState
+__all__ = ["LangChainAssistant", "AgentContext", "AgentState"]
+
+# When langgraph is selected:
+from app.agents.langgraph_assistant import LangGraphAssistant, AgentContext, AgentState
+__all__ = ["LangGraphAssistant", "AgentContext", "AgentState"]
+
+# When crewai is selected:
+from app.agents.crewai_assistant import CrewAIAssistant, CrewConfig, CrewContext
+__all__ = ["CrewAIAssistant", "CrewConfig", "CrewContext"]
+
+# When deepagents is selected:
+from app.agents.deepagents_assistant import DeepAgentsAssistant, DeepAgentsDeps
+__all__ = ["DeepAgentsAssistant", "DeepAgentsDeps"]
+```
+
+Each framework gets its own assistant file. The rest of the application imports from `app.agents` without knowing which implementation is behind it.
+
+## Framework 1: Pydantic AI
+
+Pydantic AI is our default choice for new projects. Type-safe dependencies via `RunContext`, structured output validation, and native support for multimodal input (`BinaryContent` for images).
+
+```python
+from pydantic_ai import Agent, RunContext
+from pydantic_ai.settings import ModelSettings
+
+@dataclass
+class Deps:
+    user_id: str | None = None
+    user_name: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
+
+class AssistantAgent:
+    def __init__(self, model_name: str | None = None):
+        self.model_name = model_name or settings.AI_MODEL
+        self.agent = Agent(
+            model=self._get_model(),
+            system_prompt=self.system_prompt,
+            deps_type=Deps,
+            model_settings=ModelSettings(temperature=self.temperature),
+        )
+        self.agent.tool(get_current_datetime)
+        if settings.ENABLE_RAG:
+            self.agent.tool(search_knowledge_base)
+```
+
+The `iter()` method streams all events — text deltas, tool calls, tool results, final output — through the WebSocket. Pydantic AI's event system maps cleanly to our streaming protocol.
+
+## Framework 2: LangChain
+
+LangChain uses `ChatOpenAI` / `ChatAnthropic` / `ChatGoogleGenerativeAI` with tool bindings. The LangSmith observability integration is opt-in:
+
+```python
+from langchain_openai import ChatOpenAI
+from langchain_core.tools import tool
+
+class LangChainAssistant:
+    def __init__(self, model_name: str | None = None):
+        self.llm = ChatOpenAI(
+            model=model_name or settings.AI_MODEL,
+            temperature=settings.AI_TEMPERATURE,
+            streaming=True,
+        )
+        self.tools = [get_current_datetime]
+        if settings.ENABLE_RAG:
+            self.tools.append(search_knowledge_base)
+        self.llm_with_tools = self.llm.bind_tools(self.tools)
+```
+
+LangChain's streaming uses `astream_events` which we translate into the same WebSocket event format.
+
+## Framework 3: LangGraph
+
+LangGraph builds on LangChain but uses a graph-based execution model. The ReAct pattern becomes explicit:
+
+```python
+from langgraph.graph import StateGraph, END
+from langgraph.prebuilt import ToolNode
+
+class LangGraphAssistant:
+    def __init__(self):
+        graph = StateGraph(AgentState)
+        graph.add_node("agent", self.agent_node)
+        graph.add_node("tools", ToolNode(self.tools))
+        graph.set_entry_point("agent")
+        graph.add_conditional_edges(
+            "agent",
+            self.should_continue,
+            {"continue": "tools", "end": END}
+        )
+        graph.add_edge("tools", "agent")
+        self.app = graph.compile()
+```
+
+The graph structure makes the agent's decision process explicit and debuggable. Each node is a step. Each edge is a condition.
+
+## Framework 4: CrewAI
+
+CrewAI takes a multi-agent approach. Instead of a single agent with tools, you define a crew of agents with roles:
+
+```python
+from crewai import Agent, Task, Crew
+
+class CrewAIAssistant:
+    def __init__(self):
+        self.researcher = Agent(
+            role="Research Assistant",
+            goal="Find accurate information",
+            tools=[search_knowledge_base],
+        )
+        self.writer = Agent(
+            role="Writing Assistant",
+            goal="Produce clear, helpful responses",
+            tools=[get_current_datetime],
+        )
+        self.crew = Crew(agents=[self.researcher, self.writer], tasks=[...])
+```
+
+CrewAI is best when the task naturally decomposes into roles.
+
+## Framework 5: DeepAgents
+
+DeepAgents focuses on middleware stacking and human-in-the-loop patterns:
+
+```python
+from deepagents import DeepAgent, Middleware
+
+class DeepAgentsAssistant:
+    def __init__(self):
+        self.agent = DeepAgent(
+            model=settings.AI_MODEL,
+            middlewares=[
+                LoggingMiddleware(),
+                RateLimitMiddleware(),
+                HumanApprovalMiddleware(),
+            ],
+            tools=[get_current_datetime, search_knowledge_base],
+        )
+```
+
+The middleware stack intercepts every agent action. You can add logging, rate limiting, approval gates, or custom validation without touching the agent logic.
+
+## The WebSocket Layer: Framework-Agnostic Streaming
+
+The WebSocket handler uses the same protocol regardless of framework:
+
+```python
+@router.websocket("/ws/agent")
+async def agent_websocket(websocket: WebSocket, user: User = Depends(get_current_user_ws)):
+    await manager.connect(websocket)
+    while True:
+        data = await websocket.receive_json()
+        user_message = data.get("message", "")
+        file_ids = data.get("file_ids", [])
+
+        # Load and process files (framework-agnostic)
+        user_input = await process_files(user_message, file_ids)
+
+        # Get agent (framework-specific, but same interface)
+        agent = get_agent(model_name=data.get("model"))
+
+        # Stream response (event format is identical)
+        async for event in agent.stream(user_input, history):
+            await manager.send_event(websocket, event.type, event.data)
+```
+
+The `get_agent()` function returns whichever framework was selected at project generation.
+
+## When to Use Which Framework
+
+After deploying all 5 across 30+ projects:
+
+| Framework | Best For | Trade-off |
+|-----------|----------|-----------|
+| **Pydantic AI** | Type-safe agents, structured output, multimodal | Newer ecosystem |
+| **LangChain** | Teams that know it, LangSmith observability | Heavyweight abstractions |
+| **LangGraph** | Complex workflows, explicit state machines | Steeper learning curve |
+| **CrewAI** | Multi-agent collaboration, role-based tasks | Overhead for simple use cases |
+| **DeepAgents** | Middleware patterns, human-in-the-loop | Smallest ecosystem |
+
+The honest answer: for most projects, pick the one your team knows best. The infrastructure around the agent matters more than the agent framework itself.
+
+## Try It
+
+```bash
+pip install fastapi-fullstack
+fastapi-fullstack
+# Pick your framework → get a production app in 30 seconds
+```
+
+All code in this article is from the [template repository](https://github.com/vstorm-co/full-stack-ai-agent-template).
+
+---
+
+*More on the template:*
+- *[Getting Started Guide](/blog/fastapi-nextjs-ai-template-guide/)*
+- *[File Upload + LLM Vision](/blog/file-upload-llm-vision-ai-chat/)*
+- *[Full RAG Pipeline: 4 Vector Stores](/blog/full-rag-pipeline-4-vector-stores/)*
+- *[Same Chat App, 4 Frameworks](/blog/same-chat-app-4-frameworks/)*

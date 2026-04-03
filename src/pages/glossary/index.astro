@@ -12,6 +12,9 @@ const t = translations[lang];
 
 const grouped = getTermsGroupedByLetter();
 const letters = Array.from(grouped.keys()).sort();
+
+// Glossary is English-only - only show English in language switcher
+const languageLinks = [{ lang: defaultLang, href: "/glossary/" }];
 ---
 
 <Layout
@@ -23,7 +26,7 @@ const letters = Array.from(grouped.keys()).sort();
   schemas={[definedTermSetSchema({ name: "AI & ML Glossary", description: "A comprehensive glossary of AI, machine learning, LLM, RAG, and agent terminology for developers.", url: SITE_URL + "/glossary/", terms: glossaryTerms.map((t) => ({ name: t.term, url: SITE_URL + `/glossary/${t.slug}/` })) })]}
   theme="light"
 >
-  <Navbar currentLang={lang} />
+  <Navbar currentLang={lang} languageLinks={languageLinks} />
 
   <Breadcrumbs items={[
     { label: "Home", href: "/" },

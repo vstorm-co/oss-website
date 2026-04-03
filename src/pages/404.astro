@@ -50,5 +50,33 @@ const t = translations[lang];
         Read our Blog
       </a>
     </div>
+
+    <!-- English version link - shown dynamically via JS for localized 404s -->
+    <div id="english-version-hint" class="mt-6 hidden">
+      <a href="/" class="text-sm text-text-secondary hover:text-accent transition-colors">
+        <svg class="inline w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+        </svg>
+        Try English version
+      </a>
+    </div>
   </main>
 </Layout>
+
+<script is:inline>
+  (function(){
+    // Show English version hint if on a localized 404
+    var path = window.location.pathname;
+    var localizedMatch = path.match(/^\/(pl|de|es)\//);
+    if (localizedMatch) {
+      var lang = localizedMatch[1];
+      var englishPath = path.replace(/^\/(pl|de|es)\//, '/');
+      var hint = document.getElementById('english-version-hint');
+      if (hint) {
+        hint.classList.remove('hidden');
+        var link = hint.querySelector('a');
+        if (link) link.href = englishPath;
+      }
+    }
+  })();
+</script>

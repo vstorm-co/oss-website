@@ -26,6 +26,9 @@ const term = getGlossaryTermBySlug(slug!)!;
 const related = getRelatedTerms(term);
 const projects = termToProjectMap[slug!] ?? [];
 const blogPosts = termToBlogMap[slug!] ?? [];
+
+// Glossary is English-only - only show English in language switcher
+const languageLinks = [{ lang: defaultLang, href: `/glossary/${slug}/` }];
 ---
 
 <Layout
@@ -37,7 +40,7 @@ const blogPosts = termToBlogMap[slug!] ?? [];
   schemas={[definedTermSchema({ name: term.term, description: term.definition, url: SITE_URL + `/glossary/${slug}/`, inDefinedTermSet: "AI & ML Glossary" })]}
   theme="light"
 >
-  <Navbar currentLang={lang} />
+  <Navbar currentLang={lang} languageLinks={languageLinks} />
 
   <Breadcrumbs items={[
     { label: "Home", href: "/" },

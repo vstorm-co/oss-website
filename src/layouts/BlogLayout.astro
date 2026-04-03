@@ -47,6 +47,12 @@ const {
 const t = translations[lang];
 const blogHref = lang === defaultLang ? '/blog/' : `/${lang}/blog/`;
 
+// Build language links for the language switcher - only show languages that have actual translations
+const languageLinks = allTranslations.map((tr) => ({
+  lang: tr.lang,
+  href: tr.lang === defaultLang ? `/blog/${tr.slug}/` : `/${tr.lang}/blog/${tr.slug}/`,
+}));
+
 const alternates = allTranslations.map((tr) => ({
   lang: tr.lang,
   href: tr.lang === defaultLang ? `/blog/${tr.slug}/` : `/${tr.lang}/blog/${tr.slug}/`,
@@ -116,7 +122,7 @@ if (category === "tutorial" && headings.length > 0) {
   <!-- Scroll progress bar -->
   <div id="scroll-progress" class="fixed top-0 left-0 h-0.5 bg-accent z-50 transition-none" style="width: 0%"></div>
 
-  <Navbar currentLang={lang} />
+  <Navbar currentLang={lang} languageLinks={languageLinks} />
   <Breadcrumbs items={[
     { label: "Home", href: lang === defaultLang ? "/" : `/${lang}/` },
     { label: t["nav.blog"], href: blogHref },

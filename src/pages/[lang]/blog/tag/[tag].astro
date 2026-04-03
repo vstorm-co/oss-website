@@ -44,6 +44,8 @@ const t = translations[lang];
 const pageTitle = t["blog.tag.title"].replace("{tag}", tag);
 const postCount = t["blog.tag.postCount"].replace("{count}", String(posts.length));
 
+// alternates already computed above - pass to Navbar to limit language switcher to languages that actually have this tag
+
 const allBlogPosts = await getCollection('blog', ({ data }) => !data.draft);
 const alternates = Object.keys(languages)
   .filter((locale) => allBlogPosts.some((p) => p.data.lang === locale && (p.data.tags ?? []).includes(tag)))
@@ -60,7 +62,7 @@ const alternates = Object.keys(languages)
   alternates={alternates}
   schemas={[collectionPageSchema({ name: pageTitle, description: `${postCount} tagged "${tag}"`, url: SITE_URL + `/${lang}/blog/tag/${tag}/` })]}
 >
-  <Navbar currentLang={lang} />
+  <Navbar currentLang={lang} languageLinks={alternates} />
   <Breadcrumbs items={[
     { label: "Home", href: `/${lang}/` },
     { label: t["nav.blog"], href: `/${lang}/blog/` },

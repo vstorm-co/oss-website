@@ -34,6 +34,9 @@ const categories = ["open-source", "tutorial", "article", "news"] as const;
 
 const categoryKey = `blog.category.${category}` as keyof typeof t;
 const categoryLabel = t[categoryKey] || category;
+
+// Blog category pages are English-only - only show English in language switcher
+const languageLinks = [{ lang: defaultLang, href: `/blog/category/${category}/` }];
 ---
 
 <Layout
@@ -44,7 +47,7 @@ const categoryLabel = t[categoryKey] || category;
   schemas={[collectionPageSchema({ name: `${categoryLabel} — ${t["blog.title"]}`, description: t["blog.subtitle"], url: SITE_URL + `/blog/category/${category}/` })]}
   theme="light"
 >
-  <Navbar currentLang={lang} />
+  <Navbar currentLang={lang} languageLinks={languageLinks} />
 
   <Breadcrumbs items={[
     { label: "Home", href: "/" },

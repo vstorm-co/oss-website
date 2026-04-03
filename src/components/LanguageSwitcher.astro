@@ -4,16 +4,25 @@ import { languages, defaultLang, type Lang } from '../i18n/translations';
 interface Props {
   currentLang: Lang;
   pathSuffix?: string;
+  // Explicit language links: if provided, only show these languages
+  languageLinks?: { lang: Lang; href: string }[];
 }
 
-const { currentLang, pathSuffix } = Astro.props;
+const { currentLang, pathSuffix, languageLinks } = Astro.props;
 const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith("/") ? rawBase : rawBase + "/";
 
 // Build language switch URLs:
 // If pathSuffix is explicitly provided, use it (landing pages with custom slugs).
 // Otherwise, derive the path automatically from the current URL.
+// If languageLinks is provided, use those directly instead.
 function getLangHref(targetLang: string): string {
+  if (languageLinks) {
+    const link = languageLinks.find(l => l.lang === targetLang);
+    if (link) return link.href;
+    return "#"; // Fallback if link not found (shouldn't happen if configured correctly)
+  }
+
   if (pathSuffix !== undefined) {
     const suffix = pathSuffix ? (pathSuffix.endsWith("/") ? pathSuffix : pathSuffix + "/") : "";
     return targetLang === defaultLang ? `${base}${suffix}` : `${base}${targetLang}/${suffix}`;
@@ -42,6 +51,13 @@ function getLangHref(targetLang: string): string {
     ? `${base}${pathWithoutLang}`
     : `${base}${targetLang}/${pathWithoutLang}`;
 }
+
+// Determine which languages to show
+const languagesToShow = languageLinks
+  ? languageLinks
+      .filter(l => languages[l.lang as Lang]) // Only include valid languages
+      .map(l => ({ code: l.lang, label: languages[l.lang as Lang], href: l.href }))
+  : Object.entries(languages).map(([code, label]) => ({ code, label, href: getLangHref(code) }));
 ---
 
 <div class="relative lang-switcher">
@@ -59,9 +75,9 @@ function getLangHref(targetLang: string): string {
   <div
     class="lang-dropdown absolute right-0 top-full mt-1 hidden min-w-[120px] rounded-xl border border-border bg-surface shadow-xl shadow-black/20 overflow-hidden"
   >
-    {Object.entries(languages).map(([code, label]) => (
+    {languagesToShow.map(({ code, label, href }) => (
       <a
-        href={getLangHref(code)}
+        href={href}
         class={`block px-3 py-2 text-xs transition-colors ${
           code === currentLang
             ? "bg-accent/10 text-accent font-medium"
