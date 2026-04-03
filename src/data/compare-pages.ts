@@ -41,10 +41,10 @@ export const comparisonPages: ComparisonPage[] = [
     competitorUrl: "https://github.com/langchain-ai/deepagents",
     category: "framework",
     verdict: {
-      en: "Both implement the same deep agent pattern (planning, filesystem, subagents, context management). Pydantic DeepAgents is built on Pydantic AI with full type safety. LangChain Deep Agents is built on LangGraph with access to the LangChain ecosystem.",
-      pl: "Oba implementują ten sam wzorzec deep agent (planowanie, system plików, subagenty, zarządzanie kontekstem). Pydantic DeepAgents jest zbudowany na Pydantic AI z pełnym bezpieczeństwem typów. LangChain Deep Agents jest zbudowany na LangGraph z dostępem do ekosystemu LangChain.",
-      de: "Beide implementieren das gleiche Deep-Agent-Muster (Planung, Dateisystem, Subagenten, Kontextmanagement). Pydantic DeepAgents basiert auf Pydantic AI mit voller Typsicherheit. LangChain Deep Agents basiert auf LangGraph mit Zugang zum LangChain-Ökosystem.",
-      es: "Ambos implementan el mismo patrón deep agent (planificación, sistema de archivos, subagentes, gestión de contexto). Pydantic DeepAgents está construido sobre Pydantic AI con seguridad de tipos completa. LangChain Deep Agents está construido sobre LangGraph con acceso al ecosistema LangChain.",
+      en: "Both implement the deep agent pattern. DeepAgents uses Pydantic AI for full type safety; LangChain Deep Agents uses LangGraph with access to the broader LangChain ecosystem.",
+      pl: "Oba implementują wzorzec deep agent. DeepAgents używa Pydantic AI (pełne bezpieczeństwo typów); LangChain Deep Agents używa LangGraph i ekosystemu LangChain.",
+      de: "Beide implementieren das Deep-Agent-Muster. DeepAgents nutzt Pydantic AI mit Typsicherheit; LangChain Deep Agents nutzt LangGraph und das LangChain-Ökosystem.",
+      es: "Ambos implementan el patrón deep agent. DeepAgents usa Pydantic AI (seguridad de tipos completa); LangChain Deep Agents usa LangGraph y el ecosistema LangChain.",
     },
     highlights: [
       {
@@ -279,10 +279,10 @@ result = agent.invoke({
     competitorUrl: "https://github.com/crewAIInc/crewAI",
     category: "framework",
     verdict: {
-      en: "Different philosophies: DeepAgents implements the deep agent pattern (Claude Code-style autonomous agents with planning, filesystem, and context management). CrewAI focuses on role-based multi-agent crews with predefined coordination patterns. DeepAgents gives more control; CrewAI is faster for team-of-agents prototypes.",
-      pl: "Różne filozofie: DeepAgents implementuje wzorzec deep agent (autonomiczne agenty w stylu Claude Code z planowaniem, systemem plików i zarządzaniem kontekstem). CrewAI skupia się na zespołach wieloagentowych opartych na rolach z predefiniowanymi wzorcami koordynacji. DeepAgents daje więcej kontroli; CrewAI jest szybszy do prototypów zespołów agentów.",
-      de: "Unterschiedliche Philosophien: DeepAgents implementiert das Deep-Agent-Muster (autonome Claude-Code-Agenten mit Planung, Dateisystem und Kontextmanagement). CrewAI konzentriert sich auf rollenbasierte Multi-Agenten-Crews mit vordefinierten Koordinationsmustern. DeepAgents bietet mehr Kontrolle; CrewAI ist schneller für Team-Prototypen.",
-      es: "Filosofías diferentes: DeepAgents implementa el patrón deep agent (agentes autónomos estilo Claude Code con planificación, sistema de archivos y gestión de contexto). CrewAI se enfoca en equipos multi-agente basados en roles con patrones de coordinación predefinidos. DeepAgents da más control; CrewAI es más rápido para prototipos de equipos.",
+      en: "Autonomous deep agents (DeepAgents) vs role-based agent crews (CrewAI). DeepAgents offers more control; CrewAI is faster for multi-agent team prototypes.",
+      pl: "Autonomiczne deep agenty (DeepAgents) vs agenty oparte na rolach (CrewAI). DeepAgents daje więcej kontroli; CrewAI jest szybszy do prototypów wieloagentowych.",
+      de: "Autonome Deep Agents (DeepAgents) vs rollenbasierte Agent-Teams (CrewAI). DeepAgents bietet mehr Kontrolle; CrewAI ist schneller für Multi-Agenten-Prototypen.",
+      es: "Agentes deep autónomos (DeepAgents) vs equipos de agentes por roles (CrewAI). DeepAgents ofrece más control; CrewAI es más rápido para prototipos multi-agente.",
     },
     highlights: [
       {
@@ -534,10 +534,10 @@ result = crew.kickoff()`,
     competitorUrl: "https://github.com/ag2ai/ag2",
     category: "framework",
     verdict: {
-      en: "Different approaches: DeepAgents builds autonomous deep agents (Claude Code-style) with planning, filesystem, and context management on Pydantic AI. AutoGen (AG2) focuses on multi-agent conversations with group chats, code execution, and Microsoft-backed research. DeepAgents is simpler; AutoGen is more powerful for agent-to-agent dialogues.",
-      pl: "Różne podejścia: DeepAgents buduje autonomiczne deep agenty (styl Claude Code) z planowaniem, systemem plików i zarządzaniem kontekstem na Pydantic AI. AutoGen (AG2) skupia się na konwersacjach wieloagentowych z czatami grupowymi, wykonywaniem kodu i badaniami wspieranymi przez Microsoft. DeepAgents jest prostszy; AutoGen jest potężniejszy w dialogach agent-agent.",
-      de: "Unterschiedliche Ansätze: DeepAgents baut autonome Deep Agents (Claude-Code-Stil) mit Planung, Dateisystem und Kontextmanagement auf Pydantic AI. AutoGen (AG2) konzentriert sich auf Multi-Agent-Konversationen mit Gruppen-Chats, Code-Ausführung und Microsoft-unterstützter Forschung. DeepAgents ist einfacher; AutoGen ist mächtiger für Agent-zu-Agent-Dialoge.",
-      es: "Enfoques diferentes: DeepAgents construye agentes autónomos deep (estilo Claude Code) con planificación, sistema de archivos y gestión de contexto sobre Pydantic AI. AutoGen (AG2) se enfoca en conversaciones multi-agente con chats grupales, ejecución de código e investigación respaldada por Microsoft. DeepAgents es más simple; AutoGen es más poderoso para diálogos agente-a-agente.",
+      en: "DeepAgents vs AutoGen: Pydantic AI autonomous agents vs multi-agent group chats. DeepAgents is simpler; AutoGen is better for agent-to-agent dialogue use cases.",
+      pl: "DeepAgents vs AutoGen: autonomiczne agenty Pydantic AI vs wieloagentowe czaty grupowe. DeepAgents jest prostszy; AutoGen lepszy do dialogów agent-agent.",
+      de: "DeepAgents vs AutoGen: autonome Pydantic-AI-Agenten vs Multi-Agent-Gruppenkonversationen. DeepAgents ist einfacher; AutoGen besser für Agent-zu-Agent-Dialoge.",
+      es: "DeepAgents vs AutoGen: agentes autónomos Pydantic AI vs grupos multi-agente. DeepAgents es más simple; AutoGen mejor para diálogos agente-a-agente.",
     },
     highlights: [
       {

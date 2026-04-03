@@ -323,7 +323,7 @@ export function breadcrumbSchema(
   if (items.length <= 1) return null;
   return {
     "@context": CONTEXT,
-    "@type": "BreadcrumbList",
+    "@type": ["BreadcrumbList"],
     itemListElement: items.map((bc, i) => ({
       "@type": "ListItem",
       position: i + 1,

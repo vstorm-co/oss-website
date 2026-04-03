@@ -96,7 +96,7 @@ export const translations = {
     // Blog
     "nav.blog": "Blog",
     "blog.title": "AI Agent Blog",
-    "blog.subtitle": "Tutorials, framework comparisons, and production guides for building AI agents with Python",
+    "blog.subtitle": "Tutorials, framework comparisons, and production guides for building AI agents with Python. Covering Pydantic AI, LangChain, LangGraph, CrewAI, and more.",
     "blog.readMore": "Read more",
     "blog.publishedOn": "Published on",
     "blog.updatedOn": "Updated on",
@@ -111,14 +111,14 @@ export const translations = {
 
     // FAQ
     "faq.title": "Frequently Asked Questions",
-    "faq.subtitle": "Everything you need to know about our tools and projects.",
+    "faq.subtitle": "Answers to common questions about the Full-Stack AI Agent Template, Pydantic DeepAgents, and Logfire integration. Find guides and troubleshooting tips.",
     "faq.seeAll": "See all questions",
     "faq.category.template": "Full-Stack AI Agent Template",
     "faq.category.deepagents": "Pydantic DeepAgents",
     "faq.category.logfire": "Logfire Assistant",
 
     // OSS Landing
-    "oss.meta.description": "Open-source tools for building production AI agents with Python. By Vstorm.",
+    "oss.meta.description": "Open-source tools for building production AI agents with Python. Full-stack templates, middleware, subagents, and more. 13 repos, 1,730+ GitHub stars. By Vstorm.",
     "oss.hero.badge": "13 Open Source Repos · 1,730+ Stars",
     "oss.hero.title.line1": "Build",
     "oss.hero.title.highlight": "Production AI Agents",
@@ -130,7 +130,7 @@ export const translations = {
     "oss.hero.consultancy.title": "Need help building production AI agents?",
     "oss.hero.consultancy.description": "We're Vstorm — an Applied Agentic AI Engineering Consultancy with 30+ production AI agent implementations.",
     "oss.projects.title": "Our Projects",
-    "oss.projects.subtitle": "Open-source packages for the Pydantic AI ecosystem",
+    "oss.projects.subtitle": "Open-source packages for the Pydantic AI ecosystem — middleware, subagents, summarization, monitoring, and a full-stack AI agent template.",
     "oss.projects.viewAll": "View all projects",
     "oss.trustedby.title": "Featured & trusted by",
     "oss.trustedby.reactions": "LinkedIn reactions",
@@ -483,7 +483,7 @@ export const translations = {
 
     // Compare landing pages
     "compare.index.title": "Compare Our Tools",
-    "compare.index.subtitle": "See how Vstorm OSS tools stack up against alternatives",
+    "compare.index.subtitle": "Side-by-side comparisons of Pydantic DeepAgents, AI agent templates, and Python tools vs popular alternatives. Find the right tool for your AI stack.",
     "compare.index.meta.description": "Feature comparisons of Vstorm OSS tools vs LangChain, CrewAI, AutoGen, and other AI frameworks",
     "compare.verdict": "The Verdict",
     "compare.highlights": "Key Differences",
@@ -553,7 +553,7 @@ export const translations = {
     "blog.tag.postCount": "{count} posts",
     "oss.githubStars": "stars on GitHub — Star us!",
     "changelog.title": "Changelog",
-    "changelog.subtitle": "Release history across all Vstorm OSS projects",
+    "changelog.subtitle": "Track releases across all Vstorm OSS projects — Full-Stack AI Agent Template, Pydantic DeepAgents, and more. New features, bug fixes, and migration notes.",
     "roadmap.title": "Roadmap",
     "roadmap.subtitle": "What we're building and what's coming next",
     "nav.about": "About",
@@ -571,7 +571,7 @@ export const translations = {
     "usecases.cta.button": "Get Started",
     "nav.guides": "Guides",
     "guides.index.title": "Guides",
-    "guides.index.subtitle": "Learn how to build AI agents with different frameworks — step-by-step tutorials with working code.",
+    "guides.index.subtitle": "Learn how to build AI agents with different frameworks — step-by-step tutorials with working code. Pydantic AI, LangChain, LangGraph, CrewAI, and more.",
     "guides.step1.title": "Install dependencies",
     "guides.step1.description": "Install {framework} and the required tools for this use case.",
     "guides.step2.title": "Define your tools",
@@ -699,7 +699,7 @@ export const translations = {
     // Blog
     "nav.blog": "Blog",
     "blog.title": "Blog",
-    "blog.subtitle": "Poradniki, porównania i przewodniki do budowania aplikacji AI",
+    "blog.subtitle": "Poradniki, porównania frameworków i przewodniki do budowania produkcyjnych agentów AI w Pythonie. Pydantic AI, LangChain, LangGraph, CrewAI i więcej.",
     "blog.readMore": "Czytaj więcej",
     "blog.publishedOn": "Opublikowano",
     "blog.updatedOn": "Zaktualizowano",
@@ -713,14 +713,14 @@ export const translations = {
 
     // FAQ
     "faq.title": "Często zadawane pytania",
-    "faq.subtitle": "Wszystko co musisz wiedzieć o naszych narzędziach i projektach.",
+    "faq.subtitle": "Odpowiedzi na pytania o Full-Stack AI Agent Template, Pydantic DeepAgents i integrację z Logfire. Poradniki i wskazówki dotyczące rozwiązywania problemów.",
     "faq.seeAll": "Zobacz wszystkie pytania",
     "faq.category.template": "Full-Stack AI Agent Template",
     "faq.category.deepagents": "Pydantic DeepAgents",
     "faq.category.logfire": "Logfire Assistant",
 
     // OSS Landing
-    "oss.meta.description": "Open-source narzędzia do budowania produkcyjnych agentów AI w Pythonie. By Vstorm.",
+    "oss.meta.description": "Open-source narzędzia do budowania produkcyjnych agentów AI w Pythonie. Szablony full-stack, middleware, subagenty i więcej. 13 repozytoriów, 1730+ gwiazdek. By Vstorm.",
     "oss.hero.badge": "13 repozytoriów Open Source · 1 730+ gwiazdek",
     "oss.hero.title.line1": "Twórz",
     "oss.hero.title.highlight": "produkcyjne agenty AI",
@@ -733,7 +733,7 @@ export const translations = {
     "oss.hero.consultancy.title": "Potrzebujesz pomocy z produkcyjnymi agentami AI?",
     "oss.hero.consultancy.description": "Jesteśmy Vstorm — konsultingowa firma inżynierii AI z ponad 30 wdrożeniami agentów AI w produkcji.",
     "oss.projects.title": "Nasze projekty",
-    "oss.projects.subtitle": "Pakiety open-source dla ekosystemu Pydantic AI",
+    "oss.projects.subtitle": "Pakiety open-source dla ekosystemu Pydantic AI — middleware, subagenty, podsumowywanie, monitorowanie i szablon agenta AI full-stack.",
     "oss.projects.viewAll": "Zobacz wszystkie projekty",
     "oss.trustedby.title": "Polecane i zaufane przez",
     "oss.trustedby.reactions": "reakcji na LinkedIn",
@@ -1077,7 +1077,7 @@ export const translations = {
 
     // Compare landing pages
     "compare.index.title": "Porównaj nasze narzędzia",
-    "compare.index.subtitle": "Zobacz jak narzędzia Vstorm OSS wypadają na tle alternatyw",
+    "compare.index.subtitle": "Porównania Pydantic DeepAgents, szablonów agentów AI i narzędzi Python z popularnymi alternatywami. Znajdź odpowiednie narzędzie dla swojego projektu AI.",
     "compare.index.meta.description": "Porównania funkcji narzędzi Vstorm OSS vs LangChain, CrewAI, AutoGen i inne frameworki AI",
     "compare.verdict": "Werdykt",
     "compare.highlights": "Kluczowe różnice",
@@ -1147,7 +1147,7 @@ export const translations = {
     "blog.tag.postCount": "{count} postów",
     "oss.githubStars": "gwiazdek na GitHub — Daj gwiazdke!",
     "changelog.title": "Historia zmian",
-    "changelog.subtitle": "Historia wydań wszystkich projektów Vstorm OSS",
+    "changelog.subtitle": "Historia wydań wszystkich projektów Vstorm OSS: Full-Stack AI Agent Template, Pydantic DeepAgents i więcej. Nowe funkcje, poprawki i notatki migracyjne.",
     "roadmap.title": "Plan rozwoju",
     "roadmap.subtitle": "Co budujemy i co nadchodzi",
     "nav.about": "O nas",
@@ -1165,7 +1165,7 @@ export const translations = {
     "usecases.cta.button": "Rozpocznij",
     "nav.guides": "Poradniki",
     "guides.index.title": "Poradniki",
-    "guides.index.subtitle": "Naucz się budować agentów AI z różnymi frameworkami — poradniki krok po kroku z działającym kodem.",
+    "guides.index.subtitle": "Naucz się budować agentów AI z różnymi frameworkami — poradniki krok po kroku z działającym kodem. Pydantic AI, LangChain, LangGraph, CrewAI i więcej.",
     "guides.step1.title": "Zainstaluj zależności",
     "guides.step1.description": "Zainstaluj {framework} i wymagane narzędzia do tego przypadku użycia.",
     "guides.step2.title": "Zdefiniuj narzędzia",
@@ -1293,7 +1293,7 @@ export const translations = {
     // Blog
     "nav.blog": "Blog",
     "blog.title": "Blog",
-    "blog.subtitle": "Tutorials, Vergleiche und Anleitungen für KI-Apps",
+    "blog.subtitle": "Tutorials, Framework-Vergleiche und Produktionsleitfäden für KI-Agenten mit Python. Zu Pydantic AI, LangChain, LangGraph, CrewAI und mehr.",
     "blog.readMore": "Weiterlesen",
     "blog.publishedOn": "Veröffentlicht am",
     "blog.updatedOn": "Aktualisiert am",
@@ -1307,14 +1307,14 @@ export const translations = {
 
     // FAQ
     "faq.title": "Häufig gestellte Fragen",
-    "faq.subtitle": "Alles was Sie über unsere Tools und Projekte wissen müssen.",
+    "faq.subtitle": "Antworten auf häufige Fragen zum Full-Stack AI Agent Template, Pydantic DeepAgents und Logfire-Integration. Anleitungen und Troubleshooting-Tipps.",
     "faq.seeAll": "Alle Fragen anzeigen",
     "faq.category.template": "Full-Stack AI Agent Template",
     "faq.category.deepagents": "Pydantic DeepAgents",
     "faq.category.logfire": "Logfire Assistant",
 
     // OSS Landing
-    "oss.meta.description": "Open-Source-Tools für produktionsreife KI-Agenten mit Python. Von Vstorm.",
+    "oss.meta.description": "Open-Source-Tools für KI-Agenten in Python. Full-Stack-Templates, Middleware, Subagenten und mehr. 13 Repos, 1.730+ GitHub-Sterne. Von Vstorm.",
     "oss.hero.badge": "13 Open-Source-Repos · 1.730+ Sterne",
     "oss.hero.title.line1": "Baue",
     "oss.hero.title.highlight": "produktionsreife KI-Agenten",
@@ -1327,7 +1327,7 @@ export const translations = {
     "oss.hero.consultancy.title": "Brauchen Sie Hilfe beim Aufbau von KI-Agenten für die Produktion?",
     "oss.hero.consultancy.description": "Wir sind Vstorm — eine Beratung für angewandtes KI-Engineering mit über 30 produktiven KI-Agenten-Implementierungen.",
     "oss.projects.title": "Unsere Projekte",
-    "oss.projects.subtitle": "Open-Source-Pakete für das Pydantic AI Ökosystem",
+    "oss.projects.subtitle": "Open-Source-Pakete für das Pydantic AI Ökosystem — Middleware, Subagenten, Zusammenfassung, Monitoring und ein Full-Stack-KI-Agent-Template.",
     "oss.projects.viewAll": "Alle Projekte anzeigen",
     "oss.trustedby.title": "Empfohlen und vertraut von",
     "oss.trustedby.reactions": "LinkedIn-Reaktionen",
@@ -1671,7 +1671,7 @@ export const translations = {
 
     // Compare landing pages
     "compare.index.title": "Unsere Tools vergleichen",
-    "compare.index.subtitle": "Sieh wie Vstorm OSS Tools im Vergleich zu Alternativen abschneiden",
+    "compare.index.subtitle": "Vergleiche zu Pydantic DeepAgents, KI-Agent-Templates und Python-Tools vs. gängigen Alternativen. Finde das richtige Werkzeug für deinen KI-Stack.",
     "compare.index.meta.description": "Funktionsvergleiche von Vstorm OSS Tools vs LangChain, CrewAI, AutoGen und andere KI-Frameworks",
     "compare.verdict": "Das Urteil",
     "compare.highlights": "Wesentliche Unterschiede",
@@ -1723,7 +1723,7 @@ export const translations = {
     // About page
     "about.title": "Über Vstorm OSS",
     "about.subtitle": "Open-Source-KI-Agent-Tools, von Praktikern für Praktiker entwickelt.",
-    "about.meta.description": "Erfahren Sie mehr über Vstorm OSS - 13 Open-Source-Repositories, 1.730+ GitHub-Sterne und 830K+ PyPI-Downloads. Produktionsreife KI-Agent-Tools für Python. Von Vstorm.",
+    "about.meta.description": "Vstorm OSS: 13 Open-Source-Repos, 1.730+ GitHub-Sterne und 830K+ PyPI-Downloads. Produktionsreife KI-Agent-Tools für Python. Von Vstorm.",
     "about.company.title": "Wer wir sind",
     "about.company.description": "Vstorm ist eine Applied Agentic AI Engineering Consultancy. Wir entwickeln produktionsreife KI-Agent-Systeme für Unternehmen in den USA, Europa und dem Nahen Osten. Jedes Tool in diesem Portfolio entstand aus einer echten Produktionsherausforderung - wir veröffentlichen als Open Source, was wir entwickeln.",
     "about.numbers.title": "In Zahlen",
@@ -1741,7 +1741,7 @@ export const translations = {
     "blog.tag.postCount": "{count} Beiträge",
     "oss.githubStars": "Sterne auf GitHub — Gib uns einen Stern!",
     "changelog.title": "Änderungsprotokoll",
-    "changelog.subtitle": "Veröffentlichungsverlauf aller Vstorm OSS-Projekte",
+    "changelog.subtitle": "Alle Versionen der Vstorm OSS-Projekte: Full-Stack AI Agent Template, Pydantic DeepAgents und mehr. Neue Features, Bugfixes und Migrationshinweise.",
     "roadmap.title": "Roadmap",
     "roadmap.subtitle": "Was wir bauen und was als nächstes kommt",
     "nav.about": "Über uns",
@@ -1759,7 +1759,7 @@ export const translations = {
     "usecases.cta.button": "Loslegen",
     "nav.guides": "Anleitungen",
     "guides.index.title": "Anleitungen",
-    "guides.index.subtitle": "Lernen Sie, KI-Agenten mit verschiedenen Frameworks zu bauen — Schritt-für-Schritt-Anleitungen mit funktionierendem Code.",
+    "guides.index.subtitle": "Lernen Sie, KI-Agenten mit verschiedenen Frameworks zu bauen — Schritt-für-Schritt-Anleitungen mit funktionierendem Code. Pydantic AI, LangChain, LangGraph, CrewAI und mehr.",
     "guides.step1.title": "Abhängigkeiten installieren",
     "guides.step1.description": "Installieren Sie {framework} und die benötigten Tools für diesen Anwendungsfall.",
     "guides.step2.title": "Tools definieren",
@@ -1887,7 +1887,7 @@ export const translations = {
     // Blog
     "nav.blog": "Blog",
     "blog.title": "Blog",
-    "blog.subtitle": "Tutoriales, comparaciones y guías para crear apps de IA",
+    "blog.subtitle": "Tutoriales, comparaciones de frameworks y guías de producción para agentes de IA con Python. Pydantic AI, LangChain, LangGraph, CrewAI y más.",
     "blog.readMore": "Leer más",
     "blog.publishedOn": "Publicado el",
     "blog.updatedOn": "Actualizado el",
@@ -1901,14 +1901,14 @@ export const translations = {
 
     // FAQ
     "faq.title": "Preguntas frecuentes",
-    "faq.subtitle": "Todo lo que necesitas saber sobre nuestras herramientas y proyectos.",
+    "faq.subtitle": "Respuestas a preguntas frecuentes sobre el Full-Stack AI Agent Template, Pydantic DeepAgents e integración con Logfire. Guías y consejos de resolución.",
     "faq.seeAll": "Ver todas las preguntas",
     "faq.category.template": "Full-Stack AI Agent Template",
     "faq.category.deepagents": "Pydantic DeepAgents",
     "faq.category.logfire": "Logfire Assistant",
 
     // OSS Landing
-    "oss.meta.description": "Herramientas open source para construir agentes IA de producción con Python. Por Vstorm.",
+    "oss.meta.description": "Herramientas open source para construir agentes IA de producción con Python. Templates full-stack, middleware, subagentes y más. 13 repos. Por Vstorm.",
     "oss.hero.badge": "13 repos Open Source · 1.730+ estrellas",
     "oss.hero.title.line1": "Construye",
     "oss.hero.title.highlight": "agentes IA de producción",
@@ -1921,7 +1921,7 @@ export const translations = {
     "oss.hero.consultancy.title": "¿Necesitas ayuda para construir agentes IA en producción?",
     "oss.hero.consultancy.description": "Somos Vstorm — una consultoría de ingeniería de IA aplicada con más de 30 implementaciones de agentes IA en producción.",
     "oss.projects.title": "Nuestros proyectos",
-    "oss.projects.subtitle": "Paquetes open source para el ecosistema Pydantic AI",
+    "oss.projects.subtitle": "Paquetes open source para el ecosistema Pydantic AI — middleware, subagentes, resumido, monitoreo y una plantilla de agente IA full-stack.",
     "oss.projects.viewAll": "Ver todos los proyectos",
     "oss.trustedby.title": "Destacado y confiado por",
     "oss.trustedby.reactions": "reacciones en LinkedIn",
@@ -2265,7 +2265,7 @@ export const translations = {
 
     // Compare landing pages
     "compare.index.title": "Compara nuestras herramientas",
-    "compare.index.subtitle": "Mira cómo las herramientas Vstorm OSS se comparan con las alternativas",
+    "compare.index.subtitle": "Comparaciones de Pydantic DeepAgents, plantillas de agentes IA y herramientas Python vs alternativas populares. Elige la herramienta correcta para tu stack.",
     "compare.index.meta.description": "Comparaciones de características de herramientas Vstorm OSS vs LangChain, CrewAI, AutoGen y otros frameworks de IA",
     "compare.verdict": "El veredicto",
     "compare.highlights": "Diferencias clave",
@@ -2317,7 +2317,7 @@ export const translations = {
     // About page
     "about.title": "Sobre Vstorm OSS",
     "about.subtitle": "Herramientas de agentes de IA de código abierto creadas por profesionales, para profesionales.",
-    "about.meta.description": "Conoce Vstorm OSS - 13 repositorios de código abierto, 1.730+ estrellas en GitHub y 830K+ descargas de PyPI. Herramientas de agentes de IA para Python. Por Vstorm.",
+    "about.meta.description": "Vstorm OSS: 13 repos open source, 1.730+ estrellas en GitHub y 830K+ descargas de PyPI. Herramientas de agentes de IA en producción para Python. Por Vstorm.",
     "about.company.title": "Quiénes somos",
     "about.company.description": "Vstorm es una consultora de ingeniería de IA agéntica aplicada. Construimos sistemas de agentes de IA en producción para empresas en EE.UU., Europa y Oriente Medio. Cada herramienta en este portafolio nació de un desafío real de producción - publicamos como código abierto lo que construimos.",
     "about.numbers.title": "En números",
@@ -2335,7 +2335,7 @@ export const translations = {
     "blog.tag.postCount": "{count} publicaciones",
     "oss.githubStars": "estrellas en GitHub — !Danos una estrella!",
     "changelog.title": "Registro de cambios",
-    "changelog.subtitle": "Historial de lanzamientos de todos los proyectos de Vstorm OSS",
+    "changelog.subtitle": "Sigue todas las versiones de los proyectos Vstorm OSS: Full-Stack AI Agent Template, Pydantic DeepAgents y más. Nuevas funciones y correcciones de errores.",
     "roadmap.title": "Hoja de ruta",
     "roadmap.subtitle": "Qué estamos construyendo y qué viene después",
     "nav.about": "Acerca de",
@@ -2353,7 +2353,7 @@ export const translations = {
     "usecases.cta.button": "Comenzar",
     "nav.guides": "Guías",
     "guides.index.title": "Guías",
-    "guides.index.subtitle": "Aprende a construir agentes de IA con diferentes frameworks — tutoriales paso a paso con código funcional.",
+    "guides.index.subtitle": "Aprende a construir agentes de IA con diferentes frameworks — tutoriales paso a paso con código funcional. Pydantic AI, LangChain, LangGraph, CrewAI y más.",
     "guides.step1.title": "Instalar dependencias",
     "guides.step1.description": "Instala {framework} y las herramientas necesarias para este caso de uso.",
     "guides.step2.title": "Definir herramientas",

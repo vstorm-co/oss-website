@@ -57,10 +57,10 @@ const alternates = Object.keys(languages)
 
 <Layout
   title={`${pageTitle} — Vstorm OSS`}
-  description={`${postCount} tagged "${tag}"`}
+  description={`Browse ${postCount} tagged "${tag}" — tutorials, guides, and deep dives on building production AI agents with Python.`}
   lang={lang}
   alternates={alternates}
-  schemas={[collectionPageSchema({ name: pageTitle, description: `${postCount} tagged "${tag}"`, url: SITE_URL + `/${lang}/blog/tag/${tag}/` })]}
+  schemas={[collectionPageSchema({ name: pageTitle, description: `Browse ${postCount} tagged "${tag}" — tutorials, guides, and deep dives on building production AI agents with Python.`, url: SITE_URL + `/${lang}/blog/tag/${tag}/` })]}
 >
   <Navbar currentLang={lang} languageLinks={alternates} />
   <Breadcrumbs items={[

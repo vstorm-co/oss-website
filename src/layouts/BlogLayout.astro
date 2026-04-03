@@ -16,6 +16,7 @@ import '../styles/prose.css';
 
 interface Props {
   title: string;
+  seoTitle?: string;
   description: string;
   pubDate: Date;
   updatedDate?: Date;
@@ -31,6 +32,7 @@ interface Props {
 
 const {
   title,
+  seoTitle,
   description,
   pubDate,
   updatedDate,
@@ -109,7 +111,7 @@ if (category === "tutorial" && headings.length > 0) {
 ---
 
 <Layout
-  title={`${title} — Vstorm OSS`}
+  title={`${seoTitle ?? title} — Vstorm OSS`}
   description={description}
   keywords={tags.join(", ")}
   lang={lang}

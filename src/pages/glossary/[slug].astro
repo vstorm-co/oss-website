@@ -29,11 +29,15 @@ const blogPosts = termToBlogMap[slug!] ?? [];
 
 // Glossary is English-only - only show English in language switcher
 const languageLinks = [{ lang: defaultLang, href: `/glossary/${slug}/` }];
+
+// Build meta description: first 2 sentences, capped at 160 chars
+const rawMetaDesc = term.definition.split(". ").slice(0, 2).join(". ") + ".";
+const glossaryMetaDesc = rawMetaDesc.length > 160 ? rawMetaDesc.slice(0, 157) + "..." : rawMetaDesc;
 ---
 
 <Layout
   title={`${term.term} — AI Glossary — Vstorm OSS`}
-  description={term.definition.split(". ").slice(0, 2).join(". ") + "."}
+  description={glossaryMetaDesc}
   keywords={`${term.term}, ${categoryLabels[term.category]}, ai glossary, definition, ${term.relatedTerms.join(", ")}`}
   lang={lang}
   alternates={[{ lang: "en", href: `/glossary/${slug}/` }]}
