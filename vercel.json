@@ -22,6 +22,18 @@
       "source": "/configurator",
       "destination": "/projects/full-stack-ai-agent-template/configurator/",
       "statusCode": 301
-    }
+    },
+    { "source": "/pl/terms/", "destination": "/terms/", "statusCode": 301 },
+    { "source": "/pl/terms", "destination": "/terms/", "statusCode": 301 },
+    { "source": "/de/terms/", "destination": "/terms/", "statusCode": 301 },
+    { "source": "/de/terms", "destination": "/terms/", "statusCode": 301 },
+    { "source": "/es/terms/", "destination": "/terms/", "statusCode": 301 },
+    { "source": "/es/terms", "destination": "/terms/", "statusCode": 301 },
+    { "source": "/pl/privacy/", "destination": "/privacy/", "statusCode": 301 },
+    { "source": "/pl/privacy", "destination": "/privacy/", "statusCode": 301 },
+    { "source": "/de/privacy/", "destination": "/privacy/", "statusCode": 301 },
+    { "source": "/de/privacy", "destination": "/privacy/", "statusCode": 301 },
+    { "source": "/es/privacy/", "destination": "/privacy/", "statusCode": 301 },
+    { "source": "/es/privacy", "destination": "/privacy/", "statusCode": 301 }
   ]
 }
