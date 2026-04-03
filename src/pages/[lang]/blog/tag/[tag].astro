@@ -43,12 +43,21 @@ const t = translations[lang];
 
 const pageTitle = t["blog.tag.title"].replace("{tag}", tag);
 const postCount = t["blog.tag.postCount"].replace("{count}", String(posts.length));
+
+const allBlogPosts = await getCollection('blog', ({ data }) => !data.draft);
+const alternates = Object.keys(languages)
+  .filter((locale) => allBlogPosts.some((p) => p.data.lang === locale && (p.data.tags ?? []).includes(tag)))
+  .map((locale) => ({
+    lang: locale,
+    href: locale === defaultLang ? `/blog/tag/${tag}/` : `/${locale}/blog/tag/${tag}/`,
+  }));
 ---
 
 <Layout
   title={`${pageTitle} — Vstorm OSS`}
   description={`${postCount} tagged "${tag}"`}
   lang={lang}
+  alternates={alternates}
   schemas={[collectionPageSchema({ name: pageTitle, description: `${postCount} tagged "${tag}"`, url: SITE_URL + `/${lang}/blog/tag/${tag}/` })]}
 >
   <Navbar currentLang={lang} />

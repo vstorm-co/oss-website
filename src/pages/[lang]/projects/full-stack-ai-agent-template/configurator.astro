@@ -16,12 +16,20 @@ const lang = Astro.params.lang as Lang;
 const url = new URL(Astro.request.url);
 const preset = url.searchParams.get('preset') || undefined;
 const project = getProjectBySlug("full-stack-ai-agent-template")!;
+
+const alternates = [
+  { lang: "en", href: "/projects/full-stack-ai-agent-template/configurator/" },
+  ...Object.keys(languages)
+    .filter((l) => l !== defaultLang)
+    .map((l) => ({ lang: l, href: `/${l}/projects/full-stack-ai-agent-template/configurator/` })),
+];
 ---
 
 <Layout
   theme="dark"
   title="Configure Your Project — Vstorm OSS"
   description="Configure and download a production-ready FastAPI + Next.js AI project. Choose from 5 AI frameworks, databases, auth, and 75+ options."
+  alternates={alternates}
   schemas={[]}
 >
   <Navbar showLang={false} project={project} pathSuffix="projects/full-stack-ai-agent-template/" />

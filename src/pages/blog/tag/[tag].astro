@@ -5,7 +5,7 @@ import Footer from '../../../components/landing/Footer.astro';
 import BlogCard from '../../../components/blog/BlogCard.astro';
 import Breadcrumbs from '../../../components/shared/Breadcrumbs.astro';
 import { getCollection } from 'astro:content';
-import { translations, defaultLang } from '../../../i18n/translations';
+import { translations, languages, defaultLang } from '../../../i18n/translations';
 import { collectionPageSchema, SITE_URL } from '../../../lib/schemas';
 
 export async function getStaticPaths() {
@@ -32,6 +32,14 @@ const { tag, posts } = Astro.props;
 const lang = defaultLang;
 const t = translations[lang];
 
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const alternates = Object.keys(languages)
+  .filter((locale) => allPosts.some((p) => p.data.lang === locale && (p.data.tags ?? []).includes(tag)))
+  .map((locale) => ({
+    lang: locale,
+    href: locale === defaultLang ? `/blog/tag/${tag}/` : `/${locale}/blog/tag/${tag}/`,
+  }));
+
 const pageTitle = t["blog.tag.title"].replace("{tag}", tag);
 const postCount = t["blog.tag.postCount"].replace("{count}", String(posts.length));
 ---
@@ -40,6 +48,7 @@ const postCount = t["blog.tag.postCount"].replace("{count}", String(posts.length
   title={`${pageTitle} — Vstorm OSS`}
   description={`${postCount} tagged "${tag}"`}
   lang={lang}
+  alternates={alternates}
   schemas={[collectionPageSchema({ name: pageTitle, description: `${postCount} tagged "${tag}"`, url: SITE_URL + `/blog/tag/${tag}/` })]}
 >
   <Navbar currentLang={lang} />
