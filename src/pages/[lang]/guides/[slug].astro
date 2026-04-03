@@ -189,7 +189,7 @@ const otherUseCases = getGuidesForFramework(guide.framework.slug)
           {(t["guides.cta.description"] ?? "Generate a production-ready project with {framework} pre-configured — FastAPI + Next.js, auth, streaming, and more.").replace("{framework}", guide.framework.name)}
         </p>
         <a
-          href={`/${lang}/${guide.framework.projectSlug}/`}
+          href={`/${lang}/projects/${guide.framework.projectSlug}/`}
           class="mt-6 sm:mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-base font-semibold text-white transition-colors hover:bg-accent-hover"
         >
           {t["guides.cta.button"] ?? "Get Started"}

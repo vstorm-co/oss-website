@@ -15,12 +15,12 @@
   "redirects": [
     {
       "source": "/configurator/",
-      "destination": "/full-stack-ai-agent-template/configurator/",
+      "destination": "/projects/full-stack-ai-agent-template/configurator/",
       "statusCode": 301
     },
     {
       "source": "/configurator",
-      "destination": "/full-stack-ai-agent-template/configurator/",
+      "destination": "/projects/full-stack-ai-agent-template/configurator/",
       "statusCode": 301
     }
   ]

@@ -36,7 +36,7 @@ const alternates = [
     .map((l) => ({ lang: l, href: `/${l}/compare/${slug}/` })),
 ];
 
-const productHref = `/${comparison.productSlug}/`;
+const productHref = `/projects/${comparison.productSlug}/`;
 
 // FAQ schema
 const schemas: JsonLdSchema[] = comparison.faq.length > 0
