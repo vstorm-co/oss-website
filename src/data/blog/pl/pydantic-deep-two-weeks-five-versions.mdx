@@ -1,0 +1,189 @@
+---
+title: "pydantic-deep v0.3.4–v0.3.8: Co zbudowaliśmy w 2 tygodnie ciszy"
+description: "Przeprojektowany TUI, automatyzacja przeglądarki, Docker sandbox, instalator curl, StuckLoopDetection, LimitWarnerCapability — pełny przegląd 5 wydań w 2 tygodnie."
+pubDate: 2026-04-12
+updatedDate: 2026-04-12
+author: "Kacper Włodarczyk"
+lang: pl
+translationKey: pydantic-deep-two-weeks-five-versions
+tags: ["pydantic-ai", "python", "ai-agents", "open-source", "llm"]
+category: announcement
+draft: false
+---
+
+> **TL;DR:** W ciągu dwóch tygodni ciszy pydantic-deep wydał pięć wersji: przeprojektowany TUI z live śledzeniem tokenów, automatyzację przeglądarki przez Playwright, Docker sandbox i headless runner dla CI, jednokomendowy instalator curl, poprawki web search dla konfiguracji multi-provider oraz trzy nowe capabilities dla samoświadomych agentów (StuckLoopDetection, LimitWarnerCapability, wyszukiwanie historii BM25). Ten post to przegląd — szczegółowe deep dive'y wychodziły każdego dnia tego tygodnia.
+
+---
+
+*autor: [Kacper Włodarczyk](https://linkedin.com/in/kacper-wlodarczyk/) — AI Engineering Lead w [Vstorm](https://vstorm.co). Budujemy produkcyjne systemy agentów AI i open-source'ujemy najtrudniejsze części. Śledź nas na [GitHub](https://github.com/vstorm-co/pydantic-deep) lub [oss.vstorm.co](https://oss.vstorm.co).*
+
+---
+
+Przez dwa tygodnie milczeliśmy. Żadnych tweetów, żadnych postów, żadnych „podekscytowanych ogłoszeń".
+
+Budowaliśmy.
+
+[pydantic-deep](https://github.com/vstorm-co/pydantic-deep) to nasz otwartoźródłowy agent AI do kodowania — pythonowa alternatywa dla Claude Code i podobnych narzędzi, zbudowana na bazie Pydantic AI. Dostarczamy realne funkcje z naszych wdrożeń produkcyjnych: 30+ systemów agentów AI w Vstorm, prawdziwe przypadki graniczne, prawdziwe awarie, prawdziwe poprawki.
+
+W ciągu dwóch tygodni wydaliśmy wersje od v0.3.4 do v0.3.8. Pięć wydań. Oto co każde z nich dodało.
+
+---
+
+## v0.3.4 — TUI jako domyślny interfejs + przeprojektowanie /improve
+
+Największa zmiana poprawiająca komfort pracy: uruchomienie `pydantic-deep` teraz domyślnie uruchamia TUI. Żadnych flag, żadnych podkomend.
+
+Ale bardziej interesującą częścią jest `/improve`. Przeprojektowaliśmy cały pipeline. Zamiast luźnego podsumowywania sesji, teraz wyodrębniane są dwa odrębne typy spostrzeżeń:
+
+- **`UserFactInsight`** — rzeczy, których agent dowiedział się o użytkowniku (preferencje, wzorce, kontekst)
+- **`AgentLearningInsight`** — rzeczy, których agent dowiedział się o sobie (co zadziałało, co nie)
+
+Oba trafiają do `MEMORY.md` jako głównego celu. Surowe ślady narzędzi są teraz uwzględniane w syntezie (architektura Meta-Harness: surowe dane zawsze biją podsumowania — modele lepiej rozumują na rzeczywistych danych niż na skompresowanych interpretacjach).
+
+Inne poprawki w v0.3.4: komenda `/config` w TUI, debugowanie per-sesja w `.pydantic-deep/logs/`, naprawiony crash `/improve` przy `{}` w promptach, ciche awarie teraz raportują `failed_sessions`, naprawa ładowania kluczy API, naprawa niedopasowania ścieżki MEMORY.md.
+
+---
+
+## v0.3.5 — Automatyzacja przeglądarki, Docker sandbox, Headless Runner
+
+Trzy funkcje infrastrukturalne pojawiły się razem w v0.3.5.
+
+**Automatyzacja przeglądarki przez `BrowserCapability`**: oparta na Playwright, 9 narzędzi:
+
+```python
+from pydantic_deep.capabilities import BrowserCapability
+
+agent = create_deep_agent(
+    model="anthropic:claude-opus-4-6",
+    capabilities=[BrowserCapability()],
+)
+# Agent może teraz: navigate, click, type_text, get_text,
+# screenshot, scroll, go_back, go_forward, execute_js
+```
+
+Allowlista domen, auto-screenshot przy nawigacji, cykl życia przeglądarki zarządzany przez `wrap_run`. Agent może wchodzić w interakcje z prawdziwymi stronami internetowymi.
+
+**Docker sandbox (`--sandbox docker`)**: operacje na plikach i komendy powłoki uruchamiają się wewnątrz kontenera. `/workspace` jest zamontowany, czyszczenie jest automatyczne.
+
+```bash
+pydantic-deep --sandbox docker
+```
+
+**Nazwane workspace'y**: trwałe środowiska Docker przeżywające między sesjami, możliwe do współdzielenia między wątkami.
+
+```bash
+pydantic-deep --workspace my-project  # ponowne użycie tego samego kontenera
+pydantic-deep sandbox list            # widok działających workspace'ów
+pydantic-deep sandbox stop my-project
+```
+
+**Headless runner (`pydantic-deep run`)**: dla benchmarków, CI/CD, skryptowanej automatyzacji. Bez TUI, bez interakcji — agent wykonuje zadanie i zwraca wyniki.
+
+Również w v0.3.5: `DEFAULT_USAGE_LIMITS` usuwa domyślne ograniczenie Pydantic AI do 50 żądań (które psuje każde nietrywalne zadanie kodowania). Wyświetlanie tokenów per-tura (`in:X · out:Y · total:Z · reqs:N`) w nagłówku TUI.
+
+---
+
+## v0.3.6 — Instalacja jedną komendą
+
+Najważniejsza praktyczna poprawa dla nowych użytkowników.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/vstorm-co/pydantic-deep/main/install.sh | bash
+```
+
+Tyle. Żadnego konfigurowania virtualenv, żadnego pip, żadnych konfliktów wersji.
+
+Dwie dodatkowe funkcje wydane razem:
+
+- **`pydantic-deep update`** — komenda self-update. Uruchom ją, dostań najnowszą wersję.
+- **Powiadomienia o aktualizacjach przy starcie** — przy uruchomieniu pydantic-deep sprawdza nowsze wydania (cache 24h, timeout 2s żeby nie blokować startu). Jeśli jest aktualizacja, informuje o tym.
+
+Małe wydanie, duża wartość. Doświadczenie instalacji było punktem tarcia — teraz już nie jest.
+
+---
+
+## v0.3.7 — Poprawka Web Search dla modeli innych niż Anthropic
+
+Skoncentrowana poprawka: web search działa teraz poprawnie dla modeli routowanych przez OpenRouter i dowolnego dostawcy innego niż Anthropic.
+
+Wcześniej fallback DuckDuckGo nie był niezawodnie dołączany. Teraz jest, w obu rozszerzeniach `cli` i `tui`.
+
+Jeśli uruchamiasz pydantic-deep z GPT-4.1, Gemini lub dowolnym modelem przez OpenRouter, web search teraz działa.
+
+---
+
+## v0.3.8 — Trzy samoświadome capabilities
+
+Najbardziej bogata w funkcje wersja. Trzy nowe capabilities dla agentów, które rozumieją swój własny stan.
+
+### StuckLoopDetection
+
+Agenci się blokują. Nie w sposób „model jest zdezorientowany" — w sposób mechaniczny. Agent wywołuje `read_file("config.json")`, dostaje wynik, nie może ustalić następnego kroku, wywołuje `read_file("config.json")` znowu. I znowu. I znowu.
+
+StuckLoopDetection wychwytuje to na poziomie capability, zanim spalisz 50 wywołań API:
+
+```python
+from pydantic_deep import create_deep_agent
+
+agent = create_deep_agent(
+    model="anthropic:claude-opus-4-6",
+    stuck_loop_detection=True,  # domyślnie: True
+)
+```
+
+Trzy wykrywane wzorce:
+1. **Powtarzające się identyczne wywołania** — to samo narzędzie, te same argumenty, N razy z rzędu (domyślny próg: 3)
+2. **Naprzemienność A-B-A-B** — narzędzie A, narzędzie B, narzędzie A, narzędzie B... zablokowane w pętli dwóch wywołań
+3. **Pętle no-op** — to samo wywołanie, ten sam wynik, ciągle powtarzane
+
+Akcja jest konfigurowalna: `warn` (wyzwala `ModelRetry`) lub `error` (podnosi `StuckLoopError`).
+
+Izolacja per-run przez `for_run()` zapewnia, że równoległe wywołania `agent.run()` nie współdzielą stanu detekcji pętli.
+
+### LimitWarnerCapability
+
+Przed tą capability, użycie okna kontekstu było widoczne tylko na pasku statusu TUI. Sam model nie miał świadomości — radośnie generowałby output zbliżając się do 90% użycia, a następnie uderzałby w wyzwalacz auto-kompresji bez ostrzeżenia.
+
+LimitWarnerCapability naprawia to, wstrzykując ostrzeżenia bezpośrednio do konwersacji jako wiadomości użytkownika:
+
+- Przy **70% użycia kontekstu**: `[URGENT] Context window at 70%. Start wrapping up current task.`
+- Przy **90% użycia kontekstu**: `[CRITICAL] Context window at 90%. Auto-compression imminent.`
+
+Model to czyta. Może się dostosować. Automatycznie włączone gdy `context_manager=True` (domyślnie).
+
+### Wyszukiwanie historii BM25
+
+`search_conversation_history` teraz używa scoringu BM25 zamiast naiwnego dopasowania podciągów. Ten sam wzór co Elasticsearch i Lucene. Zero zależności — czysta implementacja Python.
+
+Lepsze wyniki wyszukiwania, bez nowych zależności.
+
+---
+
+## Kluczowe wnioski
+
+- **pydantic-deep v0.3.4–v0.3.8** wydał pięć wydań w ciągu dwóch tygodni aktywnego rozwoju
+- **TUI jest teraz domyślny** — lepsza widoczność tokenów, live strumień myślenia, auto-zapis sesji
+- **Przeglądarka + Docker + CI** — pydantic-deep działa teraz w pełnym stosie infrastruktury
+- **Instalacja curl | bash** — koniec tarcia przy onboardingu
+- **Trzy samoświadome capabilities** — StuckLoopDetection, LimitWarnerCapability, wyszukiwanie BM25 — agenci rozumiejący swój własny stan
+- Wszystkie capabilities są w czystym Pythonie tam gdzie to możliwe, zero dodatkowych zależności domyślnie
+
+---
+
+## Zacznij teraz
+
+Zainstaluj pydantic-deep:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/vstorm-co/pydantic-deep/main/install.sh | bash
+```
+
+Lub przez pip:
+
+```bash
+pip install "pydantic-deep[tui]"
+```
+
+- GitHub: [github.com/vstorm-co/pydantic-deep](https://github.com/vstorm-co/pydantic-deep)
+- Portal OSS: [oss.vstorm.co](https://oss.vstorm.co)
+- Vstorm: [vstorm.co](https://vstorm.co)

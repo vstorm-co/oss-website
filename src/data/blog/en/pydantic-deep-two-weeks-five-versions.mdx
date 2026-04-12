@@ -1,0 +1,207 @@
+---
+title: "pydantic-deep v0.3.4–v0.3.8: What We Built in 2 Weeks of Silence"
+seoTitle: "pydantic-deep v0.3.4–v0.3.8: 5 Releases in 2 Weeks"
+description: "TUI redesign, browser automation, Docker sandbox, curl installer, StuckLoopDetection, LimitWarnerCapability — full changelog overview of 5 releases in 2 weeks."
+pubDate: 2026-04-12
+updatedDate: 2026-04-12
+author: "Kacper Włodarczyk"
+lang: en
+translationKey: pydantic-deep-two-weeks-five-versions
+tags: ["pydantic-ai", "python", "ai-agents", "open-source", "llm"]
+category: announcement
+draft: false
+---
+
+> **TL;DR:** In two weeks of radio silence, pydantic-deep shipped five versions: a redesigned TUI with live token tracking, browser automation via Playwright, Docker sandbox and headless CI runner, a one-command curl installer, web search fixes for multi-provider setups, and three new capabilities for self-aware agents (StuckLoopDetection, LimitWarnerCapability, BM25 history search). This post is the overview — detailed deep dives ship every day this week.
+
+---
+
+*by [Kacper Włodarczyk](https://linkedin.com/in/kacper-wlodarczyk/) — AI Engineering Lead at [Vstorm](https://vstorm.co). We build production AI agent systems and open-source the hard parts. Follow along on [GitHub](https://github.com/vstorm-co/pydantic-deep) or [oss.vstorm.co](https://oss.vstorm.co).*
+
+---
+
+We went quiet for two weeks. No tweets, no posts, no "excited to share" announcements.
+
+We were building.
+
+[pydantic-deep](https://github.com/vstorm-co/pydantic-deep) is our open-source AI coding agent — a Python-first alternative to Claude Code and similar tools, built on top of Pydantic AI. We ship real features from our production deployments: 30+ AI agent systems at Vstorm, real edge cases, real failures, real fixes.
+
+In two weeks, we shipped v0.3.4 through v0.3.8. Five releases. Here's what each one added.
+
+---
+
+## v0.3.4 — TUI as Default + /improve Redesign
+
+The biggest quality-of-life change in this release: running `pydantic-deep` now launches the TUI by default. No more flags, no more subcommands.
+
+But the more interesting part is `/improve`. We redesigned the entire pipeline. Instead of loosely summarizing sessions, it now extracts two distinct types of insights:
+
+- **`UserFactInsight`** — things the agent learned about the user (preferences, patterns, context)
+- **`AgentLearningInsight`** — things the agent learned about itself (what worked, what failed)
+
+Both feed into `MEMORY.md` as the primary target. Raw tool traces are now included in synthesis (Meta-Harness architecture: raw traces beat summaries every time — models reason better on actual data than on compressed interpretations of that data).
+
+Other fixes in v0.3.4: `/config` command in TUI, per-session debug logging in `.pydantic-deep/logs/`, fixed `/improve` crash on `{}` in prompts, fixed silent failures now reporting `failed_sessions`, fixed API key loading, fixed MEMORY.md path mismatch.
+
+---
+
+## v0.3.5 — Browser Automation, Docker Sandbox, Headless Runner
+
+Three infrastructure features landed together in v0.3.5.
+
+**Browser automation via `BrowserCapability`**: Playwright-backed, 9 tools:
+
+```python
+from pydantic_deep.capabilities import BrowserCapability
+
+agent = create_deep_agent(
+    model="anthropic:claude-opus-4-6",
+    capabilities=[BrowserCapability()],
+)
+# Agent can now: navigate, click, type_text, get_text,
+# screenshot, scroll, go_back, go_forward, execute_js
+```
+
+Domain allowlist, auto-screenshot on navigation, browser lifecycle managed by `wrap_run`. The agent can interact with real web pages.
+
+**Docker sandbox (`--sandbox docker`)**: file operations and shell commands run inside a container. `/workspace` is mounted, cleanup is automatic.
+
+```bash
+pydantic-deep --sandbox docker
+```
+
+**Named workspaces**: persistent Docker environments that survive between sessions, shareable across threads.
+
+```bash
+pydantic-deep --workspace my-project  # reuse same container
+pydantic-deep sandbox list            # see running workspaces
+pydantic-deep sandbox stop my-project
+```
+
+**Headless runner (`pydantic-deep run`)**: for benchmarks, CI/CD, scripted automation. No TUI, no interaction — just the agent executing a task and returning results.
+
+Also in v0.3.5: `DEFAULT_USAGE_LIMITS` removes Pydantic AI's default 50-request cap (which breaks any non-trivial coding task). Per-turn token display (`in:X · out:Y · total:Z · reqs:N`) in TUI header.
+
+---
+
+## v0.3.6 — One-Command Install
+
+The single most practical improvement for new users.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/vstorm-co/pydantic-deep/main/install.sh | bash
+```
+
+That's it. No virtualenv setup, no pip, no version conflicts.
+
+Two more features shipped with this:
+
+- **`pydantic-deep update`** — self-update command. Run it, get the latest version.
+- **Startup update notifications** — on launch, pydantic-deep checks for newer releases (24h cache, 2s timeout so it doesn't block startup). If there's an update, it tells you.
+
+Small release, high leverage. The install experience was a friction point — now it isn't.
+
+---
+
+## v0.3.7 — Web Search Fixed for Non-Anthropic Models
+
+A focused fix: web search now works correctly for OpenRouter-routed models and any non-Anthropic provider.
+
+Previously, the DuckDuckGo fallback wasn't reliably bundled. It is now, in both `cli` and `tui` extras.
+
+If you run pydantic-deep with GPT-4.1, Gemini, or any model via OpenRouter, web search now works.
+
+---
+
+## v0.3.8 — Three Self-Aware Capabilities
+
+The most feature-dense release. Three new capabilities for agents that understand their own state.
+
+### StuckLoopDetection
+
+Agents get stuck. Not in a "model is confused" way — in a mechanical way. The agent calls `read_file("config.json")`, gets a result, can't figure out the next step, calls `read_file("config.json")` again. And again. And again.
+
+StuckLoopDetection catches this at the capability level, before you burn 50 API calls:
+
+```python
+from pydantic_deep import create_deep_agent
+
+agent = create_deep_agent(
+    model="anthropic:claude-opus-4-6",
+    stuck_loop_detection=True,  # default: True
+)
+```
+
+Three patterns detected:
+1. **Repeated identical calls** — same tool, same arguments, N times in a row (default threshold: 3)
+2. **A-B-A-B alternating** — tool A, tool B, tool A, tool B... locked in a two-call loop
+3. **No-op loops** — same call, same result, still repeating
+
+Action is configurable: `warn` (triggers `ModelRetry`) or `error` (raises `StuckLoopError`).
+
+Per-run isolation via `for_run()` ensures parallel `agent.run()` calls don't share stuck-detection state.
+
+Tomorrow: full deep dive on StuckLoopDetection — what causes each pattern, how detection works, production examples.
+
+### LimitWarnerCapability
+
+Before this capability, context window usage was only visible in the TUI status bar. The model itself had no awareness — it would happily keep generating output as it approached 90% usage, then hit the auto-compression trigger with no warning.
+
+LimitWarnerCapability fixes this by injecting warnings directly into the conversation as user messages:
+
+- At **70% context usage**: `[URGENT] Context window at 70%. Start wrapping up current task.`
+- At **90% context usage**: `[CRITICAL] Context window at 90%. Auto-compression imminent.`
+
+The model reads these. It can adjust. Auto-enabled when `context_manager=True` (the default).
+
+(Full deep dive on Tuesday.)
+
+### BM25-Ranked History Search
+
+`search_conversation_history` now uses BM25 scoring instead of naive substring matching. Same formula as Elasticsearch and Lucene. Zero dependencies — pure Python implementation.
+
+Better search results, no new deps.
+
+---
+
+## What's Coming This Week
+
+Every day this week, one deep dive:
+
+- **Sunday (today):** v0.3.4–v0.3.8 overview ← you're reading it
+- **Monday:** StuckLoopDetection — full walkthrough, 3 patterns, real examples
+- **Tuesday:** LimitWarnerCapability — teaching agents to know their limits
+- **Wednesday:** Browser automation + Docker sandbox
+- **Thursday:** The curl install and what we learned about distribution
+- **Friday:** /improve pipeline — how agents get smarter after every session
+
+---
+
+## Key Takeaways
+
+- **pydantic-deep v0.3.4–v0.3.8** shipped five releases in two weeks of active development
+- **TUI is now default** — better token visibility, live thinking stream, session auto-save
+- **Browser + Docker + CI** — pydantic-deep now runs in full infrastructure stack
+- **curl | bash install** — no more onboarding friction
+- **Three self-aware capabilities** — StuckLoopDetection, LimitWarnerCapability, BM25 search — agents that understand their own state
+- All capabilities are pure Python where possible, zero extra dependencies by default
+
+---
+
+## Get Started
+
+Install pydantic-deep:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/vstorm-co/pydantic-deep/main/install.sh | bash
+```
+
+Or with pip:
+
+```bash
+pip install "pydantic-deep[tui]"
+```
+
+- GitHub: [github.com/vstorm-co/pydantic-deep](https://github.com/vstorm-co/pydantic-deep)
+- OSS portal: [oss.vstorm.co](https://oss.vstorm.co)
+- Vstorm: [vstorm.co](https://vstorm.co)

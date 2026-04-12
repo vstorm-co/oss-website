@@ -1,0 +1,168 @@
+---
+title: "pydantic-deep v0.3.4–v0.3.8: Was wir in 2 Wochen Stille gebaut haben"
+description: "Neues TUI-Design, Browser-Automatisierung, Docker-Sandbox, Curl-Installer, StuckLoopDetection, LimitWarnerCapability — vollständiger Überblick über 5 Releases in 2 Wochen."
+pubDate: 2026-04-12
+updatedDate: 2026-04-12
+author: "Kacper Włodarczyk"
+lang: de
+translationKey: pydantic-deep-two-weeks-five-versions
+tags: ["pydantic-ai", "python", "ai-agents", "open-source", "llm"]
+category: announcement
+draft: false
+---
+
+> **TL;DR:** In zwei Wochen der Stille lieferte pydantic-deep fünf Versionen: ein neu gestaltetes TUI mit Live-Token-Tracking, Browser-Automatisierung via Playwright, Docker-Sandbox und Headless-CI-Runner, einen Ein-Befehl-Curl-Installer, Web-Search-Fixes für Multi-Provider-Setups und drei neue Capabilities für selbstbewusste Agenten (StuckLoopDetection, LimitWarnerCapability, BM25-Verlaufssuche). Dieser Post ist der Überblick — detaillierte Deep Dives kamen jeden Tag dieser Woche.
+
+---
+
+*von [Kacper Włodarczyk](https://linkedin.com/in/kacper-wlodarczyk/) — AI Engineering Lead bei [Vstorm](https://vstorm.co). Wir bauen produktive KI-Agentensysteme und open-sourcen die schwierigen Teile. Folge uns auf [GitHub](https://github.com/vstorm-co/pydantic-deep) oder [oss.vstorm.co](https://oss.vstorm.co).*
+
+---
+
+Wir waren zwei Wochen still. Keine Tweets, keine Posts, keine "aufgeregten Ankündigungen".
+
+Wir haben gebaut.
+
+[pydantic-deep](https://github.com/vstorm-co/pydantic-deep) ist unser Open-Source-KI-Coding-Agent — eine Python-first-Alternative zu Claude Code und ähnlichen Tools, gebaut auf Pydantic AI. Wir liefern echte Features aus unseren Produktionsdeployments: 30+ KI-Agentensysteme bei Vstorm, echte Edge Cases, echte Ausfälle, echte Fixes.
+
+In zwei Wochen haben wir v0.3.4 bis v0.3.8 geliefert. Fünf Releases. Hier ist, was jedes hinzugefügt hat.
+
+---
+
+## v0.3.4 — TUI als Standard + /improve-Redesign
+
+Die größte Quality-of-Life-Änderung: Das Ausführen von `pydantic-deep` startet jetzt standardmäßig das TUI. Keine Flags mehr, keine Unterbefehle.
+
+Der interessantere Teil ist `/improve`. Wir haben die gesamte Pipeline neu gestaltet. Statt Sessions lose zusammenzufassen, werden jetzt zwei verschiedene Insight-Typen extrahiert:
+
+- **`UserFactInsight`** — Dinge, die der Agent über den Benutzer gelernt hat (Präferenzen, Muster, Kontext)
+- **`AgentLearningInsight`** — Dinge, die der Agent über sich selbst gelernt hat (was funktionierte, was nicht)
+
+Beide fließen in `MEMORY.md` als primäres Ziel. Rohe Tool-Traces werden jetzt in die Synthese einbezogen (Meta-Harness-Architektur: rohe Traces schlagen Zusammenfassungen immer — Modelle reasoning besser auf tatsächlichen Daten als auf komprimierten Interpretationen).
+
+Weitere Fixes in v0.3.4: `/config`-Befehl im TUI, per-Session-Debug-Logging in `.pydantic-deep/logs/`, behobener `/improve`-Crash bei `{}` in Prompts, stille Fehler berichten jetzt `failed_sessions`, API-Key-Laden behoben, MEMORY.md-Pfad-Mismatch behoben.
+
+---
+
+## v0.3.5 — Browser-Automatisierung, Docker-Sandbox, Headless-Runner
+
+Drei Infrastruktur-Features kamen zusammen in v0.3.5.
+
+**Browser-Automatisierung via `BrowserCapability`**: Playwright-basiert, 9 Tools:
+
+```python
+from pydantic_deep.capabilities import BrowserCapability
+
+agent = create_deep_agent(
+    model="anthropic:claude-opus-4-6",
+    capabilities=[BrowserCapability()],
+)
+# Agent kann jetzt: navigate, click, type_text, get_text,
+# screenshot, scroll, go_back, go_forward, execute_js
+```
+
+Domain-Allowlist, Auto-Screenshot bei Navigation, Browser-Lifecycle verwaltet durch `wrap_run`.
+
+**Docker-Sandbox (`--sandbox docker`)**: Dateioperationen und Shell-Befehle laufen in einem Container. `/workspace` ist gemountet, Cleanup ist automatisch.
+
+```bash
+pydantic-deep --sandbox docker
+```
+
+**Benannte Workspaces**: persistente Docker-Umgebungen, die zwischen Sessions erhalten bleiben, teilbar zwischen Threads.
+
+```bash
+pydantic-deep --workspace my-project  # denselben Container wiederverwenden
+pydantic-deep sandbox list            # laufende Workspaces anzeigen
+pydantic-deep sandbox stop my-project
+```
+
+**Headless-Runner (`pydantic-deep run`)**: für Benchmarks, CI/CD, skriptierte Automatisierung. Kein TUI, keine Interaktion.
+
+Auch in v0.3.5: `DEFAULT_USAGE_LIMITS` entfernt Pydantic AIs Standard-50-Request-Cap. Per-Turn-Token-Anzeige (`in:X · out:Y · total:Z · reqs:N`) im TUI-Header.
+
+---
+
+## v0.3.6 — Ein-Befehl-Installation
+
+Die praktischste Verbesserung für neue Benutzer:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/vstorm-co/pydantic-deep/main/install.sh | bash
+```
+
+Kein Virtualenv-Setup, kein pip, keine Versionskonflikte.
+
+Zwei weitere Features:
+
+- **`pydantic-deep update`** — Self-Update-Befehl. Ausführen, neueste Version erhalten.
+- **Startup-Update-Benachrichtigungen** — beim Start prüft pydantic-deep auf neuere Releases (24h-Cache, 2s-Timeout). Bei Update wird informiert.
+
+---
+
+## v0.3.7 — Web-Suche für Nicht-Anthropic-Modelle behoben
+
+DuckDuckGo-Fallback jetzt in beiden `cli`- und `tui`-Extras gebündelt. Web-Suche funktioniert für OpenRouter, GPT-4.1, Gemini — alles.
+
+---
+
+## v0.3.8 — Drei selbstbewusste Capabilities
+
+### StuckLoopDetection
+
+```python
+from pydantic_deep import create_deep_agent
+
+agent = create_deep_agent(
+    model="anthropic:claude-opus-4-6",
+    stuck_loop_detection=True,  # Standard: True
+)
+```
+
+Drei erkannte Muster:
+1. **Wiederholte identische Aufrufe** — gleiches Tool, gleiche Argumente, N-mal hintereinander (Standard-Schwellenwert: 3)
+2. **A-B-A-B-Wechsel** — Tool A, Tool B, Tool A, Tool B... in einer Zwei-Aufruf-Schleife gefangen
+3. **No-Op-Schleifen** — gleicher Aufruf, gleiche Ergebnisse, trotzdem weiter
+
+Aktion konfigurierbar: `warn` (löst `ModelRetry` aus) oder `error` (wirft `StuckLoopError`). Per-Run-Isolation via `for_run()`.
+
+### LimitWarnerCapability
+
+Injiziert Warnungen direkt in die Konversation als Benutzernachrichten:
+
+- Bei **70% Kontextnutzung**: `[URGENT] Context window at 70%. Start wrapping up current task.`
+- Bei **90% Kontextnutzung**: `[CRITICAL] Context window at 90%. Auto-compression imminent.`
+
+Automatisch aktiviert wenn `context_manager=True` (Standard).
+
+### BM25-Verlaufssuche
+
+`search_conversation_history` verwendet jetzt BM25-Scoring statt naivem Substring-Matching. Gleiche Formel wie Elasticsearch und Lucene. Null Abhängigkeiten — reines Python.
+
+---
+
+## Wichtigste Erkenntnisse
+
+- **TUI ist jetzt Standard** — bessere Token-Sichtbarkeit, Live-Thinking-Stream, Auto-Session-Speicherung
+- **Browser + Docker + CI** — pydantic-deep läuft jetzt im vollständigen Infrastruktur-Stack
+- **curl | bash Installation** — kein Onboarding-Reibungspunkt mehr
+- **Drei selbstbewusste Capabilities** — Agenten, die ihren eigenen Zustand verstehen
+- Alle Capabilities sind nach Möglichkeit in reinem Python, ohne zusätzliche Abhängigkeiten
+
+---
+
+## Loslegen
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/vstorm-co/pydantic-deep/main/install.sh | bash
+```
+
+Oder mit pip:
+
+```bash
+pip install "pydantic-deep[tui]"
+```
+
+- GitHub: [github.com/vstorm-co/pydantic-deep](https://github.com/vstorm-co/pydantic-deep)
+- OSS-Portal: [oss.vstorm.co](https://oss.vstorm.co)
+- Vstorm: [vstorm.co](https://vstorm.co)
