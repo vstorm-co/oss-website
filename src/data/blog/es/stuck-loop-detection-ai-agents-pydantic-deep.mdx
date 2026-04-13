@@ -1,0 +1,179 @@
+---
+title: "StuckLoopDetection: Cómo detuvimos a un agente quemando $12 en 47 llamadas idénticas"
+description: "La mayoría de los bucles de agentes son repeticiones mecánicas, no fallos del modelo. pydantic-deep v0.3.8 detecta 3 patrones de bucle antes de que desperdicien tu presupuesto de API."
+pubDate: 2026-04-13
+updatedDate: 2026-04-13
+author: "Kacper Włodarczyk"
+lang: es
+translationKey: stuck-loop-detection-ai-agents-pydantic-deep
+tags: ["pydantic-ai", "python", "ai-agents", "open-source", "llm"]
+category: open-source
+draft: false
+---
+
+> **TL;DR:** La mayoría de los bucles de agentes no son fallos del modelo — son repeticiones mecánicas que el propio modelo no reconoce. pydantic-deep v0.3.8 introduce StuckLoopDetection, una capability que detecta tres patrones de bucle (llamadas idénticas repetidas, alternancia A-B-A-B, bucles no-op) antes de que desperdicien tokens. Umbral configurable, acción configurable (ModelRetry o StuckLoopError), aislamiento de estado por ejecución para ejecuciones paralelas. Activado por defecto.
+
+---
+
+*por [Kacper Włodarczyk](https://linkedin.com/in/kacper-wlodarczyk/) — AI Engineering Lead en [Vstorm](https://vstorm.co). Construimos sistemas de agentes de IA de producción y hacemos open source las partes difíciles. Este es el post 1/3 de la serie "Self-Aware Agents". [Post de resumen: pydantic-deep v0.3.4–v0.3.8](https://oss.vstorm.co/blog/pydantic-deep-two-weeks-five-versions/).*
+
+---
+
+El domingo publiqué un resumen de cinco versiones que lanzamos en dos semanas. Hoy empiezo con los deep dives. Primero: StuckLoopDetection — la capability que apareció en v0.3.8 y que deberíamos haber construido meses antes.
+
+Aquí está el incidente que lo hizo evidente.
+
+Un agente de codificación estaba trabajando en una tarea de refactorización durante la noche. La tarea: reestructurar los imports de un módulo y actualizar los archivos dependientes. El agente llegó a mitad del camino, encontró un archivo con un patrón de imports inusual, intentó leerlo, no pudo parsear el resultado correctamente, y decidió volver a leer el archivo.
+
+Por la mañana: 47 llamadas a `read_file` en la misma ruta. $12 en costos de API. Cero progreso en la tarea real.
+
+El modelo no estaba "roto." Cada llamada parecía localmente razonable — el agente leyó el archivo, se confundió, intentó de nuevo. Desde la perspectiva del modelo: estaba esforzándose. Desde fuera: estaba atascado.
+
+---
+
+## Por qué el prompting no es suficiente
+
+La respuesta obvia a los bucles de agentes son mejores system prompts. "No repitas llamadas a herramientas." "Si obtienes el mismo resultado dos veces, intenta un enfoque diferente."
+
+Esto funciona a veces. Los problemas:
+
+1. **El modelo a menudo no reconoce los bucles como bucles.** Cada llamada repetida parece localmente justificada. El agente no "ignora" la instrucción — genuinamente no ve el patrón entre llamadas.
+2. **El cumplimiento del prompt se degrada bajo carga cognitiva.** Las tareas de larga duración con muchas llamadas a herramientas, contextos complejos y múltiples restricciones empujan al modelo a ignorar instrucciones de casos extremos.
+3. **Tienes que añadir la instrucción a cada agente por separado.** No hay un lugar estándar para la lógica de "prevención de bucles" que se aplique en todas partes.
+
+La detección a nivel de capability resuelve los tres. No pide al modelo que se monitoree a sí mismo — monitorea desde fuera.
+
+---
+
+## Los tres patrones de bucle
+
+### Patrón 1: Llamadas idénticas repetidas
+
+El patrón más simple. El agente llama a la misma herramienta con los mismos argumentos N veces seguidas.
+
+```
+Turno 12: read_file(path="src/config.json")  → {"imports": [...], "unknown_field": ...}
+Turno 13: read_file(path="src/config.json")  → {"imports": [...], "unknown_field": ...}
+Turno 14: read_file(path="src/config.json")  → {"imports": [...], "unknown_field": ...}
+```
+
+**Por qué sucede:** El agente no puede procesar el resultado y no tiene otra herramienta a la que recurrir. El comportamiento predeterminado: intentar lo mismo de nuevo.
+
+**Umbral por defecto:** 3 llamadas idénticas. Después de la tercera, se activa la intervención.
+
+### Patrón 2: Bucles alternantes A-B-A-B
+
+Más sutil. El agente alterna entre dos herramientas, cada una alimentando un resultado incompleto a la otra.
+
+```
+Turno 8:  list_directory(path="src/")
+Turno 9:  read_file(path="src/main.py")
+Turno 10: list_directory(path="src/")
+Turno 11: read_file(path="src/main.py")
+Turno 12: list_directory(path="src/")
+```
+
+**Por qué sucede:** La Herramienta A devuelve algo que sugiere la Herramienta B, la Herramienta B devuelve algo que sugiere la Herramienta A, y el agente cicla indefinidamente. Ninguna herramienta le da al agente suficiente para avanzar.
+
+Este patrón es particularmente costoso porque parece progreso — el agente está llamando diferentes herramientas — pero no va a ningún lado.
+
+### Patrón 3: Bucles no-op
+
+El agente hace la misma llamada y obtiene el mismo resultado, pero continúa de todos modos.
+
+```
+Turno 5:  write_file(path="output.txt", content="result: error")  → success
+Turno 6:  write_file(path="output.txt", content="result: error")  → success
+Turno 7:  write_file(path="output.txt", content="result: error")  → success
+```
+
+**Por qué sucede:** El agente intenta "confirmar" un resultado pero no se da cuenta de que la escritura ya ocurrió.
+
+---
+
+## La implementación
+
+```python
+from pydantic_deep import create_deep_agent
+from pydantic_deep.capabilities import StuckLoopDetection
+
+# Simple: usar el valor predeterminado
+agent = create_deep_agent(
+    model="anthropic:claude-opus-4-6",
+    stuck_loop_detection=True,  # predeterminado: True, umbral: 3
+)
+
+# Personalizado: configurar umbral y acción
+agent = create_deep_agent(
+    model="anthropic:claude-opus-4-6",
+    capabilities=[
+        StuckLoopDetection(
+            max_repeated=5,
+            action="warn",     # "warn" = ModelRetry, "error" = StuckLoopError
+        )
+    ],
+)
+```
+
+**`action="warn"` (predeterminado):** Activa `ModelRetry`. El modelo recibe un mensaje y generalmente pivota a una herramienta diferente.
+
+**`action="error"`:** Lanza `StuckLoopError`. Útil para pipelines automatizados.
+
+```python
+from pydantic_deep.capabilities import StuckLoopDetection, StuckLoopError
+
+try:
+    result = await agent.run("refactor the imports in src/")
+except StuckLoopError as e:
+    print(f"Agente atascado: patrón {e.pattern} detectado")
+```
+
+### Aislamiento de estado por ejecución
+
+Las llamadas paralelas a `agent.run()` no comparten estado de detección:
+
+```python
+# Seguro para ejecutar concurrentemente con una instancia de agente compartida
+results = await asyncio.gather(
+    agent.run("analyze src/module_a.py"),
+    agent.run("analyze src/module_b.py"),
+)
+```
+
+Se maneja automáticamente mediante `for_run()`.
+
+---
+
+## El caso de negocio
+
+Un bucle de 47 llamadas a precios de Claude Opus cuesta ~$12 para una tarea que debería haber costado $0.50.
+
+Costo de `stuck_loop_detection=True`: cero llamadas API adicionales, latencia negligible, activado por defecto. Incluso los falsos positivos son baratos: un ModelRetry, luego el agente intenta un enfoque diferente.
+
+---
+
+## Conclusiones clave
+
+- **Los bucles de agentes son generalmente mecánicos, no fallos del modelo.** El modelo no reconoce el patrón; la detección debe ocurrir fuera del modelo.
+- **Tres patrones** con diferentes causas raíz.
+- **Detección a nivel de capability** se aplica uniformemente sin ingeniería de prompts por agente.
+- **Aislamiento por ejecución** (`for_run()`) lo hace seguro para llamadas paralelas a `agent.run()`.
+- **Activado por defecto** en `create_deep_agent()` — no tienes que pensar en ello.
+
+---
+
+## Empezar
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/vstorm-co/pydantic-deep/main/install.sh | bash
+```
+
+O con pip:
+
+```bash
+pip install "pydantic-deep[tui]"
+```
+
+- GitHub: [github.com/vstorm-co/pydantic-deep](https://github.com/vstorm-co/pydantic-deep)
+- Portal OSS: [oss.vstorm.co](https://oss.vstorm.co)
+- Vstorm: [vstorm.co](https://vstorm.co)

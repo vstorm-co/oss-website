@@ -1,0 +1,219 @@
+---
+title: "StuckLoopDetection: How We Stopped an Agent Burning $12 on 47 Identical Calls"
+seoTitle: "StuckLoopDetection: Stop AI Agents Burning Tokens in Loops"
+description: "Most agent loops are mechanical, not model failures. pydantic-deep v0.3.8 catches 3 loop patterns — repeated calls, A-B-A-B alternating, no-op — before they waste your API budget."
+pubDate: 2026-04-13
+updatedDate: 2026-04-13
+author: "Kacper Włodarczyk"
+lang: en
+translationKey: stuck-loop-detection-ai-agents-pydantic-deep
+tags: ["pydantic-ai", "python", "ai-agents", "open-source", "llm"]
+category: open-source
+draft: false
+---
+
+> **TL;DR:** Most agent loops aren't model failures — they're mechanical repetitions that the model itself doesn't recognize. pydantic-deep v0.3.8 introduces StuckLoopDetection, a capability that catches three loop patterns (repeated identical calls, A-B-A-B alternating, no-op loops) before they waste tokens. Configurable threshold, configurable action (ModelRetry or StuckLoopError), per-run state isolation for parallel runs. Enabled by default.
+
+---
+
+*by [Kacper Włodarczyk](https://linkedin.com/in/kacper-wlodarczyk/) — AI Engineering Lead at [Vstorm](https://vstorm.co). We build production AI agent systems and open-source the hard parts. This is post 1/3 in the "Self-Aware Agents" series. [Overview post: pydantic-deep v0.3.4–v0.3.8](https://oss.vstorm.co/blog/pydantic-deep-two-weeks-five-versions/).*
+
+---
+
+Sunday I posted an overview of five releases we shipped in two weeks. Today I'm starting the deep dives. First up: StuckLoopDetection — the capability that shipped in v0.3.8 and that we should have built months ago.
+
+Here's the incident that made it obvious.
+
+A coding agent was working on a refactor task overnight. The task: restructure a module's imports and update dependent files. The agent got partway through, hit a file with an unusual import pattern, tried to read it, couldn't parse the result correctly, and defaulted to reading the file again.
+
+By morning: 47 calls to `read_file` on the same path. $12 in API costs. Zero progress on the actual task.
+
+The model wasn't "broken." Each call looked locally reasonable — the agent read the file, got confused, tried again. From the model's perspective, it was making an effort. From outside: it was stuck.
+
+---
+
+## Why Prompting Isn't Enough
+
+The obvious response to agent loops is better system prompts. "Don't repeat tool calls." "If you get the same result twice, try a different approach."
+
+This works some of the time. The problem:
+
+1. **The model often doesn't recognize loops as loops.** Each repeated call appears locally justified. The agent isn't "ignoring" the instruction — it genuinely doesn't see the pattern across calls.
+2. **Prompt compliance degrades under cognitive load.** Long-running tasks with many tool calls, complex contexts, and multiple constraints push the model toward ignoring edge-case instructions.
+3. **You have to add the instruction to every agent.** There's no standard place to put "loop prevention" logic that applies everywhere.
+
+Detection at the capability level fixes all three. It's not asking the model to monitor itself — it's monitoring from outside.
+
+---
+
+## The Three Loop Patterns
+
+After reviewing our production session logs, we found that agent loops fall into three distinct categories.
+
+### Pattern 1: Repeated Identical Calls
+
+The simplest pattern. The agent calls the same tool with the same arguments N times in a row.
+
+```
+Turn 12: read_file(path="src/config.json")  → {"imports": [...], "unknown_field": ...}
+Turn 13: read_file(path="src/config.json")  → {"imports": [...], "unknown_field": ...}
+Turn 14: read_file(path="src/config.json")  → {"imports": [...], "unknown_field": ...}
+```
+
+**Why this happens:** The agent can't process the result and has no other tool to fall back on. The default behavior is to try the same thing again, hoping for a different result (or just not having a better strategy).
+
+**Default threshold:** 3 identical calls. After the third, intervention triggers.
+
+### Pattern 2: A-B-A-B Alternating Loops
+
+More subtle. The agent alternates between two tools, each feeding an incomplete result to the other.
+
+```
+Turn 8:  list_directory(path="src/")
+Turn 9:  read_file(path="src/main.py")
+Turn 10: list_directory(path="src/")
+Turn 11: read_file(path="src/main.py")
+Turn 12: list_directory(path="src/")
+```
+
+**Why this happens:** Tool A returns something that suggests Tool B, Tool B returns something that suggests Tool A, and the agent cycles indefinitely. Neither tool gives the agent enough to move forward, but both give enough to justify another call.
+
+This pattern is particularly expensive because it looks like progress — the agent is calling different tools, switching context — but it's going nowhere.
+
+### Pattern 3: No-Op Loops
+
+The agent makes the same call and gets the same result, but continues anyway.
+
+```
+Turn 5:  write_file(path="output.txt", content="result: error")  → success
+Turn 6:  write_file(path="output.txt", content="result: error")  → success
+Turn 7:  write_file(path="output.txt", content="result: error")  → success
+```
+
+**Why this happens:** The agent is trying to "commit" a result but doesn't realize the write already happened. Or it's waiting for some downstream effect that never materializes. Writes, status checks, and verification calls are the most common triggers.
+
+---
+
+## The Implementation
+
+StuckLoopDetection is a capability — it hooks into the agent's tool call lifecycle.
+
+```python
+from pydantic_deep import create_deep_agent
+from pydantic_deep.capabilities import StuckLoopDetection
+
+# Simple: use the default
+agent = create_deep_agent(
+    model="anthropic:claude-opus-4-6",
+    stuck_loop_detection=True,  # default: True, threshold: 3
+)
+
+# Custom: configure threshold and action
+agent = create_deep_agent(
+    model="anthropic:claude-opus-4-6",
+    capabilities=[
+        StuckLoopDetection(
+            max_repeated=5,    # allow up to 5 identical calls before intervention
+            action="warn",     # "warn" = ModelRetry, "error" = StuckLoopError
+        )
+    ],
+)
+```
+
+### What Happens When a Loop Is Detected
+
+**`action="warn"` (default):** The capability triggers a `ModelRetry`. The model receives a message like:
+
+```
+You have called read_file(path="src/config.json") 3 times with identical arguments
+and received the same result. This indicates a stuck loop. You must try a different
+approach — use a different tool, request help, or report that the task cannot be
+completed with available tools.
+```
+
+Most of the time, this is enough. The model pivots to a different tool or escalates.
+
+**`action="error"`:** Raises `StuckLoopError`. Execution stops. Useful for automated pipelines where you'd rather fail cleanly than burn budget.
+
+```python
+from pydantic_deep.capabilities import StuckLoopDetection, StuckLoopError
+
+try:
+    result = await agent.run("refactor the imports in src/")
+except StuckLoopError as e:
+    print(f"Agent got stuck: {e.pattern} pattern detected")
+    # handle gracefully — escalate, retry with different model, etc.
+```
+
+### Per-Run State Isolation
+
+If you run `agent.run()` concurrently for multiple tasks, stuck-detection state must not leak between runs. Run 1 calling `read_file` three times shouldn't trigger detection for Run 2.
+
+```python
+async def run_task(task: str):
+    # Each call to agent.run() gets isolated stuck-detection state
+    # via for_run() — shared agent instance, isolated per-run capabilities
+    return await agent.run(task)
+
+# Safe to run concurrently
+results = await asyncio.gather(
+    run_task("analyze src/module_a.py"),
+    run_task("analyze src/module_b.py"),
+)
+```
+
+This is handled automatically. You don't need to create separate agent instances for parallel runs.
+
+---
+
+## The Business Case
+
+If you're running AI agents on production tasks, stuck loops are a cost problem before they're anything else.
+
+A 47-call loop at Claude Opus pricing costs roughly $12 for a task that should have cost $0.50. At scale — multiple agents, multiple concurrent tasks, overnight runs — this compounds fast.
+
+The calculation for adding `stuck_loop_detection=True`:
+
+- **Cost:** zero (enabled by default, no additional API calls)
+- **Latency:** negligible (in-memory detection, no LLM calls)
+- **Risk:** low (warn mode triggers ModelRetry, not a hard stop)
+- **Benefit:** catches the tail of runaway loops before they drain budgets
+
+Even if StuckLoopDetection triggers incorrectly (false positive), the cost is one ModelRetry — the agent gets a message and tries a different approach. In practice, false positives are rare for threshold=3.
+
+---
+
+## What's Next in the Series
+
+This is post 1/3 in the "Self-Aware Agents" series.
+
+Tomorrow (Tuesday): a different kind of blindness. Your agent is approaching 90% context window usage. The TUI shows it. You see it. The model has no idea — and keeps generating output as if it has infinite space. That changes with `LimitWarnerCapability`, also in v0.3.8.
+
+---
+
+## Key Takeaways
+
+- **Agent loops are usually mechanical, not model failures.** The model doesn't recognize the pattern; detection needs to happen outside the model.
+- **Three patterns:** repeated identical calls, A-B-A-B alternating, no-op loops — each has a different root cause.
+- **Detection at capability level** means it applies uniformly without per-agent prompt engineering.
+- **Per-run isolation** (`for_run()`) makes it safe for parallel `agent.run()` calls.
+- **`action="warn"`** is the right default — ModelRetry before StuckLoopError, graceful before hard stop.
+- **Enabled by default** in `create_deep_agent()` — you don't have to think about it.
+
+---
+
+## Get Started
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/vstorm-co/pydantic-deep/main/install.sh | bash
+```
+
+Or with pip:
+
+```bash
+pip install "pydantic-deep[tui]"
+```
+
+- GitHub: [github.com/vstorm-co/pydantic-deep](https://github.com/vstorm-co/pydantic-deep)
+- OSS portal: [oss.vstorm.co](https://oss.vstorm.co)
+- Vstorm: [vstorm.co](https://vstorm.co)
