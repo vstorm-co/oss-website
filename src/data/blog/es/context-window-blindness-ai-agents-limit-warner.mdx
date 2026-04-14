@@ -1,0 +1,120 @@
+---
+title: "Ceguera de la ventana de contexto: por qué tu agente de IA no sabe que se está quedando sin espacio"
+description: "Los agentes de IA no tienen conciencia intrínseca de su uso del contexto. LimitWarnerCapability inyecta advertencias URGENT/CRITICAL al 70% y 85% — antes del acantilado de compresión automática al 90%."
+pubDate: 2026-04-14
+updatedDate: 2026-04-14
+author: "Kacper Włodarczyk"
+lang: es
+translationKey: context-window-blindness-ai-agents-limit-warner
+tags: ["pydantic-ai", "python", "ai-agents", "open-source", "llm"]
+category: article
+draft: false
+---
+
+> **TL;DR:** Los agentes de IA no tienen conciencia intrínseca de su propio uso de la ventana de contexto — esa información vive en la capa de orquestación, no en el historial de mensajes. `LimitWarnerCapability` en pydantic-deep v0.3.8 cierra esta brecha inyectando mensajes de usuario al 70% (URGENT) y 85% (CRITICAL), dando al modelo tiempo para concluir el trabajo con gracia antes del acantilado de compresión automática al 90%. También en v0.3.8: búsqueda en historial con BM25 sin dependencias externas, `EvictionCapability` que intercepta salidas grandes de herramientas antes de que entren al historial, y descubrimiento extendido de archivos de contexto (7 tipos de archivo).
+
+El lunes mostré cómo los agentes desperdician tokens quedándose atrapados en bucles. Hoy — un problema más silencioso que cuesta igual, y es mucho más difícil de detectar.
+
+Tu agente de IA ha estado quedándose ciego. No tenía idea de que la ventana de contexto estaba al 90% de su capacidad.
+
+---
+
+*Soy Kacper Włodarczyk, cofundador de [Vstorm](https://vstorm.co) — una consultoría de Ingeniería de IA Agentica Aplicada. Hemos desplegado más de 30 agentes de IA en producción. [pydantic-deep](https://github.com/vstorm-co/pydantic-deep) es nuestro agente de coding de código abierto — the modular agent runtime for Python.*
+
+---
+
+## El Problema: Dos Realidades Diferentes
+
+Cuando ejecutas una tarea larga del agente, ves: una barra de estado mostrando "Contexto: 87% usado." Está ahí en la TUI. Puedes ver que el agente casi se ha quedado sin espacio.
+
+Pero el modelo no puede ver la barra de estado. No tiene idea.
+
+Desde la perspectiva del modelo, cada mensaje que escribe, cada llamada a herramienta que hace, cada plan que traza — todo continúa normalmente. No tiene señal de que el historial de conversación se está llenando. Sigue produciendo respuestas largas, iniciando planes de varios pasos, haciendo llamadas a herramientas que generan páginas de salida.
+
+Luego al 90%: se activa la compresión automática. La memoria de trabajo del modelo se comprime a la fuerza. Pierde el hilo de lo que hizo 40 mensajes atrás. Empieza a contradecir sus decisiones anteriores.
+
+Esta es la ceguera de la ventana de contexto: la brecha entre lo que ve el usuario y lo que el modelo sabe sobre su propia situación.
+
+## Por Qué Sucede Esto
+
+Las interfaces LLM modernas muestran el uso del contexto en la UI — para el operador humano. Pero el modelo en sí solo ve el historial de mensajes, sin conciencia intrínseca de cuánta ventana de contexto consume esa conversación.
+
+## La Solución: LimitWarnerCapability
+
+En [pydantic-deep v0.3.8](https://github.com/vstorm-co/pydantic-deep), añadimos `LimitWarnerCapability`. La solución es simple: inyecta la información de uso del contexto directamente en la conversación como mensaje de usuario, en dos umbrales.
+
+**Al ~70% de uso (URGENT):**
+
+```
+You are approaching the context limit. You have used approximately 70% of your available context window. Begin wrapping up your current task. Avoid starting new complex subtasks.
+```
+
+**Al ~85% de uso (CRITICAL):**
+
+```
+CRITICAL: Your context window is almost full. Stop current work and use /compact NOW to compress history before continuing. Do not start new tasks.
+```
+
+Estos no son modificaciones del system prompt. Se inyectan como mensajes de usuario — el tipo que el modelo trata como entrada autoritativa.
+
+La capacidad se activa automáticamente cuando se establece `context_manager=True` (el valor por defecto en pydantic-deep):
+
+```python
+from pydantic_deep import DeepAgent
+
+agent = DeepAgent(
+    model="claude-opus-4-5",
+    context_manager=True,  # por defecto — activa LimitWarnerCapability
+)
+```
+
+## ¿Por Qué No System Prompt?
+
+Las instrucciones en el system prompt ("si notas que te estás quedando sin contexto, termina la tarea") no funcionan bien aquí — el modelo no puede estimar de manera confiable su propio uso de tokens desde dentro de la conversación.
+
+La inyección en tiempo de ejecución en umbrales específicos funciona porque usa datos reales de la capa de orquestación.
+
+## Búsqueda BM25 en Historial: Cero Dependencias, Python Puro
+
+También reescribimos `search_conversation_history`:
+
+```python
+# Antes de v0.3.8: búsqueda naive de subcadenas
+results = [msg for msg in history if query in msg.content]
+
+# Después de v0.3.8: resultados ordenados por BM25
+results = search_conversation_history(history, "explain the authentication flow")
+# Términos raros (alto IDF) tienen mayor clasificación
+# Consultas de múltiples palabras tokenizadas por separado
+# Cero dependencias externas — Python puro
+```
+
+## EvictionCapability
+
+`EvictionCapability` intercepta salidas grandes de herramientas a través del hook `after_tool_execute` — **antes** de que entren al historial de mensajes. Previenes el crecimiento del contexto en lugar de reaccionar ante él.
+
+## Conclusiones Clave
+
+- **La ceguera de la ventana de contexto** es real: los modelos no tienen conciencia intrínseca de su propio uso del contexto.
+- **LimitWarnerCapability** inyecta mensajes de usuario al 70% y 85% — antes de la compresión automática al 90%.
+- **Búsqueda BM25** reemplaza la búsqueda naive de subcadenas, cero dependencias externas.
+- **EvictionCapability** intercepta salidas grandes de herramientas antes de que entren al historial.
+- Todo automático con `context_manager=True` (el valor por defecto).
+
+---
+
+## Pruébalo
+
+```bash
+pip install "pydantic-deep[cli]"
+# o instalación en un comando:
+curl -fsSL https://raw.githubusercontent.com/vstorm-co/pydantic-deep/main/install.sh | bash
+```
+
+GitHub: [github.com/vstorm-co/pydantic-deep](https://github.com/vstorm-co/pydantic-deep) | Portal OSS: [oss.vstorm.co](https://oss.vstorm.co)
+
+¿Alguna vez tu agente comenzó a alucinar a mitad de una tarea larga y lo rastreaste hasta el desbordamiento de contexto?
+
+---
+
+*Vstorm construye sistemas de agentes de IA en producción. [vstorm.co](https://vstorm.co)*

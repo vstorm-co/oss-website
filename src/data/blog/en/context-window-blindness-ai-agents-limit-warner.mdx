@@ -1,0 +1,160 @@
+---
+title: "Context Window Blindness: Why Your AI Agent Doesn't Know It's Running Out of Space"
+seoTitle: "Context Window Blindness in AI Agents – LimitWarnerCapability"
+description: "AI agents have no intrinsic awareness of context usage. LimitWarnerCapability injects URGENT/CRITICAL warnings at 70% and 85% — before the 90% auto-compression cliff."
+pubDate: 2026-04-14
+updatedDate: 2026-04-14
+author: "Kacper Włodarczyk"
+lang: en
+translationKey: context-window-blindness-ai-agents-limit-warner
+tags: ["pydantic-ai", "python", "ai-agents", "open-source", "llm"]
+category: article
+draft: false
+---
+
+> **TL;DR:** AI agents have no intrinsic awareness of their own context usage — that information lives in the orchestration layer, not the message history. `LimitWarnerCapability` in pydantic-deep v0.3.8 bridges this gap by injecting user messages at 70% (URGENT) and 85% (CRITICAL) thresholds, giving the model time to wrap up gracefully before the 90% auto-compression cliff. Also in v0.3.8: BM25-ranked history search with zero external dependencies, `EvictionCapability` that intercepts large tool outputs before they enter history, and expanded context file discovery (7 file types).
+
+On Monday I showed how agents waste tokens by getting stuck in loops — repeating the same tool call dozens of times, burning money on nothing. Today — a quieter problem that costs just as much, and is far harder to spot.
+
+Your AI agent has been going blind. It had no idea its context window was 90% full.
+
+---
+
+*I'm Kacper Włodarczyk, co-founder of [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering consultancy. We've deployed 30+ production AI agents. [pydantic-deep](https://github.com/vstorm-co/pydantic-deep) is our open-source AI coding agent — the modular agent runtime for Python.*
+
+---
+
+## The Problem: Two Different Realities
+
+When you run a long agent task, here's what you see: a status bar showing "Context: 87% used." It's right there in the TUI. You can see the agent is almost out of space.
+
+But the model can't see the status bar. It has no idea.
+
+From the model's perspective, every message it writes, every tool call it makes, every plan it sketches — all of that just continues normally. It has no signal that the conversation history is filling up. It keeps producing long responses, initiating multi-step plans, making tool calls that generate pages of output.
+
+Then at 90%: auto-compression kicks in. The model's working memory gets force-compressed. It loses the thread of what it did 40 messages ago. It starts contradicting its earlier decisions. In a code review task, it might suggest changes it already rejected. In a research task, it reinvestigates topics it already covered.
+
+This is context window blindness: the gap between what the user sees and what the model knows about its own situation.
+
+## Why This Happens
+
+Modern LLM interfaces show context usage in the UI. Claude Code shows it in the status bar. OpenAI Playground shows a token counter. These are designed for the human operator.
+
+But the model itself — the thing actually generating the output — only sees the message history. It knows what was said, but it has no intrinsic awareness of how much of its context window that conversation consumes. That information exists outside the conversation, in the orchestration layer.
+
+The result: every long-running agent is flying blind. It will hit auto-compression without warning, lose context, and start producing degraded output — and neither the model nor the user gets a clean signal that this happened.
+
+## The Fix: LimitWarnerCapability
+
+In [pydantic-deep v0.3.8](https://github.com/vstorm-co/pydantic-deep), we added `LimitWarnerCapability`. The solution is simple: inject the context usage information directly into the conversation as a user message, at two thresholds.
+
+**At ~70% usage (URGENT):**
+
+```
+You are approaching the context limit. You have used approximately 70% of your available context window. Begin wrapping up your current task. Avoid starting new complex subtasks.
+```
+
+**At ~85% usage (CRITICAL):**
+
+```
+CRITICAL: Your context window is almost full. Stop current work and use /compact NOW to compress history before continuing. Do not start new tasks.
+```
+
+These aren't system prompt modifications. They're injected as user messages — the same type of message the model treats as authoritative input. The model responds to them the way it would respond to a user saying "stop, we're running out of time."
+
+The capability is automatically enabled when you set `context_manager=True` (the default in pydantic-deep):
+
+```python
+from pydantic_deep import DeepAgent
+
+agent = DeepAgent(
+    model="claude-opus-4-5",
+    context_manager=True,  # default — enables LimitWarnerCapability
+)
+```
+
+The injection happens well before the 90% auto-compression cliff — giving the model time to actually finish what it's doing gracefully.
+
+## Why Not Just System Prompt?
+
+A reasonable question: why inject at runtime as a user message, rather than adding context awareness to the system prompt?
+
+The system prompt approach would look like: "If you notice you're running out of context, wrap up your task." But the model doesn't notice — that's the whole problem. The model has no reliable way to estimate its own context usage from inside the conversation.
+
+Runtime injection at specific thresholds works because it uses actual usage data from the orchestration layer. When the `LimitWarnerCapability` fires, it knows the current usage percentage precisely. The injected message is grounded in real data, not a hypothetical instruction.
+
+## BM25 History Search: Zero Dependencies, Pure Python
+
+While working on context awareness, we also rewrote the `search_conversation_history` function.
+
+The old implementation was naive substring search:
+
+```python
+# Before v0.3.8: naive substring
+def search_conversation_history(history, query):
+    return [msg for msg in history if query in msg.content]
+```
+
+This worked for exact matches but failed for multi-word queries, synonyms, or partial phrases.
+
+The new implementation uses BM25 (the same relevance ranking used by Elasticsearch and Lucene):
+
+```python
+# After v0.3.8: BM25-ranked results
+from pydantic_deep.search import search_conversation_history
+
+results = search_conversation_history(
+    history,
+    "explain the authentication flow"
+)
+# Returns messages sorted by BM25 relevance score
+# Rare terms (high IDF) rank higher than common terms
+# Multi-word queries tokenized and scored separately
+# Zero external dependencies — pure Python implementation
+```
+
+The BM25 formula gives higher weight to rare terms (high inverse document frequency). Searching "authentication flow" will find messages discussing auth logic even if they use "login," "OAuth," or "session management" instead.
+
+We implemented this with zero external dependencies — pure Python using the standard Elasticsearch/Lucene BM25 formula.
+
+## EvictionCapability: Intercepting Before Entry
+
+`EvictionCapability` intercepts large tool outputs via the `after_tool_execute` hook — **before** they enter message history. If a tool returns a 50,000-token output, `EvictionCapability` evaluates it and can truncate or summarize it before the message history ever grows.
+
+The difference from post-hoc trimming: you're preventing context bloat rather than reacting to it.
+
+## Expanded Context File Discovery
+
+Also in v0.3.8: `DEFAULT_CONTEXT_FILENAMES` grew from 2 to 7 entries.
+
+Previously auto-loaded: `AGENTS.md`, `SOUL.md`
+
+Now discovers: `CLAUDE.md`, `.cursorrules`, `.github/copilot-instructions.md`, `CONVENTIONS.md`, `CODING_GUIDELINES.md`, `AGENTS.md`, `SOUL.md`
+
+pydantic-deep now picks up existing project conventions automatically, regardless of which AI coding tool originally created them.
+
+## Key Takeaways
+
+- **Context window blindness** is real: models have no intrinsic awareness of their own context usage.
+- **LimitWarnerCapability** injects user messages at 70% and 85% thresholds — before the 90% auto-compression cliff.
+- **BM25 history search** replaces naive substring matching with relevance-ranked results, zero external dependencies.
+- **EvictionCapability** intercepts large tool outputs before they enter history, not after.
+- All automatic with `context_manager=True` (the default).
+
+---
+
+## Try It
+
+```bash
+pip install "pydantic-deep[cli]"
+# or one-command install:
+curl -fsSL https://raw.githubusercontent.com/vstorm-co/pydantic-deep/main/install.sh | bash
+```
+
+GitHub: [github.com/vstorm-co/pydantic-deep](https://github.com/vstorm-co/pydantic-deep) | OSS portal: [oss.vstorm.co](https://oss.vstorm.co)
+
+Have you ever had an agent start hallucinating partway through a long task and traced it back to context overflow? I'd like to hear how it manifested.
+
+---
+
+*Vstorm builds production AI agent systems. If your team is deploying agents and running into context management at scale — [vstorm.co](https://vstorm.co).*
