@@ -1,0 +1,135 @@
+---
+title: "curl | bash dla agentów AI: instalacja pydantic-deep jednym poleceniem"
+description: "Standardowa instalacja narzędzi AI w Pythonie to 7 kroków i 15 minut. pydantic-deep teraz instaluje się jednym poleceniem curl — z detekcją uv, samodzielną aktualizacją i powiadomieniami startowymi."
+pubDate: 2026-04-15
+updatedDate: 2026-04-15
+author: "Kacper Włodarczyk"
+lang: pl
+translationKey: pydantic-deep-one-command-install-curl-bash
+tags: ["pydantic-ai", "python", "open-source", "developer-experience", "cli"]
+category: tutorial
+draft: false
+---
+
+> **TL;DR:** Standardowa instalacja narzędzia CLI w Pythonie to 7 kroków i 15+ minut: wersja Pythona, venv, pip install, złe extras, problemy z PATH. pydantic-deep v0.3.6 rozwiązuje to jednym poleceniem: `curl -fsSL https://raw.githubusercontent.com/vstorm-co/pydantic-deep/main/install.sh | bash`. Skrypt automatycznie wykrywa uv, instaluje go jeśli brak, uruchamia `uv tool install "pydantic-deep[cli]"` i weryfikuje PATH. `pydantic-deep update` obsługuje aktualizacje. Powiadomienia startowe sprawdzają PyPI z 2-sekundowym timeoutem i 24-godzinnym cache — nigdy nie blokują startu.
+
+Oto jak wygląda dziś standardowa instalacja narzędzi AI w Pythonie:
+
+1. Zainstaluj Python. (Która wersja? 3.10? 3.11? 3.12? Sprawdź README. README mówi "Python 3.8+." To nie jest pomocne.)
+2. Utwórz środowisko wirtualne.
+3. Aktywuj je. (Za każdym razem.)
+4. `pip install tool-name` — poczekaj na zależności.
+5. Uruchom narzędzie. Dostań `ModuleNotFoundError: No module named 'textual'`.
+6. `pip install tool-name[cli]` — extras były w osobnym nawiasie.
+7. Spróbuj ponownie. Teraz działa.
+
+Siedem kroków. Minimum piętnaście minut. Na pierwsze wrażenie.
+
+To jest standardowe doświadczenie instalacji narzędzi CLI w Pythonie — i stanowi realną barierę.
+
+Postanowiliśmy to naprawić dla [pydantic-deep](https://github.com/vstorm-co/pydantic-deep) — the modular agent runtime for Python.
+
+---
+
+*Jestem Kacper Włodarczyk, współzałożyciel [Vstorm](https://vstorm.co) — konsultingu Applied Agentic AI Engineering. Wdrożyliśmy ponad 30 produkcyjnych agentów AI. pydantic-deep to nasz otwartoźródłowy agent kodujący.*
+
+---
+
+## Jedno Polecenie
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/vstorm-co/pydantic-deep/main/install.sh | bash
+```
+
+To cała instalacja. Bez zarządzania wersjami Pythona. Bez środowisk wirtualnych. Bez nawiasów extras.
+
+## Co Właściwie Robi install.sh
+
+**Krok 1: Wykrywanie uv**
+
+[`uv`](https://github.com/astral-sh/uv) to menedżer pakietów Python od Astral, który obsługuje środowiska wirtualne, instalacje narzędzi i zarządzanie wersjami Pythona w sposób przezroczysty. Jeśli uv jest zainstalowane, skrypt używa go natychmiast. Jeśli nie, instaluje uv przez oficjalny instalator Astral.
+
+```bash
+if command -v uv &> /dev/null; then
+    echo "uv found, using existing installation"
+else
+    echo "Installing uv..."
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+fi
+```
+
+**Krok 2: Instalacja pydantic-deep jako narzędzia uv**
+
+```bash
+uv tool install "pydantic-deep[cli]"
+```
+
+`uv tool install` tworzy izolowane środowisko dla narzędzia i udostępnia binarny plik globalnie. Bez aktywacji. Extras `[cli]` zawiera wszystko potrzebne do uruchomienia pełnego TUI — w tym `textual`.
+
+**Krok 3: Weryfikacja i wskazówki**
+
+Skrypt uruchamia `pydantic-deep --version` żeby zweryfikować powodzenie. Jeśli binary nie jest w PATH, drukuje dokładnie co dodać do konfiguracji shella.
+
+## Błąd textual, Który Zaczął To Wszystko
+
+Przed v0.3.6 standardowa instalacja to `pip install pydantic-deep`. Potem zaczęły pojawiać się raporty `ModuleNotFoundError: No module named 'textual'` ze świeżych instalacji.
+
+Problem: `textual` było w grupie extras `tui`, ale większość użytkowników nie podawała żadnych extras. Przenieśliśmy `textual` do grupy `cli` — więc `pydantic-deep[cli]` teraz zawiera wszystko potrzebne do pełnego doświadczenia.
+
+## Samodzielna Aktualizacja: `pydantic-deep update`
+
+Aktualizacja to:
+
+```bash
+pydantic-deep update
+```
+
+To `brew upgrade` dla agentów AI. Pod spodem:
+- Jeśli uv jest dostępne: uruchamia `uv tool upgrade pydantic-deep`
+- Jeśli nie: fallback do `pip install --upgrade "pydantic-deep[cli]"`
+
+## Powiadomienia Startowe o Aktualizacjach
+
+Za każdym razem gdy uruchamiasz pydantic-deep, cicho sprawdza PyPI:
+
+```
+pydantic-deep v0.3.6
+Update available: v0.3.6 → v0.3.7  Run: pydantic-deep update
+```
+
+- 2-sekundowy timeout — nigdy nie blokuje startu
+- Wyniki cache'owane w `~/.pydantic-deep/update_check.json` przez 24 godziny
+- Implementacja przez `urllib` i threading — zero dodatkowych zależności
+
+## Dlaczego uv?
+
+Ocenialiśmy pipx (wolniejszy, wymaga osobnej instalacji), Homebrew (overhead utrzymania), binarne natywne (zbyt kruche przez dynamiczne importy), i uv.
+
+uv wybraliśmy bo: szybki, `uv tool` zaprojektowany dokładnie do tego przypadku użycia, zarządza wersjami Pythona przezroczyście.
+
+## Kluczowe Wnioski
+
+- **Standardowa instalacja CLI Python to bariera** — zarządzanie venv, problemy z PATH, złe extras.
+- **install.sh obsługuje wszystko**: wykrywanie uv, instalacja jeśli brak, `pydantic-deep[cli]`, weryfikacja PATH.
+- **`pydantic-deep update`** to jedno polecenie do aktualizacji.
+- **Powiadomienia startowe** sprawdzają PyPI pasywnie z 2-sekundowym timeoutem i 24-godzinnym cache.
+- **textual** jest teraz poprawnie w extras `cli`.
+
+---
+
+## Wypróbuj
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/vstorm-co/pydantic-deep/main/install.sh | bash
+
+# Później, żeby zaktualizować:
+pydantic-deep update
+```
+
+GitHub: [github.com/vstorm-co/pydantic-deep](https://github.com/vstorm-co/pydantic-deep) | Portal OSS: [oss.vstorm.co](https://oss.vstorm.co)
+
+Jakie było Twoje najgorsze doświadczenie z instalacją narzędzia Python AI/ML?
+
+---
+
+*Vstorm buduje produkcyjne systemy agentów AI. [vstorm.co](https://vstorm.co)*

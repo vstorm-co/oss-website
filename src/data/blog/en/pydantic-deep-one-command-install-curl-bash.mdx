@@ -1,0 +1,156 @@
+---
+title: "curl | bash for AI Agents: One-Command Install for pydantic-deep"
+seoTitle: "One-Command Install for pydantic-deep: curl | bash"
+description: "The standard Python AI tool install is 7 steps and 15 minutes. pydantic-deep now installs with a single curl command — uv detection, self-update, startup notifications included."
+pubDate: 2026-04-15
+updatedDate: 2026-04-15
+author: "Kacper Włodarczyk"
+lang: en
+translationKey: pydantic-deep-one-command-install-curl-bash
+tags: ["pydantic-ai", "python", "open-source", "developer-experience", "cli"]
+category: tutorial
+draft: false
+---
+
+> **TL;DR:** The standard Python CLI tool install is 7 steps and 15+ minutes: Python version, venv, pip install, wrong extras, PATH confusion. pydantic-deep v0.3.6 fixes this with a one-command installer: `curl -fsSL https://raw.githubusercontent.com/vstorm-co/pydantic-deep/main/install.sh | bash`. The script auto-detects uv, installs it if missing, runs `uv tool install "pydantic-deep[cli]"`, and verifies PATH. `pydantic-deep update` handles upgrades. Startup update notifications check PyPI with a 2-second timeout and 24-hour cache — they never block startup.
+
+Here's how you install most Python AI tools today:
+
+1. Install Python. (Which version? 3.10? 3.11? 3.12? Check the README. The README says "Python 3.8+." That's not helpful.)
+2. Create a virtual environment.
+3. Activate it. (Remember every time.)
+4. `pip install tool-name` — wait for dependencies.
+5. Run the tool. Get `ModuleNotFoundError: No module named 'textual'`.
+6. `pip install tool-name[cli]` — the extras were in a separate bracket.
+7. Try again. Now it works.
+
+Seven steps. Fifteen minutes minimum. For a first impression.
+
+This is the standard Python CLI tool install experience, and it is a real barrier — for developers who work in other languages, for teams onboarding new people, for anyone who wants to try something quickly before deciding whether it's worth their time.
+
+We decided to fix this for [pydantic-deep](https://github.com/vstorm-co/pydantic-deep) — the modular agent runtime for Python.
+
+---
+
+*I'm Kacper Włodarczyk, co-founder of [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering consultancy. We've deployed 30+ production AI agents. pydantic-deep is our open-source AI coding agent.*
+
+---
+
+## One Command
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/vstorm-co/pydantic-deep/main/install.sh | bash
+```
+
+That's the entire install. No Python version management. No virtual environments. No extras brackets.
+
+## What install.sh Actually Does
+
+The install script is short and readable — inspect it before running (and you should, with any `curl | bash`). Here's what it does:
+
+**Step 1: Detect uv**
+
+[`uv`](https://github.com/astral-sh/uv) is a Python package manager from Astral that handles virtual environments, tool installs, and Python version management transparently. If you have uv, the script uses it immediately. If not, it installs uv via the official Astral installer.
+
+```bash
+if command -v uv &> /dev/null; then
+    echo "uv found, using existing installation"
+else
+    echo "Installing uv..."
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+fi
+```
+
+**Step 2: Install pydantic-deep as a uv tool**
+
+```bash
+uv tool install "pydantic-deep[cli]"
+```
+
+`uv tool install` creates an isolated environment for the tool and makes the binary available globally. No activation needed. The `[cli]` extras group includes everything required to run the full TUI — including `textual`.
+
+**Step 3: Verify and guide**
+
+The script runs `pydantic-deep --version` to verify success. If the binary isn't in PATH (common on first uv install), it prints exactly what to add to your shell config — the correct line for bash or zsh — and explains why.
+
+## The textual Bug That Started This
+
+Before v0.3.6, the standard install was `pip install pydantic-deep`. Then we started getting `ModuleNotFoundError: No module named 'textual'` from fresh installs.
+
+The issue: `textual` was in the `tui` extras group, but most users didn't specify any extras. We moved `textual` into the `cli` extras group — so `pydantic-deep[cli]` now includes everything needed for the full experience.
+
+The install script handles this transparently.
+
+## Self-Update: `pydantic-deep update`
+
+Updating is:
+
+```bash
+pydantic-deep update
+```
+
+This is `brew upgrade pydantic-deep` for AI agents. Under the hood:
+- If uv is available: runs `uv tool upgrade pydantic-deep`
+- If not: falls back to `pip install --upgrade "pydantic-deep[cli]"`
+
+No manual version checking. No reading changelogs to decide whether to update.
+
+## Startup Update Notifications
+
+Every time you start pydantic-deep, it quietly checks PyPI for a newer version:
+
+```
+pydantic-deep v0.3.6
+Update available: v0.3.6 → v0.3.7  Run: pydantic-deep update
+```
+
+Implementation details:
+- 2-second timeout — never blocks startup
+- Results cached in `~/.pydantic-deep/update_check.json` for 24 hours
+- Hits `https://pypi.org/pypi/pydantic-deep/json` — PyPI's public JSON API
+- Implemented with `urllib` and threading — zero additional dependencies
+
+## Why uv?
+
+We evaluated several options:
+
+**pipx** — similar concept, good ecosystem support, but slower and requires its own separate install first.
+
+**Homebrew formula** — great UX but requires maintaining a tap, and Python package updates don't map cleanly to Homebrew's lifecycle.
+
+**Native binary (PyInstaller/Nuitka)** — eliminates the Python dependency but our tool uses dynamic imports that made compiled output brittle across platforms.
+
+**uv** — fast, handles Python version management transparently, `uv tool` is designed exactly for this use case. The tradeoff: uv gets installed on the user's system. But uv's own install is excellent and most Python developers will find it useful beyond pydantic-deep.
+
+## The Bigger Picture
+
+Developer experience is a feature. The time between "I want to try this" and "I'm running this" is a conversion metric. We want that gap to be 30 seconds, not 15 minutes.
+
+The same philosophy applies to `pydantic-deep update`. You should never be stuck on an old version because updating is annoying.
+
+## Key Takeaways
+
+- **The standard Python CLI install experience is a barrier** — venv management, PATH issues, wrong extras.
+- **install.sh handles everything**: uv detection, uv install if needed, `pydantic-deep[cli]`, PATH verification.
+- **`pydantic-deep update`** is one command to stay current — `uv tool upgrade` or pip fallback.
+- **Startup notifications** check PyPI passively with a 2-second timeout and 24-hour cache.
+- **textual** is now properly in `cli` extras — the full TUI always works.
+
+---
+
+## Try It
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/vstorm-co/pydantic-deep/main/install.sh | bash
+
+# Later, to update:
+pydantic-deep update
+```
+
+GitHub: [github.com/vstorm-co/pydantic-deep](https://github.com/vstorm-co/pydantic-deep) | OSS portal: [oss.vstorm.co](https://oss.vstorm.co)
+
+What's the worst install experience you've had with a Python AI/ML tool?
+
+---
+
+*Vstorm builds production AI agent systems. More open-source tools at [oss.vstorm.co](https://oss.vstorm.co).*

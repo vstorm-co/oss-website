@@ -1,0 +1,135 @@
+---
+title: "curl | bash para agentes de IA: instalación en un comando para pydantic-deep"
+description: "La instalación estándar de herramientas de IA en Python son 7 pasos y 15 minutos. pydantic-deep ahora se instala con un solo comando curl — con detección de uv, auto-actualización y notificaciones de inicio."
+pubDate: 2026-04-15
+updatedDate: 2026-04-15
+author: "Kacper Włodarczyk"
+lang: es
+translationKey: pydantic-deep-one-command-install-curl-bash
+tags: ["pydantic-ai", "python", "open-source", "developer-experience", "cli"]
+category: tutorial
+draft: false
+---
+
+> **TL;DR:** La instalación estándar de una herramienta CLI de Python son 7 pasos y 15+ minutos: versión de Python, venv, pip install, extras incorrectos, confusión de PATH. pydantic-deep v0.3.6 soluciona esto con un instalador de un comando: `curl -fsSL https://raw.githubusercontent.com/vstorm-co/pydantic-deep/main/install.sh | bash`. El script detecta uv automáticamente, lo instala si falta, ejecuta `uv tool install "pydantic-deep[cli]"` y verifica el PATH. `pydantic-deep update` gestiona las actualizaciones. Las notificaciones de actualización al inicio revisan PyPI con un timeout de 2 segundos y caché de 24 horas — nunca bloquean el inicio.
+
+Así es como se instalan hoy la mayoría de las herramientas de IA en Python:
+
+1. Instalar Python. (¿Qué versión? ¿3.10? ¿3.11? ¿3.12? Revisar el README. El README dice "Python 3.8+." Eso no ayuda.)
+2. Crear un entorno virtual.
+3. Activarlo. (Cada vez.)
+4. `pip install tool-name` — esperar las dependencias.
+5. Ejecutar la herramienta. Obtener `ModuleNotFoundError: No module named 'textual'`.
+6. `pip install tool-name[cli]` — los extras estaban en un corchete separado.
+7. Intentar de nuevo. Ahora funciona.
+
+Siete pasos. Quince minutos mínimo. Para una primera impresión.
+
+Esta es la experiencia de instalación estándar de herramientas CLI de Python, y es una barrera real.
+
+Decidimos arreglar esto para [pydantic-deep](https://github.com/vstorm-co/pydantic-deep) — the modular agent runtime for Python.
+
+---
+
+*Soy Kacper Włodarczyk, cofundador de [Vstorm](https://vstorm.co) — una consultoría de Ingeniería de IA Agéntica Aplicada. Hemos desplegado más de 30 agentes de IA en producción. pydantic-deep es nuestro agente de coding de código abierto.*
+
+---
+
+## Un Comando
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/vstorm-co/pydantic-deep/main/install.sh | bash
+```
+
+Eso es toda la instalación. Sin gestión de versiones de Python. Sin entornos virtuales. Sin corchetes de extras.
+
+## Lo Que Hace install.sh Realmente
+
+**Paso 1: Detectar uv**
+
+[`uv`](https://github.com/astral-sh/uv) es un gestor de paquetes de Python de Astral que gestiona entornos virtuales, instalaciones de herramientas y versiones de Python de forma transparente. Si tienes uv, el script lo usa inmediatamente. Si no, instala uv mediante el instalador oficial de Astral.
+
+```bash
+if command -v uv &> /dev/null; then
+    echo "uv found, using existing installation"
+else
+    echo "Installing uv..."
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+fi
+```
+
+**Paso 2: Instalar pydantic-deep como herramienta uv**
+
+```bash
+uv tool install "pydantic-deep[cli]"
+```
+
+`uv tool install` crea un entorno aislado para la herramienta y hace que el binario esté disponible globalmente. Sin activación necesaria. El grupo de extras `[cli]` incluye todo lo necesario para ejecutar la TUI completa — incluyendo `textual`.
+
+**Paso 3: Verificar y guiar**
+
+El script ejecuta `pydantic-deep --version` para verificar el éxito. Si el binario no está en PATH, imprime exactamente qué añadir a la configuración del shell.
+
+## El Bug de textual Que Empezó Todo
+
+Antes de v0.3.6, la instalación estándar era `pip install pydantic-deep`. Luego empezamos a recibir informes de `ModuleNotFoundError: No module named 'textual'` en instalaciones frescas.
+
+El problema: `textual` estaba en el grupo de extras `tui`, pero la mayoría de los usuarios no especificaban ningún extra. Movimos `textual` al grupo `cli`.
+
+## Auto-actualización: `pydantic-deep update`
+
+Actualizar es:
+
+```bash
+pydantic-deep update
+```
+
+Esto es `brew upgrade` para agentes de IA. Internamente:
+- Si uv está disponible: ejecuta `uv tool upgrade pydantic-deep`
+- Si no: alternativa a `pip install --upgrade "pydantic-deep[cli]"`
+
+## Notificaciones de Actualización al Inicio
+
+Cada vez que pydantic-deep se inicia, revisa silenciosamente PyPI:
+
+```
+pydantic-deep v0.3.6
+Update available: v0.3.6 → v0.3.7  Run: pydantic-deep update
+```
+
+- Timeout de 2 segundos — nunca bloquea el inicio
+- Resultados almacenados en caché en `~/.pydantic-deep/update_check.json` por 24 horas
+- Implementado con `urllib` y threading — cero dependencias adicionales
+
+## ¿Por Qué uv?
+
+Evaluamos pipx (más lento, requiere instalación separada), Homebrew (overhead de mantenimiento), binarios nativos (demasiado frágiles por imports dinámicos) y uv.
+
+Elegimos uv por: velocidad, `uv tool` diseñado exactamente para este caso de uso, gestión transparente de versiones de Python.
+
+## Conclusiones Clave
+
+- **La instalación estándar de CLI de Python es una barrera** — gestión de venv, problemas de PATH, extras incorrectos.
+- **install.sh lo gestiona todo**: detección de uv, instalación si falta, `pydantic-deep[cli]`, verificación de PATH.
+- **`pydantic-deep update`** es un comando para mantenerse actualizado.
+- **Las notificaciones de inicio** revisan PyPI pasivamente con timeout de 2 segundos y caché de 24 horas.
+- **textual** ahora está correctamente en los extras `cli`.
+
+---
+
+## Pruébalo
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/vstorm-co/pydantic-deep/main/install.sh | bash
+
+# Más tarde, para actualizar:
+pydantic-deep update
+```
+
+GitHub: [github.com/vstorm-co/pydantic-deep](https://github.com/vstorm-co/pydantic-deep) | Portal OSS: [oss.vstorm.co](https://oss.vstorm.co)
+
+¿Cuál ha sido tu peor experiencia de instalación con una herramienta de Python AI/ML?
+
+---
+
+*Vstorm construye sistemas de agentes de IA en producción. [vstorm.co](https://vstorm.co)*
