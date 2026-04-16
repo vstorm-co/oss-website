@@ -1,0 +1,124 @@
+---
+title: "Agenci AI w sandboxie: Docker + integracja z CI/CD w pydantic-deep"
+description: "Jak flaga --sandbox docker w pydantic-deep uruchamia operacje agenta wewnątrz kontenera Docker, nazwane przestrzenie robocze do trwałych środowisk i headless runner do pipeline'ów CI/CD."
+pubDate: 2026-04-16
+updatedDate: 2026-04-16
+author: "Kacper Włodarczyk"
+lang: pl
+translationKey: ai-agents-docker-sandbox-ci-cd-pydantic-deep
+tags: ["pydantic-ai", "python", "ai-agents", "docker", "devops"]
+category: tutorial
+draft: false
+---
+
+> **TL;DR:** pydantic-deep v0.3.5 wprowadza `--sandbox docker` — flagę, która pozostawia interfejs agenta w terminalu, podczas gdy wszystkie operacje na plikach i komendy powłoki wykonywane są wewnątrz kontenera Docker z projektem zamontowanym w `/workspace`. Nazwane przestrzenie robocze (`--workspace <name>`) zapewniają trwałe środowiska Docker między sesjami. Headless runner (`pydantic-deep run`) dodaje `--json`, `--max-turns` i `--timeout` do integracji z CI/CD. Żadnego Dockerfile do pisania. Kontener czyszczony automatycznie po zakończeniu.
+
+W środę skróciliśmy instalację do jednej komendy. Teraz porozmawiajmy o tym, gdzie agent faktycznie działa.
+
+Gdy uruchamiasz agenta AI lokalnie, ma pełny dostęp do środowiska hosta. Może modyfikować pliki, instalować pakiety, zmieniać konfigurację systemu. W development to jest w porządku — chcesz, żeby agent miał dostęp. Ale w CI/CD lub przy uruchamianiu niezaufanych zadań to problem.
+
+pydantic-deep v0.3.5 — modularne środowisko uruchomieniowe agentów dla Pythona — wprowadza tryb Docker sandbox. Oto co zbudowaliśmy, dlaczego w taki sposób i jak używać tego w prawdziwym pipeline'ie CI/CD.
+
+## Dlaczego izolacja wykonania ma znaczenie
+
+Ryzyko z agentami na hoście jest subtelne. Nie chodzi o to, że agent zrobi coś złośliwego — chodzi o to, że może zrobić rzeczy, których nie zamierzałeś. Zainstalować pakiet, który koliduje z zależnościami projektu. Zmodyfikować plik konfiguracyjny podczas debugowania. Zostawić stan, który psuje kolejny pipeline.
+
+Rozwiązaniem jest izolacja. Agent powinien widzieć projekt, ale jego efekty uboczne nie powinny wyciekać na host.
+
+## Architektura Docker Sandbox
+
+W pydantic-deep flaga `--sandbox docker` zmienia miejsce wykonania, a nie miejsce interfejsu.
+
+- TUI i headless runner pozostają w terminalu jak normalnie
+- Operacje na plikach (`read_file`, `write_file`, `list_dir`) wykonywane są wewnątrz kontenera
+- Komendy powłoki (`run_command`) wykonywane są wewnątrz kontenera
+- Katalog projektu zamontowany w `/workspace` (odczyt-zapis)
+
+```bash
+pydantic-deep run "analyze this codebase and suggest improvements" \
+  --sandbox docker
+```
+
+Żadnego Dockerfile do pisania. Żadnego ręcznego `docker run`. Konfiguruj obraz sandbox w `.pydantic-deep/config.toml`:
+
+```toml
+[sandbox]
+sandbox = "docker"
+sandbox_image = "python:3.12-slim"
+```
+
+## Nazwane przestrzenie robocze: trwałe środowiska Docker
+
+Nazwane przestrzenie robocze rozwiązują problem stanu — pakiety zainstalowane wewnątrz przetrwają między sesjami:
+
+```bash
+pydantic-deep tui --workspace ml-env
+# zainstalowane pakiety przetrwają między sesjami
+# wiele wątków może dzielić ten sam workspace
+```
+
+`--workspace <name>` automatycznie implikuje `--sandbox docker` — nie potrzebujesz obu flag.
+
+Zarządzanie przestrzeniami roboczymi:
+
+```bash
+# Wszystkie workspaces ze statusem, obrazem, datą utworzenia
+pydantic-deep sandbox list
+
+# Zatrzymaj konkretny workspace
+pydantic-deep sandbox stop ml-env
+
+# Zatrzymaj i usuń wszystkie workspaces projektu
+pydantic-deep sandbox stop all --rm
+```
+
+## Headless Runner do CI/CD
+
+```bash
+pydantic-deep run "run all tests and fix failures" \
+  --sandbox docker \
+  --max-turns 50 \
+  --timeout 300 \
+  --json
+```
+
+Kluczowe flagi CI/CD:
+
+| Flaga | Cel |
+|-------|-----|
+| `--json` | Wyjście do odczytu maszynowego dla pipeline'ów |
+| `--max-turns` | Limit iteracji agenta (zapobiega niekontrolowanym kosztom) |
+| `--timeout` | Limit czasu wall-clock w sekundach |
+| `--model` | Nadpisanie modelu dla konkretnego uruchomienia |
+| `--working-dir` | Jawny katalog roboczy |
+| `--no-subagents` | Wyłączenie subagentów dla deterministycznych uruchomień |
+
+pydantic-deep usuwa domyślny limit 50 requestów pydantic-ai, żeby długie zadania CI nie zawodziły cicho. Kontrolujesz limity jawnie przez `--max-turns` i `--timeout`.
+
+## Harbor Adapter: Benchmarki i ewaluacja
+
+Dla zespołów prowadzących systematyczne ewaluacje, pydantic-deep v0.3.5 wprowadza adapter Terminal Bench / Harbor:
+
+```bash
+# Konkretna wersja git dla reprodukowalnych ewaluacji
+PYDANTIC_DEEP_GIT_REF=v0.3.5 harbor run benchmark-suite
+```
+
+## Wymagania
+
+```bash
+pip install 'pydantic-ai-backend[docker]'
+```
+
+## Kluczowe wnioski
+
+- `--sandbox docker` uruchamia operacje plikowe i powłoki wewnątrz kontenera Docker, z projektem w `/workspace`
+- Nazwane przestrzenie robocze (`--workspace <name>`) utrwalają zainstalowane pakiety i stan między sesjami
+- Headless runner (`pydantic-deep run`) jest natywny dla CI/CD: `--json`, `--max-turns`, `--timeout`, pełna paryteria flag z TUI
+- Zarządzanie przestrzeniami roboczymi (`pydantic-deep sandbox list/stop`) daje widoczność i kontrolę
+- Wymaga `pip install 'pydantic-ai-backend[docker]'`
+
+---
+
+GitHub: https://github.com/vstorm-co/pydantic-deep
+OSS Portal: https://oss.vstorm.co
