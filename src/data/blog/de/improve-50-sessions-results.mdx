@@ -1,5 +1,5 @@
 ---
-title: "Wir haben /improve auf 50 Sitzungen ausgeführt — das hat es gefunden"
+title: "Wir haben /improve auf 50 Sitzungen ausgeführt, das hat es gefunden"
 seoTitle: "KI-Agent Selbstverbesserung: Ergebnisse aus 50 Sitzungen mit /improve"
 description: "Wir haben 50 echte Agent-Sitzungen mit der /improve-Pipeline von pydantic-deep analysiert. 180+ extrahierte Insights, 7 Typen, automatische MEMORY.md-Updates. Hier sind die Ergebnisse."
 pubDate: 2026-04-17
@@ -12,23 +12,23 @@ category: open-source
 draft: false
 ---
 
-> **TL;DR:** Wir haben die `/improve`-Pipeline von pydantic-deep auf 50 echten Entwicklungssitzungen (~3.200 Nachrichten, 7 Tage) ausgeführt und 180+ strukturierte Insights in 7 Typen extrahiert. AgentLearning-Insights (Build-Befehle, Dateipfade, Tool-Chains) dominierten mit 45%, gefolgt von Pattern (20%) und Failure (15%). Die Pipeline schlug 18 Änderungen an Kontextdateien mit kalibrierten Konfidenzwerten vor — MEMORY.md wurde von leer zu einer strukturierten Wissensbasis mit Benutzerpräferenzen, Build-Befehlen, Projektarchitektur und effektiven Debugging-Mustern.
+> **TL;DR:** Wir haben die `/improve`-Pipeline von pydantic-deep auf 50 echten Entwicklungssitzungen (~3.200 Nachrichten, 7 Tage) ausgeführt und 180+ strukturierte Insights in 7 Typen extrahiert. AgentLearning-Insights (Build-Befehle, Dateipfade, Tool-Chains) dominierten mit 45%, gefolgt von Pattern (20%) und Failure (15%). Die Pipeline schlug 18 Änderungen an Kontextdateien mit kalibrierten Konfidenzwerten vor, MEMORY.md wurde von leer zu einer strukturierten Wissensbasis mit Benutzerpräferenzen, Build-Befehlen, Projektarchitektur und effektiven Debugging-Mustern.
 
-Montag — das Problem: KI-Agenten wiederholen dieselben Fehler, weil jede Sitzung bei null beginnt.
+Montag, das Problem: KI-Agenten wiederholen dieselben Fehler, weil jede Sitzung bei null beginnt.
 
-Mittwoch — die Architektur: eine 4-stufige Pipeline (Discovery, Extraction, Raw Traces, Synthesis), die 7 Typen strukturierter Insights aus rohen Sitzungsdaten extrahiert.
+Mittwoch, die Architektur: eine 4-stufige Pipeline (Discovery, Extraction, Raw Traces, Synthesis), die 7 Typen strukturierter Insights aus rohen Sitzungsdaten extrahiert.
 
-Heute — die Daten.
+Heute, die Daten.
 
-Wir haben `/improve` auf 50 echten Entwicklungssitzungen von [pydantic-deep](https://github.com/vstorm-co/pydantic-deep) ausgeführt — etwa 3.200 Nachrichten verteilt über 7 Tage aktiver Entwicklung. Kein Cherry-Picking, keine synthetischen Daten. Nur die rohe Ausgabe dessen, was eine Pipeline zur Selbstverbesserung findet, wenn man sie auf echte Arbeit richtet.
+Wir haben `/improve` auf 50 echten Entwicklungssitzungen von [pydantic-deep](https://github.com/vstorm-co/pydantic-deep) ausgeführt, etwa 3.200 Nachrichten verteilt über 7 Tage aktiver Entwicklung. Kein Cherry-Picking, keine synthetischen Daten. Nur die rohe Ausgabe dessen, was eine Pipeline zur Selbstverbesserung findet, wenn man sie auf echte Arbeit richtet.
 
 ## TL;DR
 
-- **180+ Insights aus 50 Sitzungen** — automatisch aus rohen Sitzungstranskripten extrahiert, null manuelle Analyse.
-- **AgentLearning dominiert mit 45%** — Build-Befehle, Dateipfade, Tool-Chains. Das alltägliche Wissen, das die häufigsten wiederholten Fehler verhindert.
-- **MEMORY.md: von leer zu nützlich** — die Pipeline baute eine strukturierte Wissensbasis auf.
-- **Konfidenzwerte sind kalibriert** — SOUL.md-Vorschläge durchschnittlich 0,88, MEMORY.md 0,82, AGENTS.md 0,78.
-- **50 Sitzungen reichen** — man braucht keine tausend Sitzungen für verwertbare Ergebnisse.
+- **180+ Insights aus 50 Sitzungen**, automatisch aus rohen Sitzungstranskripten extrahiert, null manuelle Analyse.
+- **AgentLearning dominiert mit 45%**, Build-Befehle, Dateipfade, Tool-Chains. Das alltägliche Wissen, das die häufigsten wiederholten Fehler verhindert.
+- **MEMORY.md: von leer zu nützlich**, die Pipeline baute eine strukturierte Wissensbasis auf.
+- **Konfidenzwerte sind kalibriert**, SOUL.md-Vorschläge durchschnittlich 0,88, MEMORY.md 0,82, AGENTS.md 0,78.
+- **50 Sitzungen reichen**, man braucht keine tausend Sitzungen für verwertbare Ergebnisse.
 
 ## Das Setup
 
@@ -37,7 +37,7 @@ Die Sitzungen umfassten drei Arbeitstypen:
 - **Feature-Implementierungen** (~20 Sitzungen, durchschn. 80 Nachrichten)
 - **Refactoring-Sitzungen** (~15 Sitzungen, durchschn. 30 Nachrichten)
 
-Wir haben `ImprovementAnalyzer` mit Standardeinstellungen ausgeführt — letzte 7 Tage, alle Sitzungstypen, Konfidenzschwelle bei 0,7:
+Wir haben `ImprovementAnalyzer` mit Standardeinstellungen ausgeführt, letzte 7 Tage, alle Sitzungstypen, Konfidenzschwelle bei 0,7:
 
 ```python
 from pydantic_deep.improve.analyzer import ImprovementAnalyzer
@@ -67,13 +67,13 @@ Die Pipeline verarbeitete alle 50 Sitzungen in etwa 4 Minuten. Hier ist, was zur
 
 Die Aufschlüsselung aller 180+ extrahierten Insights:
 
-- **AgentLearning: 45%** — entdeckte Verhaltensweisen, Dateipfade, Build-Befehle, Tool-Chains
-- **Pattern: 20%** — wiederkehrende Sequenzen von Tool-Aufrufen
-- **Failure: 15%** — Fehler mit Grundursachen und Lösungen
-- **UserFact: 10%** — Fakten über den Benutzer (Sprache, Rolle, Präferenzen)
-- **Preference + Context + Decision: 10%** — Stilpräferenzen, Architekturfakten, wichtige Entscheidungen
+- **AgentLearning: 45%**, entdeckte Verhaltensweisen, Dateipfade, Build-Befehle, Tool-Chains
+- **Pattern: 20%**, wiederkehrende Sequenzen von Tool-Aufrufen
+- **Failure: 15%**, Fehler mit Grundursachen und Lösungen
+- **UserFact: 10%**, Fakten über den Benutzer (Sprache, Rolle, Präferenzen)
+- **Preference + Context + Decision: 10%**, Stilpräferenzen, Architekturfakten, wichtige Entscheidungen
 
-Dass AgentLearning mit 45% dominiert, ist logisch. Das meiste, was ein Agent "lernen" muss, ist praktisches Wissen über seine Umgebung — welche Befehle funktionieren, wo Dateien liegen, was das Build-System erwartet.
+Dass AgentLearning mit 45% dominiert, ist logisch. Das meiste, was ein Agent "lernen" muss, ist praktisches Wissen über seine Umgebung, welche Befehle funktionieren, wo Dateien liegen, was das Build-System erwartet.
 
 ## Beispiele pro Sitzung
 
@@ -102,7 +102,7 @@ description: "read → edit → run tests → fix → run tests"
 frequency: 4
 ```
 
-Dieser FailureInsight ist der entscheidende Fund. Der Agent verschwendete 3 Versuche mit direktem `pytest`, bevor er entdeckte, dass das Projekt `uv` verwendet. Ohne `/improve` würde er das in der nächsten Sitzung wiederholen. Mit `/improve` wird der Build-Befehl in AGENTS.md geschrieben — dauerhaft.
+Dieser FailureInsight ist der entscheidende Fund. Der Agent verschwendete 3 Versuche mit direktem `pytest`, bevor er entdeckte, dass das Projekt `uv` verwendet. Ohne `/improve` würde er das in der nächsten Sitzung wiederholen. Mit `/improve` wird der Build-Befehl in AGENTS.md geschrieben, dauerhaft.
 
 ### Sitzung 2: Feature-Implementierung (80 Nachrichten)
 
@@ -129,7 +129,7 @@ category: architecture
 confidence: 0.9
 ```
 
-Der PreferenceInsight ist interessant. Der Agent beobachtete, dass der Benutzer Dict-basierte Ansätze zweimal ablehnte — nicht einmal, was Zufall sein könnte, sondern zweimal in verschiedenen Teilen der Codebasis. Das ist genug Signal, um es als Präferenz zu kodieren.
+Der PreferenceInsight ist interessant. Der Agent beobachtete, dass der Benutzer Dict-basierte Ansätze zweimal ablehnte, nicht einmal, was Zufall sein könnte, sondern zweimal in verschiedenen Teilen der Codebasis. Das ist genug Signal, um es als Präferenz zu kodieren.
 
 ### Sitzung 3: Refactoring (30 Nachrichten)
 
@@ -182,7 +182,7 @@ Der echte Gewinn zeigt sich bei MEMORY.md.
 - When debugging: check error message first, then trace to source
 ```
 
-Das ist strukturiert, umsetzbar und sofort nützlich. Jede zukünftige Sitzung startet mit diesem Kontext statt mit einem leeren Blatt. Der Agent kennt die Build-Befehle, die Sprache des Benutzers, die Projektarchitektur und die effektiven Debugging-Muster — alles automatisch aus rohen Sitzungstranskripten extrahiert.
+Das ist strukturiert, umsetzbar und sofort nützlich. Jede zukünftige Sitzung startet mit diesem Kontext statt mit einem leeren Blatt. Der Agent kennt die Build-Befehle, die Sprache des Benutzers, die Projektarchitektur und die effektiven Debugging-Muster, alles automatisch aus rohen Sitzungstranskripten extrahiert.
 
 ## Was die Konfidenzwerte verraten
 
@@ -202,19 +202,19 @@ Der 45%-Anteil von AgentLearning ist kein Zufall. Die meisten Agenten-Fehler sin
 - Falscher Import-Stil
 - Falscher Test-Framework-Aufruf
 
-Genau das erfasst AgentLearningInsight — praktisches, umgebungsspezifisches Wissen, das für einen Menschen trivial ist, aber für einen Agenten, der bei null beginnt, unsichtbar.
+Genau das erfasst AgentLearningInsight, praktisches, umgebungsspezifisches Wissen, das für einen Menschen trivial ist, aber für einen Agenten, der bei null beginnt, unsichtbar.
 
-PatternInsight mit 20% ist die zweitgrößte Kategorie, weil Agenten Gewohnheiten entwickeln. Der Zyklus "read → edit → test → fix → test" erschien in 4 von 15 Bug-Fix-Sitzungen. Das ist kein Rauschen — das ist ein Workflow, den der Agent als wirksam für diese Codebasis entdeckt hat.
+PatternInsight mit 20% ist die zweitgrößte Kategorie, weil Agenten Gewohnheiten entwickeln. Der Zyklus "read → edit → test → fix → test" erschien in 4 von 15 Bug-Fix-Sitzungen. Das ist kein Rauschen, das ist ein Workflow, den der Agent als wirksam für diese Codebasis entdeckt hat.
 
 ## Wichtige Erkenntnisse
 
 **1. Agenten akkumulieren schnell praktisches Wissen.** 50 Sitzungen reichten für ein umfassendes MEMORY.md.
 
-**2. Das meiste "Lernen" ist langweilig und nützlich.** Build-Befehle und Dateipfade — die alltäglichen Dinge, die echte Reibung verursachen.
+**2. Das meiste "Lernen" ist langweilig und nützlich.** Build-Befehle und Dateipfade, die alltäglichen Dinge, die echte Reibung verursachen.
 
 **3. Konfidenzwerte sind gut kalibriert.** Die Pipeline übertreibt nicht.
 
-**4. Das System findet Dinge, die Menschen nicht dokumentieren würden.** "Benutzer hat Dict-Ansatz zweimal abgelehnt" — das schreibt kein Entwickler auf, aber es hilft dem Agenten.
+**4. Das System findet Dinge, die Menschen nicht dokumentieren würden.** "Benutzer hat Dict-Ansatz zweimal abgelehnt", das schreibt kein Entwickler auf, aber es hilft dem Agenten.
 
 **5. 50 Sitzungen genügen.** Der Grenznutzen zusätzlicher Sitzungen sinkt schnell für MEMORY.md, wächst aber für PatternInsight und PreferenceInsight.
 
@@ -252,7 +252,7 @@ Das Review-Modal im TUI erlaubt es, jede vorgeschlagene Änderung zu akzeptieren
 
 ---
 
-Das schließt die /improve-Serie ab. Das Problem (Montag), die Architektur (Mittwoch) und jetzt die Daten (heute). Nächste Woche — mehr aus dem pydantic-deep-Ökosystem: Checkpointing, Agent-Teams und die Produktionsinfrastruktur.
+Das schließt die /improve-Serie ab. Das Problem (Montag), die Architektur (Mittwoch) und jetzt die Daten (heute). Nächste Woche, mehr aus dem pydantic-deep-Ökosystem: Checkpointing, Agent-Teams und die Produktionsinfrastruktur.
 
 **GitHub:** [github.com/vstorm-co/pydantic-deep](https://github.com/vstorm-co/pydantic-deep)
 **Vstorm OSS:** [oss.vstorm.co](https://oss.vstorm.co)

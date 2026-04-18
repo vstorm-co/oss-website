@@ -1,0 +1,109 @@
+---
+title: "Observabilidad completa en agentes de IA: lo que añadimos al TUI de pydantic-deep"
+description: "pydantic-deep v0.3.5 añade seguimiento de tokens por turno, visualización del pensamiento en vivo, encabezado de costo acumulado y panel lateral con estado de subagentes."
+pubDate: 2026-04-18
+updatedDate: 2026-04-18
+author: "Kacper Włodarczyk"
+lang: es
+translationKey: ai-agent-tui-observability-pydantic-deep
+tags: ["pydantic-ai", "python", "ai-agents", "open-source", "developer-tools"]
+category: article
+draft: false
+---
+
+> Esta semana cubrí cómo pydantic-deep maneja los [bucles atascados](https://oss.vstorm.co/blog/stuck-loop-detection-ai-agents-pydantic-deep/), la [ceguera de la ventana de contexto](https://oss.vstorm.co/blog/context-window-blindness-ai-agents-limit-warner/) y la instalación sin fricciones. Hoy: lo que realmente VES cuando todo eso funciona.
+
+*Kacper Włodarczyk, consultor de ingeniería de IA en Vstorm. Hemos implementado más de 30 sistemas de agentes de IA en producción. pydantic-deep es nuestro agente de codificación de IA de código abierto, el runtime modular de agentes para Python.*
+
+## El problema con los agentes invisibles
+
+Cuando un agente de IA ejecuta una tarea, suceden muchas cosas entre tu prompt y la respuesta. El modelo piensa. Llama a herramientas. Lee archivos, realiza búsquedas, actualiza tareas, delega a subagentes. Cada acción consume tokens. Cada respuesta cuesta dinero.
+
+Sin observabilidad, vuelas a ciegas.
+
+En v0.3.5 rediseñamos el TUI para hacer todo visible.
+
+## Lo que cambió
+
+### Uso de tokens por turno
+
+Cada respuesta del asistente ahora muestra un desglose de tokens directamente debajo:
+
+```
+in:2.1K · out:412 · total:2.5K · reqs:3
+```
+
+- `in`, tokens en la entrada (prompt + contexto)
+- `out`, tokens en la respuesta
+- `total`, suma para este turno
+- `reqs`, número de llamadas a la API en este turno
+
+### Costo acumulado en el encabezado
+
+La barra superior muestra totales acumulados después de cada respuesta:
+
+```
+pydantic-deep  in:45K out:3K · $0.12
+```
+
+Se actualiza en tiempo real.
+
+### Pensamiento transmitido en vivo, luego contraído
+
+Cuando un modelo razona antes de responder (Claude Extended Thinking, razonamiento estilo o3), ese contenido aparece en el TUI como texto atenuado, transmitido en vivo. Una vez completada la fase de razonamiento, se contrae a una línea de resumen.
+
+### Panel lateral visible por defecto
+
+Si tu terminal tiene ≥100 caracteres de ancho, el panel lateral se abre al inicio. Antes de que comience cualquier tarea, muestra los subagentes disponibles con su estado:
+
+```
+Subagents:
+• planner (idle)
+• research (idle)
+```
+
+### Todas las llamadas a herramientas visibles
+
+Las herramientas de todo (`read_todos`, `write_todos`, `add_todo`, `update_todo_status`, `remove_todo`) estaban ocultas anteriormente. Ahora cada acción del agente es visible.
+
+### Sesión guardada incluso en caso de fallo
+
+`_save_session()` está ahora en un bloque `finally`. Lo que sea que ocurra, fallo, excepción, interrupción de teclado, `messages.json` se escribe en el disco.
+
+### Logs de subagentes: 20K caracteres (era 2K)
+
+`tool_log.jsonl` ahora almacena hasta 20K caracteres para los resultados de tareas de subagentes. Crítico para `/improve`, el pipeline que extrae aprendizajes de las sesiones.
+
+## El diseño completo del TUI
+
+```
+┌─────────────────────────────────┬──────────────────┐
+│ pydantic-deep  in:45K out:3K · $0.12               │
+├─────────────────────────────────┼──────────────────┤
+│ [thinking... atenuado]          │ Subagents:       │
+│ [contraído a resumen]           │ • planner (idle) │
+│                                 │ • research (idle)│
+│ Respuesta del agente aquí...    │                  │
+│ in:2.1K · out:412 · $0.04      │                  │
+└─────────────────────────────────┴──────────────────┘
+```
+
+## Conclusiones clave
+
+- El desglose de tokens por turno muestra exactamente dónde van los tokens
+- El costo en el encabezado se actualiza en tiempo real, para toda la sesión
+- El contenido del pensamiento se transmite como texto atenuado, se contrae al completarse
+- El panel lateral muestra el estado de los subagentes, responsivo al tamaño del terminal
+- Todas las llamadas a herramientas visibles, incluyendo herramientas de gestión de tareas
+- Sesión guardada en caso de fallo mediante bloque `finally`
+- Logs de subagentes de 20K caracteres para `/improve`
+
+## Pruébalo
+
+```bash
+curl -fsSL https://oss.vstorm.co/install.sh | bash
+```
+
+GitHub: [github.com/vstorm-co/pydantic-deep](https://github.com/vstorm-co/pydantic-deep)
+
+La observabilidad es cómo depuras, optimizas y confías en tu agente. ¿Cuál es la primera métrica que revisas al depurar una ejecución de agente?

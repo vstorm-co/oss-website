@@ -1,6 +1,6 @@
 ---
 title: "Automatización de Navegador + /improve: Agentes de IA que Navegan la Web y se Mejoran Solos"
-description: "BrowserCapability añade 9 herramientas Playwright a los agentes pydantic-deep. /improve extrae insights de sesión a MEMORY.md usando trazas de herramientas sin procesar — y por qué superan a los resúmenes en el aprendizaje de agentes."
+description: "BrowserCapability añade 9 herramientas Playwright a los agentes pydantic-deep. /improve extrae insights de sesión a MEMORY.md usando trazas de herramientas sin procesar, y por qué superan a los resúmenes en el aprendizaje de agentes."
 pubDate: 2026-04-17
 updatedDate: 2026-04-17
 author: "Kacper Włodarczyk"
@@ -11,7 +11,7 @@ category: tutorial
 draft: false
 ---
 
-> **TL;DR:** pydantic-deep v0.3.5 trae `BrowserCapability` — 9 herramientas Playwright (navigate, click, type_text, get_text, screenshot, scroll, go_back, go_forward, execute_js) con allowlist de dominios, diseño single-tab e intercepción automática de popups. v0.3.4 rediseña `/improve`: extrae `UserFactInsight` y `AgentLearningInsight` de trazas de herramientas sin procesar (no resúmenes) a MEMORY.md. Hallazgo clave: las trazas sin procesar superan significativamente a los resúmenes para producir aprendizajes accionables.
+> **TL;DR:** pydantic-deep v0.3.5 trae `BrowserCapability`, 9 herramientas Playwright (navigate, click, type_text, get_text, screenshot, scroll, go_back, go_forward, execute_js) con allowlist de dominios, diseño single-tab e intercepción automática de popups. v0.3.4 rediseña `/improve`: extrae `UserFactInsight` y `AgentLearningInsight` de trazas de herramientas sin procesar (no resúmenes) a MEMORY.md. Hallazgo clave: las trazas sin procesar superan significativamente a los resúmenes para producir aprendizajes accionables.
 
 pydantic-deep es el runtime modular de agentes para Python. Esta semana cubrí [StuckLoopDetection](/blog/stuck-loop-detection-ai-agents-pydantic-deep/) (lunes), [ceguera de ventana de contexto](/blog/context-window-limit-warner-bm25-pydantic-deep/) (martes), instalación con un comando (miércoles) y [Docker sandbox](/blog/ai-agents-docker-sandbox-ci-cd-pydantic-deep/) (jueves). Hoy: las dos características que completan el cuadro.
 
@@ -57,11 +57,11 @@ Cada herramienta devuelve un `BrowseResult`: `url`, `title`, `content`, `screens
 
 ### Diseño de Seguridad
 
-**Single-tab.** Una pestaña a la vez — decisión deliberada, no una limitación. Múltiples pestañas requerirían que el agente rastree el contexto de pestañas.
+**Single-tab.** Una pestaña a la vez, decisión deliberada, no una limitación. Múltiples pestañas requerirían que el agente rastree el contexto de pestañas.
 
 **Allowlist de dominios.** El agente solo puede navegar a dominios explícitamente permitidos. Los intentos de navegar a otro lugar devuelven un error.
 
-**Intercepción automática de popups.** Banners de cookies, diálogos de inicio de sesión, avisos de suscripción — interceptados automáticamente.
+**Intercepción automática de popups.** Banners de cookies, diálogos de inicio de sesión, avisos de suscripción, interceptados automáticamente.
 
 **Truncamiento de contenido.** El contenido de la página se trunca antes de pasarse al modelo.
 
@@ -88,15 +88,15 @@ pydantic-deep run "research competitors on GitHub" \
 
 ---
 
-## Parte 2: /improve — El Bucle de Automejora
+## Parte 2: /improve, El Bucle de Automejora
 
 ### Qué hace /improve
 
 Después de una sesión del agente, ejecuta `/improve` en la TUI. Analiza la sesión completa y extrae dos categorías de insights:
 
-**`UserFactInsight`** — lo que el agente aprendió sobre ti y tus preferencias.
+**`UserFactInsight`**, lo que el agente aprendió sobre ti y tus preferencias.
 
-**`AgentLearningInsight`** — patrones y estrategias que el agente descubrió.
+**`AgentLearningInsight`**, patrones y estrategias que el agente descubrió.
 
 Ambos tipos escriben en MEMORY.md, cargado al inicio de cada sesión posterior.
 
@@ -104,7 +104,7 @@ Ambos tipos escriben en MEMORY.md, cargado al inicio de cada sesión posterior.
 
 Comparamos dos entradas para el paso de síntesis:
 1. Resúmenes legibles por humanos de lo que sucedió
-2. Trazas de herramientas sin procesar — la secuencia real de llamadas a herramientas y respuestas
+2. Trazas de herramientas sin procesar, la secuencia real de llamadas a herramientas y respuestas
 
 Las trazas sin procesar funcionaron significativamente mejor. Los resúmenes pierden los patrones de fallo/recuperación que contienen la señal de aprendizaje real. `tool_log.jsonl` (escrito por sesión) captura la traza completa de herramientas. `/improve` lo lee directamente.
 
@@ -123,13 +123,13 @@ Después de esta semana, la pila de capacidades completa:
 
 ## Quieres esto en una aplicacion full-stack?
 
-Si quieres integrar las capacidades de pydantic-deep en una aplicacion de produccion — API, frontend, auth, deployment — mira el [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template). De cero a aplicacion de IA en produccion en 30 minutos: FastAPI + Next.js + 75+ opciones de configuracion.
+Si quieres integrar las capacidades de pydantic-deep en una aplicacion de produccion, API, frontend, auth, deployment, mira el [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template). De cero a aplicacion de IA en produccion en 30 minutos: FastAPI + Next.js + 75+ opciones de configuracion.
 
 ## Conclusiones Clave
 
 - BrowserCapability: 9 herramientas Playwright, `pip install 'pydantic-deep[browser]'`
 - Seguridad: single-tab, allowlist de dominios, intercepción de popups, truncamiento de contenido
-- Ciclo de vida del navegador via `wrap_run` — limpieza garantizada en éxito/fallo/cancelación
+- Ciclo de vida del navegador via `wrap_run`, limpieza garantizada en éxito/fallo/cancelación
 - /improve extrae `UserFactInsight` + `AgentLearningInsight` → MEMORY.md
 - Las trazas de herramientas sin procesar (no resúmenes) son la entrada correcta para síntesis de sesión
 - Combina navegador + /improve: agente investiga y recuerda lo que encontró

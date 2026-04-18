@@ -1,7 +1,7 @@
 ---
 title: "Browser Automation + /improve: AI Agents That Browse the Web and Fix Themselves"
 seoTitle: "AI Agents Browser Automation + Self-Improvement with pydantic-deep"
-description: "BrowserCapability adds 9 Playwright tools to pydantic-deep agents. /improve extracts session insights to MEMORY.md using raw tool traces — and why raw traces outperform summaries for agent learning."
+description: "BrowserCapability adds 9 Playwright tools to pydantic-deep agents. /improve extracts session insights to MEMORY.md using raw tool traces, and why raw traces outperform summaries for agent learning."
 pubDate: 2026-04-17
 updatedDate: 2026-04-17
 author: "Kacper Włodarczyk"
@@ -12,11 +12,15 @@ category: tutorial
 draft: false
 ---
 
-> **TL;DR:** pydantic-deep v0.3.5 ships `BrowserCapability` — 9 Playwright tools (navigate, click, type_text, get_text, screenshot, scroll, go_back, go_forward, execute_js) with domain allowlist, single-tab design, and automatic popup interception. v0.3.4 redesigns `/improve`: extracts `UserFactInsight` and `AgentLearningInsight` from raw tool traces (not summaries) into MEMORY.md. Key finding: raw traces significantly outperform summaries for producing actionable agent learnings.
+> **TL;DR:** pydantic-deep v0.3.5 ships `BrowserCapability`, 9 Playwright tools (navigate, click, type_text, get_text, screenshot, scroll, go_back, go_forward, execute_js) with domain allowlist, single-tab design, and automatic popup interception. v0.3.4 redesigns `/improve`: extracts `UserFactInsight` and `AgentLearningInsight` from raw tool traces (not summaries) into MEMORY.md. Key finding: raw traces significantly outperform summaries for producing actionable agent learnings.
 
-This week I covered [StuckLoopDetection](/blog/stuck-loop-detection-ai-agents-pydantic-deep/) (Monday), [context window blindness](/blog/context-window-limit-warner-bm25-pydantic-deep/) (Tuesday), one-command install (Wednesday), and [Docker sandbox](/blog/ai-agents-docker-sandbox-ci-cd-pydantic-deep/) (Thursday). Today: the two features that complete the picture.
+For three months my AI agent searched GitHub for the wrong query every single session.
 
-pydantic-deep is the modular agent runtime for Python. An agent that can't see the web is limited to what it already knows and what's in your codebase. An agent that doesn't learn from its sessions resets to zero every run. Both limitations are solvable — and in pydantic-deep v0.3.5 and v0.3.4, we solved them.
+Search "pydantic", zero results. Search "pydantic-ai", forty-seven results. Click the right repo. Every session, same wasted first query, because the agent forgot the lesson at session end.
+
+This week I shipped the fix in pydantic-deep v0.3.4, along with browser automation in v0.3.5. Combined with [StuckLoopDetection](/blog/stuck-loop-detection-ai-agents-pydantic-deep/), [context window warnings](/blog/context-window-limit-warner-bm25-pydantic-deep/), [curl install](/blog/ai-agent-install-curl-bash-pydantic-deep/), and [Docker sandbox](/blog/ai-agents-docker-sandbox-ci-cd-pydantic-deep/) shipped earlier this week, the two together changed what an AI agent actually is for me.
+
+pydantic-deep is the modular agent runtime for Python. An agent that can't see the web is limited to what it already knows and what's in your codebase. An agent that doesn't learn from its sessions resets to zero every run. Both limitations are solvable, and in pydantic-deep v0.3.5 and v0.3.4, we solved them.
 
 ---
 
@@ -60,17 +64,17 @@ Every tool returns a `BrowseResult`: `url`, `title`, `content`, `screenshot`, `e
 
 ### Safety Design
 
-**Single-tab.** One tab at a time — deliberate, not a limitation. Multiple tabs would require the agent to track tab context, adding state complexity and failure modes.
+**Single-tab.** One tab at a time, deliberate, not a limitation. Multiple tabs would require the agent to track tab context, adding state complexity and failure modes.
 
 **Domain allowlist.** The agent can only navigate to explicitly allowed domains. Attempts to navigate elsewhere return an error.
 
-**Automatic popup interception.** Cookie banners, login dialogs, subscription prompts — intercepted automatically.
+**Automatic popup interception.** Cookie banners, login dialogs, subscription prompts, intercepted automatically.
 
 **Content truncation.** Page content is truncated before being passed to the model, preventing context overflow from large pages.
 
 ### Browser Lifecycle
 
-The browser doesn't start lazily on first `navigate` — it starts before the agent run and is guaranteed to close after it ends:
+The browser doesn't start lazily on first `navigate`, it starts before the agent run and is guaranteed to close after it ends:
 
 ```python
 # Lifecycle via wrap_run pattern:
@@ -95,35 +99,35 @@ pydantic-deep run "research competitors on GitHub" \
 
 ### Bug Fix: No Approval Dialogs
 
-Browser tools now force `kind='function'` in `prepare_tools` — they're always treated as regular tool calls, never as actions requiring human confirmation. An approval dialog on a `screenshot()` call mid-task breaks automation entirely.
+Browser tools now force `kind='function'` in `prepare_tools`, they're always treated as regular tool calls, never as actions requiring human confirmation. An approval dialog on a `screenshot()` call mid-task breaks automation entirely.
 
 ### Use Cases
 
-**Research tasks:** Navigate, read, extract — without pre-fetching anything manually.
+**Research tasks:** Navigate, read, extract, without pre-fetching anything manually.
 
 **Competitor monitoring:** Check pricing pages, changelogs, star counts. Combine with `/improve` and the agent builds memory of what it found last time.
 
 **Documentation lookups:** Read the actual current docs, not training data. Especially useful when working with libraries that change frequently.
 
-**UI testing:** Interact with your app like a user. `click`, `type_text`, `screenshot` — the basics of any E2E flow.
+**UI testing:** Interact with your app like a user. `click`, `type_text`, `screenshot`, the basics of any E2E flow.
 
-**JS-dependent scraping:** `execute_js("document.querySelectorAll('.price').map(e => e.textContent)")` — for data that only exists after JavaScript renders it.
+**JS-dependent scraping:** `execute_js("document.querySelectorAll('.price').map(e => e.textContent)")`, for data that only exists after JavaScript renders it.
 
 ---
 
-## Part 2: /improve — The Self-Improvement Loop
+## Part 2: /improve, The Self-Improvement Loop
 
 ### What /improve Does
 
 After an agent session, run `/improve` in the TUI. It analyzes the full session and extracts two categories of insights:
 
-**`UserFactInsight`** — what the agent learned about you and your preferences:
+**`UserFactInsight`**, what the agent learned about you and your preferences:
 - Code style preferences
 - Preferred output formats
 - Domain-specific terminology
 - Patterns in the kinds of tasks you give it
 
-**`AgentLearningInsight`** — patterns and strategies the agent discovered:
+**`AgentLearningInsight`**, patterns and strategies the agent discovered:
 - Approaches that worked for your codebase
 - Effective tool call sequences
 - Failure modes encountered and how they were recovered
@@ -137,9 +141,9 @@ This was the key insight from our internal evaluation:
 
 When building the /improve pipeline, we compared two inputs to the synthesis step:
 1. Human-readable summaries of what happened
-2. Raw tool traces — the actual sequence of tool calls and responses
+2. Raw tool traces, the actual sequence of tool calls and responses
 
-Raw traces performed significantly better. Summaries lose the failure/recovery patterns that contain the actual learning signal. "The agent tried X, failed, then tried Y, which worked" becomes "the agent solved the problem" in a summary — but the learning is in the failure/recovery.
+Raw traces performed significantly better. Summaries lose the failure/recovery patterns that contain the actual learning signal. "The agent tried X, failed, then tried Y, which worked" becomes "the agent solved the problem" in a summary, but the learning is in the failure/recovery.
 
 The `tool_log.jsonl` file (written per session) captures the full tool trace. `/improve` reads this directly.
 
@@ -170,7 +174,7 @@ Agent starts with accumulated context
 - Wrong model being used
 - MEMORY.md path mismatch (writing to different location than where agent loaded from)
 
-Also: `/config` TUI command — view and edit `config.toml` without leaving the interface.
+Also: `/config` TUI command, view and edit `config.toml` without leaving the interface.
 
 ---
 
@@ -185,19 +189,19 @@ After this week, the full capability stack:
 5. Agent can browse the web (BrowserCapability)
 6. Agent learns from every session (/improve)
 
-An agent that browses the web and accumulates session insights is qualitatively different from one that doesn't. Not because the model changed — because the context of how it works with your specific codebase and preferences is growing.
+An agent that browses the web and accumulates session insights is qualitatively different from one that doesn't. Not because the model changed, because the context of how it works with your specific codebase and preferences is growing.
 
 ## Want This in a Full-Stack App?
 
-If you want to embed pydantic-deep's capabilities into a production application — API, frontend, auth, deployment — check the [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template). Zero to production AI app in 30 minutes: FastAPI + Next.js + 75+ configuration options.
+If you want to embed pydantic-deep's capabilities into a production application, API, frontend, auth, deployment, check the [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template). Zero to production AI app in 30 minutes: FastAPI + Next.js + 75+ configuration options.
 
 ## Key Takeaways
 
 - BrowserCapability: 9 Playwright tools, `pip install 'pydantic-deep[browser]'`
 - Safety: single-tab, domain allowlist, popup interception, content truncation
-- Browser lifecycle via `wrap_run` — guaranteed cleanup on success/failure/cancel
+- Browser lifecycle via `wrap_run`, guaranteed cleanup on success/failure/cancel
 - /improve extracts `UserFactInsight` + `AgentLearningInsight` → MEMORY.md
-- Raw tool traces (not summaries) are the right input for session synthesis — clearer, more specific, more actionable
+- Raw tool traces (not summaries) are the right input for session synthesis, clearer, more specific, more actionable
 - Combine browser + /improve: agent researches and remembers what it found
 
 ---

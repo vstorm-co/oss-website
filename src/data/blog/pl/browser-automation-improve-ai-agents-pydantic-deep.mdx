@@ -1,6 +1,6 @@
 ---
 title: "Automatyzacja przeglądarki + /improve: agenci AI, którzy przeglądają sieć i uczą się sami z siebie"
-description: "BrowserCapability dodaje 9 narzędzi Playwright do agentów pydantic-deep. /improve wyciąga wnioski z sesji do MEMORY.md używając surowych śladów narzędzi — i dlaczego surowe ślady przewyższają podsumowania w uczeniu agentów."
+description: "BrowserCapability dodaje 9 narzędzi Playwright do agentów pydantic-deep. /improve wyciąga wnioski z sesji do MEMORY.md używając surowych śladów narzędzi, i dlaczego surowe ślady przewyższają podsumowania w uczeniu agentów."
 pubDate: 2026-04-17
 updatedDate: 2026-04-17
 author: "Kacper Włodarczyk"
@@ -11,11 +11,11 @@ category: tutorial
 draft: false
 ---
 
-> **TL;DR:** pydantic-deep v0.3.5 wprowadza `BrowserCapability` — 9 narzędzi Playwright (navigate, click, type_text, get_text, screenshot, scroll, go_back, go_forward, execute_js) z allowlistą domen, projektem single-tab i automatycznym przechwytywaniem popupów. v0.3.4 przeprojektowuje `/improve`: wyciąga `UserFactInsight` i `AgentLearningInsight` z surowych śladów narzędzi (nie podsumowań) do MEMORY.md. Kluczowe odkrycie: surowe ślady znacznie przewyższają podsumowania w produkowaniu użytecznych wniosków.
+> **TL;DR:** pydantic-deep v0.3.5 wprowadza `BrowserCapability`, 9 narzędzi Playwright (navigate, click, type_text, get_text, screenshot, scroll, go_back, go_forward, execute_js) z allowlistą domen, projektem single-tab i automatycznym przechwytywaniem popupów. v0.3.4 przeprojektowuje `/improve`: wyciąga `UserFactInsight` i `AgentLearningInsight` z surowych śladów narzędzi (nie podsumowań) do MEMORY.md. Kluczowe odkrycie: surowe ślady znacznie przewyższają podsumowania w produkowaniu użytecznych wniosków.
 
 W tym tygodniu opisałem [StuckLoopDetection](/blog/stuck-loop-detection-ai-agents-pydantic-deep/) (poniedziałek), [ślepotę na okno kontekstu](/blog/context-window-limit-warner-bm25-pydantic-deep/) (wtorek), instalację jedną komendą (środa) i [Docker sandbox](/blog/ai-agents-docker-sandbox-ci-cd-pydantic-deep/) (czwartek). Dziś: dwie funkcje, które dopełniają obraz.
 
-pydantic-deep to modularne środowisko uruchomieniowe agentów dla Pythona. Agent, który nie widzi sieci, jest ograniczony do tego, co już wie i co jest w Twojej bazie kodu. Agent, który nie uczy się ze swoich sesji, zaczyna od zera przy każdym uruchomieniu. Oba ograniczenia są do rozwiązania — i w pydantic-deep v0.3.5 i v0.3.4 je rozwiązaliśmy.
+pydantic-deep to modularne środowisko uruchomieniowe agentów dla Pythona. Agent, który nie widzi sieci, jest ograniczony do tego, co już wie i co jest w Twojej bazie kodu. Agent, który nie uczy się ze swoich sesji, zaczyna od zera przy każdym uruchomieniu. Oba ograniczenia są do rozwiązania, i w pydantic-deep v0.3.5 i v0.3.4 je rozwiązaliśmy.
 
 ---
 
@@ -59,17 +59,17 @@ Każde narzędzie zwraca `BrowseResult`: `url`, `title`, `content`, `screenshot`
 
 ### Bezpieczeństwo
 
-**Single-tab.** Jedna zakładka na raz — celowy wybór, nie ograniczenie. Wiele zakładek wymagałoby od agenta śledzenia kontekstu zakładek, co dodaje złożoność stanu i punkty awarii.
+**Single-tab.** Jedna zakładka na raz, celowy wybór, nie ograniczenie. Wiele zakładek wymagałoby od agenta śledzenia kontekstu zakładek, co dodaje złożoność stanu i punkty awarii.
 
 **Allowlista domen.** Agent może nawigować tylko do jawnie dozwolonych domen. Próby nawigacji gdzie indziej zwracają błąd.
 
-**Automatyczne przechwytywanie popupów.** Bannery cookies, dialogi logowania, monity subskrypcji — przechwytywane automatycznie.
+**Automatyczne przechwytywanie popupów.** Bannery cookies, dialogi logowania, monity subskrypcji, przechwytywane automatycznie.
 
 **Obcinanie treści.** Zawartość strony jest obcinana przed przekazaniem do modelu, zapobiegając przepełnieniu kontekstu.
 
 ### Cykl życia przeglądarki
 
-Przeglądarka nie startuje leniwie przy pierwszym wywołaniu `navigate` — startuje przed uruchomieniem agenta i jest gwarantowana do zamknięcia po zakończeniu:
+Przeglądarka nie startuje leniwie przy pierwszym wywołaniu `navigate`, startuje przed uruchomieniem agenta i jest gwarantowana do zamknięcia po zakończeniu:
 
 ```python
 # Cykl życia przez wzorzec wrap_run:
@@ -94,19 +94,19 @@ pydantic-deep run "research competitors on GitHub" \
 
 ---
 
-## Część 2: /improve — pętla samodoskonalenia
+## Część 2: /improve, pętla samodoskonalenia
 
 ### Co robi /improve
 
 Po sesji agenta uruchom `/improve` w TUI. Analizuje pełną sesję i wyciąga dwie kategorie wniosków:
 
-**`UserFactInsight`** — co agent nauczył się o Tobie i Twoich preferencjach:
+**`UserFactInsight`**, co agent nauczył się o Tobie i Twoich preferencjach:
 - Preferencje stylu kodu
 - Preferowane formaty wyjścia
 - Terminologia dziedzinowa, której używasz
 - Wzorce w typach zadań, które dajesz
 
-**`AgentLearningInsight`** — wzorce i strategie, które agent odkrył:
+**`AgentLearningInsight`**, wzorce i strategie, które agent odkrył:
 - Podejścia, które działały dla Twojej bazy kodu
 - Efektywne sekwencje wywołań narzędzi
 - Napotkane tryby awaryjne i jak były naprawiane
@@ -118,9 +118,9 @@ Oba typy zapisują do MEMORY.md, ładowanego na początku każdej kolejnej sesji
 
 Porównaliśmy dwa wejścia dla kroku syntezy:
 1. Czytelne dla człowieka podsumowania tego, co się wydarzyło
-2. Surowe ślady narzędzi — faktyczna sekwencja wywołań narzędzi i odpowiedzi
+2. Surowe ślady narzędzi, faktyczna sekwencja wywołań narzędzi i odpowiedzi
 
-Surowe ślady działały znacznie lepiej. Podsumowania tracą wzorce awarii/naprawy, które zawierają faktyczny sygnał uczenia. "Agent próbował X, nie powiodło się, potem próbował Y, co zadziałało" staje się "agent rozwiązał problem" w podsumowaniu — ale uczenie się jest w awarii/naprawie.
+Surowe ślady działały znacznie lepiej. Podsumowania tracą wzorce awarii/naprawy, które zawierają faktyczny sygnał uczenia. "Agent próbował X, nie powiodło się, potem próbował Y, co zadziałało" staje się "agent rozwiązał problem" w podsumowaniu, ale uczenie się jest w awarii/naprawie.
 
 Plik `tool_log.jsonl` (pisany per sesja) przechwytuje pełny ślad narzędzi. `/improve` czyta go bezpośrednio.
 
@@ -139,13 +139,13 @@ Po tym tygodniu, pełny stos możliwości:
 
 ## Chcesz to w pełnej aplikacji?
 
-Jeśli chcesz osadzić możliwości pydantic-deep w produkcyjnej aplikacji — API, frontend, autoryzacja, deployment — sprawdź [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template). Od zera do produkcyjnej aplikacji AI w 30 minut: FastAPI + Next.js + 75+ opcji konfiguracji.
+Jeśli chcesz osadzić możliwości pydantic-deep w produkcyjnej aplikacji, API, frontend, autoryzacja, deployment, sprawdź [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-fastapi-nextjs-llm-template). Od zera do produkcyjnej aplikacji AI w 30 minut: FastAPI + Next.js + 75+ opcji konfiguracji.
 
 ## Kluczowe wnioski
 
 - BrowserCapability: 9 narzędzi Playwright, `pip install 'pydantic-deep[browser]'`
 - Bezpieczeństwo: single-tab, allowlista domen, przechwytywanie popupów, obcinanie treści
-- Cykl życia przeglądarki przez `wrap_run` — gwarantowane czyszczenie przy sukcesie/awarii/anulowaniu
+- Cykl życia przeglądarki przez `wrap_run`, gwarantowane czyszczenie przy sukcesie/awarii/anulowaniu
 - /improve wyciąga `UserFactInsight` + `AgentLearningInsight` → MEMORY.md
 - Surowe ślady narzędzi (nie podsumowania) to właściwe wejście dla syntezy sesji
 - Połącz przeglądarkę + /improve: agent bada i pamięta co znalazł

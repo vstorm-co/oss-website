@@ -1,5 +1,5 @@
 ---
-title: "Ejecutamos /improve en 50 sesiones — esto es lo que encontró"
+title: "Ejecutamos /improve en 50 sesiones, esto es lo que encontró"
 seoTitle: "Auto-mejora de agentes IA: resultados de 50 sesiones con /improve"
 description: "Analizamos 50 sesiones reales de agente con el pipeline /improve de pydantic-deep. 180+ insights extraídos, 7 tipos, actualizaciones automáticas de MEMORY.md. Aquí están los resultados."
 pubDate: 2026-04-17
@@ -12,23 +12,23 @@ category: open-source
 draft: false
 ---
 
-> **TL;DR:** Ejecutamos el pipeline `/improve` de pydantic-deep en 50 sesiones reales de desarrollo (~3.200 mensajes, 7 días) y extrajimos 180+ insights estructurados en 7 tipos. Los insights AgentLearning (comandos de build, rutas de archivos, cadenas de herramientas) dominaron con un 45%, seguidos por Pattern (20%) y Failure (15%). El pipeline propuso 18 cambios en archivos de contexto con puntuaciones de confianza calibradas — MEMORY.md pasó de estar vacío a ser una base de conocimiento estructurada que cubre preferencias del usuario, comandos de build, arquitectura del proyecto y patrones efectivos de depuración.
+> **TL;DR:** Ejecutamos el pipeline `/improve` de pydantic-deep en 50 sesiones reales de desarrollo (~3.200 mensajes, 7 días) y extrajimos 180+ insights estructurados en 7 tipos. Los insights AgentLearning (comandos de build, rutas de archivos, cadenas de herramientas) dominaron con un 45%, seguidos por Pattern (20%) y Failure (15%). El pipeline propuso 18 cambios en archivos de contexto con puntuaciones de confianza calibradas, MEMORY.md pasó de estar vacío a ser una base de conocimiento estructurada que cubre preferencias del usuario, comandos de build, arquitectura del proyecto y patrones efectivos de depuración.
 
-Lunes — el problema: los agentes de IA repiten los mismos errores porque cada sesión comienza desde cero.
+Lunes, el problema: los agentes de IA repiten los mismos errores porque cada sesión comienza desde cero.
 
-Miércoles — la arquitectura: un pipeline de 4 etapas (Discovery, Extraction, Raw Traces, Synthesis) que extrae 7 tipos de insights estructurados de datos brutos de sesiones.
+Miércoles, la arquitectura: un pipeline de 4 etapas (Discovery, Extraction, Raw Traces, Synthesis) que extrae 7 tipos de insights estructurados de datos brutos de sesiones.
 
-Hoy — los datos.
+Hoy, los datos.
 
-Ejecutamos `/improve` en 50 sesiones reales de desarrollo de [pydantic-deep](https://github.com/vstorm-co/pydantic-deep) — aproximadamente 3.200 mensajes distribuidos en 7 días de desarrollo activo. Sin selección previa, sin datos sintéticos. Solo la salida bruta de lo que un pipeline de auto-mejora encuentra cuando lo apuntas a trabajo real.
+Ejecutamos `/improve` en 50 sesiones reales de desarrollo de [pydantic-deep](https://github.com/vstorm-co/pydantic-deep), aproximadamente 3.200 mensajes distribuidos en 7 días de desarrollo activo. Sin selección previa, sin datos sintéticos. Solo la salida bruta de lo que un pipeline de auto-mejora encuentra cuando lo apuntas a trabajo real.
 
 ## TL;DR
 
-- **180+ insights de 50 sesiones** — extraídos automáticamente de transcripciones brutas, cero análisis manual.
-- **AgentLearning domina con 45%** — comandos de build, rutas de archivos, cadenas de herramientas. El conocimiento mundano que previene los fallos repetidos más comunes.
-- **MEMORY.md: de vacío a útil** — el pipeline construyó una base de conocimiento estructurada.
-- **Las puntuaciones de confianza están calibradas** — propuestas SOUL.md promedio 0,88, MEMORY.md 0,82, AGENTS.md 0,78.
-- **50 sesiones son suficientes** — no necesitas miles de sesiones para resultados accionables.
+- **180+ insights de 50 sesiones**, extraídos automáticamente de transcripciones brutas, cero análisis manual.
+- **AgentLearning domina con 45%**, comandos de build, rutas de archivos, cadenas de herramientas. El conocimiento mundano que previene los fallos repetidos más comunes.
+- **MEMORY.md: de vacío a útil**, el pipeline construyó una base de conocimiento estructurada.
+- **Las puntuaciones de confianza están calibradas**, propuestas SOUL.md promedio 0,88, MEMORY.md 0,82, AGENTS.md 0,78.
+- **50 sesiones son suficientes**, no necesitas miles de sesiones para resultados accionables.
 
 ## La configuración
 
@@ -37,7 +37,7 @@ Las sesiones cubrieron tres tipos de trabajo:
 - **Sesiones de implementación de features** (~20 sesiones, promedio 80 mensajes)
 - **Sesiones de refactorización** (~15 sesiones, promedio 30 mensajes)
 
-Ejecutamos `ImprovementAnalyzer` con configuración predeterminada — últimos 7 días, todos los tipos de sesión, umbral de confianza en 0,7:
+Ejecutamos `ImprovementAnalyzer` con configuración predeterminada, últimos 7 días, todos los tipos de sesión, umbral de confianza en 0,7:
 
 ```python
 from pydantic_deep.improve.analyzer import ImprovementAnalyzer
@@ -67,13 +67,13 @@ El pipeline procesó las 50 sesiones en unos 4 minutos. Esto es lo que devolvió
 
 El desglose de los 180+ insights extraídos:
 
-- **AgentLearning: 45%** — comportamientos descubiertos, rutas de archivos, comandos de build, cadenas de herramientas
-- **Pattern: 20%** — secuencias recurrentes de llamadas a herramientas
-- **Failure: 15%** — errores con causas raíz y resoluciones
-- **UserFact: 10%** — hechos sobre el usuario (idioma, rol, preferencias)
-- **Preference + Context + Decision: 10%** — preferencias de estilo, hechos de arquitectura, decisiones clave
+- **AgentLearning: 45%**, comportamientos descubiertos, rutas de archivos, comandos de build, cadenas de herramientas
+- **Pattern: 20%**, secuencias recurrentes de llamadas a herramientas
+- **Failure: 15%**, errores con causas raíz y resoluciones
+- **UserFact: 10%**, hechos sobre el usuario (idioma, rol, preferencias)
+- **Preference + Context + Decision: 10%**, preferencias de estilo, hechos de arquitectura, decisiones clave
 
-Que AgentLearning domine con 45% tiene sentido. La mayor parte de lo que un agente necesita "aprender" es conocimiento práctico sobre su entorno — qué comandos funcionan, dónde están los archivos, qué espera el sistema de build.
+Que AgentLearning domine con 45% tiene sentido. La mayor parte de lo que un agente necesita "aprender" es conocimiento práctico sobre su entorno, qué comandos funcionan, dónde están los archivos, qué espera el sistema de build.
 
 ## Ejemplos sesión por sesión
 
@@ -102,7 +102,7 @@ description: "read → edit → run tests → fix → run tests"
 frequency: 4
 ```
 
-Ese FailureInsight es el hallazgo clave. El agente desperdició 3 intentos ejecutando `pytest` directamente antes de descubrir que el proyecto usa `uv`. Sin `/improve`, haría lo mismo en la siguiente sesión. Con `/improve`, el comando de build se escribe en AGENTS.md — permanentemente.
+Ese FailureInsight es el hallazgo clave. El agente desperdició 3 intentos ejecutando `pytest` directamente antes de descubrir que el proyecto usa `uv`. Sin `/improve`, haría lo mismo en la siguiente sesión. Con `/improve`, el comando de build se escribe en AGENTS.md, permanentemente.
 
 ### Sesión 2: Implementación de feature (80 mensajes)
 
@@ -129,7 +129,7 @@ category: architecture
 confidence: 0.9
 ```
 
-El PreferenceInsight es interesante. El agente observó que el usuario rechazó enfoques basados en dicts dos veces — no una, lo que podría ser coincidencia, sino dos veces en diferentes partes del código. Eso es suficiente señal para codificarlo como preferencia.
+El PreferenceInsight es interesante. El agente observó que el usuario rechazó enfoques basados en dicts dos veces, no una, lo que podría ser coincidencia, sino dos veces en diferentes partes del código. Eso es suficiente señal para codificarlo como preferencia.
 
 ### Sesión 3: Refactorización (30 mensajes)
 
@@ -182,7 +182,7 @@ El verdadero retorno se ve en MEMORY.md.
 - When debugging: check error message first, then trace to source
 ```
 
-Esto es estructurado, accionable e inmediatamente útil. Cada sesión futura comienza con este contexto en lugar de una hoja en blanco. El agente conoce los comandos de build, el idioma del usuario, la arquitectura del proyecto y los patrones efectivos de depuración — todo extraído automáticamente de transcripciones brutas.
+Esto es estructurado, accionable e inmediatamente útil. Cada sesión futura comienza con este contexto en lugar de una hoja en blanco. El agente conoce los comandos de build, el idioma del usuario, la arquitectura del proyecto y los patrones efectivos de depuración, todo extraído automáticamente de transcripciones brutas.
 
 ## Lo que dicen las puntuaciones de confianza
 
@@ -202,19 +202,19 @@ La cuota de 45% de AgentLearning no es casualidad. La mayoría de los fallos de 
 - Estilo de import incorrecto
 - Invocación incorrecta del framework de testing
 
-Exactamente lo que captura AgentLearningInsight — conocimiento práctico, específico del entorno, que es trivial para un humano pero invisible para un agente que empieza de cero.
+Exactamente lo que captura AgentLearningInsight, conocimiento práctico, específico del entorno, que es trivial para un humano pero invisible para un agente que empieza de cero.
 
-PatternInsight con 20% es la segunda categoría más grande porque los agentes desarrollan hábitos. El ciclo "read → edit → test → fix → test" apareció en 4 de 15 sesiones de corrección de bugs. Eso no es ruido — es un workflow que el agente descubrió como efectivo.
+PatternInsight con 20% es la segunda categoría más grande porque los agentes desarrollan hábitos. El ciclo "read → edit → test → fix → test" apareció en 4 de 15 sesiones de corrección de bugs. Eso no es ruido, es un workflow que el agente descubrió como efectivo.
 
 ## Conclusiones clave
 
 **1. Los agentes acumulan conocimiento práctico rápido.** 50 sesiones bastaron para un MEMORY.md completo.
 
-**2. La mayoría del "aprendizaje" es aburrido y útil.** Comandos de build y rutas de archivos — las cosas mundanas que causan fricción real.
+**2. La mayoría del "aprendizaje" es aburrido y útil.** Comandos de build y rutas de archivos, las cosas mundanas que causan fricción real.
 
 **3. Las puntuaciones de confianza están bien calibradas.** El pipeline no exagera sus hallazgos.
 
-**4. El sistema encuentra cosas que los humanos no documentarían.** "Usuario rechazó enfoque dict dos veces" — ningún desarrollador escribiría eso, pero ayuda al agente.
+**4. El sistema encuentra cosas que los humanos no documentarían.** "Usuario rechazó enfoque dict dos veces", ningún desarrollador escribiría eso, pero ayuda al agente.
 
 **5. 50 sesiones son suficientes.** No necesitas miles para resultados accionables.
 
@@ -252,7 +252,7 @@ El modal de revisión en el TUI permite aceptar, rechazar o editar cada cambio p
 
 ---
 
-Esto cierra la serie /improve. El problema (lunes), la arquitectura (miércoles) y ahora los datos (hoy). La próxima semana — más del ecosistema pydantic-deep: checkpointing, equipos de agentes y la infraestructura de producción.
+Esto cierra la serie /improve. El problema (lunes), la arquitectura (miércoles) y ahora los datos (hoy). La próxima semana, más del ecosistema pydantic-deep: checkpointing, equipos de agentes y la infraestructura de producción.
 
 **GitHub:** [github.com/vstorm-co/pydantic-deep](https://github.com/vstorm-co/pydantic-deep)
 **Vstorm OSS:** [oss.vstorm.co](https://oss.vstorm.co)

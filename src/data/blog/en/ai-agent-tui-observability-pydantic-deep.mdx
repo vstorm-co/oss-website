@@ -1,0 +1,145 @@
+---
+title: "Full Observability in AI Agents: What We Added to the pydantic-deep TUI"
+seoTitle: "AI Agent TUI Observability: Tokens, Cost, Thinking Live"
+description: "pydantic-deep v0.3.5 adds per-turn token tracking, live thinking display, cumulative cost header, and side panel with subagent status to the terminal UI."
+pubDate: 2026-04-18
+updatedDate: 2026-04-18
+author: "Kacper Włodarczyk"
+lang: en
+translationKey: ai-agent-tui-observability-pydantic-deep
+tags: ["pydantic-ai", "python", "ai-agents", "open-source", "developer-tools"]
+category: article
+draft: false
+---
+
+An AI agent ran a subagent loop for 40 minutes before anyone noticed.
+
+$180 in tokens. Silently. The team found out from the credit card statement the next morning.
+
+That incident changed how we thought about agent observability. This post covers the rework that followed, and the three design decisions we argued about the longest.
+
+*Kacper Włodarczyk, AI engineering consultant at Vstorm. We've shipped 30+ production AI agent systems. pydantic-deep is our open-source agent runtime for Python, built on what we've learned.*
+
+## The problem with invisible agents
+
+When an AI agent runs a task, a lot happens between your prompt and the response. The model thinks. It calls tools. It reads files, runs searches, updates todos, delegates to subagents. Each of those actions consumes tokens. Each response costs money.
+
+Without observability, you're flying blind.
+
+You don't know which tool call took 3 seconds. You don't know which turn used 8,000 tokens. You don't know why the agent produced an unexpected result, because you can't see its reasoning. And if the agent crashes? The session is gone.
+
+We've been building [pydantic-deep](https://github.com/vstorm-co/pydantic-deep) for production use. Invisible behavior isn't acceptable in production.
+
+So in v0.3.5, we reworked the TUI to make everything visible.
+
+## Before: what you couldn't see
+
+The original TUI was minimal. It showed the agent's text responses and a subset of tool calls. Thinking content was discarded. Token usage wasn't displayed. The side panel didn't exist. Todo tools (`read_todos`, `write_todos`, etc.) were hidden from the UI. And if the agent crashed mid-session, the conversation was lost.
+
+The result: you'd finish a long session with no idea what it cost, what the agent was "thinking," or which tool calls were made.
+
+## After: what you see now
+
+### Per-turn token usage
+
+Every assistant response now shows a token breakdown directly below it:
+
+```
+in:2.1K · out:412 · total:2.5K · reqs:3
+```
+
+- `in`, tokens in the input (prompt + context)
+- `out`, tokens in the response
+- `total`, sum for this turn
+- `reqs`, number of API calls in this turn (multi-step tool use)
+
+This makes per-turn cost attribution straightforward. If one turn is consuming 80% of your budget, you'll know immediately.
+
+### Cumulative cost in the header
+
+The top bar shows running totals after each response:
+
+```
+pydantic-deep  in:45K out:3K · $0.12
+```
+
+This updates live. You can watch cost accumulate in real time. For long autonomous sessions, this is the difference between "I'll let it run" and "I should stop this."
+
+### Thinking streamed live, then collapsed
+
+When a model reasons before responding (Claude extended thinking, o3-style reasoning), that content now appears in the TUI as dimmed text, streamed live as the model produces it. Once the reasoning phase is complete, it collapses to a single summary line.
+
+This is the right balance. You can watch the agent reason when you want to. But it doesn't fill your screen with 2,000 tokens of chain-of-thought every turn.
+
+Design decision: we dimmed it intentionally. Reasoning content should be readable but visually subordinate to the actual response.
+
+### Side panel visible by default
+
+If your terminal is 100+ characters wide, the side panel opens on startup. Before any task runs, it shows available subagents with their status:
+
+```
+Subagents:
+• planner (idle)
+• research (idle)
+```
+
+When a subagent is delegated a task, the status updates. The panel is responsive to terminal resize, shrink below 100 chars and it closes.
+
+### All tool calls visible
+
+Previously, todo tools were hidden from the TUI. In v0.3.5, all tool calls are surfaced:
+
+- `read_todos`, `write_todos`, `add_todo`, `update_todo_status`, `remove_todo`
+
+Every action the agent takes is visible. When the agent updates a todo list, that's a decision worth seeing.
+
+### Session saved on crash
+
+`_save_session()` is now in a `finally` block. Whatever happens, crash, exception, keyboard interrupt, `messages.json` is written to disk. You can inspect the full session, continue from it, or feed it into `/improve`.
+
+### Subagent output logged fully
+
+`tool_log.jsonl` now stores up to 20K characters for subagent task results. The previous limit was 2K, which silently truncated large subagent outputs. This matters for `/improve`, the pipeline that extracts learnings from sessions.
+
+## The full TUI layout
+
+```
+┌─────────────────────────────────┬──────────────────┐
+│ pydantic-deep  in:45K out:3K · $0.12               │
+├─────────────────────────────────┼──────────────────┤
+│ [thinking... dimmed text]       │ Subagents:       │
+│ [collapsed to summary]          │ • planner (idle) │
+│                                 │ • research (idle)│
+│ Agent response here...          │                  │
+│                                 │                  │
+│ in:2.1K · out:412 · $0.04      │                  │
+└─────────────────────────────────┴──────────────────┘
+```
+
+## The connection to the rest of the week
+
+Earlier this week:
+- [StuckLoopDetection](https://oss.vstorm.co/blog/stuck-loop-detection-ai-agents-pydantic-deep/) stops the agent from running 47 identical tool calls. Now you can see in the TUI exactly when that detection fires.
+- [LimitWarnerCapability](https://oss.vstorm.co/blog/context-window-blindness-ai-agents-limit-warner/) warns when context is 70%+ full. That warning now appears clearly alongside token counts.
+
+Tomorrow: `/improve`. The pipeline that reads these session logs, extracts what the agent learned, and writes it to MEMORY.md. Better observability means better input for `/improve`.
+
+## Key Takeaways
+
+- **Per-turn token breakdown** (`in/out/total/reqs`) shows exactly where tokens are going
+- **Header cost** (`in:45K out:3K · $0.12`) updates live, session-wide
+- **Thinking content** streams as dimmed text, collapses to summary after completion
+- **Side panel** opens on startup showing subagent status, responsive to terminal size
+- **All tool calls visible**, including todo management tools
+- **Session saved on crash** via `finally` block, no more lost sessions
+- **Subagent logs at 20K chars**, full trace available for `/improve`
+
+## Try it
+
+```bash
+curl -fsSL https://oss.vstorm.co/install.sh | bash
+```
+
+GitHub: [github.com/vstorm-co/pydantic-deep](https://github.com/vstorm-co/pydantic-deep)
+
+Observability is how you debug, optimize, and trust your agent. What's the first metric you check when debugging an agent run?

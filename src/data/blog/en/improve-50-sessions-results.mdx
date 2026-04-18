@@ -1,5 +1,5 @@
 ---
-title: "We Ran /improve on 50 Sessions — Here's What It Found"
+title: "We Ran /improve on 50 Sessions, Here's What It Found"
 seoTitle: "AI Agent Self-Improvement: Results from 50 Sessions with /improve"
 description: "We analyzed 50 real agent sessions with pydantic-deep's /improve pipeline. 180+ insights extracted, 7 types, automatic MEMORY.md updates. Here are the results."
 pubDate: 2026-04-17
@@ -12,23 +12,23 @@ category: open-source
 draft: false
 ---
 
-> **TL;DR:** We ran pydantic-deep's `/improve` pipeline on 50 real development sessions (~3,200 messages, 7 days) and extracted 180+ structured insights across 7 types. AgentLearning insights (build commands, file paths, tool chains) dominated at 45%, followed by Pattern (20%) and Failure (15%). The pipeline proposed 18 changes to context files with calibrated confidence scores — MEMORY.md went from empty to a structured knowledge base covering user preferences, build commands, project architecture, and effective debugging patterns. The most valuable single insight prevented a build command failure that had repeated across 6 separate sessions.
+> **TL;DR:** We ran pydantic-deep's `/improve` pipeline on 50 real development sessions (~3,200 messages, 7 days) and extracted 180+ structured insights across 7 types. AgentLearning insights (build commands, file paths, tool chains) dominated at 45%, followed by Pattern (20%) and Failure (15%). The pipeline proposed 18 changes to context files with calibrated confidence scores, MEMORY.md went from empty to a structured knowledge base covering user preferences, build commands, project architecture, and effective debugging patterns. The most valuable single insight prevented a build command failure that had repeated across 6 separate sessions.
 
-Monday — the problem: AI agents repeat the same mistakes because every session starts from zero.
+Monday, the problem: AI agents repeat the same mistakes because every session starts from zero.
 
-Wednesday — the architecture: a 4-stage pipeline (Discovery, Extraction, Raw Traces, Synthesis) that extracts 7 types of structured insights from raw session data.
+Wednesday, the architecture: a 4-stage pipeline (Discovery, Extraction, Raw Traces, Synthesis) that extracts 7 types of structured insights from raw session data.
 
-Today — the data.
+Today, the data.
 
-We ran `/improve` on 50 real development sessions from [pydantic-deep](https://github.com/vstorm-co/pydantic-deep) — approximately 3,200 messages spread across 7 days of active development. No cherry-picking, no synthetic data. Just the raw output of what a self-improving agent pipeline finds when you point it at real work.
+We ran `/improve` on 50 real development sessions from [pydantic-deep](https://github.com/vstorm-co/pydantic-deep), approximately 3,200 messages spread across 7 days of active development. No cherry-picking, no synthetic data. Just the raw output of what a self-improving agent pipeline finds when you point it at real work.
 
 ## TL;DR
 
-- **180+ insights from 50 sessions** — extracted automatically from raw session transcripts, zero manual analysis.
-- **AgentLearning dominates at 45%** — build commands, file paths, tool chains. The mundane knowledge that prevents the most repeated failures.
-- **MEMORY.md: from empty to useful** — the pipeline built a structured knowledge base covering user preferences, build setup, project architecture, and effective workflows.
-- **Confidence scores are calibrated** — SOUL.md proposals averaged 0.88, MEMORY.md 0.82, AGENTS.md 0.78. Higher confidence = more consistent signal across sessions.
-- **50 sessions is enough** — you don't need thousands of sessions for actionable results. The marginal value decreases quickly for environment facts, keeps growing for patterns and preferences.
+- **180+ insights from 50 sessions**, extracted automatically from raw session transcripts, zero manual analysis.
+- **AgentLearning dominates at 45%**, build commands, file paths, tool chains. The mundane knowledge that prevents the most repeated failures.
+- **MEMORY.md: from empty to useful**, the pipeline built a structured knowledge base covering user preferences, build setup, project architecture, and effective workflows.
+- **Confidence scores are calibrated**, SOUL.md proposals averaged 0.88, MEMORY.md 0.82, AGENTS.md 0.78. Higher confidence = more consistent signal across sessions.
+- **50 sessions is enough**, you don't need thousands of sessions for actionable results. The marginal value decreases quickly for environment facts, keeps growing for patterns and preferences.
 
 ## The Setup
 
@@ -37,7 +37,7 @@ The sessions covered three types of work:
 - **Feature implementation sessions** (~20 sessions, avg 80 messages each)
 - **Refactoring sessions** (~15 sessions, avg 30 messages each)
 
-We ran `ImprovementAnalyzer` with default settings — last 7 days, all session types, confidence threshold at 0.7:
+We ran `ImprovementAnalyzer` with default settings, last 7 days, all session types, confidence threshold at 0.7:
 
 ```python
 from pydantic_deep.improve.analyzer import ImprovementAnalyzer
@@ -67,13 +67,13 @@ The pipeline took about 4 minutes to process all 50 sessions. Here's what came b
 
 The breakdown across all 180+ extracted insights:
 
-- **AgentLearning: 45%** — discovered behaviors, file paths, build commands, tool chains
-- **Pattern: 20%** — recurring tool call sequences the agent repeated across sessions
-- **Failure: 15%** — mistakes with root causes and resolutions
-- **UserFact: 10%** — facts about the user (language, role, preferences)
-- **Preference + Context + Decision: 10%** — user style preferences, project architecture facts, key decisions
+- **AgentLearning: 45%**, discovered behaviors, file paths, build commands, tool chains
+- **Pattern: 20%**, recurring tool call sequences the agent repeated across sessions
+- **Failure: 15%**, mistakes with root causes and resolutions
+- **UserFact: 10%**, facts about the user (language, role, preferences)
+- **Preference + Context + Decision: 10%**, user style preferences, project architecture facts, key decisions
 
-AgentLearning dominating at 45% makes sense. Most of what an agent needs to "learn" is practical knowledge about the environment it operates in — which commands work, where files live, what the build system expects. This is the low-hanging fruit that causes the most repeated failures.
+AgentLearning dominating at 45% makes sense. Most of what an agent needs to "learn" is practical knowledge about the environment it operates in, which commands work, where files live, what the build system expects. This is the low-hanging fruit that causes the most repeated failures.
 
 ## Session-by-Session Examples
 
@@ -102,7 +102,7 @@ description: "read → edit → run tests → fix → run tests"
 frequency: 4
 ```
 
-That FailureInsight is the money. The agent wasted 3 attempts running `pytest` directly before discovering the project uses `uv`. Without `/improve`, it would do this again in the next session. With `/improve`, the build command gets written to AGENTS.md — permanently.
+That FailureInsight is the money. The agent wasted 3 attempts running `pytest` directly before discovering the project uses `uv`. Without `/improve`, it would do this again in the next session. With `/improve`, the build command gets written to AGENTS.md, permanently.
 
 ### Session 2: Feature Implementation (80 messages)
 
@@ -129,7 +129,7 @@ category: architecture
 confidence: 0.9
 ```
 
-The PreferenceInsight is interesting. The agent observed that the user rejected dict-based approaches twice — not once, which could be a coincidence, but twice across different parts of the codebase. That's enough signal to encode it as a preference.
+The PreferenceInsight is interesting. The agent observed that the user rejected dict-based approaches twice, not once, which could be a coincidence, but twice across different parts of the codebase. That's enough signal to encode it as a preference.
 
 ### Session 3: Refactoring (30 messages)
 
@@ -182,14 +182,14 @@ The real payoff is what happens to MEMORY.md.
 - When debugging: check error message first, then trace to source
 ```
 
-This is structured, actionable, and immediately useful. Every future session starts with this context instead of a blank slate. The agent knows the build commands, the user's language, the project architecture, and the effective debugging patterns — all extracted automatically from raw session transcripts.
+This is structured, actionable, and immediately useful. Every future session starts with this context instead of a blank slate. The agent knows the build commands, the user's language, the project architecture, and the effective debugging patterns, all extracted automatically from raw session transcripts.
 
 ## What the Confidence Scores Tell Us
 
 Not all insights are created equal:
 
 - **SOUL.md proposals (avg 0.88):** Highest confidence. Personality and style insights are either consistent across many sessions or they don't appear at all. When the pipeline proposes a SOUL.md change, it's usually solid.
-- **MEMORY.md proposals (avg 0.82):** Strong confidence. Facts about the user and project tend to be verifiable — the agent either found `uv run pytest` works or it didn't.
+- **MEMORY.md proposals (avg 0.82):** Strong confidence. Facts about the user and project tend to be verifiable, the agent either found `uv run pytest` works or it didn't.
 - **AGENTS.md proposals (avg 0.78):** Slightly lower. Tool configurations and capability descriptions require more nuance, and the pipeline is appropriately less certain.
 
 The confidence threshold of 0.7 filters out noise. Below that, you get speculative insights like "user might prefer tabs over spaces" based on a single observation. Above 0.7, you get things the pipeline is reasonably sure about.
@@ -204,9 +204,9 @@ Most agent failures aren't dramatic. They're mundane:
 - Wrong import style
 - Wrong testing framework invocation
 
-These are exactly what AgentLearningInsight captures — practical, environment-specific knowledge that's trivial for a human but invisible to an agent starting fresh.
+These are exactly what AgentLearningInsight captures, practical, environment-specific knowledge that's trivial for a human but invisible to an agent starting fresh.
 
-PatternInsight at 20% is the second biggest category because agents develop habits. The "read → edit → test → fix → test" cycle appeared in 4 out of 15 bug fix sessions. That's not noise — it's a workflow the agent discovered works for this codebase.
+PatternInsight at 20% is the second biggest category because agents develop habits. The "read → edit → test → fix → test" cycle appeared in 4 out of 15 bug fix sessions. That's not noise, it's a workflow the agent discovered works for this codebase.
 
 FailureInsight at 15% captures the mistakes that actually happened. The `pytest` vs `uv run pytest` example is typical: the failure is specific, the root cause is identifiable, and the resolution is actionable.
 
@@ -214,7 +214,7 @@ FailureInsight at 15% captures the mistakes that actually happened. The `pytest`
 
 **1. Agents accumulate practical knowledge fast.** 50 sessions was enough to build a comprehensive MEMORY.md covering build commands, user preferences, project architecture, and effective workflows.
 
-**2. Most "learning" is boring and useful.** The highest-value insights aren't clever architectural observations — they're build commands and file paths. The mundane stuff that causes real friction.
+**2. Most "learning" is boring and useful.** The highest-value insights aren't clever architectural observations, they're build commands and file paths. The mundane stuff that causes real friction.
 
 **3. Confidence scores are calibrated well.** The pipeline doesn't oversell its findings. High-confidence proposals are genuinely reliable, and the threshold filters out speculation.
 
@@ -256,7 +256,7 @@ The review modal in the TUI lets you accept, reject, or edit each proposed chang
 
 ---
 
-This wraps up the /improve series. The problem (Monday), the architecture (Wednesday), and now the data (today). Next week — more from the pydantic-deep ecosystem: checkpointing, agent teams, and the production infrastructure that makes all of this work at scale.
+This wraps up the /improve series. The problem (Monday), the architecture (Wednesday), and now the data (today). Next week, more from the pydantic-deep ecosystem: checkpointing, agent teams, and the production infrastructure that makes all of this work at scale.
 
 **GitHub:** [github.com/vstorm-co/pydantic-deep](https://github.com/vstorm-co/pydantic-deep)
 **Vstorm OSS:** [oss.vstorm.co](https://oss.vstorm.co)
