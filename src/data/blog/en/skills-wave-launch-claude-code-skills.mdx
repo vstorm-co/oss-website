@@ -1,0 +1,109 @@
+---
+title: "24 Claude Code Skills to Fix Your AI Stack: Introducing production-stack-skills and content-skills"
+seoTitle: "Claude Code Skills: 24 Slash Commands for Production Code and Content (Vstorm Skills Wave)"
+description: "Two Claude Code skill packs shipped together. 10 skills audit AI-generated code with a 0-100 score. 14 skills kill AI slop with brand-first generation. Same install, dual-CLI, MIT."
+pubDate: 2026-04-20
+updatedDate: 2026-04-20
+author: "Kacper Włodarczyk"
+lang: en
+translationKey: skills-wave-launch-claude-code-skills
+tags: ["claude-code", "ai-agents", "python", "open-source", "developer-tools"]
+category: article
+draft: false
+---
+
+78% of Fortune 500 companies are adopting AI coding assistants. 45% of that generated code ships with security vulnerabilities. On the content side, 76% of readers identify AI-written text within three seconds, and engagement drops around 47% when they do.
+
+Those three numbers describe the same problem from two angles: **AI outputs need guardrails, whether the output is code or writing.** Today we're shipping two Claude Code skill packs that sit on those guardrails.
+
+**A Claude Code skill is a packaged slash command that augments your AI coding agent with a specific expertise, readable via `SKILL.md` and invocable from any AGENTS.md-compatible runtime.** The Skills Wave is two of those packs, released the same day because the failure modes on both sides of the AI workflow deserve the same fix.
+
+*I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co), an Applied Agentic AI Engineering Consultancy. We've shipped 30+ production AI agent implementations and open-source our tooling at [github.com/vstorm-co](https://github.com/vstorm-co).*
+
+## production-stack-skills: 10 Claude Code Skills for Production-Ready AI Code
+
+**production-stack-skills is a 10-skill pack that audits AI-generated code across six weighted categories and hands back a 0 to 100 production-readiness score with a prioritized action plan.**
+
+The flagship command is `/production check`. You point it at a repo, it reads the FastAPI routes, Postgres migrations, Dockerfiles, and config, and returns:
+
+- A headline score (e.g., "Production Readiness: 34/100")
+- Six category scores: security, error handling, observability, deployment, data layer, code quality
+- A Quick Wins section with point deltas
+- An Action Plan sorted by weighted impact
+
+In our first internal runs across Vstorm's client repos, Quick Wins alone consistently moves the score about 30 points. That's the number I'd quote if a CTO asked "what does running this for a morning actually buy me".
+
+The other nine skills split by surface area: `/production review`, `/production planner`, `/production fastapi`, `/production postgres`, `/production docker`, `/production deploy`, `/production monitoring`, `/production security`, and `/production error-handling`. Each one is a focused slash command rather than a sub-mode of a monolithic agent.
+
+## content-skills: 14 Brand-First Skills That Kill AI Slop
+
+**content-skills is a 14-skill pack with a `/brand/` directory at its core, so every piece of content generated after a five-minute brand interview reads your BRAND.md, VOICE.md, VISUAL.md, and voice samples before writing a word.**
+
+The setup is the entry point. Run `/content setup` once. Five questions about your company, your voice, and your visual identity. It writes the `/brand/` folder. From that moment on, every skill in the pack opens `/brand/` on every invocation.
+
+The audit is the exit point. Run `/content audit` on any piece of content and it scores voice consistency, anti-slop markers, visual consistency, and brand alignment on a 0 to 100 scale.
+
+Between setup and audit sit 12 production skills: strategy, calendar, blog, twitter, linkedin, reddit, hackernews, presentation, infographic, image, video, repurpose. Each auto-sources from `/brand/`. The difference between a post that reads like "Let's dive into the transformative landscape of AI" and a post that reads like your actual company is the difference between content-skills reading BRAND.md once before writing versus an LLM guessing.
+
+## One Install, Dual-CLI, Uninstall-Safe
+
+Both packs install the same way:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/vstorm-co/production-stack-skills/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/vstorm-co/content-skills/main/install.sh | bash
+```
+
+Each install mirrors the skills into both `~/.claude/` (Claude Code) and `~/.agents/` (Codex, Amp, and anything AGENTS.md-compatible). You don't pick the runtime up front, and a skill written for Claude Code works identically in Codex. This matters because the Claude Code market is fragmenting; choosing runtime-locked skills today means rewriting them in six months.
+
+Uninstall is boring by design. `/content-skills uninstall` removes the skills. Your `/brand/` stays. That's yours, not ours.
+
+Both repos are MIT.
+
+## Why Two Packs Shipped the Same Day
+
+**In 30+ production AI agent deployments at Vstorm, the failures cluster into two shapes: code that passes demo but fails the first prod incident, and content that sounds like the AI wrote it because the AI wrote it.**
+
+One pack addresses the first. The other addresses the second. Both use the same architecture (text-first SKILL.md files, dual-CLI, `/brand/`-style config directories, numeric outputs where possible), because the lesson that skills beat monolithic agents applies to both. You don't want "one AI that does everything". You want 24 small, composable, auditable slash commands.
+
+If you've been pasting a prompt template called "Please check this code for production issues" into every session, production-stack-skills replaces that.
+
+If you've been pasting a prompt template called "Write like my company, not like ChatGPT" into every session, content-skills replaces that.
+
+## Key Takeaways
+
+- **production-stack-skills** ships 10 Claude Code skills that score AI-generated code 0 to 100 across six weighted categories with a Quick Wins section that typically moves the score +30 in under five minutes.
+- **content-skills** ships 14 Claude Code skills built around a `/brand/` directory that every skill auto-reads before generating, with `/content audit` scoring output for voice consistency and anti-slop.
+- Both packs install via one `curl` command and mirror into `~/.claude/` and `~/.agents/`, working on Claude Code, Codex, and any AGENTS.md-compatible runtime.
+- The skill-first model is deliberate: 24 small composable commands beat one monolithic agent on auditability and local updates.
+- Both repos are MIT.
+
+## Frequently Asked Questions
+
+### What are Claude Code skills and how do I install them?
+
+Claude Code skills are packaged slash commands backed by a `SKILL.md` file that extends a coding agent with specific expertise. You install a skill pack with a single `curl` command that mirrors the skill files into `~/.claude/` for Claude Code and `~/.agents/` for Codex or any other AGENTS.md-compatible runtime. After install, the slash commands become available in your agent immediately without restart.
+
+### What's the difference between production-stack-skills and content-skills?
+
+production-stack-skills audits and hardens AI-generated code across security, error handling, observability, deployment, data, and code quality, returning a 0 to 100 score. content-skills audits and produces on-brand content using a `/brand/` directory you set up once, returning voice-consistency and anti-slop scores.
+
+### Do these skills work with Codex or only Claude Code?
+
+Both. Each install script mirrors files into both `~/.claude/` and `~/.agents/`, so the same skill works in Claude Code, Codex, Amp, and any AGENTS.md-compatible runtime without modification.
+
+### How long does `/production check` take to run on a real repo?
+
+On a typical FastAPI-plus-Postgres repo of a few thousand lines, about a minute. The Quick Wins section at the top is what you act on first, usually under five minutes to apply. The full Action Plan is hours to days depending on how far from production you started.
+
+### When should I use a Claude Code skill instead of writing a full agent?
+
+Use a skill when the job is a scoped expertise you want to invoke explicitly. Use a full agent when the job is open-ended, multi-step, and requires planning across tools. Skills are composable building blocks; agents orchestrate them. Most teams over-build agents and under-invest in skills.
+
+## Get Started
+
+- **production-stack-skills:** [github.com/vstorm-co/production-stack-skills](https://github.com/vstorm-co/production-stack-skills)
+- **content-skills:** [github.com/vstorm-co/content-skills](https://github.com/vstorm-co/content-skills)
+- **Related:** [Full-Stack AI Agent Template](https://oss.vstorm.co/projects/full-stack-ai-agent-template/) for a working app scaffold; [pydantic-deep](https://oss.vstorm.co/projects/pydantic-deep/) for the agent runtime these skills compose on top of.
+
+Follow me on [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/) for the follow-up pieces in this series.

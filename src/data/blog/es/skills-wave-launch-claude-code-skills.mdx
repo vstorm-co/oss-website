@@ -1,0 +1,104 @@
+---
+title: "24 Claude Code Skills para arreglar tu stack de IA: production-stack-skills y content-skills"
+description: "Dos packs de Claude Code skills lanzados el mismo día. 10 skills auditan código generado por IA con puntuación 0-100. 14 skills eliminan AI-slop con generación brand-first. Una instalación, dual-CLI, MIT."
+pubDate: 2026-04-20
+updatedDate: 2026-04-20
+author: "Kacper Włodarczyk"
+lang: es
+translationKey: skills-wave-launch-claude-code-skills
+tags: ["claude-code", "ai-agents", "python", "open-source", "developer-tools"]
+category: article
+draft: false
+---
+
+El 78% de las empresas del Fortune 500 está adoptando asistentes de IA para codificar. El 45% de ese código se despliega a producción con vulnerabilidades. Del lado del contenido, el 76% de los lectores identifica texto escrito por IA en tres segundos, y el engagement cae alrededor del 47% cuando lo identifican.
+
+Esos tres números describen el mismo problema desde dos ángulos: **los outputs de IA necesitan guardrails, ya sea que el output sea código o escritura.** Hoy lanzamos dos packs de Claude Code skills que se asientan sobre esos guardrails.
+
+**Un Claude Code skill es un slash-command empaquetado que amplía tu agente de IA con una experiencia específica, leíble vía `SKILL.md` e invocable desde cualquier runtime compatible con AGENTS.md.** La Skills Wave son dos de esos packs, lanzados el mismo día porque los modos de fallo en ambos lados del workflow de IA merecen la misma solución.
+
+*Soy Kacper, AI Engineer en [Vstorm](https://vstorm.co), una Applied Agentic AI Engineering Consultancy. Hemos entregado 30+ implementaciones de agentes de IA en producción y abrimos nuestro tooling en [github.com/vstorm-co](https://github.com/vstorm-co).*
+
+## production-stack-skills: 10 Claude Code skills para código de IA production-ready
+
+**production-stack-skills es un pack de 10 skills que audita código generado por IA en seis categorías ponderadas y devuelve una puntuación 0 a 100 con un plan de acción priorizado.**
+
+El comando flagship es `/production check`. Lo apuntas a un repo, el skill lee las rutas FastAPI, migraciones Postgres, Dockerfiles y config, y devuelve:
+
+- Puntuación principal (ej. "Production Readiness: 34/100")
+- Seis puntuaciones de categoría: security, error handling, observability, deployment, data layer, code quality
+- Sección Quick Wins con delta de puntos
+- Action Plan ordenado por impacto ponderado
+
+En las primeras ejecuciones internas sobre repos de clientes de Vstorm, solo Quick Wins mueve consistentemente la puntuación unos 30 puntos. Esa es la cifra que citaría si un CTO preguntara "qué me da dedicarle una mañana".
+
+Los otros nueve skills se dividen por superficie: `/production review`, `/production planner`, `/production fastapi`, `/production postgres`, `/production docker`, `/production deploy`, `/production monitoring`, `/production security` y `/production error-handling`.
+
+## content-skills: 14 skills brand-first que matan el AI slop
+
+**content-skills es un pack de 14 skills con un directorio `/brand/` en el centro, de modo que cada pieza de contenido generada después de una entrevista de marca de cinco minutos lee tu BRAND.md, VOICE.md, VISUAL.md y muestras de voz antes de escribir una palabra.**
+
+Setup es el punto de entrada. Ejecuta `/content setup` una vez. Cinco preguntas sobre empresa, voz e identidad visual. El skill escribe la carpeta `/brand/`. Desde ese momento, cada skill del pack abre `/brand/` en cada invocación.
+
+Audit es el punto de salida. Ejecuta `/content audit` sobre cualquier pieza y obtén una puntuación 0 a 100 sobre consistencia de voz, marcadores anti-slop, consistencia visual y alineación de marca.
+
+Entre setup y audit viven 12 skills de producción: strategy, calendar, blog, twitter, linkedin, reddit, hackernews, presentation, infographic, image, video, repurpose. Cada uno se autoalimenta de `/brand/`.
+
+## Una instalación, dual-CLI, uninstall seguro
+
+Ambos packs se instalan igual:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/vstorm-co/production-stack-skills/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/vstorm-co/content-skills/main/install.sh | bash
+```
+
+Cada instalación espeja los skills en `~/.claude/` (Claude Code) y `~/.agents/` (Codex, Amp y cualquier cosa compatible con AGENTS.md). No eliges runtime por adelantado. Un skill escrito para Claude Code corre idéntico en Codex.
+
+Uninstall es deliberadamente aburrido. `/content-skills uninstall` elimina los skills. Tu `/brand/` queda.
+
+Ambos repos son MIT.
+
+## Por qué dos packs el mismo día
+
+**En 30+ despliegues de agentes de IA en producción en Vstorm, los fallos se agrupan en dos formas: código que pasa el demo y cae en el primer incidente de producción, y contenido que suena escrito por IA porque la IA lo escribió.**
+
+Un pack cubre el primero. El otro cubre el segundo. Ambos usan la misma arquitectura, porque la lección de que los skills vencen a los agentes monolíticos aplica a ambos. No quieres "una IA que hace todo". Quieres 24 slash-commands pequeños, componibles y auditables.
+
+## Puntos clave
+
+- **production-stack-skills** entrega 10 skills con scorer 0-100 y sección Quick Wins que típicamente mueve la puntuación +30 puntos en menos de cinco minutos.
+- **content-skills** entrega 14 skills alrededor de un directorio `/brand/` leído automáticamente en cada invocación.
+- Ambos packs se instalan con un comando `curl`, espejan a `~/.claude/` y `~/.agents/`, funcionan en Claude Code, Codex y cualquier runtime compatible con AGENTS.md.
+- La arquitectura skill-first vence a los agentes monolíticos en auditabilidad y actualizaciones locales.
+- Ambos repos son MIT.
+
+## Preguntas frecuentes
+
+### ¿Qué son los Claude Code skills y cómo los instalo?
+
+Los Claude Code skills son slash-commands empaquetados basados en un archivo `SKILL.md` que amplían un agente de codificación con experiencia específica. Instalas un pack con un único comando `curl` que espeja archivos en `~/.claude/` y `~/.agents/`. Tras instalar, los slash-commands están disponibles al instante.
+
+### ¿Cuál es la diferencia entre production-stack-skills y content-skills?
+
+production-stack-skills audita y endurece código generado por IA en security, error handling, observability, deployment, data y code quality, devolviendo puntuación 0-100. content-skills audita y produce contenido on-brand usando un directorio `/brand/` configurado una vez, devolviendo puntuaciones de voice-consistency y anti-slop.
+
+### ¿Funcionan estos skills con Codex o solo Claude Code?
+
+Con ambos. Cada script de instalación espeja archivos en `~/.claude/` y `~/.agents/`, así que el mismo skill corre en Claude Code, Codex, Amp y cualquier runtime compatible con AGENTS.md sin modificación.
+
+### ¿Cuánto tarda `/production check` en un repo real?
+
+En un repo FastAPI + Postgres típico de unos miles de líneas, alrededor de un minuto. La sección Quick Wins es lo primero que actúas, generalmente bajo cinco minutos.
+
+### ¿Cuándo uso un Claude Code skill en vez de un agente completo?
+
+Skill cuando la tarea es una experiencia acotada invocada explícitamente. Agente completo cuando la tarea es abierta, multi-paso y requiere planificación entre herramientas. Los skills son bloques componibles; los agentes los orquestan.
+
+## Empieza
+
+- **production-stack-skills:** [github.com/vstorm-co/production-stack-skills](https://github.com/vstorm-co/production-stack-skills)
+- **content-skills:** [github.com/vstorm-co/content-skills](https://github.com/vstorm-co/content-skills)
+- **Relacionados:** [Full-Stack AI Agent Template](https://oss.vstorm.co/projects/full-stack-ai-agent-template/) como scaffold de app; [pydantic-deep](https://oss.vstorm.co/projects/pydantic-deep/) como agent runtime base.
+
+Sígueme en [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/) para las entregas siguientes de la serie.
