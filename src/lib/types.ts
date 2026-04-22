@@ -14,8 +14,8 @@ export type FrontendType = "none" | "nextjs";
 export type WebSocketAuthType = "none" | "jwt" | "api_key";
 export type AdminEnvironmentType = "all" | "dev_only" | "dev_staging" | "disabled";
 export type OAuthProvider = "none" | "google";
-export type AIFrameworkType = "pydantic_ai" | "langchain" | "langgraph" | "crewai" | "deepagents";
-export type LLMProviderType = "openai" | "anthropic" | "openrouter";
+export type AIFrameworkType = "pydantic_ai" | "langchain" | "langgraph" | "crewai" | "deepagents" | "pydantic_deep";
+export type LLMProviderType = "openai" | "anthropic" | "google" | "openrouter";
 export type RateLimitStorageType = "memory" | "redis";
 export type ReverseProxyType =
   | "traefik_included"
@@ -24,6 +24,10 @@ export type ReverseProxyType =
   | "nginx_external"
   | "none";
 export type OrmType = "sqlalchemy" | "sqlmodel";
+export type VectorStoreType = "milvus" | "qdrant" | "chromadb" | "pgvector";
+export type RerankerType = "none" | "cohere" | "cross_encoder";
+export type PdfParserType = "pymupdf" | "llamaparse" | "liteparse" | "all";
+export type SandboxBackendType = "state" | "daytona";
 
 // ---- Logfire feature flags ------------------------------------------------
 
@@ -78,13 +82,31 @@ export interface ProjectConfig {
   admin_require_auth: boolean;
   enable_websockets: boolean;
   enable_file_storage: boolean;
+
+  // AI Agent
   enable_ai_agent: boolean;
   ai_framework: AIFrameworkType;
   llm_provider: LLMProviderType;
+  sandbox_backend: SandboxBackendType;
   enable_conversation_persistence: boolean;
   enable_langsmith: boolean;
-  enable_webhooks: boolean;
   websocket_auth: WebSocketAuthType;
+
+  // Messaging channels
+  use_telegram: boolean;
+  use_slack: boolean;
+
+  // RAG
+  enable_rag: boolean;
+  vector_store: VectorStoreType;
+  enable_google_drive_ingestion: boolean;
+  enable_s3_ingestion: boolean;
+  reranker_type: RerankerType;
+  pdf_parser: PdfParserType;
+  enable_rag_image_description: boolean;
+
+  // Other integrations
+  enable_webhooks: boolean;
   enable_cors: boolean;
   enable_orjson: boolean;
 
@@ -173,11 +195,13 @@ export const aiFrameworkLabels: Record<AIFrameworkType, string> = {
   langgraph: "LangGraph",
   crewai: "CrewAI",
   deepagents: "DeepAgents",
+  pydantic_deep: "PydanticDeep",
 };
 
 export const llmProviderLabels: Record<LLMProviderType, string> = {
   openai: "OpenAI",
   anthropic: "Anthropic",
+  google: "Google Gemini",
   openrouter: "OpenRouter",
 };
 
@@ -197,6 +221,31 @@ export const reverseProxyLabels: Record<ReverseProxyType, string> = {
 export const ormLabels: Record<OrmType, string> = {
   sqlalchemy: "SQLAlchemy",
   sqlmodel: "SQLModel",
+};
+
+export const vectorStoreLabels: Record<VectorStoreType, string> = {
+  milvus: "Milvus",
+  qdrant: "Qdrant",
+  chromadb: "ChromaDB",
+  pgvector: "pgvector",
+};
+
+export const rerankerLabels: Record<RerankerType, string> = {
+  none: "None",
+  cohere: "Cohere Rerank",
+  cross_encoder: "Cross-Encoder (local)",
+};
+
+export const pdfParserLabels: Record<PdfParserType, string> = {
+  pymupdf: "PyMuPDF (fast, local)",
+  llamaparse: "LlamaParse (cloud AI)",
+  liteparse: "LiteParse (AI-native, local)",
+  all: "All parsers (runtime selection)",
+};
+
+export const sandboxBackendLabels: Record<SandboxBackendType, string> = {
+  state: "State (in-memory)",
+  daytona: "Daytona (cloud workspace)",
 };
 
 // ---- Value arrays for iteration in UI components --------------------------
@@ -220,8 +269,9 @@ export const aiFrameworkValues: AIFrameworkType[] = [
   "langgraph",
   "crewai",
   "deepagents",
+  "pydantic_deep",
 ];
-export const llmProviderValues: LLMProviderType[] = ["openai", "anthropic", "openrouter"];
+export const llmProviderValues: LLMProviderType[] = ["openai", "anthropic", "google", "openrouter"];
 export const rateLimitStorageValues: RateLimitStorageType[] = ["memory", "redis"];
 export const reverseProxyValues: ReverseProxyType[] = [
   "traefik_included",
@@ -232,6 +282,10 @@ export const reverseProxyValues: ReverseProxyType[] = [
 ];
 export const ormValues: OrmType[] = ["sqlalchemy", "sqlmodel"];
 export const pythonVersionValues = ["3.11", "3.12", "3.13"] as const;
+export const vectorStoreValues: VectorStoreType[] = ["milvus", "qdrant", "chromadb", "pgvector"];
+export const rerankerValues: RerankerType[] = ["none", "cohere", "cross_encoder"];
+export const pdfParserValues: PdfParserType[] = ["pymupdf", "llamaparse", "liteparse", "all"];
+export const sandboxBackendValues: SandboxBackendType[] = ["state", "daytona"];
 
 // ---- Grouped labels for LivePreview and ReviewStep -------------------------
 
@@ -249,4 +303,7 @@ export const enumLabels = {
   rate_limit_storage: rateLimitStorageLabels,
   reverse_proxy: reverseProxyLabels,
   orm_type: ormLabels,
+  vector_store: vectorStoreLabels,
+  reranker_type: rerankerLabels,
+  pdf_parser: pdfParserLabels,
 } as const;

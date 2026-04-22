@@ -6,7 +6,7 @@ import { defaultConfig } from "../../lib/defaults";
 import { projectConfigSchema } from "../../lib/schema";
 import { presets, type PresetName } from "../../lib/presets";
 
-const TOTAL_STEPS = 9;
+const TOTAL_STEPS = 10;
 
 interface WizardContextValue {
   form: UseFormReturn<ProjectConfig>;
@@ -89,10 +89,28 @@ export function WizardProvider({ children, initialPreset }: WizardProviderProps)
       form.setValue("enable_langsmith", false);
     }
 
-    // Auto-disable logfire sub-features when their dependency is gone
-    if (!cur.enable_logfire && prev.enable_logfire) {
-      // Logfire turned off — no action needed, features hidden
+    // Auto-reset sandbox to "state" when switching to a non-sandbox framework
+    const sandboxFrameworks = ["deepagents", "pydantic_deep"];
+    if (!sandboxFrameworks.includes(cur.ai_framework) && cur.sandbox_backend !== "state") {
+      form.setValue("sandbox_backend", "state");
     }
+    // Daytona is only available for pydantic_deep
+    if (cur.ai_framework !== "pydantic_deep" && cur.sandbox_backend === "daytona") {
+      form.setValue("sandbox_backend", "state");
+    }
+
+    // Auto-reset OpenRouter when switching to a framework that doesn't support it
+    const openrouterFrameworks = ["pydantic_ai", "pydantic_deep"];
+    if (cur.llm_provider === "openrouter" && !openrouterFrameworks.includes(cur.ai_framework)) {
+      form.setValue("llm_provider", "openai");
+    }
+
+    // pgvector requires PostgreSQL — reset vector store if database changes
+    if (cur.enable_rag && cur.vector_store === "pgvector" && cur.database !== "postgresql") {
+      form.setValue("vector_store", "milvus");
+    }
+
+    // Auto-disable logfire sub-features when their dependency is gone
     if (cur.enable_logfire) {
       if (cur.database === "none" && cur.logfire_features.database) {
         form.setValue("logfire_features.database", false);
@@ -101,6 +119,8 @@ export function WizardProvider({ children, initialPreset }: WizardProviderProps)
         form.setValue("logfire_features.celery", false);
       }
     }
+
+    void prev;
   }, [config, form]);
 
   const applyPreset = useCallback(

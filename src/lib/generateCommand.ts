@@ -78,6 +78,11 @@ export function generateCommand(config: ProjectConfig): string {
     if (config.websocket_auth !== "none") {
       parts.push(`--websocket-auth ${config.websocket_auth}`);
     }
+    // Sandbox backend for DeepAgents/PydanticDeep
+    const sandboxFrameworks = ["deepagents", "pydantic_deep"];
+    if (sandboxFrameworks.includes(config.ai_framework) && config.sandbox_backend !== "state") {
+      parts.push(`--sandbox-backend ${config.sandbox_backend}`);
+    }
   }
 
   // Boolean flags (only when enabled, since CLI defaults to false)
@@ -93,6 +98,10 @@ export function generateCommand(config: ProjectConfig): string {
   if (config.enable_kubernetes) parts.push("--kubernetes");
   if (config.enable_i18n) parts.push("--i18n");
 
+  // Messaging channels
+  if (config.use_telegram) parts.push("--telegram");
+  if (config.use_slack) parts.push("--slack");
+
   // OAuth
   if (config.oauth_provider === "google") {
     parts.push("--oauth-google");
@@ -106,6 +115,23 @@ export function generateCommand(config: ProjectConfig): string {
   // Background tasks (default: none)
   if (config.background_tasks !== "none") {
     parts.push(`--task-queue ${config.background_tasks}`);
+  }
+
+  // RAG
+  if (config.enable_rag) {
+    parts.push("--rag");
+    if (config.vector_store !== "milvus") {
+      parts.push(`--vector-store ${config.vector_store}`);
+    }
+    if (config.enable_google_drive_ingestion) parts.push("--google-drive");
+    if (config.enable_s3_ingestion) parts.push("--s3");
+    if (config.reranker_type !== "none") {
+      parts.push(`--reranker ${config.reranker_type}`);
+    }
+    if (config.pdf_parser !== "pymupdf") {
+      parts.push(`--pdf-parser ${config.pdf_parser}`);
+    }
+    if (config.enable_rag_image_description) parts.push("--image-description");
   }
 
   // CI (default: github)

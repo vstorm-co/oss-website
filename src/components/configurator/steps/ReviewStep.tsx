@@ -101,6 +101,9 @@ export function ReviewStep() {
         {config.enable_ai_agent && <Badge>{enumLabels.llm_provider[config.llm_provider]}</Badge>}
         {config.enable_ai_agent && config.enable_conversation_persistence && <Badge>Persistence</Badge>}
         {config.enable_ai_agent && config.enable_langsmith && <Badge>LangSmith</Badge>}
+        {config.enable_rag && <Badge>RAG: {config.vector_store}</Badge>}
+        {config.use_telegram && <Badge>Telegram</Badge>}
+        {config.use_slack && <Badge>Slack</Badge>}
         {features.map((f) => (
           <Badge key={f}>{f}</Badge>
         ))}

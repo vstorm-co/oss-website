@@ -6,6 +6,7 @@ const STEP_LABELS = [
   "Database",
   "Auth",
   "AI",
+  "RAG",
   "Infra",
   "Integrations",
   "DevOps",

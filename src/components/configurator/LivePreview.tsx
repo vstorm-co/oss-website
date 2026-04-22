@@ -23,6 +23,10 @@ export function LivePreview() {
     ]);
   }
 
+  if (config.enable_rag) {
+    lines.push(["RAG", enumLabels.vector_store[config.vector_store]]);
+  }
+
   lines.push(["Frontend", enumLabels.frontend[config.frontend]]);
 
   if (config.enable_docker) {

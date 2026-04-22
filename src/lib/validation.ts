@@ -28,9 +28,22 @@ export function shouldShowAIOptions(config: ProjectConfig): boolean {
   return config.enable_ai_agent;
 }
 
-/** Show OpenRouter as an LLM provider option only for Pydantic AI. */
+/** Show OpenRouter as an LLM provider option only for Pydantic AI and PydanticDeep. */
 export function shouldShowOpenRouter(config: ProjectConfig): boolean {
-  return config.ai_framework === "pydantic_ai";
+  return config.ai_framework === "pydantic_ai" || config.ai_framework === "pydantic_deep";
+}
+
+/** Show sandbox backend selection for DeepAgents and PydanticDeep. */
+export function shouldShowSandboxBackend(config: ProjectConfig): boolean {
+  return (
+    config.enable_ai_agent &&
+    (config.ai_framework === "deepagents" || config.ai_framework === "pydantic_deep")
+  );
+}
+
+/** Show Daytona sandbox option only for PydanticDeep. */
+export function shouldShowDaytona(config: ProjectConfig): boolean {
+  return config.enable_ai_agent && config.ai_framework === "pydantic_deep";
 }
 
 /** Show WebSocket auth options when both WebSockets and AI agent are enabled. */
@@ -50,6 +63,24 @@ export function shouldShowLangsmith(config: ProjectConfig): boolean {
     (config.ai_framework === "langchain" ||
       config.ai_framework === "langgraph" ||
       config.ai_framework === "deepagents")
+  );
+}
+
+/** Show RAG sub-options when RAG is enabled. */
+export function shouldShowRAGOptions(config: ProjectConfig): boolean {
+  return config.enable_rag;
+}
+
+/** Show pgvector option only when PostgreSQL is selected. */
+export function shouldShowPgVector(config: ProjectConfig): boolean {
+  return config.database === "postgresql";
+}
+
+/** Show image description toggle when parser supports image extraction. */
+export function shouldShowImageDescription(config: ProjectConfig): boolean {
+  return (
+    config.enable_rag &&
+    (config.pdf_parser === "pymupdf" || config.pdf_parser === "all")
   );
 }
 

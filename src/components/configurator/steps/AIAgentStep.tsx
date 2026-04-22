@@ -4,11 +4,12 @@ import {
   aiFrameworkValues, aiFrameworkLabels,
   llmProviderValues, llmProviderLabels,
   websocketAuthValues, websocketAuthLabels,
+  sandboxBackendValues, sandboxBackendLabels,
 } from "../../../lib/types";
 import {
   shouldShowAIOptions, shouldShowOpenRouter,
   shouldShowWebSocketAuth, shouldShowConversationPersistence,
-  shouldShowLangsmith,
+  shouldShowLangsmith, shouldShowSandboxBackend, shouldShowDaytona,
 } from "../../../lib/validation";
 
 export function AIAgentStep() {
@@ -16,9 +17,15 @@ export function AIAgentStep() {
   const { register, watch, formState: { errors } } = form;
   const config = watch();
 
-  const availableProviders = llmProviderValues.filter(
-    (p) => p !== "openrouter" || shouldShowOpenRouter(config)
-  );
+  const availableProviders = llmProviderValues.filter((p) => {
+    if (p === "openrouter") return shouldShowOpenRouter(config);
+    return true;
+  });
+
+  const availableSandboxBackends = sandboxBackendValues.filter((s) => {
+    if (s === "daytona") return shouldShowDaytona(config);
+    return true;
+  });
 
   return (
     <div className="space-y-6">
@@ -53,9 +60,21 @@ export function AIAgentStep() {
                 options={availableProviders.map((v) => ({ value: v, label: llmProviderLabels[v] }))}
                 value={config.llm_provider}
                 register={register("llm_provider")}
-                columns={3}
+                columns={2}
               />
             </div>
+
+            {shouldShowSandboxBackend(config) && (
+              <div>
+                <label className="block text-sm font-medium text-text mb-2">Sandbox Backend</label>
+                <RadioGroup
+                  options={availableSandboxBackends.map((v) => ({ value: v, label: sandboxBackendLabels[v] }))}
+                  value={config.sandbox_backend}
+                  register={register("sandbox_backend")}
+                  columns={2}
+                />
+              </div>
+            )}
 
             {shouldShowLangsmith(config) && (
               <Toggle

@@ -33,10 +33,41 @@ async function loadBundle(base: string): Promise<TemplateBundle> {
   return cachedBundle;
 }
 
+/**
+ * Preprocess a Jinja2 template string to fix incompatibilities with nunjucks.
+ *
+ * Jinja2 allows mutating Python lists with .append() and .extend() inside
+ * `set` blocks. Nunjucks doesn't support these methods — convert them to
+ * the nunjucks-compatible `.concat([...])` form so the template renders.
+ *
+ * Before: {%- set _ = varname.append('item') %}
+ * After:  {% set varname = varname.concat(['item']) %}
+ *
+ * Before: {%- set _ = varname.extend(['a', 'b']) %}
+ * After:  {% set varname = varname.concat(['a', 'b']) %}
+ */
+function preprocessTemplate(template: string): string {
+  // Convert list.append(item) → list.concat([item])
+  let result = template.replace(
+    /\{%-?\s*set\s+_\s*=\s*(\w+)\.append\(([^)]+)\)\s*-?%\}/g,
+    (_m, varname: string, item: string) =>
+      `{% set ${varname} = ${varname}.concat([${item}]) %}`,
+  );
+
+  // Convert list.extend([items]) → list.concat([items])
+  result = result.replace(
+    /\{%-?\s*set\s+_\s*=\s*(\w+)\.extend\((\[[^\]]*\])\)\s*-?%\}/g,
+    (_m, varname: string, items: string) =>
+      `{% set ${varname} = ${varname}.concat(${items}) %}`,
+  );
+
+  return result;
+}
+
 /** Render a single template string with cookiecutter context. */
 function render(template: string, ctx: Record<string, unknown>): string {
   try {
-    return env.renderString(template, { cookiecutter: ctx });
+    return env.renderString(preprocessTemplate(template), { cookiecutter: ctx });
   } catch {
     // If template has syntax errors, return as-is
     return template;
@@ -71,6 +102,7 @@ function getExcludedPaths(ctx: Record<string, unknown>): Set<string> {
     if (!ctx.use_langgraph) rm(`${b}/agents/langgraph_assistant.py`);
     if (!ctx.use_crewai) rm(`${b}/agents/crewai_assistant.py`);
     if (!ctx.use_deepagents) rm(`${b}/agents/deepagents_assistant.py`);
+    if (!ctx.use_pydantic_deep) rm(`${b}/agents/pydantic_deep_assistant.py`);
   }
 
   // --- Example CRUD ---
@@ -150,6 +182,40 @@ function getExcludedPaths(ctx: Record<string, unknown>): Set<string> {
     if (!ctx.use_arq) {
       rm(`${b}/worker/arq_app.py`);
     }
+  }
+
+  // --- RAG ---
+  if (!ctx.enable_rag) {
+    rmDir(`${b}/rag`);
+    rm(`${b}/api/routes/v1/rag.py`);
+  }
+
+  // --- Messaging channels ---
+  if (!ctx.use_telegram && !ctx.use_slack) {
+    rm(`${b}/api/routes/v1/channels.py`);
+    rm(`${b}/services/channel_bot.py`);
+    rm(`${b}/repositories/channel_bot.py`);
+    rm(`${b}/db/models/channel_bot.py`);
+    rm(`${b}/db/models/channel_identity.py`);
+    rm(`${b}/db/models/channel_session.py`);
+    rm(`${b}/schemas/channel_bot.py`);
+  }
+  if (!ctx.use_telegram) {
+    rm(`${b}/api/routes/v1/telegram_webhook.py`);
+    rm(`${b}/telegram_dispatcher.py`);
+  }
+  if (!ctx.use_slack) {
+    rm(`${b}/api/routes/v1/slack_webhook.py`);
+    rm(`${b}/slack_dispatcher.py`);
+  }
+
+  // --- PydanticDeep / projects ---
+  if (!ctx.use_pydantic_deep) {
+    rm(`${b}/api/routes/v1/projects.py`);
+    rm(`${b}/services/project.py`);
+    rm(`${b}/repositories/project.py`);
+    rm(`${b}/db/models/project.py`);
+    rm(`${b}/schemas/project.py`);
   }
 
   // --- CI/CD ---

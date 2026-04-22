@@ -7,6 +7,13 @@ import type { ProjectConfig } from "./types";
 export function generateCookiecutterJson(config: ProjectConfig): Record<string, unknown> {
   const projectSlug = config.project_name.replace(/-/g, "_");
 
+  // Derive embedding provider from LLM provider
+  const embeddingProvider =
+    config.llm_provider === "anthropic" ? "voyage" :
+    config.llm_provider === "google" ? "gemini" :
+    config.llm_provider === "openrouter" ? "sentence_transformers" :
+    "openai";
+
   return {
     project_name: config.project_name,
     project_slug: projectSlug,
@@ -78,6 +85,8 @@ export function generateCookiecutterJson(config: ProjectConfig): Record<string, 
     admin_require_auth: config.admin_require_auth,
     enable_websockets: config.enable_websockets,
     enable_file_storage: config.enable_file_storage,
+
+    // AI Agent
     enable_ai_agent: config.enable_ai_agent,
     ai_framework: config.ai_framework,
     use_pydantic_ai: config.ai_framework === "pydantic_ai",
@@ -85,17 +94,52 @@ export function generateCookiecutterJson(config: ProjectConfig): Record<string, 
     use_langgraph: config.ai_framework === "langgraph",
     use_crewai: config.ai_framework === "crewai",
     use_deepagents: config.ai_framework === "deepagents",
+    use_pydantic_deep: config.ai_framework === "pydantic_deep",
+    sandbox_backend: config.sandbox_backend,
     llm_provider: config.llm_provider,
     use_openai: config.llm_provider === "openai",
     use_anthropic: config.llm_provider === "anthropic",
+    use_google: config.llm_provider === "google",
     use_openrouter: config.llm_provider === "openrouter",
     enable_conversation_persistence: config.enable_conversation_persistence,
     enable_langsmith: config.enable_langsmith,
-    enable_webhooks: config.enable_webhooks,
     websocket_auth: config.websocket_auth,
     websocket_auth_jwt: config.websocket_auth === "jwt",
     websocket_auth_api_key: config.websocket_auth === "api_key",
     websocket_auth_none: config.websocket_auth === "none",
+
+    // Messaging channels
+    use_telegram: config.use_telegram,
+    use_slack: config.use_slack,
+
+    // RAG
+    enable_rag: config.enable_rag,
+    vector_store: config.vector_store,
+    use_milvus: config.enable_rag && config.vector_store === "milvus",
+    use_qdrant: config.enable_rag && config.vector_store === "qdrant",
+    use_chromadb: config.enable_rag && config.vector_store === "chromadb",
+    use_pgvector: config.enable_rag && config.vector_store === "pgvector",
+    enable_google_drive_ingestion: config.enable_rag && config.enable_google_drive_ingestion,
+    enable_s3_ingestion: config.enable_rag && config.enable_s3_ingestion,
+    enable_reranker: config.enable_rag && config.reranker_type !== "none",
+    reranker_type: config.reranker_type,
+    use_cohere_reranker: config.enable_rag && config.reranker_type === "cohere",
+    use_cross_encoder_reranker: config.enable_rag && config.reranker_type === "cross_encoder",
+    pdf_parser: config.pdf_parser,
+    use_pymupdf: config.enable_rag && (config.pdf_parser === "pymupdf"),
+    use_llamaparse: config.enable_rag && config.pdf_parser === "llamaparse",
+    use_liteparse: config.enable_rag && config.pdf_parser === "liteparse",
+    use_all_pdf_parsers: config.enable_rag && config.pdf_parser === "all",
+    enable_rag_image_description: config.enable_rag && config.enable_rag_image_description,
+    // Embedding provider (auto-derived from LLM provider)
+    embedding_provider: embeddingProvider,
+    use_openai_embeddings: embeddingProvider === "openai",
+    use_voyage_embeddings: embeddingProvider === "voyage",
+    use_gemini_embeddings: embeddingProvider === "gemini",
+    use_sentence_transformers: embeddingProvider === "sentence_transformers",
+
+    // Other integrations
+    enable_webhooks: config.enable_webhooks,
     enable_cors: config.enable_cors,
     enable_orjson: config.enable_orjson,
 

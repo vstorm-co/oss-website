@@ -24,6 +24,26 @@ export function IntegrationsStep() {
         <Toggle label="Example CRUD" desc="Sample CRUD endpoints" checked={config.include_example_crud} register={register("include_example_crud")} />
       </div>
 
+      <hr className="border-border" />
+
+      <div>
+        <label className="block text-sm font-medium text-text mb-2">Messaging Channels</label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <Toggle
+            label="Telegram"
+            desc="Multi-bot, polling + webhook, role-based access"
+            checked={config.use_telegram}
+            register={register("use_telegram")}
+          />
+          <Toggle
+            label="Slack"
+            desc="Events API, threads, @mention support"
+            checked={config.use_slack}
+            register={register("use_slack")}
+          />
+        </div>
+      </div>
+
       {shouldShowAdminPanel(config) && (
         <>
           <hr className="border-border" />

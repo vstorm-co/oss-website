@@ -54,13 +54,31 @@ export const defaultConfig: ProjectConfig = {
   admin_require_auth: true,
   enable_websockets: false,
   enable_file_storage: false,
+
+  // AI Agent
   enable_ai_agent: true,
   ai_framework: "pydantic_ai",
   llm_provider: "openai",
+  sandbox_backend: "state",
   enable_conversation_persistence: false,
   enable_langsmith: false,
-  enable_webhooks: false,
   websocket_auth: "none",
+
+  // Messaging channels
+  use_telegram: false,
+  use_slack: false,
+
+  // RAG
+  enable_rag: false,
+  vector_store: "milvus",
+  enable_google_drive_ingestion: false,
+  enable_s3_ingestion: false,
+  reranker_type: "none",
+  pdf_parser: "pymupdf",
+  enable_rag_image_description: false,
+
+  // Other integrations
+  enable_webhooks: false,
   enable_cors: true,
   enable_orjson: true,
 

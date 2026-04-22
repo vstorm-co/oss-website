@@ -7,6 +7,7 @@ import { ProjectInfoStep } from "./steps/ProjectInfoStep";
 import { DatabaseStep } from "./steps/DatabaseStep";
 import { AuthStep } from "./steps/AuthStep";
 import { AIAgentStep } from "./steps/AIAgentStep";
+import { RAGStep } from "./steps/RAGStep";
 import { InfrastructureStep } from "./steps/InfrastructureStep";
 import { IntegrationsStep } from "./steps/IntegrationsStep";
 import { DevToolsStep } from "./steps/DevToolsStep";
@@ -43,11 +44,12 @@ function WizardContent() {
           {step === 2 && <DatabaseStep />}
           {step === 3 && <AuthStep />}
           {step === 4 && <AIAgentStep />}
-          {step === 5 && <InfrastructureStep />}
-          {step === 6 && <IntegrationsStep />}
-          {step === 7 && <DevToolsStep />}
-          {step === 8 && <FrontendStep />}
-          {step === 9 && <ReviewStep />}
+          {step === 5 && <RAGStep />}
+          {step === 6 && <InfrastructureStep />}
+          {step === 7 && <IntegrationsStep />}
+          {step === 8 && <DevToolsStep />}
+          {step === 9 && <FrontendStep />}
+          {step === 10 && <ReviewStep />}
         </WizardShell>
       </div>
 

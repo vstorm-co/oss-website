@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------
 // Zod validation schema for ProjectConfig.
-// Ported from the Pydantic model_validator in fastapi_gen/config.py (lines 236-382).
+// Ported from the Pydantic model_validator in fastapi_gen/config.py.
 // ---------------------------------------------------------------------------
 
 import { z } from "zod";
@@ -21,8 +21,9 @@ const aiFrameworkSchema = z.enum([
   "langgraph",
   "crewai",
   "deepagents",
+  "pydantic_deep",
 ]);
-const llmProviderSchema = z.enum(["openai", "anthropic", "openrouter"]);
+const llmProviderSchema = z.enum(["openai", "anthropic", "google", "openrouter"]);
 const rateLimitStorageSchema = z.enum(["memory", "redis"]);
 const reverseProxySchema = z.enum([
   "traefik_included",
@@ -32,6 +33,10 @@ const reverseProxySchema = z.enum([
   "none",
 ]);
 const ormSchema = z.enum(["sqlalchemy", "sqlmodel"]);
+const vectorStoreSchema = z.enum(["milvus", "qdrant", "chromadb", "pgvector"]);
+const rerankerSchema = z.enum(["none", "cohere", "cross_encoder"]);
+const pdfParserSchema = z.enum(["pymupdf", "llamaparse", "liteparse", "all"]);
+const sandboxBackendSchema = z.enum(["state", "daytona"]);
 
 // ---- Logfire features sub-schema ------------------------------------------
 
@@ -98,13 +103,31 @@ const baseConfigSchema = z.object({
   admin_require_auth: z.boolean().default(true),
   enable_websockets: z.boolean().default(false),
   enable_file_storage: z.boolean().default(false),
+
+  // AI Agent
   enable_ai_agent: z.boolean().default(true),
   ai_framework: aiFrameworkSchema.default("pydantic_ai"),
   llm_provider: llmProviderSchema.default("openai"),
+  sandbox_backend: sandboxBackendSchema.default("state"),
   enable_conversation_persistence: z.boolean().default(false),
   enable_langsmith: z.boolean().default(false),
-  enable_webhooks: z.boolean().default(false),
   websocket_auth: websocketAuthSchema.default("none"),
+
+  // Messaging channels
+  use_telegram: z.boolean().default(false),
+  use_slack: z.boolean().default(false),
+
+  // RAG
+  enable_rag: z.boolean().default(false),
+  vector_store: vectorStoreSchema.default("milvus"),
+  enable_google_drive_ingestion: z.boolean().default(false),
+  enable_s3_ingestion: z.boolean().default(false),
+  reranker_type: rerankerSchema.default("none"),
+  pdf_parser: pdfParserSchema.default("pymupdf"),
+  enable_rag_image_description: z.boolean().default(false),
+
+  // Other integrations
+  enable_webhooks: z.boolean().default(false),
   enable_cors: z.boolean().default(true),
   enable_orjson: z.boolean().default(true),
 
@@ -142,8 +165,6 @@ export const projectConfigSchema = baseConfigSchema.superRefine((_cfg, _ctx) => 
   // 1. Auto-fix in WizardProvider (e.g., caching → auto-enable Redis)
   // 2. Conditional visibility in validation.ts (e.g., ORM only shown for SQL DBs)
   // 3. Filtered options in step components (e.g., OpenRouter hidden for non-Pydantic AI)
-  //
-  // No hard errors remain — the wizard prevents invalid combinations by design.
 });
 
 // ---- Inferred type from the schema ----------------------------------------
