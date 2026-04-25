@@ -22,7 +22,7 @@ Three days later, you have a working dev environment. Zero components written.
 
 Then Dan Abramov releases create-react-app. One command: `npx create-react-app my-app`. Sensible defaults. Proven structure. Zero config to start. Eject when you outgrow it.
 
-React development was never the same. Not because CRA did anything magical — but because it established a *default*. A starting point everyone agreed on. A floor, not a ceiling.
+React development was never the same. Not because CRA did anything magical — but because it established a _default_. A starting point everyone agreed on. A floor, not a ceiling.
 
 Fast forward to 2026. We're in the exact same moment with AI applications. And we're making the exact same mistakes.
 
@@ -38,13 +38,14 @@ CRA solved three problems simultaneously:
 2. **Standards creation.** When everyone starts from the same template, folder structures become predictable. Tutorials transfer across projects. Stack Overflow answers actually apply to your setup.
 3. **Ecosystem acceleration.** Libraries could assume a standard environment. Testing tools could assume a standard build process. The entire React ecosystem sped up because there was a shared baseline.
 
-These aren't frontend problems. They're *complexity management* problems. And AI applications have all three, amplified.
+These aren't frontend problems. They're _complexity management_ problems. And AI applications have all three, amplified.
 
 ## The AI Boilerplate Problem in 2026
 
 Here's what starting a new AI application looks like today:
 
 **Week 1 — Backend infrastructure:**
+
 - [FastAPI](https://fastapi.tiangolo.com/) project structure with async support
 - Database setup (PostgreSQL, migrations with Alembic)
 - JWT authentication (login, register, refresh tokens, session management)
@@ -52,6 +53,7 @@ Here's what starting a new AI application looks like today:
 - Environment configuration and secrets management
 
 **Week 2 — AI integration:**
+
 - AI framework setup ([Pydantic AI](https://ai.pydantic.dev/), [LangChain](https://python.langchain.com/), [LangGraph](https://langchain-ai.github.io/langgraph/), or something else)
 - LLM provider integration (OpenAI, Anthropic, OpenRouter)
 - WebSocket streaming for real-time token delivery
@@ -59,6 +61,7 @@ Here's what starting a new AI application looks like today:
 - Tool registration and dependency injection
 
 **Week 3 — Frontend and deployment:**
+
 - [Next.js](https://nextjs.org/) frontend with streaming chat UI
 - WebSocket client with reconnection logic
 - [Docker](https://docs.docker.com/) multi-stage builds
@@ -76,15 +79,15 @@ Sound familiar?
 
 Let me map it explicitly:
 
-| Dimension | CRA (2016) | AI Template (2026) |
-|-----------|-----------|-------------------|
-| **The pain** | Webpack + Babel + ESLint config hell | FastAPI + Auth + WebSocket + Docker + AI framework config hell |
-| **Time wasted** | Days before first component | Weeks before first agent |
-| **The fragmentation** | Every team's build setup was different | Every team's AI stack is different |
-| **The command** | `npx create-react-app my-app` | `fastapi-fullstack create my_app --preset ai-agent` |
-| **Sensible defaults** | Webpack config, ESLint rules, folder structure | PostgreSQL, JWT, Redis, Pydantic AI, Docker, CI/CD |
-| **Escape hatch** | `eject` when you outgrow defaults | 75+ options when you need customization |
-| **Result** | Working React app in seconds | Working AI application in minutes |
+| Dimension             | CRA (2016)                                     | AI Template (2026)                                             |
+| --------------------- | ---------------------------------------------- | -------------------------------------------------------------- |
+| **The pain**          | Webpack + Babel + ESLint config hell           | FastAPI + Auth + WebSocket + Docker + AI framework config hell |
+| **Time wasted**       | Days before first component                    | Weeks before first agent                                       |
+| **The fragmentation** | Every team's build setup was different         | Every team's AI stack is different                             |
+| **The command**       | `npx create-react-app my-app`                  | `fastapi-fullstack create my_app --preset ai-agent`            |
+| **Sensible defaults** | Webpack config, ESLint rules, folder structure | PostgreSQL, JWT, Redis, Pydantic AI, Docker, CI/CD             |
+| **Escape hatch**      | `eject` when you outgrow defaults              | 75+ options when you need customization                        |
+| **Result**            | Working React app in seconds                   | Working AI application in minutes                              |
 
 The structural similarity isn't a coincidence. It's the same pattern: a technology category matures past the "everyone hand-rolls everything" phase and enters the "we need a standard starting point" phase.
 
@@ -92,17 +95,17 @@ React was there in 2016. AI applications are there now.
 
 ## What "Sensible Defaults" Means for AI Apps
 
-CRA's genius was picking the right defaults. Not the most powerful options — the most *sensible* ones. You didn't get every possible Webpack plugin. You got the configuration that worked for 90% of projects.
+CRA's genius was picking the right defaults. Not the most powerful options — the most _sensible_ ones. You didn't get every possible Webpack plugin. You got the configuration that worked for 90% of projects.
 
 For AI applications, sensible defaults look like this:
 
 **3 presets that cover 90% of use cases:**
 
-| Preset | What you get | Who it's for |
-|--------|-------------|--------------|
-| **Minimal** | FastAPI, no database, no auth, no Docker | Quick prototypes, learning, experiments |
-| **AI Agent** | PostgreSQL, JWT, Redis, Pydantic AI, WebSocket streaming, conversation persistence, Docker, GitHub Actions | AI chatbot and agent applications |
-| **Production** | Everything in AI Agent + caching, rate limiting, Sentry, Prometheus, Kubernetes, admin panel | Enterprise-grade deployments |
+| Preset         | What you get                                                                                               | Who it's for                            |
+| -------------- | ---------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| **Minimal**    | FastAPI, no database, no auth, no Docker                                                                   | Quick prototypes, learning, experiments |
+| **AI Agent**   | PostgreSQL, JWT, Redis, Pydantic AI, WebSocket streaming, conversation persistence, Docker, GitHub Actions | AI chatbot and agent applications       |
+| **Production** | Everything in AI Agent + caching, rate limiting, Sentry, Prometheus, Kubernetes, admin panel               | Enterprise-grade deployments            |
 
 Pick a preset. Get a running application. Customize later.
 
@@ -123,7 +126,7 @@ One command. All of it. Tested, configured, and working together.
 
 CRA had `eject`. Our template has 75+ configuration options.
 
-But here's the key design decision: you don't *see* those options unless you want them. The presets abstract the complexity away. When you need to customize — switch from PostgreSQL to MongoDB, add Celery for background tasks, enable Kubernetes manifests, swap Pydantic AI for LangChain — the options are there.
+But here's the key design decision: you don't _see_ those options unless you want them. The presets abstract the complexity away. When you need to customize — switch from PostgreSQL to MongoDB, add Celery for background tasks, enable Kubernetes manifests, swap Pydantic AI for LangChain — the options are there.
 
 This is the progressive disclosure pattern that CRA pioneered. Simple by default. Powerful when needed. Never overwhelming at first contact.
 
@@ -133,7 +136,7 @@ It's what CRA would have looked like if it launched with a GUI.
 
 ## Standards Beat Snowflakes
 
-The most underrated thing CRA did wasn't eliminating boilerplate. It was *creating a standard*.
+The most underrated thing CRA did wasn't eliminating boilerplate. It was _creating a standard_.
 
 When every React project starts from CRA, something shifts:
 
@@ -145,6 +148,7 @@ When every React project starts from CRA, something shifts:
 AI applications desperately need this convergence.
 
 Right now, if I join your team and look at your AI project, I have no idea where to find:
+
 - The agent definition
 - The tool registrations
 - The conversation persistence logic
@@ -174,19 +178,21 @@ my_app/
   .github/          # CI/CD workflows
 ```
 
-This isn't just a folder structure. It's a *shared vocabulary* for AI application architecture.
+This isn't just a folder structure. It's a _shared vocabulary_ for AI application architecture.
 
 ## The Ecosystem Effect
 
 Here's what happens after a standard template exists.
 
 In React-land, after CRA:
+
 - Testing libraries (Jest, React Testing Library) targeted CRA's configuration
 - CSS solutions (styled-components, CSS modules) assumed CRA's build process
 - State management (Redux) provided CRA-specific setup guides
 - Deployment platforms (Vercel, Netlify) offered one-click CRA deployment
 
 The same flywheel is starting for AI applications:
+
 - [pydantic-deepagents](https://github.com/vstorm.co/projects/pydantic-deepagents) — our modular agent framework — provides a template integration that drops in advanced patterns (sub-agents, parallel execution, sandboxed code running) as a configuration option
 - [Logfire](https://logfire.pydantic.dev/) observability integrates out of the box because the template provides a standard instrumentation surface
 - Testing patterns are consistent because the project structure is consistent
@@ -199,7 +205,7 @@ Every new AI application should start from a template. Not from scratch.
 
 Not because templates are perfect. Not because one size fits all. But because the alternative — every team independently solving the same infrastructure problems with different implementations — is a waste of collective engineering time.
 
-CRA didn't limit React development. It *unleashed* it. By eliminating the boilerplate barrier, it let more developers build more ambitious applications faster. The framework ecosystem exploded *after* CRA made it easy to start.
+CRA didn't limit React development. It _unleashed_ it. By eliminating the boilerplate barrier, it let more developers build more ambitious applications faster. The framework ecosystem exploded _after_ CRA made it easy to start.
 
 The same will happen with AI applications. When starting a new AI project takes minutes instead of weeks, more teams will experiment. More products will ship. The bar for "minimum viable AI application" will rise from "I got the WebSocket streaming working" to "I built something users actually want." Our [FastAPI + Next.js template guide](/blog/fastapi-nextjs-ai-template-guide/) walks through the entire process step by step.
 

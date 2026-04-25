@@ -182,15 +182,15 @@ class CrewAIAssistant:
 
 ## Vergleichstabelle
 
-| Metrik | Pydantic AI | LangChain | LangGraph | CrewAI |
-|--------|------------|-----------|-----------|--------|
-| **Codezeilen** | ~160 | ~170 | ~280 | ~420 |
-| **Typsicherheit** | Volle Generics | TypedDict | TypedDict | Pydantic-Modelle |
-| **Async-Support** | Nativ | Nativ | Nativ | Sync (Executor) |
-| **Streaming** | `agent.iter()` | `astream()` | `astream()` | Event-Bus + Thread |
-| **Tool-Syntax** | `@agent.tool` | `@tool` | `bind_tools()` | Konfigurationsbasiert |
-| **Architektur** | Einzelner Agent | Agent (abstrahiert) | Expliziter Graph | Multi-Agent-Crew |
-| **Am besten fuer** | Typsichere Agenten | Schnelle Prototypen | Komplexe Workflows | Agent-Teams |
+| Metrik             | Pydantic AI        | LangChain           | LangGraph          | CrewAI                |
+| ------------------ | ------------------ | ------------------- | ------------------ | --------------------- |
+| **Codezeilen**     | ~160               | ~170                | ~280               | ~420                  |
+| **Typsicherheit**  | Volle Generics     | TypedDict           | TypedDict          | Pydantic-Modelle      |
+| **Async-Support**  | Nativ              | Nativ               | Nativ              | Sync (Executor)       |
+| **Streaming**      | `agent.iter()`     | `astream()`         | `astream()`        | Event-Bus + Thread    |
+| **Tool-Syntax**    | `@agent.tool`      | `@tool`             | `bind_tools()`     | Konfigurationsbasiert |
+| **Architektur**    | Einzelner Agent    | Agent (abstrahiert) | Expliziter Graph   | Multi-Agent-Crew      |
+| **Am besten fuer** | Typsichere Agenten | Schnelle Prototypen | Komplexe Workflows | Agent-Teams           |
 
 ## Wann welches verwenden
 

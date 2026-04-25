@@ -13,16 +13,16 @@ draft: false
 
 Cada demo de agente de IA muestra lo mismo: "pregúntale a tu agente sobre tus datos." El agente consulta una base de datos, resume resultados, tal vez hace un gráfico.
 
-Pero intenta pedirle que *ejecute una regresión polinómica sobre 24 meses de datos de ventas y pronostique los próximos 6 meses.* De repente tu agente basado en chat choca contra un muro. No puede hacer `import sklearn`. No puede ejecutar Python. Puede razonar sobre qué modelo usar, pero no puede ejecutar uno realmente.
+Pero intenta pedirle que _ejecute una regresión polinómica sobre 24 meses de datos de ventas y pronostique los próximos 6 meses._ De repente tu agente basado en chat choca contra un muro. No puede hacer `import sklearn`. No puede ejecutar Python. Puede razonar sobre qué modelo usar, pero no puede ejecutar uno realmente.
 
-La solución obvia: dale un entorno Python. Pero aquí está la pregunta de la que nadie habla - ¿ese entorno debería ser el *runtime por defecto* del agente (como Claude Code), o debería ser *una herramienta que el agente elige usar*?
+La solución obvia: dale un entorno Python. Pero aquí está la pregunta de la que nadie habla - ¿ese entorno debería ser el _runtime por defecto_ del agente (como Claude Code), o debería ser _una herramienta que el agente elige usar_?
 
 Construimos una demo que responde esta pregunta.
 
 ## TL;DR
 
 - El patrón **"environment as a tool"** permite que tu agente de IA use selectivamente un sandbox Docker solo cuando es necesario, evitando overhead en consultas simples.
-- El enfoque de **delegación a sub-agentes** mantiene limpio al agente principal - describe *qué* predecir, y el sub-agente determina *cómo* escribir el código Python.
+- El enfoque de **delegación a sub-agentes** mantiene limpio al agente principal - describe _qué_ predecir, y el sub-agente determina _cómo_ escribir el código Python.
 - La **salida estructurada con Pydantic** para gráficos supera la generación de imágenes - envía datos, deja que el frontend renderice con Chart.js.
 - El **streaming por WebSocket** con `agent.iter()` ofrece visibilidad en tiempo real del texto, llamadas a herramientas y resultados.
 - La parte más difícil es la **integración frontend** - fusionar series de gráficos con diferentes rangos de fechas, interceptar salidas de herramientas y streaming por WebSocket.
@@ -54,7 +54,7 @@ El agente principal es un agente Pydantic AI regular. No vive dentro de Docker. 
 - `predict` - crea un sub-agente con acceso a Docker, delega la tarea de predicción.
 - `generate_chart` - devuelve `LineChartData` estructurado (un modelo Pydantic) que el frontend renderiza como un gráfico Chart.js.
 
-El agente decide *cuándo* usar Docker. Si preguntas "muéstrame las ventas totales por producto", llama a `query_data` - rápido, sin overhead. Si preguntas "predice las ventas de Widget Alpha para los próximos 6 meses", llama a `predict` - que lanza un sub-agente dentro de Docker.
+El agente decide _cuándo_ usar Docker. Si preguntas "muéstrame las ventas totales por producto", llama a `query_data` - rápido, sin overhead. Si preguntas "predice las ventas de Widget Alpha para los próximos 6 meses", llama a `predict` - que lanza un sub-agente dentro de Docker.
 
 ## La Herramienta Predict: Sub-Agente con un Laboratorio Docker
 
@@ -142,24 +142,24 @@ El frontend lo recibe y lo renderiza con Chart.js. Sin imágenes, sin base64, si
 Esta es la pregunta de diseño que mencioné al principio. Hay dos formas de darle a un agente un entorno de ejecución de código:
 
 **Opción A: Entorno como Herramienta** (lo que construimos)
-El agente vive fuera de Docker. Tiene una herramienta `predict` que delega a un sub-agente dentro de Docker. El agente decide *cuándo* usarlo.
+El agente vive fuera de Docker. Tiene una herramienta `predict` que delega a un sub-agente dentro de Docker. El agente decide _cuándo_ usarlo.
 
 **Opción B: Entorno por Defecto** (como Claude Code)
-El agente vive *dentro* de Docker. Cada comando que ejecuta, cada archivo que lee - todo está en el sandbox. El entorno siempre está ahí.
+El agente vive _dentro_ de Docker. Cada comando que ejecuta, cada archivo que lee - todo está en el sandbox. El entorno siempre está ahí.
 
 Cuándo tiene sentido cada uno:
 
-| | Entorno como Herramienta | Entorno por Defecto |
-|---|---|---|
-| **Mejor para** | Tareas específicas del dominio (predicciones, análisis de datos, code review) | Agentes de codificación de propósito general |
-| **Control del agente** | El agente decide cuándo usar el sandbox | El agente siempre corre en el sandbox |
-| **Overhead** | Solo paga el costo de Docker cuando es necesario | Siempre ejecutándose |
-| **Flexibilidad** | Puede mezclar herramientas libremente | Todo pasa por el sandbox |
-| **Complejidad** | Necesita patrón de delegación a sub-agente | Más simple - el agente solo tiene herramientas |
+|                        | Entorno como Herramienta                                                      | Entorno por Defecto                            |
+| ---------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------- |
+| **Mejor para**         | Tareas específicas del dominio (predicciones, análisis de datos, code review) | Agentes de codificación de propósito general   |
+| **Control del agente** | El agente decide cuándo usar el sandbox                                       | El agente siempre corre en el sandbox          |
+| **Overhead**           | Solo paga el costo de Docker cuando es necesario                              | Siempre ejecutándose                           |
+| **Flexibilidad**       | Puede mezclar herramientas libremente                                         | Todo pasa por el sandbox                       |
+| **Complejidad**        | Necesita patrón de delegación a sub-agente                                    | Más simple - el agente solo tiene herramientas |
 
 Para nuestra demo de analítica predictiva, la Opción A es claramente la correcta. El agente principalmente responde preguntas sobre datos (no necesita Docker) y solo ejecuta Docker cuando necesita correr código sklearn. Hacer de Docker el entorno por defecto añadiría latencia innecesaria a cada interacción.
 
-Pero para un agente de codificación como Claude Code, la Opción B tiene sentido - toda la tarea del agente es leer, escribir y ejecutar código. El entorno *es* el producto.
+Pero para un agente de codificación como Claude Code, la Opción B tiene sentido - toda la tarea del agente es leer, escribir y ejecutar código. El entorno _es_ el producto.
 
 ## Resultados Reales
 
@@ -202,18 +202,18 @@ Encontramos un bug interesante durante el desarrollo. Al graficar "Historical" (
 La solución: fusionar todos los x-labels únicos de todas las series, luego usar un mapa de búsqueda por serie con `null` para fechas faltantes:
 
 ```javascript
-const allLabels = [...new Set(
-    chartData.series.flatMap((s) => s.data_points.map((dp) => dp.x))
-)].sort();
+const allLabels = [
+  ...new Set(chartData.series.flatMap((s) => s.data_points.map((dp) => dp.x))),
+].sort();
 
 const datasets = chartData.series.map((s, i) => {
-    const lookup = new Map(s.data_points.map((dp) => [dp.x, dp.y]));
-    return {
-        label: s.name,
-        data: allLabels.map((x) => lookup.get(x) ?? null),
-        spanGaps: false,
-        // ...styling
-    };
+  const lookup = new Map(s.data_points.map((dp) => [dp.x, dp.y]));
+  return {
+    label: s.name,
+    data: allLabels.map((x) => lookup.get(x) ?? null),
+    spanGaps: false,
+    // ...styling
+  };
 });
 ```
 
@@ -222,7 +222,7 @@ Algo pequeño, pero es el tipo de bug que hace que tu pronóstico se vea complet
 ## Conclusiones Clave
 
 - **"Entorno como herramienta"** es el patrón correcto cuando tu agente solo a veces necesita ejecución de código. No pagues el overhead de Docker en cada interacción.
-- **Delegación a sub-agentes** mantiene limpio al agente principal. El agente principal describe *qué* predecir. El sub-agente determina *cómo* escribir el código Python.
+- **Delegación a sub-agentes** mantiene limpio al agente principal. El agente principal describe _qué_ predecir. El sub-agente determina _cómo_ escribir el código Python.
 - **Salida estructurada de Pydantic** para gráficos supera la generación de imágenes. Envía datos, deja que el frontend renderice. Más fácil de estilizar, interactivo y sin blobs base64.
 - **Streaming por WebSocket** con `agent.iter()` te da visibilidad en tiempo real de lo que hace el agente - texto, llamadas a herramientas y resultados.
 - La parte más difícil no es el agente - es la **integración frontend** (fusionar series de gráficos con diferentes rangos de fechas, interceptar salidas de herramientas, streaming por WebSocket).

@@ -72,6 +72,7 @@ Sin coincidencia de espacios en blanco. Sin ambiguedad. Sin reproducir texto vie
 En febrero de 2026, Can Boluk publico ["I Improved 15 LLMs at Coding in One Afternoon. Only the Harness Changed."](https://blog.can.ac/2026/02/12/the-harness-problem/) — un benchmark de 16 modelos en 3 formatos de edicion (patch, str_replace, hashline).
 
 **Setup:**
+
 - 180 tareas por ejecucion, 3 ejecuciones por modelo
 - Archivos de codebase React como test fixtures
 - Mutaciones mecanicas: intercambios de operadores, inversiones de booleanos, errores off-by-one, renombramientos de identificadores
@@ -79,15 +80,16 @@ En febrero de 2026, Can Boluk publico ["I Improved 15 LLMs at Coding in One Afte
 
 **Resultados clave:**
 
-| Hallazgo | Numeros |
-|----------|---------|
+| Hallazgo         | Numeros                                                       |
+| ---------------- | ------------------------------------------------------------- |
 | Grok Code Fast 1 | **6,7% a 68,3%** de precision (+61,6pp) con hashline vs patch |
-| MiniMax | Precision mas que **duplicada** |
-| Grok 4 Fast | Tokens de salida cayeron un **61%** |
-| Gemini 3 Flash | **78,3%** de precision con hashline |
-| Formato patch | **El peor para casi todos los modelos** |
+| MiniMax          | Precision mas que **duplicada**                               |
+| Grok 4 Fast      | Tokens de salida cayeron un **61%**                           |
+| Gemini 3 Flash   | **78,3%** de precision con hashline                           |
+| Formato patch    | **El peor para casi todos los modelos**                       |
 
 El patron era claro:
+
 - **Hashline igualo o supero a str_replace para la mayoria de los modelos**
 - **Los modelos mas debiles ganaron mas** — los modelos mas pequenos tienen mas dificultades con la reproduccion exacta de texto
 - **El uso de tokens cayo drasticamente** — los modelos gastan menos tokens senalando codigo y mas tokens cambiandolo
@@ -131,6 +133,7 @@ new_content, error = apply_hashline_edit(
 ```
 
 **Operaciones soportadas:**
+
 - **Reemplazar linea individual** — `start_line` + `start_hash` + `new_content`
 - **Reemplazar rango** — ademas `end_line` + `end_hash`
 - **Insertar despues** — establecer `insert_after=True`

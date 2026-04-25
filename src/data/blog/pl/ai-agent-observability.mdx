@@ -31,7 +31,7 @@ Wiec ja zbudowalismy: asystenta Logfire napedzanego AI, ktory tlumaczy pytania w
 
 ## Problem: SQL to nie sposob na debugowanie agentow
 
-Logfire przechowuje wszystko w formacie pozwalajacym na zapytania SQL. *Mozesz* napisac:
+Logfire przechowuje wszystko w formacie pozwalajacym na zapytania SQL. _Mozesz_ napisac:
 
 ```sql
 SELECT span_name, duration, attributes
@@ -131,17 +131,16 @@ Najpotezniejsza funkcja to rozszerzenie Chrome. Kiedy przegladasz slad w webowym
 ```typescript
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   const isLogfirePage =
-    tab.url.includes('logfire.pydantic.dev') ||
-    tab.url.includes('logfire-us.pydantic.dev');
+    tab.url.includes("logfire.pydantic.dev") || tab.url.includes("logfire-us.pydantic.dev");
 
-  if (isLogfirePage && (changeInfo.url || changeInfo.status === 'complete')) {
+  if (isLogfirePage && (changeInfo.url || changeInfo.status === "complete")) {
     const context = extractLogfireContext(tab.url);
     if (context) {
       await chrome.storage.local.set({
         [`context_${tabId}`]: context,
       });
       chrome.runtime.sendMessage({
-        type: 'CONTEXT_UPDATED',
+        type: "CONTEXT_UPDATED",
         tabId,
         context,
       });
@@ -157,7 +156,7 @@ Teraz kiedy pytasz "dlaczego to wywolanie narzedzia sie nie powiodlo?", agent ju
 Rozszerzenie obsluguje wybieranie wielu spanow w interfejsie Logfire do analizy porownawczej:
 
 ```typescript
-if (message.type === 'SPAN_CONTEXT_TOGGLED') {
+if (message.type === "SPAN_CONTEXT_TOGGLED") {
   const contexts = result[`spanContexts_${tabId}`] || [];
   const spanContext = message.spanContext;
 
@@ -165,7 +164,7 @@ if (message.type === 'SPAN_CONTEXT_TOGGLED') {
   if (message.selected) {
     newContexts = [...contexts, spanContext];
   } else {
-    newContexts = contexts.filter(c => c.spanId !== spanContext.spanId);
+    newContexts = contexts.filter((c) => c.spanId !== spanContext.spanId);
   }
 
   chrome.storage.local.set({ [`spanContexts_${tabId}`]: newContexts });

@@ -25,7 +25,7 @@ So haben wir es gebaut.
 
 ---
 
-*Ich bin Kacper, AI Engineer bei [Vstorm](https://vstorm.co) — einer Applied Agentic AI Engineering Consultancy. Wir haben über 30 produktive AI-Agent-Implementierungen ausgeliefert und stellen unsere Tools als Open Source auf [github.com/vstorm-co](https://github.com/vstorm-co) bereit. Verbinden Sie sich mit mir auf [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+_Ich bin Kacper, AI Engineer bei [Vstorm](https://vstorm.co) — einer Applied Agentic AI Engineering Consultancy. Wir haben über 30 produktive AI-Agent-Implementierungen ausgeliefert und stellen unsere Tools als Open Source auf [github.com/vstorm-co](https://github.com/vstorm-co) bereit. Verbinden Sie sich mit mir auf [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/)._
 
 ---
 
@@ -129,7 +129,7 @@ def _parse_pdf_content(data: bytes) -> str | None:
 
 ## Schritt 3: Bilder durch LLM Vision
 
-```python
+````python
 from pydantic_ai.messages import BinaryContent
 
 for fid in file_ids:
@@ -144,7 +144,7 @@ for fid in file_ids:
             f"\n---\nAttached file: {chat_file.filename}"
             f"\n```\n{chat_file.parsed_content}\n```"
         )
-```
+````
 
 `BinaryContent` von [Pydantic AI](https://ai.pydantic.dev/) umhüllt Rohbytes mit einem MIME-Typ und lässt das Framework den multimodalen API-Aufruf übernehmen. Das LLM sieht das Bild buchstäblich.
 
@@ -160,7 +160,8 @@ fastapi-fullstack
 
 ---
 
-*Mehr zum Template:*
-- *[Erste-Schritte-Anleitung](/blog/fastapi-nextjs-ai-template-guide/)*
-- *[Vollständige RAG-Pipeline: 4 Vector Stores](/blog/full-rag-pipeline-4-vector-stores/)*
-- *[Dieselbe Chat-App, 4 Frameworks](/blog/same-chat-app-4-frameworks/)*
+_Mehr zum Template:_
+
+- _[Erste-Schritte-Anleitung](/blog/fastapi-nextjs-ai-template-guide/)_
+- _[Vollständige RAG-Pipeline: 4 Vector Stores](/blog/full-rag-pipeline-4-vector-stores/)_
+- _[Dieselbe Chat-App, 4 Frameworks](/blog/same-chat-app-4-frameworks/)_

@@ -27,7 +27,7 @@ Pokaze ci dokladnie jak.
 
 ---
 
-*Jestem Kacper, AI Engineer w [Vstorm](https://vstorm.co) — boutique'owej firmie konsultingowej Applied Agentic AI Engineering. Dostarczylismy 30+ produkcyjnych implementacji agentow AI i udostepniamy nasze narzedzia open-source na [github.com/vstorm-co](https://github.com/vstorm-co). Polacz sie ze mna na [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+_Jestem Kacper, AI Engineer w [Vstorm](https://vstorm.co) — boutique'owej firmie konsultingowej Applied Agentic AI Engineering. Dostarczylismy 30+ produkcyjnych implementacji agentow AI i udostepniamy nasze narzedzia open-source na [github.com/vstorm-co](https://github.com/vstorm-co). Polacz sie ze mna na [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/)._
 
 ---
 
@@ -52,10 +52,10 @@ To uruchamia interaktywnego kreatora, ktory prowadzi cie przez te same opcje.
 
 Szablon oferuje trzy presety obejmujace najczestsze przypadki uzycia:
 
-| Preset | Co dostajesz |
-|--------|-------------|
-| `--minimal` | Czysty FastAPI — bez bazy, bez auth, bez dodatkow |
-| `--preset ai-agent` | PostgreSQL + JWT auth + agent AI + streaming WebSocket + zapisywanie konwersacji + Redis |
+| Preset                | Co dostajesz                                                                                 |
+| --------------------- | -------------------------------------------------------------------------------------------- |
+| `--minimal`           | Czysty FastAPI — bez bazy, bez auth, bez dodatkow                                            |
+| `--preset ai-agent`   | PostgreSQL + JWT auth + agent AI + streaming WebSocket + zapisywanie konwersacji + Redis     |
 | `--preset production` | Pelna konfiguracja produkcyjna — Redis, cache, rate limiting, Sentry, Prometheus, Kubernetes |
 
 W tym poradniku uzyje presetu **AI Agent** z Pydantic AI — najczestszego punktu startowego dla aplikacji AI:
@@ -68,6 +68,7 @@ fastapi-fullstack create my_ai_app \
 ```
 
 To jedno polecenie generuje pelny projekt z:
+
 - Backend FastAPI z async PostgreSQL
 - Uwierzytelnianie JWT z zarzadzaniem uzytkownikami
 - Agent Pydantic AI ze streamowaniem WebSocket
@@ -215,13 +216,13 @@ Chcesz calkowicie przejsc na LangChain lub CrewAI? Wygeneruj projekt ponownie z 
 
 Szablon obsluguje piec frameworkow AI, wszystkie z ta sama infrastruktura backendu:
 
-| Framework | Najlepszy do | Obserwowalnosc |
-|-----------|-------------|---------------|
-| **Pydantic AI** | Type-safe agenty, wstrzykiwanie zaleznosci | Logfire |
-| **LangChain** | Lancuchy, istniejace narzedzia LangChain | LangSmith |
-| **LangGraph** | Zlozone wielokrokowe workflow, agenty ReAct | LangSmith |
-| **CrewAI** | Multi-agentowe zalogi, agenty oparte na rolach | LangSmith |
-| **DeepAgents** | Agentyczne kodowanie w stylu Claude Code, HITL | LangSmith |
+| Framework       | Najlepszy do                                   | Obserwowalnosc |
+| --------------- | ---------------------------------------------- | -------------- |
+| **Pydantic AI** | Type-safe agenty, wstrzykiwanie zaleznosci     | Logfire        |
+| **LangChain**   | Lancuchy, istniejace narzedzia LangChain       | LangSmith      |
+| **LangGraph**   | Zlozone wielokrokowe workflow, agenty ReAct    | LangSmith      |
+| **CrewAI**      | Multi-agentowe zalogi, agenty oparte na rolach | LangSmith      |
+| **DeepAgents**  | Agentyczne kodowanie w stylu Claude Code, HITL | LangSmith      |
 
 Wybierasz framework przy generowaniu projektu. Streaming WebSocket, zapisywanie konwersacji, auth i frontend dzialaja tak samo niezaleznie od wybranego frameworka.
 
@@ -269,6 +270,7 @@ pip install fastapi-fullstack
 Lub uzyj [konfiguratora webowego](https://oss.vstorm.co/projects/full-stack-ai-agent-template/configurator/) — bez instalacji.
 
 **Wiecej z ekosystemu open-source Vstorm:**
+
 - [Wszystkie nasze projekty open-source](https://oss.vstorm.co) — 13 pakietow dla ekosystemu Pydantic AI
 - [awesome-pydantic-ai](https://github.com/vstorm-co/awesome-pydantic-ai) — wyselekcjonowana lista zasobow i narzedzi Pydantic AI
 - [vstorm.co](https://vstorm.co) — nasza firma konsultingowa (30+ implementacji agentow AI)

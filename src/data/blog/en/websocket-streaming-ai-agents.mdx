@@ -90,10 +90,7 @@ export function useChat() {
         setMessages((prev) => {
           const last = prev[prev.length - 1];
           if (last?.role === "assistant") {
-            return [
-              ...prev.slice(0, -1),
-              { ...last, content: last.content + data.content },
-            ];
+            return [...prev.slice(0, -1), { ...last, content: last.content + data.content }];
           }
           return [...prev, { role: "assistant", content: data.content }];
         });

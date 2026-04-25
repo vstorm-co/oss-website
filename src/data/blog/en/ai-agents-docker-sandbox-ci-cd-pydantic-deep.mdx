@@ -85,13 +85,13 @@ pydantic-deep run "run all tests and fix failures" \
 
 Key CI/CD flags:
 
-| Flag | Purpose |
-|------|---------|
-| `--json` | Machine-readable output for pipeline parsing |
-| `--max-turns` | Cap agent iterations (prevents runaway costs) |
-| `--timeout` | Wall-clock timeout in seconds |
-| `--model` | Override model per run |
-| `--working-dir` | Explicit working directory |
+| Flag             | Purpose                                          |
+| ---------------- | ------------------------------------------------ |
+| `--json`         | Machine-readable output for pipeline parsing     |
+| `--max-turns`    | Cap agent iterations (prevents runaway costs)    |
+| `--timeout`      | Wall-clock timeout in seconds                    |
+| `--model`        | Override model per run                           |
+| `--working-dir`  | Explicit working directory                       |
 | `--no-subagents` | Disable subagent spawning for deterministic runs |
 
 pydantic-deep removes pydantic-ai's default 50-request cap so long-running CI tasks don't silently fail. You control limits explicitly via `--max-turns` and `--timeout`.

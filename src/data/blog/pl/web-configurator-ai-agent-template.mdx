@@ -39,11 +39,11 @@ Każdy krok waliduje w czasie rzeczywistym. Wybierz PostgreSQL w kroku 2 → poj
 
 Większość użytkowników nie chce konfigurować 75 opcji. Chcą punktu wyjścia:
 
-| Preset | Co dostajesz | Zastosowanie |
-|--------|-------------|----------|
-| **Minimal** | Bez bazy danych, bez auth, bez Dockera, bez CI | Szybkie prototypy, nauka FastAPI |
-| **Production** | PostgreSQL, JWT, Redis, cache, rate limiting, Sentry, Prometheus, Docker, K8s, GitHub Actions | Backend gotowy do wdrożenia |
-| **AI Agent** | PostgreSQL, JWT, Redis, Pydantic AI, WebSockets, persystencja konwersacji, Docker, GitHub Actions | Aplikacje chatbot/agent AI |
+| Preset         | Co dostajesz                                                                                      | Zastosowanie                     |
+| -------------- | ------------------------------------------------------------------------------------------------- | -------------------------------- |
+| **Minimal**    | Bez bazy danych, bez auth, bez Dockera, bez CI                                                    | Szybkie prototypy, nauka FastAPI |
+| **Production** | PostgreSQL, JWT, Redis, cache, rate limiting, Sentry, Prometheus, Docker, K8s, GitHub Actions     | Backend gotowy do wdrożenia      |
+| **AI Agent**   | PostgreSQL, JWT, Redis, Pydantic AI, WebSockets, persystencja konwersacji, Docker, GitHub Actions | Aplikacje chatbot/agent AI       |
 
 Kliknij preset → wszystkie 75+ pól się wypełnia → przejdź do Podsumowania → Pobierz ZIP. Mniej niż 10 sekund od strony głównej do pobranego projektu.
 
@@ -105,7 +105,7 @@ Niektóre opcje mają zależności. Zamiast pokazywać błędy walidacji, konfig
 const needsRedis =
   cur.enable_caching ||
   (cur.enable_rate_limiting && cur.rate_limit_storage === "redis") ||
-  (cur.background_tasks !== "none") ||
+  cur.background_tasks !== "none" ||
   (cur.enable_logfire && cur.logfire_features.redis);
 
 if (needsRedis && !cur.enable_redis) {

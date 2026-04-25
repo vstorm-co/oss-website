@@ -12,13 +12,26 @@ category: article
 draft: false
 ---
 
+import MetricsBar from "@/components/blog/MetricsBar.astro";
+import RepoCard from "@/components/blog/RepoCard.astro";
+import Callout from "@/components/blog/Callout.astro";
+
+<MetricsBar
+  metrics={[
+    { value: "24", label: "Claude Code Skills" },
+    { value: "10", label: "Production Audits" },
+    { value: "14", label: "Content Skills" },
+    { value: "MIT", label: "License" },
+  ]}
+/>
+
 78% of Fortune 500 companies are adopting AI coding assistants. 45% of that generated code ships with security vulnerabilities. On the content side, 76% of readers identify AI-written text within three seconds, and engagement drops around 47% when they do.
 
 Those three numbers describe the same problem from two angles: **AI outputs need guardrails, whether the output is code or writing.** Today we're shipping two Claude Code skill packs that sit on those guardrails.
 
 **A Claude Code skill is a packaged slash command that augments your AI coding agent with a specific expertise, readable via `SKILL.md` and invocable from any AGENTS.md-compatible runtime.** The Skills Wave is two of those packs, released the same day because the failure modes on both sides of the AI workflow deserve the same fix.
 
-*I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co), an Applied Agentic AI Engineering Consultancy. We've shipped 30+ production AI agent implementations and open-source our tooling at [github.com/vstorm-co](https://github.com/vstorm-co).*
+_I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co), an Applied Agentic AI Engineering Consultancy. We've shipped 30+ production AI agent implementations and open-source our tooling at [github.com/vstorm-co](https://github.com/vstorm-co)._
 
 ## production-stack-skills: 10 Claude Code Skills for Production-Ready AI Code
 
@@ -48,6 +61,18 @@ Between setup and audit sit 12 production skills: strategy, calendar, blog, twit
 ## One Install, Dual-CLI, Uninstall-Safe
 
 Both packs install the same way:
+
+<RepoCard
+  repo="vstorm-co/production-stack-skills"
+  description="10 Claude Code skills that audit AI-generated code with a 0-100 production-readiness score across security, error handling, observability, deployment, data layer, and code quality."
+  language="Python"
+/>
+
+<RepoCard
+  repo="vstorm-co/content-skills"
+  description="14 brand-first Claude Code skills with a /brand/ directory at the core — every piece of generated content reads your BRAND.md, VOICE.md, and VISUAL.md before writing a word."
+  language="Python"
+/>
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/vstorm-co/production-stack-skills/main/install.sh | bash

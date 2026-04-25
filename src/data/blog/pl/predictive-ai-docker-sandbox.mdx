@@ -13,16 +13,16 @@ draft: false
 
 Każde demo agenta AI pokazuje to samo: "zapytaj swojego agenta o dane." Agent odpytuje bazę danych, podsumowuje wyniki, może tworzy wykres.
 
-Ale spróbuj poprosić go o *uruchomienie regresji wielomianowej na 24 miesiącach danych sprzedażowych i prognozę na następne 6 miesięcy.* Nagle twój agent oparty na chacie uderza w ścianę. Nie może zrobić `import sklearn`. Nie może wykonać Pythona. Może rozumować o tym, jakiego modelu użyć, ale nie może go faktycznie uruchomić.
+Ale spróbuj poprosić go o _uruchomienie regresji wielomianowej na 24 miesiącach danych sprzedażowych i prognozę na następne 6 miesięcy._ Nagle twój agent oparty na chacie uderza w ścianę. Nie może zrobić `import sklearn`. Nie może wykonać Pythona. Może rozumować o tym, jakiego modelu użyć, ale nie może go faktycznie uruchomić.
 
-Oczywista poprawka: daj mu środowisko Pythona. Ale jest pytanie, o którym nikt nie mówi - czy to środowisko powinno być *domyślnym runtimem* agenta (jak Claude Code), czy raczej *narzędziem, które agent wybiera, kiedy chce*?
+Oczywista poprawka: daj mu środowisko Pythona. Ale jest pytanie, o którym nikt nie mówi - czy to środowisko powinno być _domyślnym runtimem_ agenta (jak Claude Code), czy raczej _narzędziem, które agent wybiera, kiedy chce_?
 
 Zbudowaliśmy demo, które odpowiada na to pytanie.
 
 ## TL;DR
 
 - Wzorzec **"environment as a tool"** pozwala agentowi AI selektywnie używać sandboxa Docker tylko wtedy, gdy jest potrzebny, unikając narzutu przy prostych zapytaniach.
-- Podejście **delegacji do sub-agenta** utrzymuje głównego agenta w czystości - opisuje *co* przewidzieć, a sub-agent wymyśla *jak* napisać kod Pythona.
+- Podejście **delegacji do sub-agenta** utrzymuje głównego agenta w czystości - opisuje _co_ przewidzieć, a sub-agent wymyśla _jak_ napisać kod Pythona.
 - **Strukturalne wyjście Pydantic** do wykresów bije generowanie obrazów - wyślij dane, pozwól frontendowi renderować z Chart.js.
 - **Strumieniowanie WebSocket** z `agent.iter()` daje wgląd w czasie rzeczywistym w tekst, wywołania narzędzi i wyniki.
 - Najtrudniejsza część to **integracja frontendowa** - łączenie serii wykresów z różnymi zakresami dat, przechwytywanie wyjść narzędzi i strumieniowanie przez WebSocket.
@@ -54,7 +54,7 @@ Główny agent to zwykły agent Pydantic AI. Nie żyje wewnątrz Dockera. Ma trz
 - `predict` - tworzy sub-agenta z dostępem do Dockera, deleguje zadanie predykcji.
 - `generate_chart` - zwraca strukturalny `LineChartData` (model Pydantic), który frontend renderuje jako wykres Chart.js.
 
-Agent decyduje *kiedy* użyć Dockera. Jeśli zapytasz "pokaż mi łączną sprzedaż według produktu", wywołuje `query_data` - szybko, bez narzutu. Jeśli zapytasz "przewidź sprzedaż Widget Alpha na następne 6 miesięcy", wywołuje `predict` - który uruchamia sub-agenta wewnątrz Dockera.
+Agent decyduje _kiedy_ użyć Dockera. Jeśli zapytasz "pokaż mi łączną sprzedaż według produktu", wywołuje `query_data` - szybko, bez narzutu. Jeśli zapytasz "przewidź sprzedaż Widget Alpha na następne 6 miesięcy", wywołuje `predict` - który uruchamia sub-agenta wewnątrz Dockera.
 
 ## Narzędzie Predict: Sub-agent z laboratorium Docker
 
@@ -142,24 +142,24 @@ Frontend odbiera to i renderuje z Chart.js. Żadnych obrazów, żadnego base64, 
 To jest pytanie projektowe, które wspomniałem na początku. Są dwa sposoby na danie agentowi środowiska do wykonywania kodu:
 
 **Opcja A: Środowisko jako narzędzie** (co zbudowaliśmy)
-Agent żyje poza Dockerem. Ma narzędzie `predict`, które deleguje do sub-agenta wewnątrz Dockera. Agent decyduje *kiedy* go użyć.
+Agent żyje poza Dockerem. Ma narzędzie `predict`, które deleguje do sub-agenta wewnątrz Dockera. Agent decyduje _kiedy_ go użyć.
 
 **Opcja B: Domyślne środowisko** (jak Claude Code)
-Agent żyje *wewnątrz* Dockera. Każda komenda, którą uruchamia, każdy plik, który czyta - wszystko jest w sandboxie. Środowisko jest zawsze dostępne.
+Agent żyje _wewnątrz_ Dockera. Każda komenda, którą uruchamia, każdy plik, który czyta - wszystko jest w sandboxie. Środowisko jest zawsze dostępne.
 
 Kiedy każde z nich ma sens:
 
-| | Środowisko jako narzędzie | Domyślne środowisko |
-|---|---|---|
-| **Najlepsze do** | Zadania domenowe (predykcje, analiza danych, code review) | Agenci do kodowania ogólnego przeznaczenia |
-| **Kontrola agenta** | Agent decyduje kiedy użyć sandboxa | Agent zawsze działa w sandboxie |
-| **Narzut** | Płaci koszt Dockera tylko gdy potrzebny | Zawsze uruchomiony |
-| **Elastyczność** | Może swobodnie mieszać narzędzia | Wszystko przechodzi przez sandbox |
-| **Złożoność** | Wymaga wzorca delegacji sub-agenta | Prostsze - agent po prostu ma narzędzia |
+|                     | Środowisko jako narzędzie                                 | Domyślne środowisko                        |
+| ------------------- | --------------------------------------------------------- | ------------------------------------------ |
+| **Najlepsze do**    | Zadania domenowe (predykcje, analiza danych, code review) | Agenci do kodowania ogólnego przeznaczenia |
+| **Kontrola agenta** | Agent decyduje kiedy użyć sandboxa                        | Agent zawsze działa w sandboxie            |
+| **Narzut**          | Płaci koszt Dockera tylko gdy potrzebny                   | Zawsze uruchomiony                         |
+| **Elastyczność**    | Może swobodnie mieszać narzędzia                          | Wszystko przechodzi przez sandbox          |
+| **Złożoność**       | Wymaga wzorca delegacji sub-agenta                        | Prostsze - agent po prostu ma narzędzia    |
 
 Dla naszego demo analityki predykcyjnej, Opcja A jest wyraźnie właściwa. Agent głównie odpowiada na pytania o dane (Docker nie jest potrzebny) i uruchamia Dockera tylko gdy musi wykonać kod sklearn. Uczynienie Dockera domyślnym środowiskiem dodałoby niepotrzebne opóźnienie do każdej interakcji.
 
-Ale dla agenta kodującego jak Claude Code, Opcja B ma sens - całym zadaniem agenta jest czytanie, pisanie i wykonywanie kodu. Środowisko *jest* produktem.
+Ale dla agenta kodującego jak Claude Code, Opcja B ma sens - całym zadaniem agenta jest czytanie, pisanie i wykonywanie kodu. Środowisko _jest_ produktem.
 
 ## Realne wyniki
 
@@ -202,18 +202,18 @@ Natrafiliśmy na ciekawy bug podczas developmentu. Przy rysowaniu "Historical" (
 Rozwiązanie: połącz wszystkie unikalne etykiety x ze wszystkich serii, a potem użyj mapy lookup per seria z `null` dla brakujących dat:
 
 ```javascript
-const allLabels = [...new Set(
-    chartData.series.flatMap((s) => s.data_points.map((dp) => dp.x))
-)].sort();
+const allLabels = [
+  ...new Set(chartData.series.flatMap((s) => s.data_points.map((dp) => dp.x))),
+].sort();
 
 const datasets = chartData.series.map((s, i) => {
-    const lookup = new Map(s.data_points.map((dp) => [dp.x, dp.y]));
-    return {
-        label: s.name,
-        data: allLabels.map((x) => lookup.get(x) ?? null),
-        spanGaps: false,
-        // ...styling
-    };
+  const lookup = new Map(s.data_points.map((dp) => [dp.x, dp.y]));
+  return {
+    label: s.name,
+    data: allLabels.map((x) => lookup.get(x) ?? null),
+    spanGaps: false,
+    // ...styling
+  };
 });
 ```
 
@@ -222,7 +222,7 @@ Mała rzecz, ale to ten rodzaj buga, który sprawia, że twoja prognoza wygląda
 ## Kluczowe wnioski
 
 - **"Środowisko jako narzędzie"** to właściwy wzorzec, gdy twój agent tylko czasami potrzebuje wykonania kodu. Nie płać narzutu Dockera przy każdej interakcji.
-- **Delegacja do sub-agenta** utrzymuje głównego agenta w czystości. Główny agent opisuje *co* przewidzieć. Sub-agent wymyśla *jak* napisać kod Pythona.
+- **Delegacja do sub-agenta** utrzymuje głównego agenta w czystości. Główny agent opisuje _co_ przewidzieć. Sub-agent wymyśla _jak_ napisać kod Pythona.
 - **Strukturalne wyjście Pydantic** do wykresów bije generowanie obrazów. Wyślij dane, pozwól frontendowi renderować. Łatwiejsze do stylowania, interaktywne i bez blobów base64.
 - **Strumieniowanie WebSocket** z `agent.iter()` daje wgląd w czasie rzeczywistym w to, co agent robi - tekst, wywołania narzędzi i wyniki.
 - Najtrudniejsza część to nie agent - to **integracja frontendowa** (łączenie serii wykresów z różnymi zakresami dat, przechwytywanie wyjść narzędzi, strumieniowanie przez WebSocket).

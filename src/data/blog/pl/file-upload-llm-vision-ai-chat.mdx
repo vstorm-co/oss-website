@@ -25,7 +25,7 @@ Oto jak to zbudowaliśmy.
 
 ---
 
-*Jestem Kacper, AI Engineer w [Vstorm](https://vstorm.co) — Applied Agentic AI Engineering Consultancy. Wdrożyliśmy ponad 30 produkcyjnych implementacji agentów AI i udostępniamy nasze narzędzia open-source na [github.com/vstorm-co](https://github.com/vstorm-co). Połącz się ze mną na [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+_Jestem Kacper, AI Engineer w [Vstorm](https://vstorm.co) — Applied Agentic AI Engineering Consultancy. Wdrożyliśmy ponad 30 produkcyjnych implementacji agentów AI i udostępniamy nasze narzędzia open-source na [github.com/vstorm-co](https://github.com/vstorm-co). Połącz się ze mną na [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/)._
 
 ---
 
@@ -148,7 +148,7 @@ Dwa kluczowe elementy:
 
 ## Krok 3: Obrazy przez LLM Vision
 
-```python
+````python
 from pydantic_ai.messages import BinaryContent
 
 for fid in file_ids:
@@ -167,7 +167,7 @@ for fid in file_ids:
             f"\n---\nAttached file: {chat_file.filename}"
             f"\n```\n{chat_file.parsed_content}\n```"
         )
-```
+````
 
 `BinaryContent` z [Pydantic AI](https://ai.pydantic.dev/) opakowuje surowe bajty z typem MIME i pozwala frameworkowi obsłużyć multimodalne wywołanie API. LLM dosłownie widzi obraz — może opisywać wykresy, czytać tekst ze zrzutów ekranu, analizować diagramy.
 
@@ -185,7 +185,8 @@ Cały kod pokazany w tym artykule pochodzi z rzeczywistego szablonu.
 
 ---
 
-*Więcej o szablonie:*
-- *[Przewodnik wprowadzający](/blog/fastapi-nextjs-ai-template-guide/)*
-- *[Pełny pipeline RAG: 4 Vector Stores](/blog/full-rag-pipeline-4-vector-stores/)*
-- *[Ta sama aplikacja czatu, 4 frameworki](/blog/same-chat-app-4-frameworks/)*
+_Więcej o szablonie:_
+
+- _[Przewodnik wprowadzający](/blog/fastapi-nextjs-ai-template-guide/)_
+- _[Pełny pipeline RAG: 4 Vector Stores](/blog/full-rag-pipeline-4-vector-stores/)_
+- _[Ta sama aplikacja czatu, 4 frameworki](/blog/same-chat-app-4-frameworks/)_

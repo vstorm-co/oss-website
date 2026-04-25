@@ -12,7 +12,17 @@ category: tutorial
 draft: false
 ---
 
-> **TL;DR:** pydantic-deep v0.3.5 ships `BrowserCapability`, 9 Playwright tools (navigate, click, type_text, get_text, screenshot, scroll, go_back, go_forward, execute_js) with domain allowlist, single-tab design, and automatic popup interception. v0.3.4 redesigns `/improve`: extracts `UserFactInsight` and `AgentLearningInsight` from raw tool traces (not summaries) into MEMORY.md. Key finding: raw traces significantly outperform summaries for producing actionable agent learnings.
+import TLDR from "@/components/blog/TLDR.astro";
+import RepoCard from "@/components/blog/RepoCard.astro";
+
+<TLDR>
+  pydantic-deep **v0.3.5** ships `BrowserCapability` — 9 Playwright tools (navigate, click,
+  type_text, get_text, screenshot, scroll, go_back, go_forward, execute_js) with domain allowlist,
+  single-tab design, and automatic popup interception. **v0.3.4** redesigns `/improve`: extracts
+  `UserFactInsight` and `AgentLearningInsight` from **raw tool traces** (not summaries) into
+  MEMORY.md. Key finding: raw traces significantly outperform summaries for producing actionable
+  agent learnings.
+</TLDR>
 
 For three months my AI agent searched GitHub for the wrong query every single session.
 
@@ -48,17 +58,17 @@ agent = create_deep_agent(
 )
 ```
 
-| Tool | What it does |
-|------|-------------|
-| `navigate(url)` | Navigate to URL, returns content + optional screenshot |
-| `click(selector)` | Click element by CSS selector |
-| `type_text(selector, text)` | Type into input field |
-| `get_text(selector)` | Extract text from element |
-| `screenshot()` | Capture current page state |
-| `scroll(direction, amount)` | Scroll page up/down |
-| `go_back()` | Browser back |
-| `go_forward()` | Browser forward |
-| `execute_js(script)` | Run arbitrary JavaScript |
+| Tool                        | What it does                                           |
+| --------------------------- | ------------------------------------------------------ |
+| `navigate(url)`             | Navigate to URL, returns content + optional screenshot |
+| `click(selector)`           | Click element by CSS selector                          |
+| `type_text(selector, text)` | Type into input field                                  |
+| `get_text(selector)`        | Extract text from element                              |
+| `screenshot()`              | Capture current page state                             |
+| `scroll(direction, amount)` | Scroll page up/down                                    |
+| `go_back()`                 | Browser back                                           |
+| `go_forward()`              | Browser forward                                        |
+| `execute_js(script)`        | Run arbitrary JavaScript                               |
 
 Every tool returns a `BrowseResult`: `url`, `title`, `content`, `screenshot`, `error`.
 
@@ -122,12 +132,14 @@ Browser tools now force `kind='function'` in `prepare_tools`, they're always tre
 After an agent session, run `/improve` in the TUI. It analyzes the full session and extracts two categories of insights:
 
 **`UserFactInsight`**, what the agent learned about you and your preferences:
+
 - Code style preferences
 - Preferred output formats
 - Domain-specific terminology
 - Patterns in the kinds of tasks you give it
 
 **`AgentLearningInsight`**, patterns and strategies the agent discovered:
+
 - Approaches that worked for your codebase
 - Effective tool call sequences
 - Failure modes encountered and how they were recovered
@@ -140,6 +152,7 @@ Both types write to MEMORY.md, loaded at the start of every subsequent session.
 This was the key insight from our internal evaluation:
 
 When building the /improve pipeline, we compared two inputs to the synthesis step:
+
 1. Human-readable summaries of what happened
 2. Raw tool traces, the actual sequence of tool calls and responses
 

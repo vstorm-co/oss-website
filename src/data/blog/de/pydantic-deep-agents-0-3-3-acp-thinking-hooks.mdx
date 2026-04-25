@@ -91,6 +91,7 @@ Installation: `pip install pydantic-deep[acp]`.
 Diese Änderung erweitert die Delegationsfähigkeiten grundlegend. Zuvor waren Subagenten einfache Pydantic AI Agents — sie hatten Tools, aber keinen Speicher, keine Eviction, kein Web Search und keinen Patch Support.
 
 Jetzt wird **jeder Subagent über `create_deep_agent()` erstellt** — mit dem vollen Werkzeugsatz:
+
 - Dateisystem (read, write, edit, ls, glob, grep)
 - Web Search und Web Fetch
 - Speicher (MEMORY.md pro Subagent)
@@ -107,15 +108,15 @@ Version 0.3.3 fügt den Parameter `thinking` zu `create_deep_agent()` hinzu, mit
 
 Es gibt 7 Stufen:
 
-| Wert | Beschreibung |
-|------|-------------|
-| `True` | Aktiviert (Standard-Stufe des Modells) |
-| `False` | Deaktiviert |
-| `"minimal"` | Minimales Reasoning |
-| `"low"` | Niedriger Aufwand |
-| `"medium"` | Mittlerer Aufwand |
-| `"high"` | Hoher Aufwand (Standard) |
-| `"xhigh"` | Maximaler Aufwand |
+| Wert        | Beschreibung                           |
+| ----------- | -------------------------------------- |
+| `True`      | Aktiviert (Standard-Stufe des Modells) |
+| `False`     | Deaktiviert                            |
+| `"minimal"` | Minimales Reasoning                    |
+| `"low"`     | Niedriger Aufwand                      |
+| `"medium"`  | Mittlerer Aufwand                      |
+| `"high"`    | Hoher Aufwand (Standard)               |
+| `"xhigh"`   | Maximaler Aufwand                      |
 
 Das bedeutet, dass Agenten tiefer nachdenken, bevor sie antworten — sie planen Schritte, berücksichtigen Edge Cases und machen weniger Fehler bei komplexen Aufgaben. Deaktivieren Sie es mit `thinking=False`, wenn Sie niedrigere Latenz benötigen.
 
@@ -129,13 +130,13 @@ Das Ergebnis: niedrigere Kosten und schnellere Antworten in nachfolgenden Turns.
 
 Version 0.3.3 fügt 5 neue Hook-Events hinzu, die auf die Lifecycle Hooks von Pydantic AI abbilden:
 
-| Hook | Wann er auslöst | Anwendungsfall |
-|------|-----------------|----------------|
-| `BEFORE_RUN` | Vor dem Start der Agenten-Schleife | Sitzungstracking, Start-Logging |
-| `AFTER_RUN` | Nach dem Ende der Agenten-Schleife | Ergebnisspeicherung, Metriken |
-| `RUN_ERROR` | Wenn die Agenten-Schleife eine Exception wirft | Fehleralarme, Retry-Logik |
-| `BEFORE_MODEL_REQUEST` | Vor jedem LLM-Aufruf | Prompt-Logging, Rate Limiting |
-| `AFTER_MODEL_REQUEST` | Nach jeder LLM-Antwort | Antwort-Logging, Kostenanalyse |
+| Hook                   | Wann er auslöst                                | Anwendungsfall                  |
+| ---------------------- | ---------------------------------------------- | ------------------------------- |
+| `BEFORE_RUN`           | Vor dem Start der Agenten-Schleife             | Sitzungstracking, Start-Logging |
+| `AFTER_RUN`            | Nach dem Ende der Agenten-Schleife             | Ergebnisspeicherung, Metriken   |
+| `RUN_ERROR`            | Wenn die Agenten-Schleife eine Exception wirft | Fehleralarme, Retry-Logik       |
+| `BEFORE_MODEL_REQUEST` | Vor jedem LLM-Aufruf                           | Prompt-Logging, Rate Limiting   |
+| `AFTER_MODEL_REQUEST`  | Nach jeder LLM-Antwort                         | Antwort-Logging, Kostenanalyse  |
 
 Diese Hooks ergänzen die bestehenden `PRE_TOOL_USE`, `POST_TOOL_USE` und `POST_TOOL_USE_FAILURE` und bieten vollständige Sichtbarkeit des Agenten-Lebenszyklus — vom Sitzungsstart über jeden Modellaufruf bis zum Ende oder Fehler.
 
@@ -157,20 +158,21 @@ Der `skills`-Parameter wurde aus `create_deep_agent()` entfernt. Jetzt übergibt
 
 Version 0.3.3 ändert die Philosophie: Statt manuelle Konfiguration jedes Features zu erfordern, liefert das Framework sinnvolle Standardwerte. Hier ist, was sich geändert hat:
 
-| Parameter | Vorher (0.3.2) | Nachher (0.3.3) |
-|-----------|----------------|-----------------|
-| `include_memory` | `False` | `True` |
-| `max_nesting_depth` | `0` | `1` |
-| `thinking` | nicht vorhanden | `"high"` |
-| `eviction_token_limit` | `None` | `20_000` |
-| `patch_tool_calls` | `False` | `True` |
-| `web_search` | nicht vorhanden (war `include_web`) | `True` |
-| `web_fetch` | nicht vorhanden (war `include_web`) | `True` |
-| `anthropic_cache_*` | nicht vorhanden | `True` |
-| `image_support` | Parameter | immer aktiviert |
-| Kontextdateien | DEEP.md, AGENTS.md, CLAUDE.md, SOUL.md | AGENTS.md, SOUL.md |
+| Parameter              | Vorher (0.3.2)                         | Nachher (0.3.3)    |
+| ---------------------- | -------------------------------------- | ------------------ |
+| `include_memory`       | `False`                                | `True`             |
+| `max_nesting_depth`    | `0`                                    | `1`                |
+| `thinking`             | nicht vorhanden                        | `"high"`           |
+| `eviction_token_limit` | `None`                                 | `20_000`           |
+| `patch_tool_calls`     | `False`                                | `True`             |
+| `web_search`           | nicht vorhanden (war `include_web`)    | `True`             |
+| `web_fetch`            | nicht vorhanden (war `include_web`)    | `True`             |
+| `anthropic_cache_*`    | nicht vorhanden                        | `True`             |
+| `image_support`        | Parameter                              | immer aktiviert    |
+| Kontextdateien         | DEEP.md, AGENTS.md, CLAUDE.md, SOUL.md | AGENTS.md, SOUL.md |
 
 Die Standardmodelle haben sich ebenfalls geändert:
+
 - Hauptagent: `anthropic:claude-opus-4-6`
 - Subagenten: `anthropic:claude-sonnet-4-6`
 - Summarization: `anthropic:claude-haiku-4-5-20251001`
@@ -190,6 +192,7 @@ Beim ersten Start erkennt das CLI automatisch fehlende API-Schlüssel und führt
 ### /config und /provider
 
 Zwei neue Slash Commands im CLI:
+
 - `/config` — Einstellungen interaktiv anzeigen und ändern (z.B. `/config set include_teams true`)
 - `/provider` — Provider und Modell während der Sitzung wechseln
 

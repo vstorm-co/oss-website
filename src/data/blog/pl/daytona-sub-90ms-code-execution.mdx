@@ -21,11 +21,11 @@ Wtedy wypróbowaliśmy Daytonę. Start poniżej 90ms. Bez Docker daemon. Efemery
 
 Nasze AI agenty używają [pydantic-ai-backend](https://github.com/vstorm-co/pydantic-ai-backend) — biblioteki Pythona, która dostarcza backendy do przechowywania plików i wykonywania kodu dla agentów Pydantic AI. Przed Daytoną mieliśmy trzy backendy:
 
-| Backend | Storage | Execution | Zastosowanie |
-|---------|---------|-----------|--------------|
-| `StateBackend` | In-memory | Nie | Testy, sesje efemeryczne |
-| `LocalBackend` | System plików | Tak | Rozwój lokalny |
-| `DockerSandbox` | Kontener | Tak | Wielu użytkowników, niezaufany kod |
+| Backend         | Storage       | Execution | Zastosowanie                       |
+| --------------- | ------------- | --------- | ---------------------------------- |
+| `StateBackend`  | In-memory     | Nie       | Testy, sesje efemeryczne           |
+| `LocalBackend`  | System plików | Tak       | Rozwój lokalny                     |
+| `DockerSandbox` | Kontener      | Tak       | Wielu użytkowników, niezaufany kod |
 
 Docker był naszym wyborem na produkcję. Izolowane wykonywanie, kontrolowane środowisko, brak ryzyka, że agenty zniszczą hosta. Ale narzut startowy był realny:
 
@@ -92,25 +92,25 @@ class BaseSandbox(ABC):
 
 Zarówno `DockerSandbox`, jak i `DaytonaSandbox` dziedziczą po `BaseSandbox`. Toolset nie interesuje się, który z nich dostaje.
 
-| Metoda | Docker | Daytona |
-|--------|--------|---------|
-| `execute()` | `docker.exec_run()` | `sandbox.process.exec()` |
-| `_read_bytes()` | Shell `cat` przez Docker exec | Natywne API pobierania plików |
-| `write()` | Shell `cat >` przez Docker exec | Natywne API wysyłania plików |
-| `stop()` | Usunięcie kontenera | Usunięcie sandboxa w chmurze |
+| Metoda          | Docker                          | Daytona                       |
+| --------------- | ------------------------------- | ----------------------------- |
+| `execute()`     | `docker.exec_run()`             | `sandbox.process.exec()`      |
+| `_read_bytes()` | Shell `cat` przez Docker exec   | Natywne API pobierania plików |
+| `write()`       | Shell `cat >` przez Docker exec | Natywne API wysyłania plików  |
+| `stop()`        | Usunięcie kontenera             | Usunięcie sandboxa w chmurze  |
 
 Natywne API plikowe Daytony są szczególnie interesujące — zamiast przepuszczać dane przez shell (co robi Docker), Daytona wysyła/pobiera pliki bezpośrednio przez swoje SDK.
 
 ## Docker vs Daytona: Kiedy używać którego
 
-| Cecha | DaytonaSandbox | DockerSandbox |
-|-------|----------------|---------------|
-| Czas startu | **Poniżej 90ms** | 2-5 sekund |
-| Infrastruktura | Chmura (platforma Daytona) | Lokalny Docker daemon |
-| Wymagana konfiguracja | Tylko klucz API | Docker zainstalowany + uruchomiony |
-| Izolacja | VM w chmurze | Kontener |
-| Koszt | Cennik Daytony | Darmowy (lokalne zasoby) |
-| Najlepszy do | **CI/CD, serverless, chmura** | Lokalne dev, self-hosted |
+| Cecha                 | DaytonaSandbox                | DockerSandbox                      |
+| --------------------- | ----------------------------- | ---------------------------------- |
+| Czas startu           | **Poniżej 90ms**              | 2-5 sekund                         |
+| Infrastruktura        | Chmura (platforma Daytona)    | Lokalny Docker daemon              |
+| Wymagana konfiguracja | Tylko klucz API               | Docker zainstalowany + uruchomiony |
+| Izolacja              | VM w chmurze                  | Kontener                           |
+| Koszt                 | Cennik Daytony                | Darmowy (lokalne zasoby)           |
+| Najlepszy do          | **CI/CD, serverless, chmura** | Lokalne dev, self-hosted           |
 
 **Używaj Daytony gdy:** wdrożenia w chmurze, opóźnienie startu ma znaczenie, skalowanie horyzontalne, pipeline CI/CD, gdzie Docker-in-Docker jest problematyczny.
 

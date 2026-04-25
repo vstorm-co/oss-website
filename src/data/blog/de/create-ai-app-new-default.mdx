@@ -19,7 +19,7 @@ Drei Tage später hast du eine funktionierende Entwicklungsumgebung. Null geschr
 
 Dann veröffentlicht Dan Abramov create-react-app. Ein Befehl: `npx create-react-app my-app`. Sinnvolle Standardeinstellungen. Bewährte Struktur. Null Konfiguration zum Start. Eject, wenn du herauswächst.
 
-React-Entwicklung war nie mehr dieselbe. Nicht weil CRA etwas Magisches tat — sondern weil es einen *Standard* etablierte. Einen Startpunkt, auf den sich alle einigten. Ein Fundament, keine Decke.
+React-Entwicklung war nie mehr dieselbe. Nicht weil CRA etwas Magisches tat — sondern weil es einen _Standard_ etablierte. Einen Startpunkt, auf den sich alle einigten. Ein Fundament, keine Decke.
 
 Vorspulen zu 2026. Wir befinden uns im exakt gleichen Moment mit KI-Anwendungen. Und wir machen exakt dieselben Fehler.
 
@@ -35,13 +35,14 @@ CRA löste drei Probleme gleichzeitig:
 2. **Schaffung von Standards.** Wenn alle vom gleichen Template starten, werden Ordnerstrukturen vorhersagbar. Tutorials übertragen sich zwischen Projekten. Stack-Overflow-Antworten passen tatsächlich zu deinem Setup.
 3. **Beschleunigung des Ökosystems.** Bibliotheken konnten eine Standardumgebung voraussetzen. Test-Tools konnten einen Standard-Build-Prozess voraussetzen. Das gesamte React-Ökosystem beschleunigte sich, weil es eine gemeinsame Basis gab.
 
-Das sind keine Frontend-Probleme. Es sind Probleme des *Komplexitätsmanagements*. Und KI-Anwendungen haben alle drei, verstärkt.
+Das sind keine Frontend-Probleme. Es sind Probleme des _Komplexitätsmanagements_. Und KI-Anwendungen haben alle drei, verstärkt.
 
 ## Das KI-Boilerplate-Problem in 2026
 
 So sieht der Start einer neuen KI-Anwendung heute aus:
 
 **Woche 1 — Backend-Infrastruktur:**
+
 - [FastAPI](https://fastapi.tiangolo.com/)-Projektstruktur mit Async-Unterstützung
 - Datenbankeinrichtung (PostgreSQL, Migrationen mit Alembic)
 - JWT-Authentifizierung (Login, Registrierung, Refresh-Tokens, Session-Management)
@@ -49,6 +50,7 @@ So sieht der Start einer neuen KI-Anwendung heute aus:
 - Umgebungskonfiguration und Secrets-Management
 
 **Woche 2 — KI-Integration:**
+
 - KI-Framework-Setup ([Pydantic AI](https://ai.pydantic.dev/), [LangChain](https://python.langchain.com/), [LangGraph](https://langchain-ai.github.io/langgraph/) oder etwas anderes)
 - LLM-Provider-Integration (OpenAI, Anthropic, OpenRouter)
 - WebSocket-Streaming für Echtzeit-Token-Übertragung
@@ -56,6 +58,7 @@ So sieht der Start einer neuen KI-Anwendung heute aus:
 - Tool-Registrierung und Dependency Injection
 
 **Woche 3 — Frontend und Deployment:**
+
 - [Next.js](https://nextjs.org/)-Frontend mit Streaming-Chat-UI
 - WebSocket-Client mit Reconnection-Logik
 - [Docker](https://docs.docker.com/) Multi-Stage Builds
@@ -73,15 +76,15 @@ Kommt dir bekannt vor?
 
 Lass mich es explizit abbilden:
 
-| Dimension | CRA (2016) | KI-Template (2026) |
-|-----------|-----------|-------------------|
-| **Der Schmerz** | Webpack + Babel + ESLint Konfigurationshölle | FastAPI + Auth + WebSocket + Docker + KI-Framework Konfigurationshölle |
-| **Verschwendete Zeit** | Tage vor der ersten Komponente | Wochen vor dem ersten Agenten |
-| **Die Fragmentierung** | Jedes Team hatte ein anderes Build-Setup | Jedes Team hat einen anderen KI-Stack |
-| **Der Befehl** | `npx create-react-app my-app` | `fastapi-fullstack create my_app --preset ai-agent` |
-| **Sinnvolle Standards** | Webpack-Config, ESLint-Regeln, Ordnerstruktur | PostgreSQL, JWT, Redis, Pydantic AI, Docker, CI/CD |
-| **Notausgang** | `eject` wenn du herauswächst | 75+ Optionen wenn du Anpassung brauchst |
-| **Ergebnis** | Funktionierende React-App in Sekunden | Funktionierende KI-Anwendung in Minuten |
+| Dimension               | CRA (2016)                                    | KI-Template (2026)                                                     |
+| ----------------------- | --------------------------------------------- | ---------------------------------------------------------------------- |
+| **Der Schmerz**         | Webpack + Babel + ESLint Konfigurationshölle  | FastAPI + Auth + WebSocket + Docker + KI-Framework Konfigurationshölle |
+| **Verschwendete Zeit**  | Tage vor der ersten Komponente                | Wochen vor dem ersten Agenten                                          |
+| **Die Fragmentierung**  | Jedes Team hatte ein anderes Build-Setup      | Jedes Team hat einen anderen KI-Stack                                  |
+| **Der Befehl**          | `npx create-react-app my-app`                 | `fastapi-fullstack create my_app --preset ai-agent`                    |
+| **Sinnvolle Standards** | Webpack-Config, ESLint-Regeln, Ordnerstruktur | PostgreSQL, JWT, Redis, Pydantic AI, Docker, CI/CD                     |
+| **Notausgang**          | `eject` wenn du herauswächst                  | 75+ Optionen wenn du Anpassung brauchst                                |
+| **Ergebnis**            | Funktionierende React-App in Sekunden         | Funktionierende KI-Anwendung in Minuten                                |
 
 Die strukturelle Ähnlichkeit ist kein Zufall. Es ist dasselbe Muster: Eine Technologiekategorie reift über die Phase "jeder baut alles von Hand" hinaus und tritt in die Phase "wir brauchen einen Standard-Startpunkt" ein.
 
@@ -89,17 +92,17 @@ React war dort 2016. KI-Anwendungen sind jetzt dort.
 
 ## Was "sinnvolle Standards" für KI-Apps bedeuten
 
-Die Genialität von CRA lag in der Wahl der richtigen Standardeinstellungen. Nicht die mächtigsten Optionen — die *sinnvollsten*. Man bekam nicht jedes mögliche Webpack-Plugin. Man bekam die Konfiguration, die für 90% der Projekte funktionierte.
+Die Genialität von CRA lag in der Wahl der richtigen Standardeinstellungen. Nicht die mächtigsten Optionen — die _sinnvollsten_. Man bekam nicht jedes mögliche Webpack-Plugin. Man bekam die Konfiguration, die für 90% der Projekte funktionierte.
 
 Für KI-Anwendungen sehen sinnvolle Standards so aus:
 
 **3 Presets, die 90% der Anwendungsfälle abdecken:**
 
-| Preset | Was du bekommst | Für wen |
-|--------|----------------|---------|
-| **Minimal** | FastAPI, keine Datenbank, kein Auth, kein Docker | Schnelle Prototypen, Lernen, Experimente |
-| **AI Agent** | PostgreSQL, JWT, Redis, Pydantic AI, WebSocket-Streaming, Konversationspersistenz, Docker, GitHub Actions | KI-Chatbot- und Agenten-Anwendungen |
-| **Production** | Alles aus AI Agent + Caching, Rate Limiting, Sentry, Prometheus, Kubernetes, Admin-Panel | Enterprise-Deployments |
+| Preset         | Was du bekommst                                                                                           | Für wen                                  |
+| -------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| **Minimal**    | FastAPI, keine Datenbank, kein Auth, kein Docker                                                          | Schnelle Prototypen, Lernen, Experimente |
+| **AI Agent**   | PostgreSQL, JWT, Redis, Pydantic AI, WebSocket-Streaming, Konversationspersistenz, Docker, GitHub Actions | KI-Chatbot- und Agenten-Anwendungen      |
+| **Production** | Alles aus AI Agent + Caching, Rate Limiting, Sentry, Prometheus, Kubernetes, Admin-Panel                  | Enterprise-Deployments                   |
 
 Wähle ein Preset. Bekomme eine laufende Anwendung. Passe später an.
 
@@ -120,7 +123,7 @@ Ein Befehl. Alles davon. Getestet, konfiguriert und zusammen funktionierend.
 
 CRA hatte `eject`. Unser Template hat 75+ Konfigurationsoptionen.
 
-Aber hier ist die entscheidende Design-Entscheidung: Du *siehst* diese Optionen nicht, es sei denn, du willst sie. Die Presets abstrahieren die Komplexität. Wenn du anpassen musst — von PostgreSQL zu MongoDB wechseln, Celery für Hintergrundaufgaben hinzufügen, Kubernetes-Manifeste aktivieren, Pydantic AI gegen LangChain tauschen — die Optionen sind da.
+Aber hier ist die entscheidende Design-Entscheidung: Du _siehst_ diese Optionen nicht, es sei denn, du willst sie. Die Presets abstrahieren die Komplexität. Wenn du anpassen musst — von PostgreSQL zu MongoDB wechseln, Celery für Hintergrundaufgaben hinzufügen, Kubernetes-Manifeste aktivieren, Pydantic AI gegen LangChain tauschen — die Optionen sind da.
 
 Das ist das Progressive-Disclosure-Muster, das CRA etabliert hat. Einfach standardmäßig. Mächtig bei Bedarf. Nie überwältigend beim ersten Kontakt.
 
@@ -130,7 +133,7 @@ So hätte CRA ausgesehen, wenn es mit einer GUI gestartet wäre.
 
 ## Standards schlagen Schneeflocken
 
-Die am meisten unterschätzte Leistung von CRA war nicht die Eliminierung von Boilerplate. Es war die *Schaffung eines Standards*.
+Die am meisten unterschätzte Leistung von CRA war nicht die Eliminierung von Boilerplate. Es war die _Schaffung eines Standards_.
 
 Wenn jedes React-Projekt mit CRA startet, verschiebt sich etwas:
 
@@ -142,6 +145,7 @@ Wenn jedes React-Projekt mit CRA startet, verschiebt sich etwas:
 KI-Anwendungen brauchen diese Konvergenz dringend.
 
 Im Moment, wenn ich deinem Team beitrete und mir dein KI-Projekt anschaue, habe ich keine Ahnung, wo ich finde:
+
 - Die Agenten-Definition
 - Die Tool-Registrierungen
 - Die Konversationspersistenz-Logik
@@ -171,19 +175,21 @@ my_app/
   .github/          # CI/CD-Workflows
 ```
 
-Das ist nicht nur eine Ordnerstruktur. Es ist ein *gemeinsames Vokabular* für KI-Anwendungsarchitektur.
+Das ist nicht nur eine Ordnerstruktur. Es ist ein _gemeinsames Vokabular_ für KI-Anwendungsarchitektur.
 
 ## Der Ökosystem-Effekt
 
 Hier ist, was nach der Existenz eines Standard-Templates passiert.
 
 In der React-Welt, nach CRA:
+
 - Test-Bibliotheken (Jest, React Testing Library) zielten auf CRAs Konfiguration
 - CSS-Lösungen (styled-components, CSS modules) setzten CRAs Build-Prozess voraus
 - State-Management (Redux) lieferte CRA-spezifische Setup-Guides
 - Deployment-Plattformen (Vercel, Netlify) boten Ein-Klick-CRA-Deployment
 
 Dasselbe Schwungrad beginnt sich für KI-Anwendungen zu drehen:
+
 - [pydantic-deepagents](https://github.com/vstorm.co/projects/pydantic-deepagents) — unser modulares Agenten-Framework — bietet eine Template-Integration, die fortgeschrittene Muster (Sub-Agenten, parallele Ausführung, sandboxed Code-Ausführung) als Konfigurationsoption einbringt
 - [Logfire](https://logfire.pydantic.dev/)-Observability integriert sich sofort, weil das Template eine Standard-Instrumentierungsoberfläche bietet
 - Testmuster sind konsistent, weil die Projektstruktur konsistent ist
@@ -196,7 +202,7 @@ Jede neue KI-Anwendung sollte von einem Template starten. Nicht von Null.
 
 Nicht weil Templates perfekt sind. Nicht weil eine Größe für alle passt. Sondern weil die Alternative — jedes Team löst unabhängig dieselben Infrastrukturprobleme mit unterschiedlichen Implementierungen — eine Verschwendung kollektiver Ingenieurszeit ist.
 
-CRA hat die React-Entwicklung nicht eingeschränkt. Es hat sie *entfesselt*. Durch die Eliminierung der Boilerplate-Barriere ermöglichte es mehr Entwicklern, ambitioniertere Anwendungen schneller zu bauen. Das Framework-Ökosystem explodierte *nachdem* CRA den Einstieg erleichterte.
+CRA hat die React-Entwicklung nicht eingeschränkt. Es hat sie _entfesselt_. Durch die Eliminierung der Boilerplate-Barriere ermöglichte es mehr Entwicklern, ambitioniertere Anwendungen schneller zu bauen. Das Framework-Ökosystem explodierte _nachdem_ CRA den Einstieg erleichterte.
 
 Dasselbe wird mit KI-Anwendungen passieren. Wenn der Start eines neuen KI-Projekts Minuten statt Wochen dauert, werden mehr Teams experimentieren. Mehr Produkte werden ausgeliefert. Die Messlatte für "minimale funktionierende KI-Anwendung" wird von "Ich habe das WebSocket-Streaming zum Laufen gebracht" zu "Ich habe etwas gebaut, das Nutzer tatsächlich wollen" steigen.
 

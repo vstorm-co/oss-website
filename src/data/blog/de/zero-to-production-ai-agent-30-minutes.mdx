@@ -27,7 +27,7 @@ Lass mich dir genau zeigen, wie.
 
 ---
 
-*Ich bin Kacper, KI-Ingenieur bei [Vstorm](https://vstorm.co) — einer Applied Agentic AI Engineering Consultancy. Wir haben 30+ produktionsreife KI-Agent-Implementierungen ausgeliefert und stellen unsere Tools als Open-Source unter [github.com/vstorm-co](https://github.com/vstorm-co) bereit. Verbinde dich mit mir auf [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+_Ich bin Kacper, KI-Ingenieur bei [Vstorm](https://vstorm.co) — einer Applied Agentic AI Engineering Consultancy. Wir haben 30+ produktionsreife KI-Agent-Implementierungen ausgeliefert und stellen unsere Tools als Open-Source unter [github.com/vstorm-co](https://github.com/vstorm-co) bereit. Verbinde dich mit mir auf [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/)._
 
 ---
 
@@ -52,10 +52,10 @@ Dies startet den interaktiven Assistenten, der dich durch dieselben Optionen fue
 
 Das Template kommt mit drei Presets fuer die haeufigsten Anwendungsfaelle:
 
-| Preset | Was du bekommst |
-|--------|----------------|
-| `--minimal` | Reines FastAPI — keine Datenbank, kein Auth, keine Extras |
-| `--preset ai-agent` | PostgreSQL + JWT Auth + KI-Agent + WebSocket-Streaming + Konversationsspeicherung + Redis |
+| Preset                | Was du bekommst                                                                                |
+| --------------------- | ---------------------------------------------------------------------------------------------- |
+| `--minimal`           | Reines FastAPI — keine Datenbank, kein Auth, keine Extras                                      |
+| `--preset ai-agent`   | PostgreSQL + JWT Auth + KI-Agent + WebSocket-Streaming + Konversationsspeicherung + Redis      |
 | `--preset production` | Volle Produktionskonfiguration — Redis, Caching, Rate Limiting, Sentry, Prometheus, Kubernetes |
 
 Fuer diese Anleitung verwende ich das **AI Agent**-Preset mit Pydantic AI — der haeufigste Startpunkt fuer KI-Anwendungen:
@@ -68,6 +68,7 @@ fastapi-fullstack create my_ai_app \
 ```
 
 Dieser einzelne Befehl generiert ein Full-Stack-Projekt mit:
+
 - FastAPI-Backend mit async PostgreSQL
 - JWT-Authentifizierung mit Benutzerverwaltung
 - Pydantic AI Agent mit WebSocket-Streaming
@@ -201,13 +202,13 @@ Komplett zu LangChain oder CrewAI wechseln? Generiere das Projekt mit einer ande
 
 Das Template unterstuetzt fuenf KI-Frameworks, alle mit derselben Backend-Infrastruktur:
 
-| Framework | Am besten fuer | Observability |
-|-----------|---------------|--------------|
-| **Pydantic AI** | Type-safe Agenten, Dependency Injection | Logfire |
-| **LangChain** | Chains, bestehende LangChain-Tools | LangSmith |
-| **LangGraph** | Komplexe mehrstufige Workflows, ReAct-Agenten | LangSmith |
-| **CrewAI** | Multi-Agent-Crews, rollenbasierte Agenten | LangSmith |
-| **DeepAgents** | Agentisches Coding im Claude-Code-Stil, HITL | LangSmith |
+| Framework       | Am besten fuer                                | Observability |
+| --------------- | --------------------------------------------- | ------------- |
+| **Pydantic AI** | Type-safe Agenten, Dependency Injection       | Logfire       |
+| **LangChain**   | Chains, bestehende LangChain-Tools            | LangSmith     |
+| **LangGraph**   | Komplexe mehrstufige Workflows, ReAct-Agenten | LangSmith     |
+| **CrewAI**      | Multi-Agent-Crews, rollenbasierte Agenten     | LangSmith     |
+| **DeepAgents**  | Agentisches Coding im Claude-Code-Stil, HITL  | LangSmith     |
 
 ```bash
 # Mit LangGraph generieren
@@ -251,6 +252,7 @@ pip install fastapi-fullstack
 Oder nutze den [Web-Konfigurator](https://oss.vstorm.co/projects/full-stack-ai-agent-template/configurator/) — keine Installation noetig.
 
 **Mehr aus dem Open-Source-Oekosystem von Vstorm:**
+
 - [Alle unsere Open-Source-Projekte](https://oss.vstorm.co) — 13 Pakete fuer das Pydantic AI Oekosystem
 - [awesome-pydantic-ai](https://github.com/vstorm-co/awesome-pydantic-ai) — kuratierte Liste von Pydantic AI Ressourcen und Tools
 - [vstorm.co](https://vstorm.co) — unsere Beratung (30+ KI-Agent-Implementierungen)

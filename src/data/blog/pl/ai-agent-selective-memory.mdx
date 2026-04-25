@@ -25,15 +25,16 @@ Bazy wektorowe zapisywaly kazda wiadomosc - w tym "tak", "ok" i "mozesz powtorzy
 
 ## Fundamentalny problem
 
-Fundamentalny problem: wiekszość systemow pamieci AI jest zaprojektowana, aby *pamietac wszystko*. Ale najlepsza ludzka pamiec dziala poprzez *zapominanie prawie wszystkiego* i zachowywanie tylko tego, co wazne.
+Fundamentalny problem: wiekszość systemow pamieci AI jest zaprojektowana, aby _pamietac wszystko_. Ale najlepsza ludzka pamiec dziala poprzez _zapominanie prawie wszystkiego_ i zachowywanie tylko tego, co wazne.
 
-Po latach pracy z agentami produkcyjnymi w Vstorm, doszlismy do innego podejscia. Zamiast przechowywac kazda wiadomosc w bazie wektorowej, dajemy agentowi ustrukturyzowany system plikow dla trwalej pamieci - i uczymy go decydowac, *co jest warte zapisania*.
+Po latach pracy z agentami produkcyjnymi w Vstorm, doszlismy do innego podejscia. Zamiast przechowywac kazda wiadomosc w bazie wektorowej, dajemy agentowi ustrukturyzowany system plikow dla trwalej pamieci - i uczymy go decydowac, _co jest warte zapisania_.
 
 ## Problem: okna kontekstu sa skonczone
 
 Oto fakt, ktory wiekszość architektur agentow ignoruje: twoje okno kontekstu miesci tylko ostatnie ~10-20 wiadomosci. Wszystko wczesniejsze znika - chyba ze jawnie to gdzies zapisales.
 
 Typowa konfiguracja produkcyjna:
+
 - Okno kontekstu: 128k tokenow (GPT-4o) lub 200k tokenow (Claude)
 - Srednia wiadomosc: ~500 tokenow (z wywolaniami narzedzi)
 - Efektywna pojemnosc: ~50-100 wiadomosci zanim zarzadzanie kontekstem sie wlaczy
@@ -111,22 +112,27 @@ Plik `AGENTS.md` sluzy jako tozsamosc agenta i wyuczone zachowania:
 # Winston - Core Instructions
 
 ## Identity
+
 You are Winston, an autonomous AI assistant.
 
 ## Critical Behaviors
 
 ### Memory Management
+
 - Your context window is LIMITED to ~10 messages
 - Important information WILL BE LOST if not saved
 - When user shares personal info → SAVE IMMEDIATELY
 
 ### Proactive Learning
+
 When you learn something new about the user:
+
 1. Acknowledge what you learned
 2. Save to appropriate memory file
 3. Confirm: "I've noted that for future reference."
 
 ## User Preferences
+
 - Language: User may speak Polish or English - match their language
 - Code style: Prefers explicit over clever
 ```
@@ -145,13 +151,16 @@ Umiejetnosci to pliki markdown, ktore ucza agenta konkretnych wzorcow:
 ## Before Starting ANY Complex Task
 
 ### 1. Understand the Goal
+
 - What is the desired end state?
 - What problem does this solve?
 - What are the constraints?
 
 ### 2. Break Down the Task
+
 **Bad**: "Build a login system"
 **Good**:
+
 1. Create user model with email/password
 2. Implement password hashing
 3. Create login endpoint
@@ -159,6 +168,7 @@ Umiejetnosci to pliki markdown, ktore ucza agenta konkretnych wzorcow:
 5. Write tests for each component
 
 ### 3. Create a Todo List
+
 Use write_todos to track the plan...
 ```
 

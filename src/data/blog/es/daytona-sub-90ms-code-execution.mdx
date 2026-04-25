@@ -21,11 +21,11 @@ Entonces probamos Daytona. Arranque en menos de 90ms. Sin Docker daemon. Sandbox
 
 Nuestros agentes de IA usan [pydantic-ai-backend](https://github.com/vstorm-co/pydantic-ai-backend) — una biblioteca de Python que proporciona backends de almacenamiento de archivos y ejecución de código para agentes de Pydantic AI. Antes de Daytona, teníamos tres backends:
 
-| Backend | Almacenamiento | Ejecución | Caso de Uso |
-|---------|----------------|-----------|-------------|
-| `StateBackend` | En memoria | No | Pruebas, sesiones efímeras |
-| `LocalBackend` | Sistema de archivos | Sí | Desarrollo local |
-| `DockerSandbox` | Contenedor | Sí | Multi-usuario, código no confiable |
+| Backend         | Almacenamiento      | Ejecución | Caso de Uso                        |
+| --------------- | ------------------- | --------- | ---------------------------------- |
+| `StateBackend`  | En memoria          | No        | Pruebas, sesiones efímeras         |
+| `LocalBackend`  | Sistema de archivos | Sí        | Desarrollo local                   |
+| `DockerSandbox` | Contenedor          | Sí        | Multi-usuario, código no confiable |
 
 Docker era nuestra elección para producción. Ejecución aislada, entorno controlado, sin riesgo de que los agentes destruyan el host. Pero la sobrecarga de arranque era real:
 
@@ -92,25 +92,25 @@ class BaseSandbox(ABC):
 
 Tanto `DockerSandbox` como `DaytonaSandbox` heredan de `BaseSandbox`. Al toolset no le importa cuál recibe.
 
-| Método | Docker | Daytona |
-|--------|--------|---------|
-| `execute()` | `docker.exec_run()` | `sandbox.process.exec()` |
-| `_read_bytes()` | Shell `cat` vía Docker exec | API nativa de descarga de archivos |
-| `write()` | Shell `cat >` vía Docker exec | API nativa de carga de archivos |
-| `stop()` | Eliminar contenedor | Eliminar sandbox en la nube |
+| Método          | Docker                        | Daytona                            |
+| --------------- | ----------------------------- | ---------------------------------- |
+| `execute()`     | `docker.exec_run()`           | `sandbox.process.exec()`           |
+| `_read_bytes()` | Shell `cat` vía Docker exec   | API nativa de descarga de archivos |
+| `write()`       | Shell `cat >` vía Docker exec | API nativa de carga de archivos    |
+| `stop()`        | Eliminar contenedor           | Eliminar sandbox en la nube        |
 
 Las APIs nativas de archivos de Daytona son particularmente interesantes — en lugar de pasar por un shell (como hace Docker), Daytona sube/descarga archivos directamente a través de su SDK.
 
 ## Docker vs Daytona: Cuándo Usar Cada Uno
 
-| Característica | DaytonaSandbox | DockerSandbox |
-|----------------|----------------|---------------|
-| Tiempo de arranque | **Menos de 90ms** | 2-5 segundos |
-| Infraestructura | Nube (plataforma Daytona) | Docker daemon local |
-| Configuración necesaria | Solo API key | Docker instalado + ejecutándose |
-| Aislamiento | VM en la nube | Contenedor |
-| Costo | Precios de Daytona | Gratis (recursos locales) |
-| Ideal para | **CI/CD, serverless, nube** | Desarrollo local, auto-hospedado |
+| Característica          | DaytonaSandbox              | DockerSandbox                    |
+| ----------------------- | --------------------------- | -------------------------------- |
+| Tiempo de arranque      | **Menos de 90ms**           | 2-5 segundos                     |
+| Infraestructura         | Nube (plataforma Daytona)   | Docker daemon local              |
+| Configuración necesaria | Solo API key                | Docker instalado + ejecutándose  |
+| Aislamiento             | VM en la nube               | Contenedor                       |
+| Costo                   | Precios de Daytona          | Gratis (recursos locales)        |
+| Ideal para              | **CI/CD, serverless, nube** | Desarrollo local, auto-hospedado |
 
 **Usa Daytona cuando:** despliegues en la nube, la latencia de arranque importa, escalado horizontal, pipelines CI/CD donde Docker-in-Docker es problemático.
 

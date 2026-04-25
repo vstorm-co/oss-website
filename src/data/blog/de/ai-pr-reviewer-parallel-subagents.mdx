@@ -28,6 +28,7 @@ So funktioniert es, und hier ist der vollstaendige, funktionierende Code, den Si
 Die Kernidee ist einfach: Anstatt eines monolithischen "pruefe diesen Code"-Prompts teilen wir das Review in drei Domaenen auf, die jeweils von einem spezialisierten Subagenten behandelt werden.
 
 **Security Reviewer** — prueft auf:
+
 - SQL-Injection-Schwachstellen
 - Cross-Site Scripting (XSS)
 - Hardcodierte Secrets und API-Keys
@@ -36,6 +37,7 @@ Die Kernidee ist einfach: Anstatt eines monolithischen "pruefe diesen Code"-Prom
 - Unsichere Dateioperationen
 
 **Style Reviewer** — prueft auf:
+
 - Verletzte Namenskonventionen
 - Code-Duplikation
 - Uebermassige zyklomatische Komplexitaet
@@ -44,6 +46,7 @@ Die Kernidee ist einfach: Anstatt eines monolithischen "pruefe diesen Code"-Prom
 - Toter Code und ungenutzte Imports
 
 **Performance Reviewer** — prueft auf:
+
 - N+1-Query-Muster
 - Unnoetige Speicherallokationen
 - Blockierendes I/O in Async-Kontexten
@@ -163,7 +166,7 @@ Das ist einer der Vorteile des Aufbauens auf [Pydantic AI](https://ai.pydantic.d
 Jeder `SubAgentConfig` definiert einen Spezialisten:
 
 - **`name`** — eindeutiger Bezeichner, den der uebergeordnete Agent zum Delegieren verwendet
-- **`description`** — sagt dem uebergeordneten Agenten, *wann* dieser Subagent eingesetzt werden soll (die Routing-Logik)
+- **`description`** — sagt dem uebergeordneten Agenten, _wann_ dieser Subagent eingesetzt werden soll (die Routing-Logik)
 - **`instructions`** — der System-Prompt fuer den Subagenten, fokussiert auf seine Domaene
 
 Die Anweisungen sind spezifisch. Wir sagen nicht "pruefe diesen Code". Wir sagen "pruefe auf SQL Injection, XSS, hardcodierte Secrets..." Diese Spezifitaet macht die Reviews tatsaechlich nuetzlich. Jeder Subagent ist ein Experte in seiner Domaene, kein Generalist, der versucht, alles abzudecken.
@@ -291,6 +294,7 @@ Drei Gruende:
 Dieser PR Reviewer ist ein Beispiel fuer das Deep Agent Muster — dieselbe Architektur, die Claude Code, OpenAI Codex und Cursor im Hintergrund antreibt.
 
 Das Muster:
+
 1. **Planen** — eine komplexe Aufgabe in Teilaufgaben zerlegen
 2. **Delegieren** — Teilaufgaben an Spezialisten (Subagenten) senden
 3. **Ausfuehren** — jeder Spezialist arbeitet unabhaengig mit seinen eigenen Tools
@@ -313,4 +317,4 @@ Die Menschen in Ihrem Team sollten Architektur, Logik und Design ueberpruefen. L
 
 ---
 
-*Ich bin Kacper, AI Engineer bei [Vstorm](https://vstorm.co) — einer Applied Agentic AI Engineering Consultancy. Wir bauen und veroeffentlichen produktionsreife AI-Agent-Tools in Python als Open Source. Geben Sie [pydantic-deepagents](https://github.com/vstorm.co/projects/pydantic-deepagents) einen Stern auf GitHub, wenn Sie es nuetzlich finden.*
+_Ich bin Kacper, AI Engineer bei [Vstorm](https://vstorm.co) — einer Applied Agentic AI Engineering Consultancy. Wir bauen und veroeffentlichen produktionsreife AI-Agent-Tools in Python als Open Source. Geben Sie [pydantic-deepagents](https://github.com/vstorm.co/projects/pydantic-deepagents) einen Stern auf GitHub, wenn Sie es nuetzlich finden._

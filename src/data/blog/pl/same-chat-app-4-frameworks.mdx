@@ -182,15 +182,15 @@ class CrewAIAssistant:
 
 ## Tabela porownawcza
 
-| Metryka | Pydantic AI | LangChain | LangGraph | CrewAI |
-|---------|------------|-----------|-----------|--------|
-| **Linie kodu** | ~160 | ~170 | ~280 | ~420 |
-| **Bezpieczenstwo typow** | Pelne generyki | TypedDict | TypedDict | Modele Pydantic |
-| **Wsparcie async** | Natywne | Natywne | Natywne | Sync (executor) |
-| **Streaming** | `agent.iter()` | `astream()` | `astream()` | Event bus + watek |
-| **Skladnia narzedzi** | `@agent.tool` | `@tool` | `bind_tools()` | Konfiguracja |
-| **Architektura** | Pojedynczy agent | Agent (abstrakcja) | Jawny graf | Wieloagentowa zaloga |
-| **Najlepszy do** | Typowane agenty | Szybkie prototypy | Zlozone przeplywy | Zespoly agentow |
+| Metryka                  | Pydantic AI      | LangChain          | LangGraph         | CrewAI               |
+| ------------------------ | ---------------- | ------------------ | ----------------- | -------------------- |
+| **Linie kodu**           | ~160             | ~170               | ~280              | ~420                 |
+| **Bezpieczenstwo typow** | Pelne generyki   | TypedDict          | TypedDict         | Modele Pydantic      |
+| **Wsparcie async**       | Natywne          | Natywne            | Natywne           | Sync (executor)      |
+| **Streaming**            | `agent.iter()`   | `astream()`        | `astream()`       | Event bus + watek    |
+| **Skladnia narzedzi**    | `@agent.tool`    | `@tool`            | `bind_tools()`    | Konfiguracja         |
+| **Architektura**         | Pojedynczy agent | Agent (abstrakcja) | Jawny graf        | Wieloagentowa zaloga |
+| **Najlepszy do**         | Typowane agenty  | Szybkie prototypy  | Zlozone przeplywy | Zespoly agentow      |
 
 ## Kiedy uzyc ktorego
 

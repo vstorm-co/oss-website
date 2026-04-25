@@ -73,15 +73,15 @@ The research subagent gets filesystem tools (ls, glob, grep, read_file, write_fi
 
 Seven levels are supported:
 
-| Value | Behavior |
-|-------|----------|
-| `True` | Enable with default budget |
-| `False` | Disable thinking |
-| `"minimal"` | Minimal reasoning |
-| `"low"` | Low effort |
-| `"medium"` | Medium effort |
-| `"high"` | High effort (default) |
-| `"xhigh"` | Maximum reasoning budget |
+| Value       | Behavior                   |
+| ----------- | -------------------------- |
+| `True`      | Enable with default budget |
+| `False`     | Disable thinking           |
+| `"minimal"` | Minimal reasoning          |
+| `"low"`     | Low effort                 |
+| `"medium"`  | Medium effort              |
+| `"high"`    | High effort (default)      |
+| `"xhigh"`   | Maximum reasoning budget   |
 
 The setting is silently ignored by models that do not support thinking (OpenAI, older Anthropic models). No conditional logic needed -- just set it once.
 
@@ -136,13 +136,13 @@ agent = create_deep_agent(
 
 The full event list:
 
-| Event | When it fires | Use case |
-|-------|--------------|----------|
-| `BEFORE_RUN` | Start of `agent.run()` | Session tracking, setup |
-| `AFTER_RUN` | End of successful run | Cleanup, metrics |
-| `RUN_ERROR` | Run fails with exception | Error alerts, logging |
-| `BEFORE_MODEL_REQUEST` | Before each LLM call | Request logging, rate limiting |
-| `AFTER_MODEL_REQUEST` | After each LLM response | Token tracking, response logging |
+| Event                  | When it fires            | Use case                         |
+| ---------------------- | ------------------------ | -------------------------------- |
+| `BEFORE_RUN`           | Start of `agent.run()`   | Session tracking, setup          |
+| `AFTER_RUN`            | End of successful run    | Cleanup, metrics                 |
+| `RUN_ERROR`            | Run fails with exception | Error alerts, logging            |
+| `BEFORE_MODEL_REQUEST` | Before each LLM call     | Request logging, rate limiting   |
+| `AFTER_MODEL_REQUEST`  | After each LLM response  | Token tracking, response logging |
 
 These complement the existing tool-level hooks (`PRE_TOOL_USE`, `POST_TOOL_USE`, `POST_TOOL_USE_FAILURE`). Together they give you full observability over the agent lifecycle -- from run start to individual tool calls to run completion.
 
@@ -164,20 +164,20 @@ This means you can override any built-in skill at the project level. A project-l
 
 0.3.3 flips several defaults to production-ready values. The goal: `create_deep_agent()` with zero arguments should give you a capable agent.
 
-| Setting | Before (0.3.2) | After (0.3.3) |
-|---------|-----------------|----------------|
-| `include_memory` | `False` | `True` |
-| `thinking` | not available | `"high"` |
-| Anthropic caching | off | on (instructions, tools, messages) |
-| Subagent type | plain Pydantic AI agent | full deep agent |
-| `max_nesting_depth` | `0` | `1` |
-| `eviction_token_limit` | `None` | `20_000` |
-| `patch_tool_calls` | `False` | `True` |
-| `image_support` | opt-in | always on (removed flag) |
-| `BASE_PROMPT` | replaceable | always included (`instructions` appends) |
-| Default main model | `anthropic:claude-sonnet-4-6` | `anthropic:claude-opus-4-6` |
-| Default subagent model | `anthropic:claude-sonnet-4-6` | `anthropic:claude-sonnet-4-6` |
-| Default summarization model | `anthropic:claude-haiku-4-5-20251001` | `anthropic:claude-haiku-4-5-20251001` |
+| Setting                     | Before (0.3.2)                        | After (0.3.3)                            |
+| --------------------------- | ------------------------------------- | ---------------------------------------- |
+| `include_memory`            | `False`                               | `True`                                   |
+| `thinking`                  | not available                         | `"high"`                                 |
+| Anthropic caching           | off                                   | on (instructions, tools, messages)       |
+| Subagent type               | plain Pydantic AI agent               | full deep agent                          |
+| `max_nesting_depth`         | `0`                                   | `1`                                      |
+| `eviction_token_limit`      | `None`                                | `20_000`                                 |
+| `patch_tool_calls`          | `False`                               | `True`                                   |
+| `image_support`             | opt-in                                | always on (removed flag)                 |
+| `BASE_PROMPT`               | replaceable                           | always included (`instructions` appends) |
+| Default main model          | `anthropic:claude-sonnet-4-6`         | `anthropic:claude-opus-4-6`              |
+| Default subagent model      | `anthropic:claude-sonnet-4-6`         | `anthropic:claude-sonnet-4-6`            |
+| Default summarization model | `anthropic:claude-haiku-4-5-20251001` | `anthropic:claude-haiku-4-5-20251001`    |
 
 The minimal agent that used to require 10+ flags now requires zero:
 

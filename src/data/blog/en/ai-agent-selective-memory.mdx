@@ -28,15 +28,16 @@ Vector databases saved every message - including "yes," "ok," and "can you repea
 
 ## The Fundamental Problem
 
-The fundamental problem: most AI memory systems are designed to *remember everything*. But the best human memory works by *forgetting almost everything* and keeping only what matters.
+The fundamental problem: most AI memory systems are designed to _remember everything_. But the best human memory works by _forgetting almost everything_ and keeping only what matters.
 
-After years of production agent work at Vstorm, we converged on a different approach using [Pydantic AI](https://ai.pydantic.dev/). Instead of storing every message in a vector database, we give the agent a structured file system for persistent memory - and teach it to decide *what's worth saving*. For the complementary problem of handling context overflow when conversations get too long, see our post on [AI agent memory management](/blog/ai-agent-memory-management/).
+After years of production agent work at Vstorm, we converged on a different approach using [Pydantic AI](https://ai.pydantic.dev/). Instead of storing every message in a vector database, we give the agent a structured file system for persistent memory - and teach it to decide _what's worth saving_. For the complementary problem of handling context overflow when conversations get too long, see our post on [AI agent memory management](/blog/ai-agent-memory-management/).
 
 ## The Problem: Context Windows Are Finite
 
 Here's a fact that most agent architectures ignore: your context window only holds the last ~10-20 messages. Everything before that is gone - unless you explicitly save it somewhere.
 
 A typical production setup:
+
 - Context window: 128k tokens (GPT-4o) or 200k tokens (Claude)
 - Average message: ~500 tokens (with tool calls)
 - Effective capacity: ~50-100 messages before context management kicks in
@@ -114,22 +115,27 @@ The `AGENTS.md` file serves as the agent's identity and learned behaviors. We co
 # Winston - Core Instructions
 
 ## Identity
+
 You are Winston, an autonomous AI assistant.
 
 ## Critical Behaviors
 
 ### Memory Management
+
 - Your context window is LIMITED to ~10 messages
 - Important information WILL BE LOST if not saved
 - When user shares personal info → SAVE IMMEDIATELY
 
 ### Proactive Learning
+
 When you learn something new about the user:
+
 1. Acknowledge what you learned
 2. Save to appropriate memory file
 3. Confirm: "I've noted that for future reference."
 
 ## User Preferences
+
 - Language: User may speak Polish or English - match their language
 - Code style: Prefers explicit over clever
 ```
@@ -148,13 +154,16 @@ Skills are markdown files that teach the agent specific patterns:
 ## Before Starting ANY Complex Task
 
 ### 1. Understand the Goal
+
 - What is the desired end state?
 - What problem does this solve?
 - What are the constraints?
 
 ### 2. Break Down the Task
+
 **Bad**: "Build a login system"
 **Good**:
+
 1. Create user model with email/password
 2. Implement password hashing
 3. Create login endpoint
@@ -162,6 +171,7 @@ Skills are markdown files that teach the agent specific patterns:
 5. Write tests for each component
 
 ### 3. Create a Todo List
+
 Use write_todos to track the plan...
 ```
 

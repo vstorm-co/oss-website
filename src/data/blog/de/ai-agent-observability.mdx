@@ -31,7 +31,7 @@ Also haben wir eine gebaut: einen KI-gestuetzten Logfire-Assistenten, der natuer
 
 ## Das Problem: SQL ist nicht die Art, wie man Agenten debuggt
 
-Logfire speichert alles in einem SQL-abfragbaren Format. Sie *koennen* schreiben:
+Logfire speichert alles in einem SQL-abfragbaren Format. Sie _koennen_ schreiben:
 
 ```sql
 SELECT span_name, duration, attributes
@@ -131,17 +131,16 @@ Das maechtigste Feature ist die Chrome-Erweiterung. Wenn Sie einen Trace in Logf
 ```typescript
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   const isLogfirePage =
-    tab.url.includes('logfire.pydantic.dev') ||
-    tab.url.includes('logfire-us.pydantic.dev');
+    tab.url.includes("logfire.pydantic.dev") || tab.url.includes("logfire-us.pydantic.dev");
 
-  if (isLogfirePage && (changeInfo.url || changeInfo.status === 'complete')) {
+  if (isLogfirePage && (changeInfo.url || changeInfo.status === "complete")) {
     const context = extractLogfireContext(tab.url);
     if (context) {
       await chrome.storage.local.set({
         [`context_${tabId}`]: context,
       });
       chrome.runtime.sendMessage({
-        type: 'CONTEXT_UPDATED',
+        type: "CONTEXT_UPDATED",
         tabId,
         context,
       });
@@ -157,7 +156,7 @@ Wenn Sie jetzt fragen "warum ist dieser Tool-Aufruf fehlgeschlagen?", weiss der 
 Die Erweiterung unterstuetzt das Auswaehlen mehrerer Spans in der Logfire-UI fuer vergleichende Analyse:
 
 ```typescript
-if (message.type === 'SPAN_CONTEXT_TOGGLED') {
+if (message.type === "SPAN_CONTEXT_TOGGLED") {
   const contexts = result[`spanContexts_${tabId}`] || [];
   const spanContext = message.spanContext;
 
@@ -165,7 +164,7 @@ if (message.type === 'SPAN_CONTEXT_TOGGLED') {
   if (message.selected) {
     newContexts = [...contexts, spanContext];
   } else {
-    newContexts = contexts.filter(c => c.spanId !== spanContext.spanId);
+    newContexts = contexts.filter((c) => c.spanId !== spanContext.spanId);
   }
 
   chrome.storage.local.set({ [`spanContexts_${tabId}`]: newContexts });

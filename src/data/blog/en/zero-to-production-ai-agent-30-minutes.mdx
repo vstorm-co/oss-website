@@ -12,6 +12,22 @@ category: tutorial
 draft: false
 ---
 
+import Callout from "@/components/blog/Callout.astro";
+import FileTree from "@/components/blog/FileTree.astro";
+import MetricsBar from "@/components/blog/MetricsBar.astro";
+import RepoCard from "@/components/blog/RepoCard.astro";
+import FrameworkBadge from "@/components/blog/FrameworkBadge.astro";
+import TLDR from "@/components/blog/TLDR.astro";
+
+<MetricsBar
+  metrics={[
+    { value: "614", label: "GitHub Stars" },
+    { value: "5", label: "AI Frameworks" },
+    { value: "75+", label: "Config Options" },
+    { value: "30 min", label: "Time to Production" },
+  ]}
+/>
+
 > **TL;DR:** The full-stack-ai-agent-template lets you go from zero to a running production AI agent in 30 minutes, with 614 GitHub stars and adoption by teams at NVIDIA, Pfizer, TikTok, and others. A single command (`fastapi-fullstack create my_ai_app --preset ai-agent --ai-framework pydantic_ai --frontend nextjs`) generates a complete stack: FastAPI backend with async PostgreSQL and Alembic migrations, JWT auth with user management, Pydantic AI agent with WebSocket streaming and conversation persistence, Redis caching, Next.js 15 frontend with React 19, Docker Compose, GitHub Actions CI/CD, and Logfire observability. The template supports 5 AI frameworks (Pydantic AI, LangChain, LangGraph, CrewAI, DeepAgents) behind the same infrastructure, so switching frameworks means regenerating with a different `--ai-framework` flag without rewriting your backend. Generated projects include CLAUDE.md and AGENTS.md files optimized for AI coding assistants, and the 75+ configuration options cover databases, ORMs, auth methods, background tasks, observability, Kubernetes, and frontend i18n. Your customization focus is one directory: `app/agents/`.
 
 Every AI project starts the same way.
@@ -22,15 +38,22 @@ Three days of boilerplate before you write a single line of AI code.
 
 I've set up this stack from scratch more times than I'd like to admit. After the third project where I copy-pasted the same auth middleware, the same WebSocket handler, the same Docker Compose config — I decided to build a generator that does all of it in one command.
 
-The result: [full-stack-ai-agent-template](https://github.com/vstorm.co/projects/full-stack-ai-agent-template) — an open-source full-stack template with 5 AI frameworks, 75+ configuration options, and a web configurator that generates your entire project in minutes.
+The result:
 
-614 stars on GitHub. Used by teams at NVIDIA, Pfizer, TikTok, and others. And you can go from zero to a running production AI agent in about 30 minutes.
+<RepoCard
+  repo="vstorm-co/full-stack-ai-agent-template"
+  description="Open-source full-stack template with 5 AI frameworks, 75+ configuration options, and a web configurator that generates your entire project in minutes."
+  stars="614"
+  language="Python"
+/>
+
+Used by teams at NVIDIA, Pfizer, TikTok, and others. And you can go from zero to a running production AI agent in about 30 minutes.
 
 Let me walk you through exactly how.
 
 ---
 
-*I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering Consultancy. We've shipped 30+ production AI agent implementations and open-source our tooling at [github.com/vstorm-co](https://github.com/vstorm-co). Connect with me on [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+_I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering Consultancy. We've shipped 30+ production AI agent implementations and open-source our tooling at [github.com/vstorm-co](https://github.com/vstorm-co). Connect with me on [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/)._
 
 ---
 
@@ -55,11 +78,11 @@ This launches the interactive wizard that walks you through the same options.
 
 The template ships with three presets that cover the most common use cases:
 
-| Preset | What you get |
-|--------|-------------|
-| `--minimal` | Bare FastAPI app — no database, no auth, no extras |
-| `--preset ai-agent` | PostgreSQL + JWT auth + AI agent + WebSocket streaming + conversation persistence + Redis |
-| `--preset production` | Full production setup — Redis, caching, rate limiting, Sentry, Prometheus, Kubernetes |
+| Preset                | What you get                                                                              |
+| --------------------- | ----------------------------------------------------------------------------------------- |
+| `--minimal`           | Bare FastAPI app — no database, no auth, no extras                                        |
+| `--preset ai-agent`   | PostgreSQL + JWT auth + AI agent + WebSocket streaming + conversation persistence + Redis |
+| `--preset production` | Full production setup — Redis, caching, rate limiting, Sentry, Prometheus, Kubernetes     |
 
 For this walkthrough, I'll use the **AI Agent** preset with Pydantic AI — the most common starting point for AI applications:
 
@@ -71,6 +94,7 @@ fastapi-fullstack create my_ai_app \
 ```
 
 That single command generates a full-stack project with:
+
 - FastAPI backend with async PostgreSQL
 - JWT authentication with user management
 - Pydantic AI agent with WebSocket streaming
@@ -85,33 +109,60 @@ That single command generates a full-stack project with:
 
 The generated project follows a clean layered architecture — Repository + Service pattern, inspired by real production codebases:
 
-```
-my_ai_app/
-├── backend/
-│   ├── app/
-│   │   ├── main.py              # FastAPI app with lifespan
-│   │   ├── api/routes/v1/       # Versioned API endpoints
-│   │   ├── core/                # Config, security, middleware
-│   │   ├── db/models/           # SQLAlchemy models
-│   │   ├── schemas/             # Pydantic schemas
-│   │   ├── repositories/        # Data access layer
-│   │   ├── services/            # Business logic
-│   │   ├── agents/              # AI agents (this is where your code goes)
-│   │   └── commands/            # Django-style CLI commands
-│   ├── cli/                     # Project CLI
-│   ├── tests/                   # pytest test suite
-│   └── alembic/                 # Database migrations
-├── frontend/
-│   ├── src/
-│   │   ├── app/                 # Next.js App Router
-│   │   ├── components/          # React components (chat UI included)
-│   │   ├── hooks/               # useChat, useWebSocket
-│   │   └── stores/              # Zustand state management
-├── docker-compose.yml
-├── Makefile
-├── CLAUDE.md                    # AI coding assistant context
-└── AGENTS.md                    # Multi-agent project guide
-```
+<FileTree
+  items={[
+    {
+      label: "my_ai_app",
+      children: [
+        {
+          label: "backend",
+          children: [
+            {
+              label: "app",
+              children: [
+                { label: "main.py" },
+                { label: "api/routes/v1" },
+                { label: "core" },
+                { label: "db/models" },
+                { label: "schemas" },
+                { label: "repositories" },
+                { label: "services" },
+                { label: "agents" },
+                { label: "commands" },
+              ],
+            },
+            { label: "cli" },
+            { label: "tests" },
+            { label: "alembic" },
+          ],
+        },
+        {
+          label: "frontend",
+          children: [
+            {
+              label: "src",
+              children: [
+                { label: "app" },
+                { label: "components" },
+                { label: "hooks" },
+                { label: "stores" },
+              ],
+            },
+          ],
+        },
+        { label: "docker-compose.yml" },
+        { label: "Makefile" },
+        { label: "CLAUDE.md" },
+        { label: "AGENTS.md" },
+      ],
+    },
+  ]}
+/>
+
+<Callout type="info" title="One directory to focus on">
+  After generation, almost all your custom code lives in `backend/app/agents/`. Everything else is
+  scaffolding you can ignore until you need to extend it.
+</Callout>
 
 Notice the `CLAUDE.md` and `AGENTS.md` files — the generated project is optimized for AI coding assistants like Claude Code, Cursor, and Copilot. It follows progressive disclosure best practices so your AI assistant understands the project structure immediately.
 
@@ -218,13 +269,13 @@ Want to switch to LangChain or CrewAI entirely? Regenerate the project with a di
 
 The template supports five AI frameworks, all with the same backend infrastructure:
 
-| Framework | Best for | Observability |
-|-----------|----------|--------------|
-| **Pydantic AI** | Type-safe agents, dependency injection | Logfire |
-| **LangChain** | Chains, existing LangChain tooling | LangSmith |
-| **LangGraph** | Complex multi-step workflows, ReAct agents | LangSmith |
-| **CrewAI** | Multi-agent crews, role-based agents | LangSmith |
-| **DeepAgents** | Claude Code-style agentic coding, HITL | LangSmith |
+| Framework       | Best for                                   | Observability |
+| --------------- | ------------------------------------------ | ------------- |
+| **Pydantic AI** | Type-safe agents, dependency injection     | Logfire       |
+| **LangChain**   | Chains, existing LangChain tooling         | LangSmith     |
+| **LangGraph**   | Complex multi-step workflows, ReAct agents | LangSmith     |
+| **CrewAI**      | Multi-agent crews, role-based agents       | LangSmith     |
+| **DeepAgents**  | Claude Code-style agentic coding, HITL     | LangSmith     |
 
 You pick the framework when generating the project. The WebSocket streaming, conversation persistence, auth, and frontend all work the same way regardless of which framework you choose.
 
@@ -274,6 +325,7 @@ pip install fastapi-fullstack
 Or use the [Web Configurator](https://oss.vstorm.co/projects/full-stack-ai-agent-template/configurator/) — no installation needed.
 
 **More from Vstorm's open-source ecosystem:**
+
 - [All our open-source projects](https://oss.vstorm.co) — 13 packages for the Pydantic AI ecosystem
 - [awesome-pydantic-ai](https://github.com/vstorm-co/awesome-pydantic-ai) — curated list of Pydantic AI resources and tools
 - [vstorm.co](https://vstorm.co) — our consultancy (30+ AI agent implementations)

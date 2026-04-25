@@ -12,13 +12,23 @@ category: article
 draft: false
 ---
 
+import Stat from "@/components/blog/Stat.astro";
+import Callout from "@/components/blog/Callout.astro";
+import RepoCard from "@/components/blog/RepoCard.astro";
+
 An AI agent ran a subagent loop for 40 minutes before anyone noticed.
 
-$180 in tokens. Silently. The team found out from the credit card statement the next morning.
+<div class="my-6 grid gap-3 sm:grid-cols-3">
+  <Stat value="40 min" label="silent runtime" />
+  <Stat value="$180" label="tokens burned" />
+  <Stat value="0" label="visibility before the bill" />
+</div>
+
+The team found out from the credit card statement the next morning.
 
 That incident changed how we thought about agent observability. This post covers the rework that followed, and the three design decisions we argued about the longest.
 
-*Kacper Włodarczyk, AI engineering consultant at Vstorm. We've shipped 30+ production AI agent systems. pydantic-deep is our open-source agent runtime for Python, built on what we've learned.*
+_Kacper Włodarczyk, AI engineering consultant at Vstorm. We've shipped 30+ production AI agent systems. pydantic-deep is our open-source agent runtime for Python, built on what we've learned._
 
 ## The problem with invisible agents
 
@@ -119,6 +129,7 @@ Every action the agent takes is visible. When the agent updates a todo list, tha
 ## The connection to the rest of the week
 
 Earlier this week:
+
 - [StuckLoopDetection](https://oss.vstorm.co/blog/stuck-loop-detection-ai-agents-pydantic-deep/) stops the agent from running 47 identical tool calls. Now you can see in the TUI exactly when that detection fires.
 - [LimitWarnerCapability](https://oss.vstorm.co/blog/context-window-blindness-ai-agents-limit-warner/) warns when context is 70%+ full. That warning now appears clearly alongside token counts.
 

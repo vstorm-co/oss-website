@@ -33,6 +33,7 @@ Uruchomiliśmy `/improve` na 50 prawdziwych sesjach deweloperskich z [pydantic-d
 ## Konfiguracja
 
 Sesje obejmowały trzy typy pracy:
+
 - **Sesje naprawy błędów** (~15 sesji, śr. 45 wiadomości)
 - **Sesje implementacji funkcji** (~20 sesji, śr. 80 wiadomości)
 - **Sesje refaktoryzacji** (~15 sesji, śr. 30 wiadomości)
@@ -54,14 +55,14 @@ Pipeline przetworzył wszystkie 50 sesji w około 4 minuty. Oto co zwrócił.
 
 ## Zagregowane liczby
 
-| Metryka | Wartość |
-|---------|---------|
-| Przeanalizowane sesje | 50 |
-| Przetworzone wiadomości | ~3200 |
-| Wyciągnięte insighty | 180+ |
+| Metryka                      | Wartość                |
+| ---------------------------- | ---------------------- |
+| Przeanalizowane sesje        | 50                     |
+| Przetworzone wiadomości      | ~3200                  |
+| Wyciągnięte insighty         | 180+                   |
 | Proponowane zmiany MEMORY.md | 12 (śr. pewność: 0.82) |
-| Proponowane zmiany AGENTS.md | 4 (śr. pewność: 0.78) |
-| Proponowane zmiany SOUL.md | 2 (śr. pewność: 0.88) |
+| Proponowane zmiany AGENTS.md | 4 (śr. pewność: 0.78)  |
+| Proponowane zmiany SOUL.md   | 2 (śr. pewność: 0.88)  |
 
 ## Rozkład typów insightów
 
@@ -82,6 +83,7 @@ Dominacja AgentLearning na poziomie 45% ma sens. Większość tego, czego agent 
 Agent naprawiał nieudany test. Oto co wyciągnął `/improve`:
 
 **FailureInsight:**
+
 ```yaml
 description: "Agent tried `pytest tests/` but actual command is `uv run pytest`"
 root_cause: "Build system not documented in AGENTS.md"
@@ -90,6 +92,7 @@ severity: medium
 ```
 
 **AgentLearningInsight:**
+
 ```yaml
 description: "Tests located in tests/ directory, run with `uv run pytest`"
 category: tool_chain
@@ -97,6 +100,7 @@ confidence: 0.95
 ```
 
 **PatternInsight:**
+
 ```yaml
 description: "read → edit → run tests → fix → run tests"
 frequency: 4
@@ -109,6 +113,7 @@ Ten FailureInsight to kluczowe znalezisko. Agent zmarnował 3 próby uruchamiaj�
 Dłuższa sesja, bardziej zróżnicowane insighty:
 
 **UserFactInsight:**
+
 ```yaml
 description: "User speaks Polish"
 category: language
@@ -116,6 +121,7 @@ confidence: 1.0
 ```
 
 **PreferenceInsight:**
+
 ```yaml
 description: "User prefers type-safe solutions with Pydantic models"
 evidence: "User rejected dict-based approach twice in favor of Pydantic BaseModel"
@@ -123,6 +129,7 @@ confidence: 0.85
 ```
 
 **ContextInsight:**
+
 ```yaml
 description: "Project uses Textual for TUI, Pydantic AI for agents"
 category: architecture
@@ -136,6 +143,7 @@ PreferenceInsight jest interesujący. Agent zaobserwował, że użytkownik odrzu
 Krótsza sesja, ale wartościowe insighty:
 
 **DecisionInsight:**
+
 ```yaml
 description: "Moved from dataclasses to Pydantic models for serialization"
 rationale: "Pydantic provides model_dump_json() and validation"
@@ -143,6 +151,7 @@ confirmed: true
 ```
 
 **AgentLearningInsight:**
+
 ```yaml
 description: "model_dump_json() preferred over json.dumps(asdict())"
 category: tool_chain
@@ -156,28 +165,34 @@ DecisionInsights to najrzadszy typ, ale prawdopodobnie najcenniejszy. Utrwalają
 Prawdziwy zwrot z inwestycji to to, co dzieje się z MEMORY.md.
 
 **Przed:**
+
 ```markdown
 (pusty)
 ```
 
 **Po:**
+
 ```markdown
 ## User
+
 - User's name is Kacper
 - Primary language: Polish, code in English
 - Prefers type-safe Pydantic models over raw dicts
 
 ## Build & Test
+
 - Run tests: `uv run pytest`
 - Type check: `uv run ty check`
 - Lint: `uv run ruff check --fix`
 
 ## Project
+
 - TUI built with Textual
 - Agent framework: Pydantic AI
 - Structured output via output_type parameter
 
 ## Effective Patterns
+
 - Read file → understand → edit → verify with tests
 - When debugging: check error message first, then trace to source
 ```
@@ -199,6 +214,7 @@ Próg pewności 0.7 odfiltrowuje szum. Poniżej tego dostajemy spekulatywne insi
 Udział AgentLearning na poziomie 45% to nie przypadek. Oto dlaczego:
 
 Większość błędów agentów nie jest dramatyczna. Są przyziemne:
+
 - Zła komenda build
 - Zła ścieżka pliku
 - Zły styl importów

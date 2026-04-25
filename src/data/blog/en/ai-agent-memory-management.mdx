@@ -32,14 +32,14 @@ So we built [`summarization-pydantic-ai`](/projects/summarization-pydantic-ai/) 
 
 ## Two Processors, Two Trade-offs
 
-| Aspect | SummarizationProcessor | SlidingWindowProcessor |
-|--------|----------------------|----------------------|
-| **Cost** | LLM API call per trigger | Zero |
-| **Latency** | Depends on model | ~0ms |
-| **Context loss** | Minimal (intelligently summarized) | Complete (old messages gone) |
-| **Default trigger** | 170,000 tokens | 100 messages |
-| **Default keep** | 20 messages | 50 messages |
-| **Best for** | Quality-critical agents | Speed/cost-critical agents |
+| Aspect              | SummarizationProcessor             | SlidingWindowProcessor       |
+| ------------------- | ---------------------------------- | ---------------------------- |
+| **Cost**            | LLM API call per trigger           | Zero                         |
+| **Latency**         | Depends on model                   | ~0ms                         |
+| **Context loss**    | Minimal (intelligently summarized) | Complete (old messages gone) |
+| **Default trigger** | 170,000 tokens                     | 100 messages                 |
+| **Default keep**    | 20 messages                        | 50 messages                  |
+| **Best for**        | Quality-critical agents            | Speed/cost-critical agents   |
 
 Both work as Pydantic AI history processors - drop-in functions that transform the message history before each agent run.
 
@@ -62,6 +62,7 @@ agent = Agent(
 ```
 
 When the token count exceeds the trigger, the processor:
+
 1. Calculates a safe cutoff point (never splitting tool call pairs)
 2. Sends the older messages to an LLM for summarization
 3. Replaces the old messages with a compact summary
@@ -74,6 +75,7 @@ The result: your agent maintains context from early in the conversation without 
 You can trigger summarization based on messages, tokens, or context fraction:
 
 **Message-based** - simple and predictable:
+
 ```python
 processor = SummarizationProcessor(
     model="openai:gpt-4.1",
@@ -82,6 +84,7 @@ processor = SummarizationProcessor(
 ```
 
 **Token-based** - accounts for message length:
+
 ```python
 processor = SummarizationProcessor(
     model="openai:gpt-4.1",
@@ -90,6 +93,7 @@ processor = SummarizationProcessor(
 ```
 
 **Fraction-based** - adapts to any model's context:
+
 ```python
 processor = SummarizationProcessor(
     model="openai:gpt-4.1",
@@ -99,6 +103,7 @@ processor = SummarizationProcessor(
 ```
 
 **Multiple triggers** - OR logic, first one wins:
+
 ```python
 processor = SummarizationProcessor(
     model="openai:gpt-4.1",

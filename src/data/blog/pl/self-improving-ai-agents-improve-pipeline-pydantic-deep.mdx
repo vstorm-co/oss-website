@@ -13,7 +13,7 @@ draft: false
 
 > Ten tydzień poświęciłem na nowe funkcje pydantic-deep, [wykrywanie zapętleń](https://oss.vstorm.co/blog/stuck-loop-detection-ai-agents-pydantic-deep/), [ostrzeżenia o oknie kontekstu](https://oss.vstorm.co/blog/context-window-blindness-ai-agents-limit-warner/), [instalację curl](https://oss.vstorm.co/blog/ai-agent-install-curl-bash-pydantic-deep/), [sandbox Docker](https://oss.vstorm.co/blog/docker-sandbox-ai-agent-pydantic-deep/), [automatyzację przeglądarki](https://oss.vstorm.co/blog/browser-automation-ai-agent-pydantic-deep/) i [obserwowalność TUI](https://oss.vstorm.co/blog/ai-agent-tui-observability-pydantic-deep/). Dziś, ta, która ma największe znaczenie dla długoterminowego wdrożenia agentów: /improve.
 
-*Kacper Włodarczyk, konsultant AI engineering w Vstorm. Wdrożyliśmy 30+ produkcyjnych systemów agentów AI. pydantic-deep to nasz open-source'owy agent kodujący, modularne środowisko uruchomieniowe agentów dla Pythona.*
+_Kacper Włodarczyk, konsultant AI engineering w Vstorm. Wdrożyliśmy 30+ produkcyjnych systemów agentów AI. pydantic-deep to nasz open-source'owy agent kodujący, modularne środowisko uruchomieniowe agentów dla Pythona._
 
 ## 1. Problem: agenty AI są domyślnie bezstanowe
 
@@ -49,12 +49,14 @@ Następna sesja: agent ładuje MEMORY.md przy starcie
 
 ## 3. UserFactInsight vs AgentLearningInsight
 
-**UserFactInsight**, fakty o *Tobie*:
+**UserFactInsight**, fakty o _Tobie_:
+
 - "Użytkownik preferuje asynchroniczne wzorce Pythona"
 - "Użytkownik pracuje nad pydantic-deep"
 - "Projekty użytkownika są w ~/Projects/"
 
-**AgentLearningInsight**, fakty o *domenie, narzędziach, wzorcach*:
+**AgentLearningInsight**, fakty o _domenie, narzędziach, wzorcach_:
+
 - "GitHub: lepiej użyć 'pydantic-ai' niż 'pydantic'"
 - "Narzędzie X kończy się cichym błędem przy pustym wejściu"
 
@@ -69,6 +71,7 @@ Dlaczego:
 **Podsumowanie:** "Agent przeszukał GitHub i znalazł odpowiednie repozytorium."
 
 **Surowy ślad:**
+
 ```python
 browser.navigate("github.com/search?q=pydantic+agent")
 # → 0 wyników
@@ -98,11 +101,13 @@ Po kilku sesjach z /improve może wyglądać tak:
 # Memory
 
 ## User Facts
+
 - Prefers async Python patterns
 - Working on pydantic-deep (github.com/vstorm-co/pydantic-deep)
 - Projects live in ~/Projects/
 
 ## Agent Learnings
+
 - GitHub: use "pydantic-ai" not "pydantic" for better search results
 - Check for empty input before calling file read tools
 ```

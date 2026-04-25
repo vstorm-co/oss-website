@@ -12,7 +12,29 @@ category: open-source
 draft: false
 ---
 
-> **TL;DR:** We ran pydantic-deep's `/improve` pipeline on 50 real development sessions (~3,200 messages, 7 days) and extracted 180+ structured insights across 7 types. AgentLearning insights (build commands, file paths, tool chains) dominated at 45%, followed by Pattern (20%) and Failure (15%). The pipeline proposed 18 changes to context files with calibrated confidence scores, MEMORY.md went from empty to a structured knowledge base covering user preferences, build commands, project architecture, and effective debugging patterns. The most valuable single insight prevented a build command failure that had repeated across 6 separate sessions.
+import MetricsBar from "@/components/blog/MetricsBar.astro";
+import DeploymentStat from "@/components/blog/DeploymentStat.astro";
+import RepoCard from "@/components/blog/RepoCard.astro";
+import Callout from "@/components/blog/Callout.astro";
+import TLDR from "@/components/blog/TLDR.astro";
+
+<MetricsBar
+  metrics={[
+    { value: "50", label: "Real Sessions" },
+    { value: "180+", label: "Insights Extracted" },
+    { value: "3,200", label: "Messages Analyzed" },
+    { value: "7", label: "Insight Types" },
+  ]}
+/>
+
+<TLDR>
+  We ran pydantic-deep's `/improve` pipeline on 50 real development sessions (~3,200 messages, 7
+  days) and extracted **180+ structured insights** across 7 types. AgentLearning insights (build
+  commands, file paths, tool chains) dominated at 45%, followed by Pattern (20%) and Failure (15%).
+  The pipeline proposed 18 changes to context files with calibrated confidence scores, MEMORY.md
+  went from empty to a structured knowledge base. The most valuable single insight prevented a build
+  command failure that had repeated across **6 separate sessions**.
+</TLDR>
 
 Monday, the problem: AI agents repeat the same mistakes because every session starts from zero.
 
@@ -33,6 +55,7 @@ We ran `/improve` on 50 real development sessions from [pydantic-deep](https://g
 ## The Setup
 
 The sessions covered three types of work:
+
 - **Bug fix sessions** (~15 sessions, avg 45 messages each)
 - **Feature implementation sessions** (~20 sessions, avg 80 messages each)
 - **Refactoring sessions** (~15 sessions, avg 30 messages each)
@@ -54,14 +77,14 @@ The pipeline took about 4 minutes to process all 50 sessions. Here's what came b
 
 ## Aggregated Numbers
 
-| Metric | Value |
-|--------|-------|
-| Sessions analyzed | 50 |
-| Total messages processed | ~3,200 |
-| Insights extracted | 180+ |
+| Metric                     | Value                     |
+| -------------------------- | ------------------------- |
+| Sessions analyzed          | 50                        |
+| Total messages processed   | ~3,200                    |
+| Insights extracted         | 180+                      |
 | Proposed MEMORY.md changes | 12 (avg confidence: 0.82) |
-| Proposed AGENTS.md changes | 4 (avg confidence: 0.78) |
-| Proposed SOUL.md changes | 2 (avg confidence: 0.88) |
+| Proposed AGENTS.md changes | 4 (avg confidence: 0.78)  |
+| Proposed SOUL.md changes   | 2 (avg confidence: 0.88)  |
 
 ## Insight Type Distribution
 
@@ -82,6 +105,7 @@ AgentLearning dominating at 45% makes sense. Most of what an agent needs to "lea
 The agent was fixing a test failure. Here's what `/improve` extracted:
 
 **FailureInsight:**
+
 ```yaml
 description: "Agent tried `pytest tests/` but actual command is `uv run pytest`"
 root_cause: "Build system not documented in AGENTS.md"
@@ -90,6 +114,7 @@ severity: medium
 ```
 
 **AgentLearningInsight:**
+
 ```yaml
 description: "Tests located in tests/ directory, run with `uv run pytest`"
 category: tool_chain
@@ -97,6 +122,7 @@ confidence: 0.95
 ```
 
 **PatternInsight:**
+
 ```yaml
 description: "read → edit → run tests → fix → run tests"
 frequency: 4
@@ -109,6 +135,7 @@ That FailureInsight is the money. The agent wasted 3 attempts running `pytest` d
 Longer session, more diverse insights:
 
 **UserFactInsight:**
+
 ```yaml
 description: "User speaks Polish"
 category: language
@@ -116,6 +143,7 @@ confidence: 1.0
 ```
 
 **PreferenceInsight:**
+
 ```yaml
 description: "User prefers type-safe solutions with Pydantic models"
 evidence: "User rejected dict-based approach twice in favor of Pydantic BaseModel"
@@ -123,6 +151,7 @@ confidence: 0.85
 ```
 
 **ContextInsight:**
+
 ```yaml
 description: "Project uses Textual for TUI, Pydantic AI for agents"
 category: architecture
@@ -136,6 +165,7 @@ The PreferenceInsight is interesting. The agent observed that the user rejected 
 Shorter session, but high-value insights:
 
 **DecisionInsight:**
+
 ```yaml
 description: "Moved from dataclasses to Pydantic models for serialization"
 rationale: "Pydantic provides model_dump_json() and validation"
@@ -143,6 +173,7 @@ confirmed: true
 ```
 
 **AgentLearningInsight:**
+
 ```yaml
 description: "model_dump_json() preferred over json.dumps(asdict())"
 category: tool_chain
@@ -156,28 +187,34 @@ DecisionInsights are the rarest type but arguably the most valuable. They captur
 The real payoff is what happens to MEMORY.md.
 
 **Before:**
+
 ```markdown
 (empty)
 ```
 
 **After:**
+
 ```markdown
 ## User
+
 - User's name is Kacper
 - Primary language: Polish, code in English
 - Prefers type-safe Pydantic models over raw dicts
 
 ## Build & Test
+
 - Run tests: `uv run pytest`
 - Type check: `uv run ty check`
 - Lint: `uv run ruff check --fix`
 
 ## Project
+
 - TUI built with Textual
 - Agent framework: Pydantic AI
 - Structured output via output_type parameter
 
 ## Effective Patterns
+
 - Read file → understand → edit → verify with tests
 - When debugging: check error message first, then trace to source
 ```
@@ -194,11 +231,20 @@ Not all insights are created equal:
 
 The confidence threshold of 0.7 filters out noise. Below that, you get speculative insights like "user might prefer tabs over spaces" based on a single observation. Above 0.7, you get things the pipeline is reasonably sure about.
 
+<DeploymentStat
+  value="6"
+  unit="separate sessions"
+  finding="hit the same `pytest` vs `uv run pytest` build command failure before /improve captured it as a single AgentLearningInsight in MEMORY.md"
+  context="50 real pydantic-deep development sessions"
+  source="Session log analysis, Q1 2026"
+/>
+
 ## Why AgentLearning Dominates
 
 The 45% AgentLearning share is not a fluke. Here's why:
 
 Most agent failures aren't dramatic. They're mundane:
+
 - Wrong build command
 - Wrong file path
 - Wrong import style
@@ -223,6 +269,12 @@ FailureInsight at 15% captures the mistakes that actually happened. The `pytest`
 **5. You don't need 1,000 sessions.** 50 sessions over 7 days produced actionable results. The marginal value of additional sessions decreases quickly for MEMORY.md (there are only so many build commands to discover) but keeps growing for PatternInsight and PreferenceInsight.
 
 ## Try It Yourself
+
+<RepoCard
+  repo="vstorm-co/pydantic-deep"
+  description="Production-ready Python framework for autonomous AI agents with Claude-Code-style architecture. Includes /improve pipeline for self-improving agents."
+  language="Python"
+/>
 
 ```bash
 pip install pydantic-deep

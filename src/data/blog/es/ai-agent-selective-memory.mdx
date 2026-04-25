@@ -25,15 +25,16 @@ Las bases de datos vectoriales guardaban cada mensaje - incluyendo "si," "ok," y
 
 ## El problema fundamental
 
-El problema fundamental: la mayoria de los sistemas de memoria AI estan disenados para *recordar todo*. Pero la mejor memoria humana funciona *olvidando casi todo* y conservando solo lo que importa.
+El problema fundamental: la mayoria de los sistemas de memoria AI estan disenados para _recordar todo_. Pero la mejor memoria humana funciona _olvidando casi todo_ y conservando solo lo que importa.
 
-Despues de anos de trabajo productivo con agentes en Vstorm, convergimos en un enfoque diferente. En lugar de almacenar cada mensaje en una base de datos vectorial, le damos al agente un sistema de archivos estructurado para memoria persistente - y le ensenamos a decidir *que vale la pena guardar*.
+Despues de anos de trabajo productivo con agentes en Vstorm, convergimos en un enfoque diferente. En lugar de almacenar cada mensaje en una base de datos vectorial, le damos al agente un sistema de archivos estructurado para memoria persistente - y le ensenamos a decidir _que vale la pena guardar_.
 
 ## El problema: las ventanas de contexto son finitas
 
 Aqui hay un hecho que la mayoria de las arquitecturas de agentes ignoran: tu ventana de contexto solo contiene los ultimos ~10-20 mensajes. Todo lo anterior desaparecio - a menos que lo guardes explicitamente en algun lugar.
 
 Una configuracion tipica de produccion:
+
 - Ventana de contexto: 128k tokens (GPT-4o) o 200k tokens (Claude)
 - Mensaje promedio: ~500 tokens (con llamadas a herramientas)
 - Capacidad efectiva: ~50-100 mensajes antes de que entre la gestion de contexto
@@ -111,22 +112,27 @@ El archivo `AGENTS.md` sirve como la identidad y los comportamientos aprendidos 
 # Winston - Core Instructions
 
 ## Identity
+
 You are Winston, an autonomous AI assistant.
 
 ## Critical Behaviors
 
 ### Memory Management
+
 - Your context window is LIMITED to ~10 messages
 - Important information WILL BE LOST if not saved
 - When user shares personal info → SAVE IMMEDIATELY
 
 ### Proactive Learning
+
 When you learn something new about the user:
+
 1. Acknowledge what you learned
 2. Save to appropriate memory file
 3. Confirm: "I've noted that for future reference."
 
 ## User Preferences
+
 - Language: User may speak Polish or English - match their language
 - Code style: Prefers explicit over clever
 ```
@@ -145,13 +151,16 @@ Los skills son archivos markdown que ensenan al agente patrones especificos:
 ## Before Starting ANY Complex Task
 
 ### 1. Understand the Goal
+
 - What is the desired end state?
 - What problem does this solve?
 - What are the constraints?
 
 ### 2. Break Down the Task
+
 **Bad**: "Build a login system"
 **Good**:
+
 1. Create user model with email/password
 2. Implement password hashing
 3. Create login endpoint
@@ -159,6 +168,7 @@ Los skills son archivos markdown que ensenan al agente patrones especificos:
 5. Write tests for each component
 
 ### 3. Create a Todo List
+
 Use write_todos to track the plan...
 ```
 

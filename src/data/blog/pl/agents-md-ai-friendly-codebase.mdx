@@ -33,13 +33,13 @@ Efekt? Połowę czasu spędzasz na przeglądaniu i poprawianiu kodu wygenerowane
 
 Oto co każde narzędzie AI do kodowania czyta dzisiaj:
 
-| Narzędzie | Plik konfiguracyjny | Zakres |
-|-----------|-------------------|-------|
+| Narzędzie          | Plik konfiguracyjny               | Zakres                                       |
+| ------------------ | --------------------------------- | -------------------------------------------- |
 | **GitHub Copilot** | `.github/copilot-instructions.md` | Instrukcje na poziomie repo dla Copilot Chat |
-| **Cursor** | `.cursor/rules/*.mdc` | Reguły projektu z dopasowaniem glob |
-| **Claude Code** | `CLAUDE.md` | Kontekst projektu, komendy, architektura |
-| **OpenAI Codex** | `AGENTS.md` | Wskazówki dla agentów AI |
-| **Zed** | (czyta AGENTS.md) | Jak Codex |
+| **Cursor**         | `.cursor/rules/*.mdc`             | Reguły projektu z dopasowaniem glob          |
+| **Claude Code**    | `CLAUDE.md`                       | Kontekst projektu, komendy, architektura     |
+| **OpenAI Codex**   | `AGENTS.md`                       | Wskazówki dla agentów AI                     |
+| **Zed**            | (czyta AGENTS.md)                 | Jak Codex                                    |
 
 Każde narzędzie wymyśliło swój format. Jeśli Twój zespół używa Copilota I Cursora I Claude Code (co jest coraz częstsze), potrzebujesz trzech oddzielnych plików opisujących te same konwencje projektu.
 
@@ -177,21 +177,26 @@ Nie potrzebujesz szablonu. Oto minimalna wersja dla dowolnego projektu Python:
 # AGENTS.md
 
 ## Project Overview
+
 [Nazwa projektu] — [opis jednolinijkowy].
 Stack: [języki, frameworki, bazy danych]
 
 ## Commands
+
 # Komendy instalacji / testów / lintowania
 
 ## Structure
+
 [uproszczone drzewo kluczowych katalogów]
 
 ## Conventions
+
 - [wzorzec 1]
 - [wzorzec 2]
 - [wzorzec 3]
 
 ## Do Not Modify
+
 - [wygenerowane pliki]
 - [pliki lock]
 - [sekrety]

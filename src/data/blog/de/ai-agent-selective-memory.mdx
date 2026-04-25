@@ -25,15 +25,16 @@ Vektordatenbanken haben jede Nachricht gespeichert - einschliesslich "ja," "ok,"
 
 ## Das Grundproblem
 
-Das grundlegende Problem: Die meisten AI-Memory-Systeme sind darauf ausgelegt, *sich an alles zu erinnern*. Aber das beste menschliche Gedaechtnis funktioniert, indem es *fast alles vergisst* und nur das Wichtige behaelt.
+Das grundlegende Problem: Die meisten AI-Memory-Systeme sind darauf ausgelegt, _sich an alles zu erinnern_. Aber das beste menschliche Gedaechtnis funktioniert, indem es _fast alles vergisst_ und nur das Wichtige behaelt.
 
-Nach Jahren produktiver Arbeit mit Agenten bei Vstorm haben wir uns auf einen anderen Ansatz geeinigt. Anstatt jede Nachricht in einer Vektordatenbank zu speichern, geben wir dem Agenten ein strukturiertes Dateisystem fuer persistenten Speicher - und bringen ihm bei zu entscheiden, *was es wert ist, gespeichert zu werden*.
+Nach Jahren produktiver Arbeit mit Agenten bei Vstorm haben wir uns auf einen anderen Ansatz geeinigt. Anstatt jede Nachricht in einer Vektordatenbank zu speichern, geben wir dem Agenten ein strukturiertes Dateisystem fuer persistenten Speicher - und bringen ihm bei zu entscheiden, _was es wert ist, gespeichert zu werden_.
 
 ## Das Problem: Kontextfenster sind endlich
 
 Hier ist eine Tatsache, die die meisten Agenten-Architekturen ignorieren: Dein Kontextfenster haelt nur die letzten ~10-20 Nachrichten. Alles davor ist weg - es sei denn, du speicherst es explizit irgendwo.
 
 Ein typisches Produktions-Setup:
+
 - Kontextfenster: 128k Tokens (GPT-4o) oder 200k Tokens (Claude)
 - Durchschnittliche Nachricht: ~500 Tokens (mit Tool-Aufrufen)
 - Effektive Kapazitaet: ~50-100 Nachrichten, bevor Kontextmanagement einsetzt
@@ -111,22 +112,27 @@ Die Datei `AGENTS.md` dient als Identitaet und erlernte Verhaltensweisen des Age
 # Winston - Core Instructions
 
 ## Identity
+
 You are Winston, an autonomous AI assistant.
 
 ## Critical Behaviors
 
 ### Memory Management
+
 - Your context window is LIMITED to ~10 messages
 - Important information WILL BE LOST if not saved
 - When user shares personal info → SAVE IMMEDIATELY
 
 ### Proactive Learning
+
 When you learn something new about the user:
+
 1. Acknowledge what you learned
 2. Save to appropriate memory file
 3. Confirm: "I've noted that for future reference."
 
 ## User Preferences
+
 - Language: User may speak Polish or English - match their language
 - Code style: Prefers explicit over clever
 ```
@@ -145,13 +151,16 @@ Skills sind Markdown-Dateien, die dem Agenten bestimmte Muster beibringen:
 ## Before Starting ANY Complex Task
 
 ### 1. Understand the Goal
+
 - What is the desired end state?
 - What problem does this solve?
 - What are the constraints?
 
 ### 2. Break Down the Task
+
 **Bad**: "Build a login system"
 **Good**:
+
 1. Create user model with email/password
 2. Implement password hashing
 3. Create login endpoint
@@ -159,6 +168,7 @@ Skills sind Markdown-Dateien, die dem Agenten bestimmte Muster beibringen:
 5. Write tests for each component
 
 ### 3. Create a Todo List
+
 Use write_todos to track the plan...
 ```
 

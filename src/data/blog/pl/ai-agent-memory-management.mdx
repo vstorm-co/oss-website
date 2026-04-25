@@ -29,14 +29,14 @@ Dlatego zbudowalismy `summarization-pydantic-ai` - dwa procesory zarzadzajace hi
 
 ## Dwa procesory, dwa kompromisy
 
-| Aspekt | SummarizationProcessor | SlidingWindowProcessor |
-|--------|----------------------|----------------------|
-| **Koszt** | Wywolanie API LLM na trigger | Zero |
-| **Opoznienie** | Zalezy od modelu | ~0ms |
-| **Utrata kontekstu** | Minimalna (inteligentne podsumowanie) | Calkowita (stare wiadomosci usuniete) |
-| **Domyslny trigger** | 170 000 tokenow | 100 wiadomosci |
-| **Domyslne zachowanie** | 20 wiadomosci | 50 wiadomosci |
-| **Najlepszy dla** | Agentow krytycznych jakosciowo | Agentow krytycznych kosztowo/szybkosciowo |
+| Aspekt                  | SummarizationProcessor                | SlidingWindowProcessor                    |
+| ----------------------- | ------------------------------------- | ----------------------------------------- |
+| **Koszt**               | Wywolanie API LLM na trigger          | Zero                                      |
+| **Opoznienie**          | Zalezy od modelu                      | ~0ms                                      |
+| **Utrata kontekstu**    | Minimalna (inteligentne podsumowanie) | Calkowita (stare wiadomosci usuniete)     |
+| **Domyslny trigger**    | 170 000 tokenow                       | 100 wiadomosci                            |
+| **Domyslne zachowanie** | 20 wiadomosci                         | 50 wiadomosci                             |
+| **Najlepszy dla**       | Agentow krytycznych jakosciowo        | Agentow krytycznych kosztowo/szybkosciowo |
 
 Oba dzialaja jako history processors Pydantic AI - funkcje typu drop-in, ktore transformuja historie wiadomosci przed kazdym uruchomieniem agenta.
 
@@ -59,6 +59,7 @@ agent = Agent(
 ```
 
 Gdy liczba tokenow przekroczy trigger, procesor:
+
 1. Oblicza bezpieczny punkt odciecia (nigdy nie rozdzielajac par tool call)
 2. Wysyla starsze wiadomosci do LLM w celu podsumowania
 3. Zastepuje stare wiadomosci kompaktowym podsumowaniem
@@ -71,6 +72,7 @@ Rezultat: agent utrzymuje kontekst z poczatku konwersacji bez zuzycia calego bud
 Mozesz wyzwalac sumaryzacje na podstawie wiadomosci, tokenow lub frakcji kontekstu:
 
 **Na podstawie wiadomosci** - proste i przewidywalne:
+
 ```python
 processor = SummarizationProcessor(
     model="openai:gpt-4.1",
@@ -79,6 +81,7 @@ processor = SummarizationProcessor(
 ```
 
 **Na podstawie tokenow** - uwzglednia dlugosc wiadomosci:
+
 ```python
 processor = SummarizationProcessor(
     model="openai:gpt-4.1",
@@ -87,6 +90,7 @@ processor = SummarizationProcessor(
 ```
 
 **Na podstawie frakcji** - adaptuje sie do kontekstu dowolnego modelu:
+
 ```python
 processor = SummarizationProcessor(
     model="openai:gpt-4.1",
@@ -96,6 +100,7 @@ processor = SummarizationProcessor(
 ```
 
 **Wiele triggerow** - logika OR, pierwszy wygrywa:
+
 ```python
 processor = SummarizationProcessor(
     model="openai:gpt-4.1",

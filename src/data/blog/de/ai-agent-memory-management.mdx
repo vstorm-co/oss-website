@@ -29,14 +29,14 @@ Deshalb haben wir `summarization-pydantic-ai` gebaut - zwei Prozessoren, die die
 
 ## Zwei Prozessoren, zwei Kompromisse
 
-| Aspekt | SummarizationProcessor | SlidingWindowProcessor |
-|--------|----------------------|----------------------|
-| **Kosten** | LLM-API-Aufruf pro Trigger | Null |
-| **Latenz** | Abhaengig vom Modell | ~0ms |
-| **Kontextverlust** | Minimal (intelligent zusammengefasst) | Vollstaendig (alte Nachrichten weg) |
-| **Standard-Trigger** | 170.000 Tokens | 100 Nachrichten |
-| **Standard-Beibehaltung** | 20 Nachrichten | 50 Nachrichten |
-| **Am besten fuer** | Qualitaetskritische Agenten | Geschwindigkeits-/kostenkritische Agenten |
+| Aspekt                    | SummarizationProcessor                | SlidingWindowProcessor                    |
+| ------------------------- | ------------------------------------- | ----------------------------------------- |
+| **Kosten**                | LLM-API-Aufruf pro Trigger            | Null                                      |
+| **Latenz**                | Abhaengig vom Modell                  | ~0ms                                      |
+| **Kontextverlust**        | Minimal (intelligent zusammengefasst) | Vollstaendig (alte Nachrichten weg)       |
+| **Standard-Trigger**      | 170.000 Tokens                        | 100 Nachrichten                           |
+| **Standard-Beibehaltung** | 20 Nachrichten                        | 50 Nachrichten                            |
+| **Am besten fuer**        | Qualitaetskritische Agenten           | Geschwindigkeits-/kostenkritische Agenten |
 
 Beide funktionieren als Pydantic AI History Processors - Drop-in-Funktionen, die die Nachrichtenhistorie vor jedem Agentenlauf transformieren.
 
@@ -59,6 +59,7 @@ agent = Agent(
 ```
 
 Wenn die Tokenanzahl den Trigger ueberschreitet, macht der Prozessor:
+
 1. Berechnet einen sicheren Abschneidepunkt (trennt nie Tool-Call-Paare)
 2. Sendet die aelteren Nachrichten an ein LLM zur Zusammenfassung
 3. Ersetzt die alten Nachrichten durch eine kompakte Zusammenfassung
@@ -71,6 +72,7 @@ Das Ergebnis: Dein Agent behaelt den Kontext vom Anfang der Konversation, ohne d
 Du kannst die Zusammenfassung basierend auf Nachrichten, Tokens oder Kontextanteil ausloesen:
 
 **Nachrichtenbasiert** - einfach und vorhersagbar:
+
 ```python
 processor = SummarizationProcessor(
     model="openai:gpt-4.1",
@@ -79,6 +81,7 @@ processor = SummarizationProcessor(
 ```
 
 **Tokenbasiert** - beruecksichtigt Nachrichtenlaenge:
+
 ```python
 processor = SummarizationProcessor(
     model="openai:gpt-4.1",
@@ -87,6 +90,7 @@ processor = SummarizationProcessor(
 ```
 
 **Fraktionsbasiert** - passt sich dem Kontext jedes Modells an:
+
 ```python
 processor = SummarizationProcessor(
     model="openai:gpt-4.1",
@@ -96,6 +100,7 @@ processor = SummarizationProcessor(
 ```
 
 **Mehrere Trigger** - ODER-Logik, erster gewinnt:
+
 ```python
 processor = SummarizationProcessor(
     model="openai:gpt-4.1",

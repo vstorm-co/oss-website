@@ -33,6 +33,7 @@ Wir haben `/improve` auf 50 echten Entwicklungssitzungen von [pydantic-deep](htt
 ## Das Setup
 
 Die Sitzungen umfassten drei Arbeitstypen:
+
 - **Bug-Fix-Sitzungen** (~15 Sitzungen, durchschn. 45 Nachrichten)
 - **Feature-Implementierungen** (~20 Sitzungen, durchschn. 80 Nachrichten)
 - **Refactoring-Sitzungen** (~15 Sitzungen, durchschn. 30 Nachrichten)
@@ -54,14 +55,14 @@ Die Pipeline verarbeitete alle 50 Sitzungen in etwa 4 Minuten. Hier ist, was zur
 
 ## Aggregierte Zahlen
 
-| Metrik | Wert |
-|--------|------|
-| Analysierte Sitzungen | 50 |
-| Verarbeitete Nachrichten | ~3.200 |
-| Extrahierte Insights | 180+ |
+| Metrik                              | Wert                            |
+| ----------------------------------- | ------------------------------- |
+| Analysierte Sitzungen               | 50                              |
+| Verarbeitete Nachrichten            | ~3.200                          |
+| Extrahierte Insights                | 180+                            |
 | Vorgeschlagene MEMORY.md-Änderungen | 12 (durchschn. Konfidenz: 0,82) |
-| Vorgeschlagene AGENTS.md-Änderungen | 4 (durchschn. Konfidenz: 0,78) |
-| Vorgeschlagene SOUL.md-Änderungen | 2 (durchschn. Konfidenz: 0,88) |
+| Vorgeschlagene AGENTS.md-Änderungen | 4 (durchschn. Konfidenz: 0,78)  |
+| Vorgeschlagene SOUL.md-Änderungen   | 2 (durchschn. Konfidenz: 0,88)  |
 
 ## Verteilung der Insight-Typen
 
@@ -82,6 +83,7 @@ Dass AgentLearning mit 45% dominiert, ist logisch. Das meiste, was ein Agent "le
 Der Agent behob einen Testfehler. Hier ist, was `/improve` extrahierte:
 
 **FailureInsight:**
+
 ```yaml
 description: "Agent tried `pytest tests/` but actual command is `uv run pytest`"
 root_cause: "Build system not documented in AGENTS.md"
@@ -90,6 +92,7 @@ severity: medium
 ```
 
 **AgentLearningInsight:**
+
 ```yaml
 description: "Tests located in tests/ directory, run with `uv run pytest`"
 category: tool_chain
@@ -97,6 +100,7 @@ confidence: 0.95
 ```
 
 **PatternInsight:**
+
 ```yaml
 description: "read → edit → run tests → fix → run tests"
 frequency: 4
@@ -109,6 +113,7 @@ Dieser FailureInsight ist der entscheidende Fund. Der Agent verschwendete 3 Vers
 Längere Sitzung, vielfältigere Insights:
 
 **UserFactInsight:**
+
 ```yaml
 description: "User speaks Polish"
 category: language
@@ -116,6 +121,7 @@ confidence: 1.0
 ```
 
 **PreferenceInsight:**
+
 ```yaml
 description: "User prefers type-safe solutions with Pydantic models"
 evidence: "User rejected dict-based approach twice in favor of Pydantic BaseModel"
@@ -123,6 +129,7 @@ confidence: 0.85
 ```
 
 **ContextInsight:**
+
 ```yaml
 description: "Project uses Textual for TUI, Pydantic AI for agents"
 category: architecture
@@ -136,6 +143,7 @@ Der PreferenceInsight ist interessant. Der Agent beobachtete, dass der Benutzer 
 Kürzere Sitzung, aber wertvolle Insights:
 
 **DecisionInsight:**
+
 ```yaml
 description: "Moved from dataclasses to Pydantic models for serialization"
 rationale: "Pydantic provides model_dump_json() and validation"
@@ -143,6 +151,7 @@ confirmed: true
 ```
 
 **AgentLearningInsight:**
+
 ```yaml
 description: "model_dump_json() preferred over json.dumps(asdict())"
 category: tool_chain
@@ -156,28 +165,34 @@ DecisionInsights sind der seltenste Typ, aber wohl der wertvollste. Sie erfassen
 Der echte Gewinn zeigt sich bei MEMORY.md.
 
 **Vorher:**
+
 ```markdown
 (leer)
 ```
 
 **Nachher:**
+
 ```markdown
 ## User
+
 - User's name is Kacper
 - Primary language: Polish, code in English
 - Prefers type-safe Pydantic models over raw dicts
 
 ## Build & Test
+
 - Run tests: `uv run pytest`
 - Type check: `uv run ty check`
 - Lint: `uv run ruff check --fix`
 
 ## Project
+
 - TUI built with Textual
 - Agent framework: Pydantic AI
 - Structured output via output_type parameter
 
 ## Effective Patterns
+
 - Read file → understand → edit → verify with tests
 - When debugging: check error message first, then trace to source
 ```
@@ -197,6 +212,7 @@ Die Konfidenzschwelle von 0,7 filtert Rauschen heraus. Darunter kommen spekulati
 ## Warum AgentLearning dominiert
 
 Der 45%-Anteil von AgentLearning ist kein Zufall. Die meisten Agenten-Fehler sind nicht dramatisch. Sie sind alltäglich:
+
 - Falscher Build-Befehl
 - Falscher Dateipfad
 - Falscher Import-Stil

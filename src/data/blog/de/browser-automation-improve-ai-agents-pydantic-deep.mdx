@@ -41,17 +41,17 @@ agent = create_deep_agent(
 )
 ```
 
-| Tool | Was es tut |
-|------|-----------|
-| `navigate(url)` | Navigiert zur URL, gibt Inhalt + optionalen Screenshot zurück |
-| `click(selector)` | Klickt Element per CSS-Selektor |
-| `type_text(selector, text)` | Tippt in Eingabefeld |
-| `get_text(selector)` | Extrahiert Text aus Element |
-| `screenshot()` | Erfasst aktuellen Seitenzustand |
-| `scroll(direction, amount)` | Scrollt Seite hoch/runter |
-| `go_back()` | Browser zurück |
-| `go_forward()` | Browser vorwärts |
-| `execute_js(script)` | Führt beliebiges JavaScript aus |
+| Tool                        | Was es tut                                                    |
+| --------------------------- | ------------------------------------------------------------- |
+| `navigate(url)`             | Navigiert zur URL, gibt Inhalt + optionalen Screenshot zurück |
+| `click(selector)`           | Klickt Element per CSS-Selektor                               |
+| `type_text(selector, text)` | Tippt in Eingabefeld                                          |
+| `get_text(selector)`        | Extrahiert Text aus Element                                   |
+| `screenshot()`              | Erfasst aktuellen Seitenzustand                               |
+| `scroll(direction, amount)` | Scrollt Seite hoch/runter                                     |
+| `go_back()`                 | Browser zurück                                                |
+| `go_forward()`              | Browser vorwärts                                              |
+| `execute_js(script)`        | Führt beliebiges JavaScript aus                               |
 
 Jedes Tool gibt ein `BrowseResult` zurück: `url`, `title`, `content`, `screenshot`, `error`.
 
@@ -103,6 +103,7 @@ Beide Typen schreiben in MEMORY.md, das beim Start jeder nachfolgenden Sitzung g
 ### Die Meta-Harness-Erkenntnis: Rohe Traces >> Zusammenfassungen
 
 Wir verglichen zwei Eingaben für den Syntheseschritt:
+
 1. Für Menschen lesbare Zusammenfassungen des Geschehenen
 2. Rohe Tool-Traces, die tatsächliche Sequenz von Tool-Aufrufen und Antworten
 

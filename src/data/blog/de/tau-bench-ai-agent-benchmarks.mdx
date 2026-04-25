@@ -69,6 +69,7 @@ Tau-bench führt **pass^k** (pass-hat-k) ein: Hat der Agent in _allen_ k Versuch
 Für den Kundenservice zählt Zuverlässigkeit. Sie können nicht jede Kundeninteraktion acht Mal durchführen und die beste auswählen. Jedes Gespräch muss funktionieren.
 
 Die Ergebnisse sind ernüchternd. GPT-4o, das beste Modell im Originalpaper, erreicht:
+
 - **61,2% pass^1** bei Retail (etwa 6 von 10 Aufgaben gelöst)
 - **~25% pass^8** bei Retail (nur 1 von 4 Aufgaben konsistent über 8 Durchläufe gelöst)
 - **35,2% pass^1** bei Airline (kaum ein Drittel)
@@ -116,6 +117,7 @@ Die Telekommunikationsdomäne hat 5 Tarife, 9 Leitungen, 4 Kunden, mit 15 Schrei
 Eine der größten Verbesserungen in Tau-squared ist die Art der Aufgabenerstellung. Anstatt jedes Szenario von Hand zu erstellen, verwendet der Benchmark einen **kompositionalen Aufgabengenerator**, der vielfältige Aufgaben aus atomaren Bausteinen aufbaut.
 
 Jede atomare Teilaufgabe wird durch drei Funktionstypen definiert:
+
 - **Initialisierungsfunktionen** richten das Problem ein (z.B. `set_airplane_mode(True)`)
 - **Lösungsfunktionen** spezifizieren die benötigten Werkzeuge zur Behebung (z.B. `toggle_airplane_mode()`)
 - **Assertionsfunktionen** verifizieren, dass die Behebung funktioniert hat (z.B. `assert_service_status("connected")`)

@@ -25,7 +25,7 @@ We hit this enough times across 30+ production deployments that we built a solut
 
 ---
 
-*I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering Consultancy. We've shipped 30+ production AI agent implementations and open-source our tooling at [github.com/vstorm-co](https://github.com/vstorm-co). Connect with me on [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+_I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering Consultancy. We've shipped 30+ production AI agent implementations and open-source our tooling at [github.com/vstorm-co](https://github.com/vstorm-co). Connect with me on [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/)._
 
 ---
 
@@ -72,14 +72,14 @@ agents:
     tools:
       - search_web
       - read_document
-    
+
   - name: summarizer
     model: anthropic:claude-sonnet-4-20250514
     system_prompt: |
       You summarize research findings into concise,
       actionable summaries.
     result_type: Summary
-    
+
   - name: validator
     model: openai:gpt-4.1-mini
     system_prompt: |
@@ -151,7 +151,7 @@ toolset = create_agent_factory_toolset(
 
 The priority chain is clear: `agent` (pre-built) > `agent_factory` (per-spec factory) > `default_agent_factory` (global default) > vanilla `Agent()`.
 
-This means you can use SubAgentSpec for simple agents and custom factories for complex ones — in the same system. The YAML defines *what* each agent should be. The factory defines *how* to build it.
+This means you can use SubAgentSpec for simple agents and custom factories for complex ones — in the same system. The YAML defines _what_ each agent should be. The factory defines _how_ to build it.
 
 ## Token Tracking Across Subagents
 
@@ -173,7 +173,7 @@ total = get_total_usage(all_task_handles)
 
 Each `TaskHandle` stores a `RunUsage` object from its subagent run. `check_task` displays input/output token counts for a single task. `get_total_usage()` aggregates across all task handles — useful for cost analysis across your entire multi-agent pipeline.
 
-This is different from tracking at the model level (which Pydantic AI already does). Task-level tracking tells you which *logical task* consumed what resources, not just which model call.
+This is different from tracking at the model level (which Pydantic AI already does). Task-level tracking tells you which _logical task_ consumed what resources, not just which model call.
 
 ## Structured Output Serialization
 
@@ -257,7 +257,8 @@ pip install pydantic-ai-subagents
 
 ---
 
-*More from our open-source tooling:*
-- *[pydantic-ai-shields: 10 Guardrails, Zero Dependencies](/blog/pydantic-ai-shields-10-guardrails-zero-dependencies)*
-- *[5 Frameworks, 1 Template: Architecture Deep Dive](/blog/5-ai-frameworks-1-template-architecture)*
-- *[Full-Stack AI Agent Template](https://github.com/vstorm-co/full-stack-ai-agent-template)*
+_More from our open-source tooling:_
+
+- _[pydantic-ai-shields: 10 Guardrails, Zero Dependencies](/blog/pydantic-ai-shields-10-guardrails-zero-dependencies)_
+- _[5 Frameworks, 1 Template: Architecture Deep Dive](/blog/5-ai-frameworks-1-template-architecture)_
+- _[Full-Stack AI Agent Template](https://github.com/vstorm-co/full-stack-ai-agent-template)_

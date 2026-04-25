@@ -31,6 +31,7 @@ Here's how it works, and the full working code you can run today.
 The core idea is simple: instead of one monolithic "review this code" prompt, we split the review into three domains, each handled by a specialized subagent.
 
 **Security Reviewer** — checks for:
+
 - SQL injection vulnerabilities
 - Cross-site scripting (XSS)
 - Hardcoded secrets and API keys
@@ -39,6 +40,7 @@ The core idea is simple: instead of one monolithic "review this code" prompt, we
 - Insecure file operations
 
 **Style Reviewer** — checks for:
+
 - Naming convention violations
 - Code duplication
 - Excessive cyclomatic complexity
@@ -47,6 +49,7 @@ The core idea is simple: instead of one monolithic "review this code" prompt, we
 - Dead code and unused imports
 
 **Performance Reviewer** — checks for:
+
 - N+1 query patterns
 - Unnecessary memory allocations
 - Blocking I/O in async contexts
@@ -166,7 +169,7 @@ This is one of the advantages of building on [Pydantic AI](https://ai.pydantic.d
 Each `SubAgentConfig` defines a specialist:
 
 - **`name`** — unique identifier the parent agent uses to delegate
-- **`description`** — tells the parent *when* to use this subagent (the routing logic)
+- **`description`** — tells the parent _when_ to use this subagent (the routing logic)
 - **`instructions`** — the system prompt for the subagent, focused on its domain
 
 The instructions are specific. We don't say "review this code." We say "check for SQL injection, XSS, hardcoded secrets..." This specificity is what makes the reviews actually useful. Each subagent is an expert in its domain, not a generalist trying to cover everything.
@@ -296,6 +299,7 @@ Three reasons:
 This PR reviewer is one example of the deep agent pattern — the same architecture powering Claude Code, OpenAI Codex, and Cursor behind the scenes.
 
 The pattern — which we break down further in [task planning for AI agents](/blog/task-planning-ai-agents/):
+
 1. **Plan** — break a complex task into subtasks
 2. **Delegate** — dispatch subtasks to specialists (subagents)
 3. **Execute** — each specialist works independently with its own tools
@@ -318,4 +322,4 @@ The humans on your team should be reviewing architecture, logic, and design. Let
 
 ---
 
-*I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering Consultancy. We build and open-source production AI agent tooling in Python. Star [pydantic-deepagents](https://github.com/vstorm.co/projects/pydantic-deepagents) on GitHub if you find it useful.*
+_I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering Consultancy. We build and open-source production AI agent tooling in Python. Star [pydantic-deepagents](https://github.com/vstorm.co/projects/pydantic-deepagents) on GitHub if you find it useful._

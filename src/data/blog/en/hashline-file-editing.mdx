@@ -75,6 +75,7 @@ No whitespace matching. No ambiguity. No reproducing old text. The hash acts as 
 In February 2026, Can Boluk published ["I Improved 15 LLMs at Coding in One Afternoon. Only the Harness Changed."](https://blog.can.ac/2026/02/12/the-harness-problem/) - a benchmark of 16 models across 3 edit formats (patch, str_replace, hashline).
 
 **Setup:**
+
 - 180 tasks per run, 3 runs per model
 - React codebase files as test fixtures
 - Mechanical mutations: operator swaps, boolean flips, off-by-one errors, identifier renames
@@ -82,15 +83,16 @@ In February 2026, Can Boluk published ["I Improved 15 LLMs at Coding in One Afte
 
 **Key results:**
 
-| Finding | Numbers |
-|---------|---------|
+| Finding          | Numbers                                                     |
+| ---------------- | ----------------------------------------------------------- |
 | Grok Code Fast 1 | **6.7% to 68.3%** accuracy (+61.6pp) with hashline vs patch |
-| MiniMax | More than **doubled** accuracy |
-| Grok 4 Fast | Output tokens dropped **61%** |
-| Gemini 3 Flash | **78.3%** accuracy with hashline |
-| Patch format | **Worst for nearly every model** |
+| MiniMax          | More than **doubled** accuracy                              |
+| Grok 4 Fast      | Output tokens dropped **61%**                               |
+| Gemini 3 Flash   | **78.3%** accuracy with hashline                            |
+| Patch format     | **Worst for nearly every model**                            |
 
 The pattern was clear:
+
 - **Hashline matched or beat str_replace for most models**
 - **The weakest models gained the most** - smaller models struggle most with exact text reproduction
 - **Token usage dropped dramatically** - models spend fewer tokens pointing to code and more tokens changing it
@@ -134,6 +136,7 @@ new_content, error = apply_hashline_edit(
 ```
 
 **Operations supported:**
+
 - **Replace single line** - `start_line` + `start_hash` + `new_content`
 - **Replace range** - also set `end_line` + `end_hash`
 - **Insert after** - set `insert_after=True`

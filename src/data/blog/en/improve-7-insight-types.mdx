@@ -22,7 +22,7 @@ Today I want to show you the architecture that fixes this — how `/improve` act
 
 ---
 
-*I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering Consultancy. We've shipped 30+ production AI agent implementations and open-source our tooling at [oss.vstorm.co](https://oss.vstorm.co). Connect with me on [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+_I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering Consultancy. We've shipped 30+ production AI agent implementations and open-source our tooling at [oss.vstorm.co](https://oss.vstorm.co). Connect with me on [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/)._
 
 ---
 
@@ -174,7 +174,7 @@ This is where `/improve` diverges from simpler approaches.
 
 Instead of only passing the extracted insights to synthesis, we also load raw `tool_log.jsonl` files from each session. This follows what we call the **Meta-Harness principle**: raw execution traces contain diagnostic information that gets lost when an LLM summarizes them.
 
-Think about it — an LLM extracting insights might note "the test failed." The raw trace shows you *exactly* which assertion failed, what the expected vs. actual output was, and what command was run. That granularity matters when the synthesizer decides how to update your agent's context.
+Think about it — an LLM extracting insights might note "the test failed." The raw trace shows you _exactly_ which assertion failed, what the expected vs. actual output was, and what command was run. That granularity matters when the synthesizer decides how to update your agent's context.
 
 ## Stage 4: Synthesis
 
@@ -236,4 +236,4 @@ If you want to try it before then: [github.com/vstorm-co/pydantic-deep](https://
 
 ---
 
-*This is part 2 of a 3-part series on self-improving agents. [Part 1: What If Your AI Agent Could Learn From Its Mistakes?](/blog/what-if-agent-could-learn/) covered the problem and high-level solution. Part 3 (Friday) will show real results from running /improve on 50 sessions.*
+_This is part 2 of a 3-part series on self-improving agents. [Part 1: What If Your AI Agent Could Learn From Its Mistakes?](/blog/what-if-agent-could-learn/) covered the problem and high-level solution. Part 3 (Friday) will show real results from running /improve on 50 sessions._

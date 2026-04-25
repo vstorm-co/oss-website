@@ -161,12 +161,12 @@ async def ingest_file(self, filepath, collection_name, replace=True):
 
 ## 4 proveedores de embeddings
 
-| Proveedor | Modelo | Dimensiones | ¿API Key? |
-|-----------|--------|-------------|-----------|
-| OpenAI | text-embedding-3-small | 1536 | Sí |
-| Voyage | voyage-3 | 1024 | Sí |
-| Gemini | gemini-embedding-exp-03-07 | 3072 | Sí |
-| SentenceTransformers | all-MiniLM-L6-v2 | 384 | No (local) |
+| Proveedor            | Modelo                     | Dimensiones | ¿API Key?  |
+| -------------------- | -------------------------- | ----------- | ---------- |
+| OpenAI               | text-embedding-3-small     | 1536        | Sí         |
+| Voyage               | voyage-3                   | 1024        | Sí         |
+| Gemini               | gemini-embedding-exp-03-07 | 3072        | Sí         |
+| SentenceTransformers | all-MiniLM-L6-v2           | 384         | No (local) |
 
 Las dimensiones se derivan automáticamente del nombre del modelo — sin configuración manual:
 

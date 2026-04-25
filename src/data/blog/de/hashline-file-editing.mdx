@@ -72,6 +72,7 @@ Kein Whitespace-Abgleich. Keine Mehrdeutigkeit. Kein Reproduzieren von altem Tex
 Im Februar 2026 veroeffentlichte Can Boluk ["I Improved 15 LLMs at Coding in One Afternoon. Only the Harness Changed."](https://blog.can.ac/2026/02/12/the-harness-problem/) — einen Benchmark von 16 Modellen ueber 3 Editformate (patch, str_replace, hashline).
 
 **Setup:**
+
 - 180 Aufgaben pro Durchlauf, 3 Durchlaeufe pro Modell
 - React-Codebase-Dateien als Test-Fixtures
 - Mechanische Mutationen: Operator-Tausch, Boolean-Flips, Off-by-One-Fehler, Identifier-Umbenennungen
@@ -79,15 +80,16 @@ Im Februar 2026 veroeffentlichte Can Boluk ["I Improved 15 LLMs at Coding in One
 
 **Wichtigste Ergebnisse:**
 
-| Erkenntnis | Zahlen |
-|------------|--------|
+| Erkenntnis       | Zahlen                                                         |
+| ---------------- | -------------------------------------------------------------- |
 | Grok Code Fast 1 | **6,7% auf 68,3%** Genauigkeit (+61,6pp) mit hashline vs patch |
-| MiniMax | Genauigkeit mehr als **verdoppelt** |
-| Grok 4 Fast | Ausgabe-Tokens um **61%** gesunken |
-| Gemini 3 Flash | **78,3%** Genauigkeit mit hashline |
-| Patch-Format | **Am schlechtesten fuer fast jedes Modell** |
+| MiniMax          | Genauigkeit mehr als **verdoppelt**                            |
+| Grok 4 Fast      | Ausgabe-Tokens um **61%** gesunken                             |
+| Gemini 3 Flash   | **78,3%** Genauigkeit mit hashline                             |
+| Patch-Format     | **Am schlechtesten fuer fast jedes Modell**                    |
 
 Das Muster war klar:
+
 - **Hashline erreichte oder uebertraf str_replace bei den meisten Modellen**
 - **Die schwaechsten Modelle profitierten am meisten** — kleinere Modelle haben die groessten Probleme mit exakter Textreproduktion
 - **Der Token-Verbrauch sank drastisch** — Modelle verwenden weniger Tokens zum Zeigen auf Code und mehr zum Aendern
@@ -131,6 +133,7 @@ new_content, error = apply_hashline_edit(
 ```
 
 **Unterstuetzte Operationen:**
+
 - **Einzelne Zeile ersetzen** — `start_line` + `start_hash` + `new_content`
 - **Bereich ersetzen** — zusaetzlich `end_line` + `end_hash`
 - **Nach Zeile einfuegen** — `insert_after=True` setzen

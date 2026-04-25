@@ -27,7 +27,7 @@ Dejame mostrarte exactamente como.
 
 ---
 
-*Soy Kacper, Ingeniero de IA en [Vstorm](https://vstorm.co) — una consultoria boutique de Applied Agentic AI Engineering. Hemos entregado mas de 30 implementaciones de agentes IA en produccion y publicamos nuestras herramientas como open-source en [github.com/vstorm-co](https://github.com/vstorm-co). Conecta conmigo en [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+_Soy Kacper, Ingeniero de IA en [Vstorm](https://vstorm.co) — una consultoria boutique de Applied Agentic AI Engineering. Hemos entregado mas de 30 implementaciones de agentes IA en produccion y publicamos nuestras herramientas como open-source en [github.com/vstorm-co](https://github.com/vstorm-co). Conecta conmigo en [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/)._
 
 ---
 
@@ -52,10 +52,10 @@ Esto lanza el asistente interactivo que te guia a traves de las mismas opciones.
 
 La plantilla viene con tres presets que cubren los casos de uso mas comunes:
 
-| Preset | Que obtienes |
-|--------|-------------|
-| `--minimal` | FastAPI basico — sin base de datos, sin auth, sin extras |
-| `--preset ai-agent` | PostgreSQL + JWT auth + agente IA + streaming WebSocket + persistencia de conversaciones + Redis |
+| Preset                | Que obtienes                                                                                         |
+| --------------------- | ---------------------------------------------------------------------------------------------------- |
+| `--minimal`           | FastAPI basico — sin base de datos, sin auth, sin extras                                             |
+| `--preset ai-agent`   | PostgreSQL + JWT auth + agente IA + streaming WebSocket + persistencia de conversaciones + Redis     |
 | `--preset production` | Configuracion completa de produccion — Redis, caching, rate limiting, Sentry, Prometheus, Kubernetes |
 
 Para este tutorial, usare el preset **AI Agent** con Pydantic AI — el punto de partida mas comun para aplicaciones de IA:
@@ -68,6 +68,7 @@ fastapi-fullstack create my_ai_app \
 ```
 
 Ese unico comando genera un proyecto full-stack con:
+
 - Backend FastAPI con PostgreSQL asincrono
 - Autenticacion JWT con gestion de usuarios
 - Agente Pydantic AI con streaming WebSocket
@@ -201,13 +202,13 @@ Quieres cambiar completamente a LangChain o CrewAI? Regenera el proyecto con una
 
 La plantilla soporta cinco frameworks de IA, todos con la misma infraestructura de backend:
 
-| Framework | Mejor para | Observabilidad |
-|-----------|-----------|---------------|
-| **Pydantic AI** | Agentes type-safe, inyeccion de dependencias | Logfire |
-| **LangChain** | Cadenas, herramientas existentes de LangChain | LangSmith |
-| **LangGraph** | Workflows complejos multi-paso, agentes ReAct | LangSmith |
-| **CrewAI** | Crews multi-agente, agentes basados en roles | LangSmith |
-| **DeepAgents** | Coding agentico estilo Claude Code, HITL | LangSmith |
+| Framework       | Mejor para                                    | Observabilidad |
+| --------------- | --------------------------------------------- | -------------- |
+| **Pydantic AI** | Agentes type-safe, inyeccion de dependencias  | Logfire        |
+| **LangChain**   | Cadenas, herramientas existentes de LangChain | LangSmith      |
+| **LangGraph**   | Workflows complejos multi-paso, agentes ReAct | LangSmith      |
+| **CrewAI**      | Crews multi-agente, agentes basados en roles  | LangSmith      |
+| **DeepAgents**  | Coding agentico estilo Claude Code, HITL      | LangSmith      |
 
 ```bash
 # Generar con LangGraph
@@ -251,6 +252,7 @@ pip install fastapi-fullstack
 O usa el [configurador web](https://oss.vstorm.co/projects/full-stack-ai-agent-template/configurator/) — sin instalacion necesaria.
 
 **Mas del ecosistema open-source de Vstorm:**
+
 - [Todos nuestros proyectos open-source](https://oss.vstorm.co) — 13 paquetes para el ecosistema Pydantic AI
 - [awesome-pydantic-ai](https://github.com/vstorm-co/awesome-pydantic-ai) — lista curada de recursos y herramientas de Pydantic AI
 - [vstorm.co](https://vstorm.co) — nuestra consultoria (mas de 30 implementaciones de agentes IA)

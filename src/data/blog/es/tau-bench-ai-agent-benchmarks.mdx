@@ -69,6 +69,7 @@ Tau-bench introduce **pass^k** (pass-hat-k): ¿tuvo éxito el agente en _todos_ 
 Para atención al cliente, la fiabilidad es lo que importa. No puedes ejecutar cada interacción con el cliente ocho veces y elegir la mejor. Cada conversación necesita funcionar.
 
 Los resultados son aleccionadores. GPT-4o, el mejor modelo en el paper original, logra:
+
 - **61,2% pass^1** en retail (aproximadamente 6 de cada 10 tareas resueltas)
 - **~25% pass^8** en retail (solo 1 de cada 4 tareas resueltas consistentemente en 8 ejecuciones)
 - **35,2% pass^1** en aerolínea (apenas un tercio)
@@ -116,6 +117,7 @@ El dominio de telecomunicaciones tiene 5 planes, 9 líneas, 4 clientes, con 15 h
 Una de las mejoras más grandes en Tau-squared es cómo se crean las tareas. En lugar de crear cada escenario a mano, el benchmark usa un **generador de tareas composicional** que construye tareas diversas a partir de bloques atómicos.
 
 Cada subtarea atómica se define por tres tipos de funciones:
+
 - **Funciones de inicialización** configuran el problema (por ejemplo, `set_airplane_mode(True)`)
 - **Funciones de solución** especifican las herramientas necesarias para arreglarlo (por ejemplo, `toggle_airplane_mode()`)
 - **Funciones de aserción** verifican que la corrección funcionó (por ejemplo, `assert_service_status("connected")`)

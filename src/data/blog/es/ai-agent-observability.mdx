@@ -31,7 +31,7 @@ Asi que construimos una: un asistente Logfire potenciado por IA que traduce preg
 
 ## El problema: SQL no es como se depuran los agentes
 
-Logfire almacena todo en un formato consultable por SQL. *Puedes* escribir:
+Logfire almacena todo en un formato consultable por SQL. _Puedes_ escribir:
 
 ```sql
 SELECT span_name, duration, attributes
@@ -131,17 +131,16 @@ La caracteristica mas poderosa es la extension de Chrome. Cuando estas viendo un
 ```typescript
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   const isLogfirePage =
-    tab.url.includes('logfire.pydantic.dev') ||
-    tab.url.includes('logfire-us.pydantic.dev');
+    tab.url.includes("logfire.pydantic.dev") || tab.url.includes("logfire-us.pydantic.dev");
 
-  if (isLogfirePage && (changeInfo.url || changeInfo.status === 'complete')) {
+  if (isLogfirePage && (changeInfo.url || changeInfo.status === "complete")) {
     const context = extractLogfireContext(tab.url);
     if (context) {
       await chrome.storage.local.set({
         [`context_${tabId}`]: context,
       });
       chrome.runtime.sendMessage({
-        type: 'CONTEXT_UPDATED',
+        type: "CONTEXT_UPDATED",
         tabId,
         context,
       });
@@ -157,7 +156,7 @@ Ahora cuando preguntas "por que fallo esta llamada a herramienta?", el agente ya
 La extension soporta seleccionar multiples spans en la interfaz de Logfire para analisis comparativo:
 
 ```typescript
-if (message.type === 'SPAN_CONTEXT_TOGGLED') {
+if (message.type === "SPAN_CONTEXT_TOGGLED") {
   const contexts = result[`spanContexts_${tabId}`] || [];
   const spanContext = message.spanContext;
 
@@ -165,7 +164,7 @@ if (message.type === 'SPAN_CONTEXT_TOGGLED') {
   if (message.selected) {
     newContexts = [...contexts, spanContext];
   } else {
-    newContexts = contexts.filter(c => c.spanId !== spanContext.spanId);
+    newContexts = contexts.filter((c) => c.spanId !== spanContext.spanId);
   }
 
   chrome.storage.local.set({ [`spanContexts_${tabId}`]: newContexts });

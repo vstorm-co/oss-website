@@ -28,7 +28,7 @@ Asi que construimos `/improve`.
 
 ---
 
-*Soy Kacper, Ingeniero de IA en [Vstorm](https://vstorm.co) — una consultoria de Applied Agentic AI Engineering. Hemos implementado mas de 30 agentes de IA en produccion y publicamos nuestras herramientas como open source en [github.com/vstorm-co](https://github.com/vstorm-co). Conecta conmigo en [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+_Soy Kacper, Ingeniero de IA en [Vstorm](https://vstorm.co) — una consultoria de Applied Agentic AI Engineering. Hemos implementado mas de 30 agentes de IA en produccion y publicamos nuestras herramientas como open source en [github.com/vstorm-co](https://github.com/vstorm-co). Conecta conmigo en [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/)._
 
 ---
 
@@ -90,7 +90,7 @@ class AgentLearningInsight:
     confidence: float # 0.0-1.0
 ```
 
-*Ejemplo: "El proyecto usa `make test`, no `pytest` directamente. Confianza: 0.95 (observado en 4 sesiones)."*
+_Ejemplo: "El proyecto usa `make test`, no `pytest` directamente. Confianza: 0.95 (observado en 4 sesiones)."_
 
 **2. Failure** — que salio mal y como se resolvio:
 
@@ -102,7 +102,7 @@ class FailureInsight:
     resolution: str   # How it was fixed
 ```
 
-*Ejemplo: "El agente intento editar `/src/main.py` pero la ruta real es `/app/main.py`. Causa raiz: asumio estructura estandar de proyecto Python. Resolucion: siempre verificar el arbol de archivos primero."*
+_Ejemplo: "El agente intento editar `/src/main.py` pero la ruta real es `/app/main.py`. Causa raiz: asumio estructura estandar de proyecto Python. Resolucion: siempre verificar el arbol de archivos primero."_
 
 **3. Pattern** — flujos de trabajo recurrentes del agente:
 
@@ -114,7 +114,7 @@ class PatternInsight:
     context: str      # When this pattern applies
 ```
 
-*Ejemplo: "Leer archivo -> editar -> ejecutar tests -> commit. Frecuencia: 12. Contexto: todas las tareas de modificacion de codigo."*
+_Ejemplo: "Leer archivo -> editar -> ejecutar tests -> commit. Frecuencia: 12. Contexto: todas las tareas de modificacion de codigo."_
 
 **4. UserFact** — cosas que el agente aprendio sobre las preferencias y entorno del usuario.
 
@@ -198,4 +198,4 @@ Este es el post 1 de 3 en la serie de Agentes que se Auto-Mejoran.
 
 ---
 
-*Sigueme en [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/) o [X](https://x.com/kacper_wlodar) para posts diarios sobre ingenieria de agentes de IA. Todas nuestras herramientas son open source en [github.com/vstorm-co](https://github.com/vstorm-co).*
+_Sigueme en [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/) o [X](https://x.com/kacper_wlodar) para posts diarios sobre ingenieria de agentes de IA. Todas nuestras herramientas son open source en [github.com/vstorm-co](https://github.com/vstorm-co)._

@@ -42,11 +42,11 @@ Each step validates in real-time. Select PostgreSQL in step 2 → ORM options ap
 
 Most users don't want to configure 75 options. They want a starting point:
 
-| Preset | What you get | Use case |
-|--------|-------------|----------|
-| **Minimal** | No database, no auth, no Docker, no CI | Quick prototypes, learning [FastAPI](https://fastapi.tiangolo.com/) |
-| **Production** | PostgreSQL, JWT, Redis, caching, rate limiting, Sentry, Prometheus, Docker, K8s, GitHub Actions | Deploy-ready backend |
-| **AI Agent** | PostgreSQL, JWT, Redis, Pydantic AI, WebSockets, conversation persistence, Docker, GitHub Actions | AI chatbot/agent apps |
+| Preset         | What you get                                                                                      | Use case                                                            |
+| -------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| **Minimal**    | No database, no auth, no Docker, no CI                                                            | Quick prototypes, learning [FastAPI](https://fastapi.tiangolo.com/) |
+| **Production** | PostgreSQL, JWT, Redis, caching, rate limiting, Sentry, Prometheus, Docker, K8s, GitHub Actions   | Deploy-ready backend                                                |
+| **AI Agent**   | PostgreSQL, JWT, Redis, Pydantic AI, WebSockets, conversation persistence, Docker, GitHub Actions | AI chatbot/agent apps                                               |
 
 Click a preset → all 75+ fields pre-fill → jump to Review → Download ZIP. Under 10 seconds from landing page to downloaded project.
 
@@ -108,7 +108,7 @@ Certain options have dependencies. Instead of showing validation errors, the con
 const needsRedis =
   cur.enable_caching ||
   (cur.enable_rate_limiting && cur.rate_limit_storage === "redis") ||
-  (cur.background_tasks !== "none") ||
+  cur.background_tasks !== "none" ||
   (cur.enable_logfire && cur.logfire_features.redis);
 
 if (needsRedis && !cur.enable_redis) {

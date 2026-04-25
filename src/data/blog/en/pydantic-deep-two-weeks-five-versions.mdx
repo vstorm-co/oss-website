@@ -16,7 +16,7 @@ draft: false
 
 ---
 
-*by [Kacper Włodarczyk](https://linkedin.com/in/kacper-wlodarczyk/) — AI Engineering Lead at [Vstorm](https://vstorm.co). We build production AI agent systems and open-source the hard parts. Follow along on [GitHub](https://github.com/vstorm-co/pydantic-deep) or [oss.vstorm.co](https://oss.vstorm.co).*
+_by [Kacper Włodarczyk](https://linkedin.com/in/kacper-wlodarczyk/) — AI Engineering Lead at [Vstorm](https://vstorm.co). We build production AI agent systems and open-source the hard parts. Follow along on [GitHub](https://github.com/vstorm-co/pydantic-deep) or [oss.vstorm.co](https://oss.vstorm.co)._
 
 ---
 
@@ -133,6 +133,7 @@ agent = create_deep_agent(
 ```
 
 Three patterns detected:
+
 1. **Repeated identical calls** — same tool, same arguments, N times in a row (default threshold: 3)
 2. **A-B-A-B alternating** — tool A, tool B, tool A, tool B... locked in a two-call loop
 3. **No-op loops** — same call, same result, still repeating

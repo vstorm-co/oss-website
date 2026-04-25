@@ -39,11 +39,11 @@ Cada paso valida en tiempo real. Selecciona PostgreSQL en el paso 2 → aparecen
 
 La mayoría de los usuarios no quieren configurar 75 opciones. Quieren un punto de partida:
 
-| Preset | Lo que obtienes | Caso de uso |
-|--------|----------------|-------------|
-| **Minimal** | Sin base de datos, sin auth, sin Docker, sin CI | Prototipos rápidos, aprender FastAPI |
-| **Production** | PostgreSQL, JWT, Redis, caché, limitación de tasa, Sentry, Prometheus, Docker, K8s, GitHub Actions | Backend listo para desplegar |
-| **AI Agent** | PostgreSQL, JWT, Redis, Pydantic AI, WebSockets, persistencia de conversaciones, Docker, GitHub Actions | Apps de chatbot/agente IA |
+| Preset         | Lo que obtienes                                                                                         | Caso de uso                          |
+| -------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| **Minimal**    | Sin base de datos, sin auth, sin Docker, sin CI                                                         | Prototipos rápidos, aprender FastAPI |
+| **Production** | PostgreSQL, JWT, Redis, caché, limitación de tasa, Sentry, Prometheus, Docker, K8s, GitHub Actions      | Backend listo para desplegar         |
+| **AI Agent**   | PostgreSQL, JWT, Redis, Pydantic AI, WebSockets, persistencia de conversaciones, Docker, GitHub Actions | Apps de chatbot/agente IA            |
 
 Haz clic en un preset → los más de 75 campos se rellenan automáticamente → salta a Revisión → Descarga ZIP. Menos de 10 segundos desde la página de inicio hasta el proyecto descargado.
 
@@ -105,7 +105,7 @@ Ciertas opciones tienen dependencias. En lugar de mostrar errores de validación
 const needsRedis =
   cur.enable_caching ||
   (cur.enable_rate_limiting && cur.rate_limit_storage === "redis") ||
-  (cur.background_tasks !== "none") ||
+  cur.background_tasks !== "none" ||
   (cur.enable_logfire && cur.logfire_features.redis);
 
 if (needsRedis && !cur.enable_redis) {

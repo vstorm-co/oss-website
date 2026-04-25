@@ -13,16 +13,16 @@ draft: false
 
 Jede KI-Agent-Demo zeigt dasselbe: "Fragen Sie Ihren Agenten zu Ihren Daten." Der Agent fragt eine Datenbank ab, fasst Ergebnisse zusammen, erstellt vielleicht ein Diagramm.
 
-Aber versuchen Sie mal, ihn zu bitten, *eine polynomiale Regression auf 24 Monaten Verkaufsdaten auszuführen und die nächsten 6 Monate vorherzusagen.* Plötzlich stößt Ihr Chat-basierter Agent an eine Wand. Er kann kein `import sklearn` machen. Er kann kein Python ausführen. Er kann darüber nachdenken, welches Modell er verwenden soll, aber er kann keines tatsächlich ausführen.
+Aber versuchen Sie mal, ihn zu bitten, _eine polynomiale Regression auf 24 Monaten Verkaufsdaten auszuführen und die nächsten 6 Monate vorherzusagen._ Plötzlich stößt Ihr Chat-basierter Agent an eine Wand. Er kann kein `import sklearn` machen. Er kann kein Python ausführen. Er kann darüber nachdenken, welches Modell er verwenden soll, aber er kann keines tatsächlich ausführen.
 
-Die offensichtliche Lösung: Geben Sie ihm eine Python-Umgebung. Aber hier ist die Frage, über die niemand spricht - sollte diese Umgebung die *Standard-Laufzeitumgebung* des Agenten sein (wie Claude Code), oder sollte sie *ein Werkzeug sein, das der Agent bei Bedarf wählt*?
+Die offensichtliche Lösung: Geben Sie ihm eine Python-Umgebung. Aber hier ist die Frage, über die niemand spricht - sollte diese Umgebung die _Standard-Laufzeitumgebung_ des Agenten sein (wie Claude Code), oder sollte sie _ein Werkzeug sein, das der Agent bei Bedarf wählt_?
 
 Wir haben eine Demo gebaut, die diese Frage beantwortet.
 
 ## TL;DR
 
 - Das **"Environment as a Tool"**-Muster lässt Ihren KI-Agenten selektiv eine Docker-Sandbox nur bei Bedarf nutzen und vermeidet Overhead bei einfachen Abfragen.
-- Der **Sub-Agent-Delegationsansatz** hält den Hauptagenten sauber - er beschreibt *was* vorhergesagt werden soll, und der Sub-Agent findet heraus, *wie* der Python-Code geschrieben wird.
+- Der **Sub-Agent-Delegationsansatz** hält den Hauptagenten sauber - er beschreibt _was_ vorhergesagt werden soll, und der Sub-Agent findet heraus, _wie_ der Python-Code geschrieben wird.
 - **Strukturierte Pydantic-Ausgabe** für Charts schlägt Bildgenerierung - senden Sie Daten, lassen Sie das Frontend mit Chart.js rendern.
 - **WebSocket-Streaming** mit `agent.iter()` bietet Echtzeit-Einblick in Text, Tool-Aufrufe und Ergebnisse.
 - Der schwierigste Teil ist die **Frontend-Integration** - das Zusammenführen von Chart-Serien mit unterschiedlichen Datumsbereichen, das Abfangen von Tool-Ausgaben und das Streaming über WebSocket.
@@ -54,7 +54,7 @@ Der Hauptagent ist ein regulärer Pydantic AI Agent. Er lebt nicht innerhalb von
 - `predict` - erstellt einen Sub-Agenten mit Docker-Zugriff, delegiert die Vorhersageaufgabe.
 - `generate_chart` - gibt strukturiertes `LineChartData` (ein Pydantic-Modell) zurück, das das Frontend als Chart.js-Diagramm rendert.
 
-Der Agent entscheidet *wann* er Docker nutzt. Wenn Sie fragen "zeige mir die Gesamtverkäufe nach Produkt", ruft er `query_data` auf - schnell, kein Overhead. Wenn Sie fragen "sage die Widget-Alpha-Verkäufe für die nächsten 6 Monate voraus", ruft er `predict` auf - der einen Sub-Agenten innerhalb von Docker startet.
+Der Agent entscheidet _wann_ er Docker nutzt. Wenn Sie fragen "zeige mir die Gesamtverkäufe nach Produkt", ruft er `query_data` auf - schnell, kein Overhead. Wenn Sie fragen "sage die Widget-Alpha-Verkäufe für die nächsten 6 Monate voraus", ruft er `predict` auf - der einen Sub-Agenten innerhalb von Docker startet.
 
 ## Das Predict-Werkzeug: Sub-Agent mit Docker-Labor
 
@@ -142,24 +142,24 @@ Das Frontend empfängt es und rendert es mit Chart.js. Keine Bilder, kein base64
 Das ist die Design-Frage, die ich am Anfang erwähnt habe. Es gibt zwei Wege, einem Agenten eine Code-Ausführungsumgebung zu geben:
 
 **Option A: Umgebung als Werkzeug** (was wir gebaut haben)
-Der Agent lebt außerhalb von Docker. Er hat ein `predict`-Werkzeug, das an einen Sub-Agenten innerhalb von Docker delegiert. Der Agent entscheidet *wann* er es nutzt.
+Der Agent lebt außerhalb von Docker. Er hat ein `predict`-Werkzeug, das an einen Sub-Agenten innerhalb von Docker delegiert. Der Agent entscheidet _wann_ er es nutzt.
 
 **Option B: Standard-Umgebung** (wie Claude Code)
-Der Agent lebt *innerhalb* von Docker. Jeder Befehl, den er ausführt, jede Datei, die er liest - alles ist in der Sandbox. Die Umgebung ist immer da.
+Der Agent lebt _innerhalb_ von Docker. Jeder Befehl, den er ausführt, jede Datei, die er liest - alles ist in der Sandbox. Die Umgebung ist immer da.
 
 Wann jede Option sinnvoll ist:
 
-| | Umgebung als Werkzeug | Standard-Umgebung |
-|---|---|---|
-| **Am besten für** | Domänenspezifische Aufgaben (Vorhersagen, Datenanalyse, Code-Review) | Allzweck-Coding-Agenten |
-| **Agent-Kontrolle** | Agent entscheidet, wann die Sandbox genutzt wird | Agent läuft immer in der Sandbox |
-| **Overhead** | Zahlt Docker-Kosten nur bei Bedarf | Immer aktiv |
-| **Flexibilität** | Kann Werkzeuge frei mischen | Alles geht durch die Sandbox |
-| **Komplexität** | Braucht Sub-Agent-Delegationsmuster | Einfacher - Agent hat einfach Werkzeuge |
+|                     | Umgebung als Werkzeug                                                | Standard-Umgebung                       |
+| ------------------- | -------------------------------------------------------------------- | --------------------------------------- |
+| **Am besten für**   | Domänenspezifische Aufgaben (Vorhersagen, Datenanalyse, Code-Review) | Allzweck-Coding-Agenten                 |
+| **Agent-Kontrolle** | Agent entscheidet, wann die Sandbox genutzt wird                     | Agent läuft immer in der Sandbox        |
+| **Overhead**        | Zahlt Docker-Kosten nur bei Bedarf                                   | Immer aktiv                             |
+| **Flexibilität**    | Kann Werkzeuge frei mischen                                          | Alles geht durch die Sandbox            |
+| **Komplexität**     | Braucht Sub-Agent-Delegationsmuster                                  | Einfacher - Agent hat einfach Werkzeuge |
 
 Für unsere prädiktive Analytik-Demo ist Option A klar die richtige Wahl. Der Agent beantwortet hauptsächlich Fragen zu Daten (kein Docker nötig) und führt Docker nur aus, wenn er sklearn-Code ausführen muss. Docker als Standard-Umgebung zu verwenden, würde unnötige Latenz zu jeder Interaktion hinzufügen.
 
-Aber für einen Coding-Agenten wie Claude Code macht Option B Sinn - die gesamte Aufgabe des Agenten ist Lesen, Schreiben und Ausführen von Code. Die Umgebung *ist* das Produkt.
+Aber für einen Coding-Agenten wie Claude Code macht Option B Sinn - die gesamte Aufgabe des Agenten ist Lesen, Schreiben und Ausführen von Code. Die Umgebung _ist_ das Produkt.
 
 ## Echte Ergebnisse
 
@@ -202,18 +202,18 @@ Wir sind während der Entwicklung auf einen interessanten Bug gestoßen. Beim Ze
 Die Lösung: alle einzigartigen x-Labels über alle Serien zusammenführen, dann eine Lookup-Map pro Serie mit `null` für fehlende Daten verwenden:
 
 ```javascript
-const allLabels = [...new Set(
-    chartData.series.flatMap((s) => s.data_points.map((dp) => dp.x))
-)].sort();
+const allLabels = [
+  ...new Set(chartData.series.flatMap((s) => s.data_points.map((dp) => dp.x))),
+].sort();
 
 const datasets = chartData.series.map((s, i) => {
-    const lookup = new Map(s.data_points.map((dp) => [dp.x, dp.y]));
-    return {
-        label: s.name,
-        data: allLabels.map((x) => lookup.get(x) ?? null),
-        spanGaps: false,
-        // ...styling
-    };
+  const lookup = new Map(s.data_points.map((dp) => [dp.x, dp.y]));
+  return {
+    label: s.name,
+    data: allLabels.map((x) => lookup.get(x) ?? null),
+    spanGaps: false,
+    // ...styling
+  };
 });
 ```
 
@@ -222,7 +222,7 @@ Kleinigkeit, aber es ist die Art von Bug, die Ihre Prognose komplett falsch auss
 ## Wichtigste Erkenntnisse
 
 - **"Umgebung als Werkzeug"** ist das richtige Muster, wenn Ihr Agent nur manchmal Code-Ausführung braucht. Zahlen Sie nicht den Docker-Overhead bei jeder Interaktion.
-- **Sub-Agent-Delegation** hält den Hauptagenten sauber. Der Hauptagent beschreibt *was* vorhergesagt werden soll. Der Sub-Agent findet heraus, *wie* der Python-Code geschrieben wird.
+- **Sub-Agent-Delegation** hält den Hauptagenten sauber. Der Hauptagent beschreibt _was_ vorhergesagt werden soll. Der Sub-Agent findet heraus, _wie_ der Python-Code geschrieben wird.
 - **Strukturierte Pydantic-Ausgabe** für Charts schlägt Bildgenerierung. Senden Sie Daten, lassen Sie das Frontend rendern. Einfacher zu stylen, interaktiv und keine base64-Blobs.
 - **WebSocket-Streaming** mit `agent.iter()` gibt Ihnen Echtzeit-Einblick in das, was der Agent tut - Text, Tool-Aufrufe und Ergebnisse.
 - Der schwierigste Teil ist nicht der Agent - es ist die **Frontend-Integration** (Zusammenführen von Chart-Serien mit unterschiedlichen Datumsbereichen, Abfangen von Tool-Ausgaben, Streaming über WebSocket).

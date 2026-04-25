@@ -84,13 +84,13 @@ pydantic-deep run "run all tests and fix failures" \
 
 Banderas clave para CI/CD:
 
-| Bandera | Propósito |
-|---------|-----------|
-| `--json` | Salida legible por máquina para parseo en pipelines |
-| `--max-turns` | Límite de iteraciones del agente (previene costos desbocados) |
-| `--timeout` | Timeout wall-clock en segundos |
-| `--model` | Override del modelo por ejecución |
-| `--no-subagents` | Deshabilita subagentes para ejecuciones deterministas |
+| Bandera          | Propósito                                                     |
+| ---------------- | ------------------------------------------------------------- |
+| `--json`         | Salida legible por máquina para parseo en pipelines           |
+| `--max-turns`    | Límite de iteraciones del agente (previene costos desbocados) |
+| `--timeout`      | Timeout wall-clock en segundos                                |
+| `--model`        | Override del modelo por ejecución                             |
+| `--no-subagents` | Deshabilita subagentes para ejecuciones deterministas         |
 
 pydantic-deep elimina el límite predeterminado de 50 requests de pydantic-ai para que las tareas largas de CI no fallen silenciosamente. Controlas los límites explícitamente mediante `--max-turns` y `--timeout`.
 

@@ -36,13 +36,13 @@ The result? You spend half your time reviewing and fixing AI-generated code that
 
 Here's what each major AI coding tool reads today:
 
-| Tool | Config file | Scope |
-|------|------------|-------|
-| **GitHub Copilot** | `.github/copilot-instructions.md` | Repo-level instructions for Copilot Chat |
-| **Cursor** | `.cursor/rules/*.mdc` | Project rules with glob-based file matching |
-| **Claude Code** | `CLAUDE.md` | Project context, commands, architecture |
-| **OpenAI Codex** | `AGENTS.md` | Agent-readable project guidance |
-| **Zed** | (reads AGENTS.md) | Same as Codex |
+| Tool               | Config file                       | Scope                                       |
+| ------------------ | --------------------------------- | ------------------------------------------- |
+| **GitHub Copilot** | `.github/copilot-instructions.md` | Repo-level instructions for Copilot Chat    |
+| **Cursor**         | `.cursor/rules/*.mdc`             | Project rules with glob-based file matching |
+| **Claude Code**    | `CLAUDE.md`                       | Project context, commands, architecture     |
+| **OpenAI Codex**   | `AGENTS.md`                       | Agent-readable project guidance             |
+| **Zed**            | (reads AGENTS.md)                 | Same as Codex                               |
 
 Every tool invented its own format. If your team uses Copilot AND Cursor AND Claude Code (which is increasingly common), you'd need three separate files describing the same project conventions.
 
@@ -196,21 +196,26 @@ You don't need a template to do this. Here's the minimal version for any Python 
 # AGENTS.md
 
 ## Project Overview
+
 [Project name] — [one-line description].
 Stack: [languages, frameworks, databases]
 
 ## Commands
+
 # Install / Test / Lint commands here
 
 ## Structure
+
 [simplified tree of key directories]
 
 ## Conventions
+
 - [pattern 1]
 - [pattern 2]
 - [pattern 3]
 
 ## Do Not Modify
+
 - [generated files]
 - [lock files]
 - [secrets]

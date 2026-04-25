@@ -28,7 +28,7 @@ So we built `/improve`.
 
 ---
 
-*I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering Consultancy. We've shipped 30+ production AI agent implementations and open-source our tooling at [github.com/vstorm-co](https://github.com/vstorm-co). Connect with me on [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+_I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering Consultancy. We've shipped 30+ production AI agent implementations and open-source our tooling at [github.com/vstorm-co](https://github.com/vstorm-co). Connect with me on [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/)._
 
 ---
 
@@ -90,7 +90,7 @@ class AgentLearningInsight:
     confidence: float # 0.0-1.0
 ```
 
-*Example: "The project uses `make test` not `pytest` directly. Confidence: 0.95 (observed in 4 sessions)."*
+_Example: "The project uses `make test` not `pytest` directly. Confidence: 0.95 (observed in 4 sessions)."_
 
 **2. Failure** — what went wrong and how it was resolved:
 
@@ -102,7 +102,7 @@ class FailureInsight:
     resolution: str   # How it was fixed
 ```
 
-*Example: "Agent tried to edit `/src/main.py` but the actual path is `/app/main.py`. Root cause: assumed standard Python project structure. Resolution: always check file tree first."*
+_Example: "Agent tried to edit `/src/main.py` but the actual path is `/app/main.py`. Root cause: assumed standard Python project structure. Resolution: always check file tree first."_
 
 **3. Pattern** — recurring workflows the agent follows:
 
@@ -114,7 +114,7 @@ class PatternInsight:
     context: str      # When this pattern applies
 ```
 
-*Example: "Read file -> edit -> run tests -> commit. Frequency: 12. Context: all code modification tasks."*
+_Example: "Read file -> edit -> run tests -> commit. Frequency: 12. Context: all code modification tasks."_
 
 **4. UserFact** — things the agent learned about the user's preferences and environment.
 
@@ -198,4 +198,4 @@ This is post 1 of 3 in the Self-Improving Agents series.
 
 ---
 
-*Follow me on [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/) or [X](https://x.com/kacper_wlodar) for daily posts on AI agent engineering. All our tools are open-source at [github.com/vstorm-co](https://github.com/vstorm-co).*
+_Follow me on [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/) or [X](https://x.com/kacper_wlodar) for daily posts on AI agent engineering. All our tools are open-source at [github.com/vstorm-co](https://github.com/vstorm-co)._

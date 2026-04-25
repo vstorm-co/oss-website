@@ -28,6 +28,7 @@ Asi es como funciona, y aqui esta el codigo completo que puedes ejecutar hoy.
 La idea central es simple: en lugar de un prompt monolitico de "revisa este codigo", dividimos la revision en tres dominios, cada uno manejado por un subagente especializado.
 
 **Security Reviewer** — verifica:
+
 - Vulnerabilidades de SQL injection
 - Cross-site scripting (XSS)
 - Secretos y claves API hardcodeados
@@ -36,6 +37,7 @@ La idea central es simple: en lugar de un prompt monolitico de "revisa este codi
 - Operaciones de archivos inseguras
 
 **Style Reviewer** — verifica:
+
 - Violaciones de convenciones de nombres
 - Duplicacion de codigo
 - Complejidad ciclomatica excesiva
@@ -44,6 +46,7 @@ La idea central es simple: en lugar de un prompt monolitico de "revisa este codi
 - Codigo muerto e imports sin usar
 
 **Performance Reviewer** — verifica:
+
 - Patrones de queries N+1
 - Asignaciones de memoria innecesarias
 - I/O bloqueante en contextos async
@@ -163,7 +166,7 @@ Esta es una de las ventajas de construir sobre [Pydantic AI](https://ai.pydantic
 Cada `SubAgentConfig` define un especialista:
 
 - **`name`** — identificador unico que el agente principal usa para delegar
-- **`description`** — le dice al agente principal *cuando* usar este subagente (la logica de enrutamiento)
+- **`description`** — le dice al agente principal _cuando_ usar este subagente (la logica de enrutamiento)
 - **`instructions`** — el system prompt para el subagente, enfocado en su dominio
 
 Las instrucciones son especificas. No decimos "revisa este codigo". Decimos "busca SQL injection, XSS, secretos hardcodeados..." Esta especificidad es lo que hace que las revisiones sean realmente utiles. Cada subagente es un experto en su dominio, no un generalista tratando de cubrir todo.
@@ -291,6 +294,7 @@ Tres razones:
 Este PR reviewer es un ejemplo del patron deep agent — la misma arquitectura que impulsa Claude Code, OpenAI Codex y Cursor detras de escena.
 
 El patron:
+
 1. **Planificar** — dividir una tarea compleja en subtareas
 2. **Delegar** — despachar subtareas a especialistas (subagentes)
 3. **Ejecutar** — cada especialista trabaja independientemente con sus propias herramientas
@@ -313,4 +317,4 @@ Los humanos de tu equipo deberian estar revisando arquitectura, logica y diseno.
 
 ---
 
-*Soy Kacper, AI Engineer en [Vstorm](https://vstorm.co) — una consultoria de Applied Agentic AI Engineering. Construimos y publicamos como open-source herramientas de agentes AI para produccion en Python. Dale una estrella a [pydantic-deepagents](https://github.com/vstorm.co/projects/pydantic-deepagents) en GitHub si lo encuentras util.*
+_Soy Kacper, AI Engineer en [Vstorm](https://vstorm.co) — una consultoria de Applied Agentic AI Engineering. Construimos y publicamos como open-source herramientas de agentes AI para produccion en Python. Dale una estrella a [pydantic-deepagents](https://github.com/vstorm.co/projects/pydantic-deepagents) en GitHub si lo encuentras util._

@@ -13,7 +13,7 @@ draft: false
 
 > Esta semana cubrí las nuevas características de pydantic-deep, [detección de bucles atascados](https://oss.vstorm.co/blog/stuck-loop-detection-ai-agents-pydantic-deep/), [advertencias de ventana de contexto](https://oss.vstorm.co/blog/context-window-blindness-ai-agents-limit-warner/), [instalación curl](https://oss.vstorm.co/blog/ai-agent-install-curl-bash-pydantic-deep/), [sandbox Docker](https://oss.vstorm.co/blog/docker-sandbox-ai-agent-pydantic-deep/), [automatización del navegador](https://oss.vstorm.co/blog/browser-automation-ai-agent-pydantic-deep/) y [observabilidad TUI](https://oss.vstorm.co/blog/ai-agent-tui-observability-pydantic-deep/). Hoy: la que mas importa para el despliegue de agentes a largo plazo, /improve.
 
-*Kacper Włodarczyk, consultor de ingeniería de IA en Vstorm. Hemos implementado más de 30 sistemas de agentes de IA en producción. pydantic-deep es nuestro agente de codificación de IA de código abierto, el runtime modular de agentes para Python.*
+_Kacper Włodarczyk, consultor de ingeniería de IA en Vstorm. Hemos implementado más de 30 sistemas de agentes de IA en producción. pydantic-deep es nuestro agente de codificación de IA de código abierto, el runtime modular de agentes para Python._
 
 ## 1. El problema: los agentes de IA son stateless por defecto
 
@@ -49,12 +49,14 @@ Siguiente sesión: agente carga MEMORY.md al inicio
 
 ## 3. UserFactInsight vs AgentLearningInsight
 
-**UserFactInsight**, hechos sobre *ti*:
+**UserFactInsight**, hechos sobre _ti_:
+
 - "El usuario prefiere patrones async de Python"
 - "El usuario está trabajando en pydantic-deep"
 - "Los proyectos del usuario están en ~/Projects/"
 
-**AgentLearningInsight**, hechos sobre el *dominio, herramientas, patrones*:
+**AgentLearningInsight**, hechos sobre el _dominio, herramientas, patrones_:
+
 - "GitHub: 'pydantic-ai' da mejores resultados que 'pydantic'"
 - "La herramienta X falla silenciosamente con entrada vacía"
 
@@ -69,6 +71,7 @@ Por qué:
 **Resumen:** "El agente buscó en GitHub y encontró el repositorio relevante."
 
 **Traza cruda:**
+
 ```python
 browser.navigate("github.com/search?q=pydantic+agent")
 # → 0 resultados
@@ -98,10 +101,12 @@ Después de algunas sesiones con /improve, podría verse así:
 # Memory
 
 ## User Facts
+
 - Prefers async Python patterns
 - Working on pydantic-deep (github.com/vstorm-co/pydantic-deep)
 
 ## Agent Learnings
+
 - GitHub: use "pydantic-ai" not "pydantic" for better search results
 - Check for empty input before calling file read tools
 ```

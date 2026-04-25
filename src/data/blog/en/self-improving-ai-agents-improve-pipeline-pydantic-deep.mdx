@@ -12,13 +12,17 @@ category: article
 draft: false
 ---
 
+import Steps from "@/components/blog/Steps.astro";
+import Callout from "@/components/blog/Callout.astro";
+import RepoCard from "@/components/blog/RepoCard.astro";
+
 For three months my AI agent made the same wrong query every morning.
 
 Search "pydantic", zero results. Search "pydantic-ai", forty-seven. Click the right repo. Every. Single. Session.
 
 I would watch it happen, sigh, and move on, because I knew correcting the agent was pointless. By tomorrow it would forget the correction anyway. This is the default state of most AI agents today, and it's the reason we built `/improve`.
 
-*Kacper Włodarczyk, AI engineering consultant at Vstorm. We've shipped 30+ production AI agent systems. pydantic-deep is our open-source agent runtime for Python, built on what we've learned from those deployments.*
+_Kacper Włodarczyk, AI engineering consultant at Vstorm. We've shipped 30+ production AI agent systems. pydantic-deep is our open-source agent runtime for Python, built on what we've learned from those deployments._
 
 ## 1. The problem: AI agents are stateless by default
 
@@ -36,23 +40,34 @@ For a single-use tool, this is fine. For a coding agent you use every day, it's 
 
 Here's the flow:
 
-```
-Session ends
-    ↓
-tool_log.jsonl saved (raw tool calls, up to 20K chars)
-    ↓
-/improve command triggered
-    ↓
-Extraction agent reads raw tool traces
-    ↓
-Extracts: UserFactInsight + AgentLearningInsight
-    ↓
-Synthesis agent: insights + raw traces → structured improvements
-    ↓
-MEMORY.md updated
-    ↓
-Next session: agent loads MEMORY.md on startup
-```
+<Steps
+  items={[
+    {
+      title: "Session ends",
+      body: "tool_log.jsonl is saved with the raw tool calls (up to 20K chars).",
+    },
+    {
+      title: "/improve command triggered",
+      body: "Manually or as a post-session hook.",
+    },
+    {
+      title: "Extraction agent reads raw traces",
+      body: "Pulls structured UserFactInsight + AgentLearningInsight records.",
+    },
+    {
+      title: "Synthesis agent merges insights with raw traces",
+      body: "Outputs concrete proposed changes to context files.",
+    },
+    {
+      title: "MEMORY.md is updated",
+      body: "Calibrated confidence scores; 0.7 threshold filters out speculation.",
+    },
+    {
+      title: "Next session loads MEMORY.md on startup",
+      body: "Agent begins with everything the previous session learned.",
+    },
+  ]}
+/>
 
 The output isn't a log file you read later. It's living documentation that changes how the agent behaves in the next session.
 
@@ -60,13 +75,15 @@ The output isn't a log file you read later. It's living documentation that chang
 
 We designed two distinct insight categories because they serve different purposes.
 
-**UserFactInsight** captures facts about *you*:
+**UserFactInsight** captures facts about _you_:
+
 - "User prefers async Python patterns over sync"
 - "User is working on pydantic-deep, an AI coding agent"
 - "User wants concise responses, not extensive explanations"
 - "User's projects live in ~/Projects, not ~/code"
 
-**AgentLearningInsight** captures what the agent learned about the *domain, tools, and patterns*:
+**AgentLearningInsight** captures what the agent learned about the _domain, tools, and patterns_:
+
 - "GitHub search works better with 'pydantic-ai' than 'pydantic'"
 - "The Anthropic API returns usage data in stream chunks, not just at completion"
 - "Tool X fails silently on empty input, check before calling"
@@ -92,6 +109,7 @@ Here's why. Consider a session where the agent searched GitHub:
 **Summary:** "Agent searched GitHub and found the relevant repository."
 
 **Raw trace:**
+
 ```python
 browser.navigate("github.com/search?q=pydantic+agent")
 # → 0 results
@@ -123,12 +141,14 @@ After a few sessions with /improve, it might look like:
 # Memory
 
 ## User Facts
+
 - Prefers async Python patterns
 - Working on pydantic-deep (github.com/vstorm-co/pydantic-deep)
 - Projects live in ~/Projects/
 - Prefers minimal output, not verbose explanations
 
 ## Agent Learnings
+
 - GitHub: use "pydantic-ai" not "pydantic" for better search results
 - Anthropic API usage data available in stream (not just completion)
 - Project uses underscores in filenames, not hyphens

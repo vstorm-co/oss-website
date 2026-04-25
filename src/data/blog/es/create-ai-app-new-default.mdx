@@ -19,7 +19,7 @@ Tres días después, tienes un entorno de desarrollo funcionando. Cero component
 
 Entonces Dan Abramov lanza create-react-app. Un comando: `npx create-react-app my-app`. Valores predeterminados sensatos. Estructura probada. Cero configuración para empezar. Eject cuando lo necesites.
 
-El desarrollo en React nunca fue igual. No porque CRA hiciera algo mágico — sino porque estableció un *estándar*. Un punto de partida en el que todos estaban de acuerdo. Un piso, no un techo.
+El desarrollo en React nunca fue igual. No porque CRA hiciera algo mágico — sino porque estableció un _estándar_. Un punto de partida en el que todos estaban de acuerdo. Un piso, no un techo.
 
 Avancemos a 2026. Estamos en el mismo momento exacto con las aplicaciones de IA. Y estamos cometiendo exactamente los mismos errores.
 
@@ -35,13 +35,14 @@ CRA resolvió tres problemas simultáneamente:
 2. **Creación de estándares.** Cuando todos parten de la misma plantilla, las estructuras de carpetas se vuelven predecibles. Los tutoriales se transfieren entre proyectos. Las respuestas de Stack Overflow realmente aplican a tu setup.
 3. **Aceleración del ecosistema.** Las bibliotecas podían asumir un entorno estándar. Las herramientas de testing podían asumir un proceso de build estándar. Todo el ecosistema de React se aceleró porque había una base compartida.
 
-Estos no son problemas de frontend. Son problemas de *gestión de complejidad*. Y las aplicaciones de IA tienen los tres, amplificados.
+Estos no son problemas de frontend. Son problemas de _gestión de complejidad_. Y las aplicaciones de IA tienen los tres, amplificados.
 
 ## El problema del boilerplate de IA en 2026
 
 Así es como se ve iniciar una nueva aplicación de IA hoy:
 
 **Semana 1 — Infraestructura de backend:**
+
 - Estructura de proyecto [FastAPI](https://fastapi.tiangolo.com/) con soporte async
 - Configuración de base de datos (PostgreSQL, migraciones con Alembic)
 - Autenticación JWT (login, registro, refresh tokens, gestión de sesiones)
@@ -49,6 +50,7 @@ Así es como se ve iniciar una nueva aplicación de IA hoy:
 - Configuración de entorno y gestión de secretos
 
 **Semana 2 — Integración de IA:**
+
 - Setup del framework de IA ([Pydantic AI](https://ai.pydantic.dev/), [LangChain](https://python.langchain.com/), [LangGraph](https://langchain-ai.github.io/langgraph/) u otro)
 - Integración con proveedor de LLM (OpenAI, Anthropic, OpenRouter)
 - Streaming por WebSocket para entrega de tokens en tiempo real
@@ -56,6 +58,7 @@ Así es como se ve iniciar una nueva aplicación de IA hoy:
 - Registro de herramientas e inyección de dependencias
 
 **Semana 3 — Frontend y deployment:**
+
 - Frontend [Next.js](https://nextjs.org/) con UI de chat streaming
 - Cliente WebSocket con lógica de reconexión
 - Builds multi-stage de [Docker](https://docs.docker.com/)
@@ -73,15 +76,15 @@ Y aquí está la parte que debería preocuparte: cada equipo que hace esto toma 
 
 Mapeémoslo explícitamente:
 
-| Dimensión | CRA (2016) | Template de IA (2026) |
-|-----------|-----------|-------------------|
-| **El dolor** | Infierno de config Webpack + Babel + ESLint | Infierno de config FastAPI + Auth + WebSocket + Docker + framework de IA |
-| **Tiempo perdido** | Días antes del primer componente | Semanas antes del primer agente |
-| **La fragmentación** | Cada equipo tenía un build setup diferente | Cada equipo tiene un stack de IA diferente |
-| **El comando** | `npx create-react-app my-app` | `fastapi-fullstack create my_app --preset ai-agent` |
-| **Valores sensatos** | Config Webpack, reglas ESLint, estructura de carpetas | PostgreSQL, JWT, Redis, Pydantic AI, Docker, CI/CD |
-| **Escape** | `eject` cuando lo superas | 75+ opciones cuando necesitas personalización |
-| **Resultado** | App React funcionando en segundos | Aplicación de IA funcionando en minutos |
+| Dimensión            | CRA (2016)                                            | Template de IA (2026)                                                    |
+| -------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------ |
+| **El dolor**         | Infierno de config Webpack + Babel + ESLint           | Infierno de config FastAPI + Auth + WebSocket + Docker + framework de IA |
+| **Tiempo perdido**   | Días antes del primer componente                      | Semanas antes del primer agente                                          |
+| **La fragmentación** | Cada equipo tenía un build setup diferente            | Cada equipo tiene un stack de IA diferente                               |
+| **El comando**       | `npx create-react-app my-app`                         | `fastapi-fullstack create my_app --preset ai-agent`                      |
+| **Valores sensatos** | Config Webpack, reglas ESLint, estructura de carpetas | PostgreSQL, JWT, Redis, Pydantic AI, Docker, CI/CD                       |
+| **Escape**           | `eject` cuando lo superas                             | 75+ opciones cuando necesitas personalización                            |
+| **Resultado**        | App React funcionando en segundos                     | Aplicación de IA funcionando en minutos                                  |
 
 La similitud estructural no es una coincidencia. Es el mismo patrón: una categoría tecnológica madura más allá de la fase "todos construyen todo a mano" y entra en la fase "necesitamos un punto de partida estándar".
 
@@ -89,17 +92,17 @@ React estuvo ahí en 2016. Las aplicaciones de IA están ahí ahora.
 
 ## Qué significan "valores predeterminados sensatos" para apps de IA
 
-La genialidad de CRA fue elegir los valores predeterminados correctos. No las opciones más poderosas — las más *sensatas*. No obtenías cada plugin posible de Webpack. Obtenías la configuración que funcionaba para el 90% de los proyectos.
+La genialidad de CRA fue elegir los valores predeterminados correctos. No las opciones más poderosas — las más _sensatas_. No obtenías cada plugin posible de Webpack. Obtenías la configuración que funcionaba para el 90% de los proyectos.
 
 Para aplicaciones de IA, los valores predeterminados sensatos lucen así:
 
 **3 presets que cubren el 90% de los casos de uso:**
 
-| Preset | Lo que obtienes | Para quién |
-|--------|----------------|------------|
-| **Minimal** | FastAPI, sin base de datos, sin auth, sin Docker | Prototipos rápidos, aprendizaje, experimentos |
-| **AI Agent** | PostgreSQL, JWT, Redis, Pydantic AI, streaming WebSocket, persistencia de conversaciones, Docker, GitHub Actions | Aplicaciones de chatbot y agentes de IA |
-| **Production** | Todo de AI Agent + caché, rate limiting, Sentry, Prometheus, Kubernetes, panel de admin | Deployments empresariales |
+| Preset         | Lo que obtienes                                                                                                  | Para quién                                    |
+| -------------- | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| **Minimal**    | FastAPI, sin base de datos, sin auth, sin Docker                                                                 | Prototipos rápidos, aprendizaje, experimentos |
+| **AI Agent**   | PostgreSQL, JWT, Redis, Pydantic AI, streaming WebSocket, persistencia de conversaciones, Docker, GitHub Actions | Aplicaciones de chatbot y agentes de IA       |
+| **Production** | Todo de AI Agent + caché, rate limiting, Sentry, Prometheus, Kubernetes, panel de admin                          | Deployments empresariales                     |
 
 Elige un preset. Obtén una aplicación funcionando. Personaliza después.
 
@@ -120,7 +123,7 @@ Un comando. Todo esto. Testeado, configurado y funcionando junto.
 
 CRA tenía `eject`. Nuestro template tiene 75+ opciones de configuración.
 
-Pero aquí está la decisión de diseño clave: no *ves* esas opciones a menos que las quieras. Los presets abstraen la complejidad. Cuando necesitas personalizar — cambiar de PostgreSQL a MongoDB, agregar Celery para tareas en segundo plano, habilitar manifiestos de Kubernetes, cambiar Pydantic AI por LangChain — las opciones están ahí.
+Pero aquí está la decisión de diseño clave: no _ves_ esas opciones a menos que las quieras. Los presets abstraen la complejidad. Cuando necesitas personalizar — cambiar de PostgreSQL a MongoDB, agregar Celery para tareas en segundo plano, habilitar manifiestos de Kubernetes, cambiar Pydantic AI por LangChain — las opciones están ahí.
 
 Este es el patrón de revelación progresiva que CRA estableció. Simple por defecto. Poderoso cuando se necesita. Nunca abrumador en el primer contacto.
 
@@ -130,7 +133,7 @@ Es lo que CRA hubiera sido si hubiera lanzado con una GUI.
 
 ## Los estándares vencen a los copos de nieve
 
-Lo más subestimado que hizo CRA no fue eliminar el boilerplate. Fue *crear un estándar*.
+Lo más subestimado que hizo CRA no fue eliminar el boilerplate. Fue _crear un estándar_.
 
 Cuando cada proyecto React parte de CRA, algo cambia:
 
@@ -142,6 +145,7 @@ Cuando cada proyecto React parte de CRA, algo cambia:
 Las aplicaciones de IA necesitan desesperadamente esta convergencia.
 
 Ahora mismo, si me uno a tu equipo y miro tu proyecto de IA, no tengo idea de dónde encontrar:
+
 - La definición del agente
 - Los registros de herramientas
 - La lógica de persistencia de conversaciones
@@ -171,19 +175,21 @@ my_app/
   .github/          # Workflows CI/CD
 ```
 
-Esto no es solo una estructura de carpetas. Es un *vocabulario compartido* para la arquitectura de aplicaciones de IA.
+Esto no es solo una estructura de carpetas. Es un _vocabulario compartido_ para la arquitectura de aplicaciones de IA.
 
 ## El efecto ecosistema
 
 Esto es lo que sucede después de que existe un template estándar.
 
 En el mundo de React, después de CRA:
+
 - Bibliotecas de testing (Jest, React Testing Library) apuntaron a la configuración de CRA
 - Soluciones CSS (styled-components, CSS modules) asumieron el proceso de build de CRA
 - Gestión de estado (Redux) proporcionó guías de setup específicas para CRA
 - Plataformas de deployment (Vercel, Netlify) ofrecieron deployment de CRA con un clic
 
 El mismo efecto flywheel está comenzando para aplicaciones de IA:
+
 - [pydantic-deepagents](https://github.com/vstorm.co/projects/pydantic-deepagents) — nuestro framework modular de agentes — proporciona una integración con el template que incorpora patrones avanzados (sub-agentes, ejecución paralela, ejecución de código en sandbox) como opción de configuración
 - La observabilidad de [Logfire](https://logfire.pydantic.dev/) se integra de forma nativa porque el template proporciona una superficie de instrumentación estándar
 - Los patrones de testing son consistentes porque la estructura del proyecto es consistente
@@ -196,7 +202,7 @@ Cada nueva aplicación de IA debería partir de un template. No desde cero.
 
 No porque los templates sean perfectos. No porque un tamaño sirva para todos. Sino porque la alternativa — cada equipo resolviendo independientemente los mismos problemas de infraestructura con diferentes implementaciones — es un desperdicio del tiempo colectivo de ingeniería.
 
-CRA no limitó el desarrollo de React. Lo *desató*. Al eliminar la barrera del boilerplate, permitió que más desarrolladores construyeran aplicaciones más ambiciosas más rápido. El ecosistema de frameworks explotó *después* de que CRA facilitara el inicio.
+CRA no limitó el desarrollo de React. Lo _desató_. Al eliminar la barrera del boilerplate, permitió que más desarrolladores construyeran aplicaciones más ambiciosas más rápido. El ecosistema de frameworks explotó _después_ de que CRA facilitara el inicio.
 
 Lo mismo sucederá con las aplicaciones de IA. Cuando iniciar un nuevo proyecto de IA tome minutos en vez de semanas, más equipos experimentarán. Más productos saldrán al mercado. El listón para "aplicación de IA mínima viable" subirá de "logré que el streaming WebSocket funcione" a "construí algo que los usuarios realmente quieren".
 

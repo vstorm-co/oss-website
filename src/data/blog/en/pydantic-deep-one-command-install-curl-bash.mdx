@@ -32,7 +32,7 @@ We decided to fix this for [pydantic-deep](https://github.com/vstorm-co/pydantic
 
 ---
 
-*I'm Kacper Włodarczyk, co-founder of [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering consultancy. We've deployed 30+ production AI agents. pydantic-deep is our open-source AI coding agent.*
+_I'm Kacper Włodarczyk, co-founder of [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering consultancy. We've deployed 30+ production AI agents. pydantic-deep is our open-source AI coding agent._
 
 ---
 
@@ -90,6 +90,7 @@ pydantic-deep update
 ```
 
 This is `brew upgrade pydantic-deep` for AI agents. Under the hood:
+
 - If uv is available: runs `uv tool upgrade pydantic-deep`
 - If not: falls back to `pip install --upgrade "pydantic-deep[cli]"`
 
@@ -105,6 +106,7 @@ Update available: v0.3.6 → v0.3.7  Run: pydantic-deep update
 ```
 
 Implementation details:
+
 - 2-second timeout — never blocks startup
 - Results cached in `~/.pydantic-deep/update_check.json` for 24 hours
 - Hits `https://pypi.org/pypi/pydantic-deep/json` — PyPI's public JSON API
@@ -153,4 +155,4 @@ What's the worst install experience you've had with a Python AI/ML tool?
 
 ---
 
-*Vstorm builds production AI agent systems. More open-source tools at [oss.vstorm.co](https://oss.vstorm.co).*
+_Vstorm builds production AI agent systems. More open-source tools at [oss.vstorm.co](https://oss.vstorm.co)._

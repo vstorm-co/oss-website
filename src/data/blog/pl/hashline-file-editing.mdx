@@ -72,6 +72,7 @@ replace line 2:f1 with:
 W lutym 2026 Can Boluk opublikował ["I Improved 15 LLMs at Coding in One Afternoon. Only the Harness Changed."](https://blog.can.ac/2026/02/12/the-harness-problem/) — benchmark 16 modeli w 3 formatach edycji (patch, str_replace, hashline).
 
 **Setup:**
+
 - 180 zadań na uruchomienie, 3 uruchomienia na model
 - Pliki React codebase jako test fixtures
 - Mechaniczne mutacje: zamiany operatorów, odwracanie wartości boolean, błędy off-by-one, zmiany nazw identyfikatorów
@@ -79,15 +80,16 @@ W lutym 2026 Can Boluk opublikował ["I Improved 15 LLMs at Coding in One Aftern
 
 **Kluczowe wyniki:**
 
-| Odkrycie | Liczby |
-|----------|--------|
+| Odkrycie         | Liczby                                                      |
+| ---------------- | ----------------------------------------------------------- |
 | Grok Code Fast 1 | **6,7% do 68,3%** dokładności (+61,6pp) z hashline vs patch |
-| MiniMax | Ponad **podwojona** dokładność |
-| Grok 4 Fast | Tokeny wyjściowe spadły o **61%** |
-| Gemini 3 Flash | **78,3%** dokładności z hashline |
-| Format patch | **Najgorszy dla prawie każdego modelu** |
+| MiniMax          | Ponad **podwojona** dokładność                              |
+| Grok 4 Fast      | Tokeny wyjściowe spadły o **61%**                           |
+| Gemini 3 Flash   | **78,3%** dokładności z hashline                            |
+| Format patch     | **Najgorszy dla prawie każdego modelu**                     |
 
 Wzorzec był czytelny:
+
 - **Hashline dorównał lub pobił str_replace dla większości modeli**
 - **Najsłabsze modele zyskały najwięcej** — mniejsze modele mają największy problem z dokładnym odtwarzaniem tekstu
 - **Zużycie tokenów drastycznie spadło** — modele wydają mniej tokenów na wskazywanie kodu, a więcej na jego zmianę
@@ -131,6 +133,7 @@ new_content, error = apply_hashline_edit(
 ```
 
 **Obsługiwane operacje:**
+
 - **Zamiana pojedynczej linii** — `start_line` + `start_hash` + `new_content`
 - **Zamiana zakresu** — dodatkowo `end_line` + `end_hash`
 - **Wstawienie po** — ustaw `insert_after=True`

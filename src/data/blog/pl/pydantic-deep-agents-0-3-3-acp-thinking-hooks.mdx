@@ -91,6 +91,7 @@ Instalacja: `pip install pydantic-deep[acp]`.
 To zmiana, która fundamentalnie zwiększa możliwości delegacji. Wcześniej subagenty były zwykłymi agentami Pydantic AI — miały narzędzia, ale nie miały pamięci, eviction, web search ani patch support.
 
 Teraz **każdy subagent jest tworzony przez `create_deep_agent()`** z pełnym zestawem:
+
 - System plików (read, write, edit, ls, glob, grep)
 - Web search i web fetch
 - Pamięć (MEMORY.md per subagent)
@@ -107,15 +108,15 @@ Wersja 0.3.3 dodaje parametr `thinking` do `create_deep_agent()` z domyślną wa
 
 Dostępnych jest 7 poziomów:
 
-| Wartość | Opis |
-|---------|------|
-| `True` | Włączone (domyślny poziom modelu) |
-| `False` | Wyłączone |
-| `"minimal"` | Minimalne rozumowanie |
-| `"low"` | Niski wysiłek |
-| `"medium"` | Średni wysiłek |
-| `"high"` | Wysoki wysiłek (domyślnie) |
-| `"xhigh"` | Maksymalny wysiłek |
+| Wartość     | Opis                              |
+| ----------- | --------------------------------- |
+| `True`      | Włączone (domyślny poziom modelu) |
+| `False`     | Wyłączone                         |
+| `"minimal"` | Minimalne rozumowanie             |
+| `"low"`     | Niski wysiłek                     |
+| `"medium"`  | Średni wysiłek                    |
+| `"high"`    | Wysoki wysiłek (domyślnie)        |
+| `"xhigh"`   | Maksymalny wysiłek                |
 
 To oznacza, że agenty myślą głębiej zanim odpowiedzą — planują kroki, rozważają edge case'y i mniej się mylą w złożonych zadaniach. Wyłącz przez `thinking=False`, jeśli potrzebujesz niższej latencji.
 
@@ -129,13 +130,13 @@ Efekt: niższe koszty i szybsze odpowiedzi w kolejnych turach. Dla modeli nie-An
 
 Wersja 0.3.3 dodaje 5 nowych zdarzeń hookowych, które mapują się na lifecycle hooks Pydantic AI:
 
-| Hook | Kiedy się odpala | Przypadek użycia |
-|------|------------------|-------------------|
-| `BEFORE_RUN` | Przed rozpoczęciem pętli agenta | Śledzenie sesji, logowanie startu |
-| `AFTER_RUN` | Po zakończeniu pętli agenta | Zapis wyników, metryki |
-| `RUN_ERROR` | Gdy pętla agenta rzuci wyjątek | Alerty o błędach, retry logic |
-| `BEFORE_MODEL_REQUEST` | Przed każdym wywołaniem LLM | Logowanie promptów, rate limiting |
-| `AFTER_MODEL_REQUEST` | Po każdej odpowiedzi LLM | Logowanie odpowiedzi, analiza kosztów |
+| Hook                   | Kiedy się odpala                | Przypadek użycia                      |
+| ---------------------- | ------------------------------- | ------------------------------------- |
+| `BEFORE_RUN`           | Przed rozpoczęciem pętli agenta | Śledzenie sesji, logowanie startu     |
+| `AFTER_RUN`            | Po zakończeniu pętli agenta     | Zapis wyników, metryki                |
+| `RUN_ERROR`            | Gdy pętla agenta rzuci wyjątek  | Alerty o błędach, retry logic         |
+| `BEFORE_MODEL_REQUEST` | Przed każdym wywołaniem LLM     | Logowanie promptów, rate limiting     |
+| `AFTER_MODEL_REQUEST`  | Po każdej odpowiedzi LLM        | Logowanie odpowiedzi, analiza kosztów |
 
 Te hooki dopełniają istniejące `PRE_TOOL_USE`, `POST_TOOL_USE` i `POST_TOOL_USE_FAILURE`, dając pełną widoczność cyklu życia agenta — od startu sesji, przez każde wywołanie modelu, po zakończenie lub błąd.
 
@@ -157,20 +158,21 @@ Parametr `skills` został usunięty z `create_deep_agent()`. Teraz przekazujesz 
 
 Wersja 0.3.3 zmienia filozofię: zamiast wymagać ręcznej konfiguracji każdej funkcji, framework dostarcza sensowne domyślne wartości. Oto co się zmieniło:
 
-| Parametr | Przed (0.3.2) | Po (0.3.3) |
-|----------|---------------|------------|
-| `include_memory` | `False` | `True` |
-| `max_nesting_depth` | `0` | `1` |
-| `thinking` | brak | `"high"` |
-| `eviction_token_limit` | `None` | `20_000` |
-| `patch_tool_calls` | `False` | `True` |
-| `web_search` | brak (było `include_web`) | `True` |
-| `web_fetch` | brak (było `include_web`) | `True` |
-| `anthropic_cache_*` | brak | `True` |
-| `image_support` | parametr | zawsze włączone |
-| Pliki kontekstowe | DEEP.md, AGENTS.md, CLAUDE.md, SOUL.md | AGENTS.md, SOUL.md |
+| Parametr               | Przed (0.3.2)                          | Po (0.3.3)         |
+| ---------------------- | -------------------------------------- | ------------------ |
+| `include_memory`       | `False`                                | `True`             |
+| `max_nesting_depth`    | `0`                                    | `1`                |
+| `thinking`             | brak                                   | `"high"`           |
+| `eviction_token_limit` | `None`                                 | `20_000`           |
+| `patch_tool_calls`     | `False`                                | `True`             |
+| `web_search`           | brak (było `include_web`)              | `True`             |
+| `web_fetch`            | brak (było `include_web`)              | `True`             |
+| `anthropic_cache_*`    | brak                                   | `True`             |
+| `image_support`        | parametr                               | zawsze włączone    |
+| Pliki kontekstowe      | DEEP.md, AGENTS.md, CLAUDE.md, SOUL.md | AGENTS.md, SOUL.md |
 
 Domyślne modele również się zmieniły:
+
 - Główny agent: `anthropic:claude-opus-4-6`
 - Subagenty: `anthropic:claude-sonnet-4-6`
 - Summarization: `anthropic:claude-haiku-4-5-20251001`
@@ -190,6 +192,7 @@ Przy pierwszym uruchomieniu CLI automatycznie wykrywa brakujące klucze API i pr
 ### /config i /provider
 
 Dwa nowe slash commands w CLI:
+
 - `/config` — przeglądaj i zmieniaj ustawienia interaktywnie (np. `/config set include_teams true`)
 - `/provider` — przełącz provider i model w trakcie sesji
 

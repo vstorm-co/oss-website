@@ -26,7 +26,7 @@ Here's how we built it.
 
 ---
 
-*I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering Consultancy. We've shipped 30+ production AI agent implementations and open-source our tooling at [github.com/vstorm-co](https://github.com/vstorm-co). Connect with me on [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+_I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering Consultancy. We've shipped 30+ production AI agent implementations and open-source our tooling at [github.com/vstorm-co](https://github.com/vstorm-co). Connect with me on [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/)._
 
 ---
 
@@ -189,7 +189,7 @@ We read from an in-memory `BytesIO` stream — no temp files needed. Empty parag
 
 This is where it gets interesting. Images don't get parsed — they go directly to the LLM as binary content. The WebSocket handler builds a multimodal input when file attachments include images:
 
-```python
+````python
 from pydantic_ai.messages import BinaryContent
 
 user_input: str | list[Any] = user_message
@@ -225,7 +225,7 @@ if image_parts or file_context_parts:
         user_input = [user_message] + image_parts
     else:
         user_input = user_message
-```
+````
 
 The `BinaryContent` from [Pydantic AI](https://ai.pydantic.dev/) is the key. It wraps raw bytes with a MIME type and lets the framework handle the multimodal API call. The LLM literally sees the image — it can describe charts, read text from screenshots, analyze diagrams.
 
@@ -291,9 +291,10 @@ All code shown in this article is from the actual template. No simplified exampl
 
 ---
 
-*If you're building AI applications with file handling, I'd love to hear how you're approaching document parsing and LLM Vision integration.*
+_If you're building AI applications with file handling, I'd love to hear how you're approaching document parsing and LLM Vision integration._
 
-*More on the template:*
-- *[Getting Started Guide](/blog/fastapi-nextjs-ai-template-guide/)*
-- *[Full RAG Pipeline: 4 Vector Stores](/blog/full-rag-pipeline-4-vector-stores/)*
-- *[Same Chat App, 4 Frameworks](/blog/same-chat-app-4-frameworks/)*
+_More on the template:_
+
+- _[Getting Started Guide](/blog/fastapi-nextjs-ai-template-guide/)_
+- _[Full RAG Pipeline: 4 Vector Stores](/blog/full-rag-pipeline-4-vector-stores/)_
+- _[Same Chat App, 4 Frameworks](/blog/same-chat-app-4-frameworks/)_

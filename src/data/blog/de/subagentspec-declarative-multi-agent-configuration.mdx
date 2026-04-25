@@ -25,7 +25,7 @@ Wir sind oft genug darauf gestossen — in ueber 30 Produktiv-Deployments — da
 
 ---
 
-*Ich bin Kacper, AI Engineer bei [Vstorm](https://vstorm.co) — einer Applied Agentic AI Engineering Beratung. Wir haben 30+ produktive AI-Agent-Implementierungen ausgeliefert und stellen unsere Tools als Open-Source bereit auf [github.com/vstorm-co](https://github.com/vstorm-co). Vernetze dich mit mir auf [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+_Ich bin Kacper, AI Engineer bei [Vstorm](https://vstorm.co) — einer Applied Agentic AI Engineering Beratung. Wir haben 30+ produktive AI-Agent-Implementierungen ausgeliefert und stellen unsere Tools als Open-Source bereit auf [github.com/vstorm-co](https://github.com/vstorm-co). Vernetze dich mit mir auf [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/)._
 
 ---
 
@@ -72,14 +72,14 @@ agents:
     tools:
       - search_web
       - read_document
-    
+
   - name: summarizer
     model: anthropic:claude-sonnet-4-20250514
     system_prompt: |
       You summarize research findings into concise,
       actionable summaries.
     result_type: Summary
-    
+
   - name: validator
     model: openai:gpt-4.1-mini
     system_prompt: |
@@ -150,7 +150,7 @@ toolset = create_agent_factory_toolset(
 
 Die Prioritaetskette: `agent` (fertig) > `agent_factory` (Factory pro Spec) > `default_agent_factory` (globaler Default) > einfacher `Agent()`.
 
-YAML definiert *was* jeder Agent sein soll. Die Factory definiert *wie* er gebaut wird.
+YAML definiert _was_ jeder Agent sein soll. Die Factory definiert _wie_ er gebaut wird.
 
 ## Token-Tracking ueber Subagenten hinweg
 
@@ -172,7 +172,7 @@ total = get_total_usage(all_task_handles)
 
 Jeder `TaskHandle` speichert ein `RunUsage`-Objekt vom Subagent-Lauf. `check_task` zeigt Input/Output-Token-Zaehler fuer einen einzelnen Task. `get_total_usage()` aggregiert ueber alle Task-Handles.
 
-Tracking auf Task-Ebene sagt dir, welcher *logische Task* welche Ressourcen verbraucht hat, nicht nur welcher Modell-Aufruf.
+Tracking auf Task-Ebene sagt dir, welcher _logische Task_ welche Ressourcen verbraucht hat, nicht nur welcher Modell-Aufruf.
 
 ## Strukturierte Ausgabe-Serialisierung
 
@@ -253,7 +253,8 @@ pip install pydantic-ai-subagents
 
 ---
 
-*Mehr von unseren Open-Source-Tools:*
-- *[pydantic-ai-shields: 10 Guardrails, Zero Dependencies](/blog/pydantic-ai-shields-10-guardrails-zero-dependencies)*
-- *[5 Frameworks, 1 Template: Architecture Deep Dive](/blog/5-ai-frameworks-1-template-architecture)*
-- *[Full-Stack AI Agent Template](https://github.com/vstorm-co/full-stack-ai-agent-template)*
+_Mehr von unseren Open-Source-Tools:_
+
+- _[pydantic-ai-shields: 10 Guardrails, Zero Dependencies](/blog/pydantic-ai-shields-10-guardrails-zero-dependencies)_
+- _[5 Frameworks, 1 Template: Architecture Deep Dive](/blog/5-ai-frameworks-1-template-architecture)_
+- _[Full-Stack AI Agent Template](https://github.com/vstorm-co/full-stack-ai-agent-template)_

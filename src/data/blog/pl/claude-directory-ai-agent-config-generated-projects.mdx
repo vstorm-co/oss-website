@@ -25,7 +25,7 @@ Mozesz to naprawic konfiguracja specyficzna dla projektu. Problem: prawie nikt t
 
 ---
 
-*Jestem Kacper, AI Engineer w [Vstorm](https://vstorm.co) — firmie konsultingowej specjalizujacej sie w Applied Agentic AI Engineering. Dostarczylismy ponad 30 produkcyjnych implementacji agentow AI i udostepniamy nasze narzedzia open-source na [github.com/vstorm-co](https://github.com/vstorm-co). Polacz sie ze mna na [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+_Jestem Kacper, AI Engineer w [Vstorm](https://vstorm.co) — firmie konsultingowej specjalizujacej sie w Applied Agentic AI Engineering. Dostarczylismy ponad 30 produkcyjnych implementacji agentow AI i udostepniamy nasze narzedzia open-source na [github.com/vstorm-co](https://github.com/vstorm-co). Polacz sie ze mna na [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/)._
 
 ---
 
@@ -33,11 +33,12 @@ Mozesz to naprawic konfiguracja specyficzna dla projektu. Problem: prawie nikt t
 
 Kazda baza kodu ma konwencje. Wzorce nazewnictwa. Podejscia do obslugi bledow. Organizacje testow. Kolejnosc importow. Te konwencje istnieja w glowach deweloperow, w plikach README ktorych nikt nie czyta, albo w przewodnikach stylu ktore rozjezdzaja sie z kodem.
 
-Kiedy agent kodujacy AI dolacza do Twojego projektu, zaczyna od zera. Moze stosowac ogolne dobre praktyki Pythona, ale nie zna *Twoich* dobrych praktyk.
+Kiedy agent kodujacy AI dolacza do Twojego projektu, zaczyna od zera. Moze stosowac ogolne dobre praktyki Pythona, ale nie zna _Twoich_ dobrych praktyk.
 
 Efekt: polowe czasu spedzasz na poprawianiu tego co agent wygeneruje, zamiast budowac funkcjonalnosci.
 
 Wiekszosc zespolow rozwiazuje to przez:
+
 1. Wklejanie konwencji w kazdy prompt (marnuje okno kontekstu)
 2. Tworzenie pliku `AGENTS.md` (lepiej, ale ograniczone)
 3. Uzywanie `.cursorrules` (specyficzne dla Cursor)
@@ -82,7 +83,7 @@ Katalog `.claude/rules/` zawiera 8 plikow markdown ktore ucza agenta konwencji T
 
 **architecture.md** — Struktura projektu. Gdzie zyja modele (`app/models/`), gdzie ida trasy API (`app/api/`), jak warstwa agenta laczy sie z handlerem WebSocket. Agent zna uklad zanim przeczyta jakikolwiek plik.
 
-**code-style.md** — Formatowanie i nazewnictwo. Limity dlugosci linii, kolejnosc importow (stdlib → third-party → local), `snake_case` dla funkcji, `PascalCase` dla klas. Rzeczy ktore ruff wymusza, ale wyjasnionie z *dlaczego* zeby agent pisal poprawny kod od razu.
+**code-style.md** — Formatowanie i nazewnictwo. Limity dlugosci linii, kolejnosc importow (stdlib → third-party → local), `snake_case` dla funkcji, `PascalCase` dla klas. Rzeczy ktore ruff wymusza, ale wyjasnionie z _dlaczego_ zeby agent pisal poprawny kod od razu.
 
 **schemas.md** — Konwencje modeli Pydantic. Klasy bazowe do dziedziczenia, nazewnictwo pol, wzorce walidatorow, rozroznienie miedzy schematami zapytan, schematami odpowiedzi i modelami bazy danych. Tutaj wiekszosc generycznych agentow sie myli.
 
@@ -112,7 +113,7 @@ Katalog `.claude/commands/` zapewnia workflow'y specyficzne dla projektu:
 
 **Jeden plik vs. modularne reguly.** Jeden masywny plik markdown staje sie nieczytelny. Osiem skoncentrowanych plikow oznacza, ze agent laduje tylko odpowiedni kontekst.
 
-**Brak modelu uprawnien.** `AGENTS.md` moze opisac co agent powinien robic, ale nie moze ograniczyc czego *nie moze*. `settings.json` zapewnia realne zabezpieczenia.
+**Brak modelu uprawnien.** `AGENTS.md` moze opisac co agent powinien robic, ale nie moze ograniczyc czego _nie moze_. `settings.json` zapewnia realne zabezpieczenia.
 
 **Brak workflow'ow.** Mozesz opisac procesy w markdownie, ale komendy slash czynia je wykonywalnymi. `/project:add-endpoint` jest szybsze niz "prosze postepuj wedlug procesu tworzenia endpointow opisanego w AGENTS.md sekcja 4.2."
 

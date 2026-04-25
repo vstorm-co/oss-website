@@ -33,13 +33,13 @@ Un agente de IA puede leer tu router de [FastAPI](https://fastapi.tiangolo.com/)
 
 Esto es lo que cada herramienta de codificación con IA lee hoy:
 
-| Herramienta | Archivo de configuración | Alcance |
-|-------------|------------------------|---------|
+| Herramienta        | Archivo de configuración          | Alcance                                         |
+| ------------------ | --------------------------------- | ----------------------------------------------- |
 | **GitHub Copilot** | `.github/copilot-instructions.md` | Instrucciones a nivel de repo para Copilot Chat |
-| **Cursor** | `.cursor/rules/*.mdc` | Reglas de proyecto con coincidencia glob |
-| **Claude Code** | `CLAUDE.md` | Contexto del proyecto, comandos, arquitectura |
-| **OpenAI Codex** | `AGENTS.md` | Guía de proyecto legible por agentes |
-| **Zed** | (lee AGENTS.md) | Igual que Codex |
+| **Cursor**         | `.cursor/rules/*.mdc`             | Reglas de proyecto con coincidencia glob        |
+| **Claude Code**    | `CLAUDE.md`                       | Contexto del proyecto, comandos, arquitectura   |
+| **OpenAI Codex**   | `AGENTS.md`                       | Guía de proyecto legible por agentes            |
+| **Zed**            | (lee AGENTS.md)                   | Igual que Codex                                 |
 
 Cada herramienta inventó su propio formato. Si tu equipo usa Copilot Y Cursor Y Claude Code (lo cual es cada vez más común), necesitarías tres archivos separados describiendo las mismas convenciones del proyecto.
 
@@ -177,21 +177,26 @@ No necesitas un template. Aquí está la versión mínima para cualquier proyect
 # AGENTS.md
 
 ## Project Overview
+
 [Nombre del proyecto] — [descripción de una línea].
 Stack: [lenguajes, frameworks, bases de datos]
 
 ## Commands
+
 # Comandos de instalación / pruebas / lint aquí
 
 ## Structure
+
 [árbol simplificado de directorios clave]
 
 ## Conventions
+
 - [patrón 1]
 - [patrón 2]
 - [patrón 3]
 
 ## Do Not Modify
+
 - [archivos generados]
 - [archivos lock]
 - [secretos]

@@ -84,14 +84,14 @@ pydantic-deep run "run all tests and fix failures" \
 
 Kluczowe flagi CI/CD:
 
-| Flaga | Cel |
-|-------|-----|
-| `--json` | Wyjście do odczytu maszynowego dla pipeline'ów |
-| `--max-turns` | Limit iteracji agenta (zapobiega niekontrolowanym kosztom) |
-| `--timeout` | Limit czasu wall-clock w sekundach |
-| `--model` | Nadpisanie modelu dla konkretnego uruchomienia |
-| `--working-dir` | Jawny katalog roboczy |
-| `--no-subagents` | Wyłączenie subagentów dla deterministycznych uruchomień |
+| Flaga            | Cel                                                        |
+| ---------------- | ---------------------------------------------------------- |
+| `--json`         | Wyjście do odczytu maszynowego dla pipeline'ów             |
+| `--max-turns`    | Limit iteracji agenta (zapobiega niekontrolowanym kosztom) |
+| `--timeout`      | Limit czasu wall-clock w sekundach                         |
+| `--model`        | Nadpisanie modelu dla konkretnego uruchomienia             |
+| `--working-dir`  | Jawny katalog roboczy                                      |
+| `--no-subagents` | Wyłączenie subagentów dla deterministycznych uruchomień    |
 
 pydantic-deep usuwa domyślny limit 50 requestów pydantic-ai, żeby długie zadania CI nie zawodziły cicho. Kontrolujesz limity jawnie przez `--max-turns` i `--timeout`.
 

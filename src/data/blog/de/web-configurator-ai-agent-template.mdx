@@ -39,11 +39,11 @@ Jeder Schritt validiert in Echtzeit. Wähle PostgreSQL in Schritt 2 → ORM-Opti
 
 Die meisten Benutzer wollen nicht 75 Optionen konfigurieren. Sie wollen einen Ausgangspunkt:
 
-| Preset | Was du bekommst | Anwendungsfall |
-|--------|----------------|----------------|
-| **Minimal** | Keine Datenbank, keine Auth, kein Docker, kein CI | Schnelle Prototypen, FastAPI lernen |
-| **Production** | PostgreSQL, JWT, Redis, Caching, Rate Limiting, Sentry, Prometheus, Docker, K8s, GitHub Actions | Deploy-fertiges Backend |
-| **AI Agent** | PostgreSQL, JWT, Redis, Pydantic AI, WebSockets, Konversationspersistenz, Docker, GitHub Actions | KI-Chatbot-/Agenten-Apps |
+| Preset         | Was du bekommst                                                                                  | Anwendungsfall                      |
+| -------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------- |
+| **Minimal**    | Keine Datenbank, keine Auth, kein Docker, kein CI                                                | Schnelle Prototypen, FastAPI lernen |
+| **Production** | PostgreSQL, JWT, Redis, Caching, Rate Limiting, Sentry, Prometheus, Docker, K8s, GitHub Actions  | Deploy-fertiges Backend             |
+| **AI Agent**   | PostgreSQL, JWT, Redis, Pydantic AI, WebSockets, Konversationspersistenz, Docker, GitHub Actions | KI-Chatbot-/Agenten-Apps            |
 
 Klicke auf ein Preset → alle 75+ Felder werden vorausgefüllt → springe zur Überprüfung → ZIP herunterladen. Unter 10 Sekunden von der Landingpage zum heruntergeladenen Projekt.
 
@@ -105,7 +105,7 @@ Bestimmte Optionen haben Abhängigkeiten. Anstatt Validierungsfehler anzuzeigen,
 const needsRedis =
   cur.enable_caching ||
   (cur.enable_rate_limiting && cur.rate_limit_storage === "redis") ||
-  (cur.background_tasks !== "none") ||
+  cur.background_tasks !== "none" ||
   (cur.enable_logfire && cur.logfire_features.redis);
 
 if (needsRedis && !cur.enable_redis) {

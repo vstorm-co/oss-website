@@ -186,15 +186,15 @@ class CrewAIAssistant:
 
 ## Comparison Table
 
-| Metric | Pydantic AI | LangChain | LangGraph | CrewAI |
-|--------|------------|-----------|-----------|--------|
-| **Lines of code** | ~160 | ~170 | ~280 | ~420 |
-| **Type safety** | Full generics | TypedDict | TypedDict | Pydantic models |
-| **Async support** | Native | Native | Native | Sync (executor) |
-| **Streaming** | `agent.iter()` | `astream()` | `astream()` | Event bus + thread |
-| **Tool syntax** | `@agent.tool` | `@tool` | `bind_tools()` | Config-based |
-| **Architecture** | Single agent | Agent (abstracted) | Explicit graph | Multi-agent crew |
-| **Best for** | Type-safe agents | Quick prototypes | Complex workflows | Multi-agent teams |
+| Metric            | Pydantic AI      | LangChain          | LangGraph         | CrewAI             |
+| ----------------- | ---------------- | ------------------ | ----------------- | ------------------ |
+| **Lines of code** | ~160             | ~170               | ~280              | ~420               |
+| **Type safety**   | Full generics    | TypedDict          | TypedDict         | Pydantic models    |
+| **Async support** | Native           | Native             | Native            | Sync (executor)    |
+| **Streaming**     | `agent.iter()`   | `astream()`        | `astream()`       | Event bus + thread |
+| **Tool syntax**   | `@agent.tool`    | `@tool`            | `bind_tools()`    | Config-based       |
+| **Architecture**  | Single agent     | Agent (abstracted) | Explicit graph    | Multi-agent crew   |
+| **Best for**      | Type-safe agents | Quick prototypes   | Complex workflows | Multi-agent teams  |
 
 ## When to Use Which
 

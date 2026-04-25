@@ -41,17 +41,17 @@ agent = create_deep_agent(
 )
 ```
 
-| Herramienta | Qué hace |
-|-------------|---------|
-| `navigate(url)` | Navega a URL, devuelve contenido + screenshot opcional |
-| `click(selector)` | Hace clic en elemento por selector CSS |
-| `type_text(selector, text)` | Escribe en campo de entrada |
-| `get_text(selector)` | Extrae texto de elemento |
-| `screenshot()` | Captura estado actual de la página |
-| `scroll(direction, amount)` | Desplaza página arriba/abajo |
-| `go_back()` | Retroceder en navegador |
-| `go_forward()` | Avanzar en navegador |
-| `execute_js(script)` | Ejecuta JavaScript arbitrario |
+| Herramienta                 | Qué hace                                               |
+| --------------------------- | ------------------------------------------------------ |
+| `navigate(url)`             | Navega a URL, devuelve contenido + screenshot opcional |
+| `click(selector)`           | Hace clic en elemento por selector CSS                 |
+| `type_text(selector, text)` | Escribe en campo de entrada                            |
+| `get_text(selector)`        | Extrae texto de elemento                               |
+| `screenshot()`              | Captura estado actual de la página                     |
+| `scroll(direction, amount)` | Desplaza página arriba/abajo                           |
+| `go_back()`                 | Retroceder en navegador                                |
+| `go_forward()`              | Avanzar en navegador                                   |
+| `execute_js(script)`        | Ejecuta JavaScript arbitrario                          |
 
 Cada herramienta devuelve un `BrowseResult`: `url`, `title`, `content`, `screenshot`, `error`.
 
@@ -103,6 +103,7 @@ Ambos tipos escriben en MEMORY.md, cargado al inicio de cada sesión posterior.
 ### El Hallazgo Meta-Harness: Trazas Sin Procesar >> Resúmenes
 
 Comparamos dos entradas para el paso de síntesis:
+
 1. Resúmenes legibles por humanos de lo que sucedió
 2. Trazas de herramientas sin procesar, la secuencia real de llamadas a herramientas y respuestas
 

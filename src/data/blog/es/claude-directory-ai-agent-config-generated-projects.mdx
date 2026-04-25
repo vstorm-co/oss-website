@@ -25,7 +25,7 @@ Puedes solucionar esto con configuracion especifica del proyecto. El problema: c
 
 ---
 
-*Soy Kacper, AI Engineer en [Vstorm](https://vstorm.co) — una consultoria de Applied Agentic AI Engineering. Hemos entregado mas de 30 implementaciones de agentes AI en produccion y compartimos nuestras herramientas como open source en [github.com/vstorm-co](https://github.com/vstorm-co). Conecta conmigo en [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+_Soy Kacper, AI Engineer en [Vstorm](https://vstorm.co) — una consultoria de Applied Agentic AI Engineering. Hemos entregado mas de 30 implementaciones de agentes AI en produccion y compartimos nuestras herramientas como open source en [github.com/vstorm-co](https://github.com/vstorm-co). Conecta conmigo en [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/)._
 
 ---
 
@@ -33,11 +33,12 @@ Puedes solucionar esto con configuracion especifica del proyecto. El problema: c
 
 Cada base de codigo tiene convenciones. Patrones de nombres. Enfoques de manejo de errores. Organizacion de tests. Orden de imports. Estas convenciones existen en las cabezas de los desarrolladores, en archivos README que nadie lee, o en guias de estilo que se dessincronizan.
 
-Cuando un agente de programacion AI se une a tu proyecto, empieza desde cero. Puede seguir buenas practicas generales de Python, pero no conoce *tus* buenas practicas.
+Cuando un agente de programacion AI se une a tu proyecto, empieza desde cero. Puede seguir buenas practicas generales de Python, pero no conoce _tus_ buenas practicas.
 
 El resultado: pasas la mitad de tu tiempo corrigiendo la salida del agente en lugar de construir funcionalidades.
 
 La mayoria de equipos resuelven esto:
+
 1. Pegando convenciones en cada prompt (desperdicia ventana de contexto)
 2. Creando un archivo `AGENTS.md` (mejor, pero limitado)
 3. Usando `.cursorrules` (especifico de Cursor)
@@ -82,7 +83,7 @@ El directorio `.claude/rules/` contiene 8 archivos markdown que ensenan al agent
 
 **architecture.md** — Estructura del proyecto. Donde viven los modelos (`app/models/`), donde van las rutas API (`app/api/`), como la capa del agente se conecta con el handler WebSocket.
 
-**code-style.md** — Formato y nombres. Limites de longitud de linea, orden de imports (stdlib → terceros → local), `snake_case` para funciones, `PascalCase` para clases. Cosas que ruff impone, pero explicadas con *por que* para que el agente escriba codigo correcto al primer intento.
+**code-style.md** — Formato y nombres. Limites de longitud de linea, orden de imports (stdlib → terceros → local), `snake_case` para funciones, `PascalCase` para clases. Cosas que ruff impone, pero explicadas con _por que_ para que el agente escriba codigo correcto al primer intento.
 
 **schemas.md** — Convenciones de modelos Pydantic. Clases base para heredar, nombres de campos, patrones de validadores, la distincion entre schemas de request, schemas de response y modelos de base de datos.
 
@@ -112,7 +113,7 @@ El directorio `.claude/commands/` proporciona workflows especificos del proyecto
 
 **Un archivo vs. reglas modulares.** Un archivo markdown masivo se vuelve inmanejable. Ocho archivos enfocados significan que el agente carga solo el contexto relevante.
 
-**Sin modelo de permisos.** `AGENTS.md` puede describir lo que el agente debe hacer, pero no puede restringir lo que *puede* hacer. `settings.json` proporciona barandillas reales.
+**Sin modelo de permisos.** `AGENTS.md` puede describir lo que el agente debe hacer, pero no puede restringir lo que _puede_ hacer. `settings.json` proporciona barandillas reales.
 
 **Sin workflows.** Puedes describir procesos en markdown, pero los comandos slash los hacen ejecutables. `/project:add-endpoint` es mas rapido que "por favor sigue el proceso de creacion de endpoints descrito en AGENTS.md seccion 4.2."
 

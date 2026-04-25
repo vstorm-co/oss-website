@@ -33,13 +33,13 @@ Das Ergebnis? Sie verbringen die Hälfte Ihrer Zeit damit, KI-generierten Code z
 
 Was jedes große KI-Coding-Tool heute liest:
 
-| Tool | Konfigurationsdatei | Umfang |
-|------|-------------------|-------|
-| **GitHub Copilot** | `.github/copilot-instructions.md` | Repo-Level-Anweisungen für Copilot Chat |
-| **Cursor** | `.cursor/rules/*.mdc` | Projektregeln mit Glob-basiertem Dateiabgleich |
-| **Claude Code** | `CLAUDE.md` | Projektkontext, Befehle, Architektur |
-| **OpenAI Codex** | `AGENTS.md` | Agenten-lesbare Projektanleitung |
-| **Zed** | (liest AGENTS.md) | Wie Codex |
+| Tool               | Konfigurationsdatei               | Umfang                                         |
+| ------------------ | --------------------------------- | ---------------------------------------------- |
+| **GitHub Copilot** | `.github/copilot-instructions.md` | Repo-Level-Anweisungen für Copilot Chat        |
+| **Cursor**         | `.cursor/rules/*.mdc`             | Projektregeln mit Glob-basiertem Dateiabgleich |
+| **Claude Code**    | `CLAUDE.md`                       | Projektkontext, Befehle, Architektur           |
+| **OpenAI Codex**   | `AGENTS.md`                       | Agenten-lesbare Projektanleitung               |
+| **Zed**            | (liest AGENTS.md)                 | Wie Codex                                      |
 
 Jedes Tool hat sein eigenes Format erfunden. Wenn Ihr Team Copilot UND Cursor UND Claude Code verwendet (was immer häufiger vorkommt), bräuchten Sie drei separate Dateien, die dieselben Projektkonventionen beschreiben.
 
@@ -177,21 +177,26 @@ Sie brauchen kein Template. Hier ist die Minimalversion für jedes Python-Projek
 # AGENTS.md
 
 ## Project Overview
+
 [Projektname] — [Einzeiler-Beschreibung].
 Stack: [Sprachen, Frameworks, Datenbanken]
 
 ## Commands
+
 # Installations- / Test- / Lint-Befehle hier
 
 ## Structure
+
 [vereinfachter Baum der wichtigsten Verzeichnisse]
 
 ## Conventions
+
 - [Muster 1]
 - [Muster 2]
 - [Muster 3]
 
 ## Do Not Modify
+
 - [generierte Dateien]
 - [Lock-Dateien]
 - [Geheimnisse]

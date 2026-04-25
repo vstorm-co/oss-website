@@ -28,6 +28,7 @@ Oto jak to dziala i pelny dzialajacy kod, ktory mozesz uruchomic juz dzis.
 Glowna idea jest prosta: zamiast jednego monolitycznego promptu "przejrzyj ten kod", dzielimy przeglad na trzy domeny, kazda obslugiwana przez wyspecjalizowanego subagenta.
 
 **Security Reviewer** — sprawdza:
+
 - Podatnosci na SQL injection
 - Cross-site scripting (XSS)
 - Zakodowane na sztywno sekrety i klucze API
@@ -36,6 +37,7 @@ Glowna idea jest prosta: zamiast jednego monolitycznego promptu "przejrzyj ten k
 - Niebezpieczne operacje na plikach
 
 **Style Reviewer** — sprawdza:
+
 - Naruszenia konwencji nazewnictwa
 - Duplikacja kodu
 - Nadmierna zlozonosc cyklomatyczna
@@ -44,6 +46,7 @@ Glowna idea jest prosta: zamiast jednego monolitycznego promptu "przejrzyj ten k
 - Martwy kod i nieuzywane importy
 
 **Performance Reviewer** — sprawdza:
+
 - Wzorce zapytan N+1
 - Niepotrzebne alokacje pamieci
 - Blokujace I/O w kontekstach async
@@ -163,7 +166,7 @@ To jedna z zalet budowania na [Pydantic AI](https://ai.pydantic.dev/) — wyjsci
 Kazdy `SubAgentConfig` definiuje specjaliste:
 
 - **`name`** — unikalny identyfikator, ktorego agent nadrzedny uzywa do delegowania
-- **`description`** — mowi agentowi nadrzednemu *kiedy* uzywac tego subagenta (logika routingu)
+- **`description`** — mowi agentowi nadrzednemu _kiedy_ uzywac tego subagenta (logika routingu)
 - **`instructions`** — system prompt dla subagenta, skupiony na jego domenie
 
 Instrukcje sa konkretne. Nie mowimy "przejrzyj ten kod". Mowimy "sprawdz SQL injection, XSS, zakodowane sekrety..." Ta konkretnosc sprawia, ze przeglady sa faktycznie uzyteczne. Kazdy subagent jest ekspertem w swojej domenie, nie generalist probujacy ogarnac wszystko.
@@ -293,6 +296,7 @@ Trzy powody:
 Ten PR reviewer to jeden przyklad wzorca deep agent — tej samej architektury zasilajcej Claude Code, OpenAI Codex i Cursor za kulisami.
 
 Wzorzec:
+
 1. **Planuj** — rozbij zlezone zadanie na podzadania
 2. **Deleguj** — wyslij podzadania do specjalistow (subagentow)
 3. **Wykonaj** — kazdy specjalista pracuje niezaleznie ze swoimi narzediami
@@ -315,4 +319,4 @@ Ludzie w twoim zespole powinni przegladac architekture, logike i design. Niech s
 
 ---
 
-*Jestem Kacper, AI Engineer w [Vstorm](https://vstorm.co) — Applied Agentic AI Engineering Consultancy. Budujemy i udostepniamy na open-source produkcyjne narzedzia do agentow AI w Pythonie. Daj gwiazdke [pydantic-deepagents](https://github.com/vstorm.co/projects/pydantic-deepagents) na GitHub, jesli uznasz to za przydatne.*
+_Jestem Kacper, AI Engineer w [Vstorm](https://vstorm.co) — Applied Agentic AI Engineering Consultancy. Budujemy i udostepniamy na open-source produkcyjne narzedzia do agentow AI w Pythonie. Daj gwiazdke [pydantic-deepagents](https://github.com/vstorm.co/projects/pydantic-deepagents) na GitHub, jesli uznasz to za przydatne._

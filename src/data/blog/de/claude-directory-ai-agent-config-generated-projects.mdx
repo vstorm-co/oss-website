@@ -25,7 +25,7 @@ Sie konnen das mit projektspezifischer Konfiguration beheben. Das Problem: fast 
 
 ---
 
-*Ich bin Kacper, AI Engineer bei [Vstorm](https://vstorm.co) — einer Applied Agentic AI Engineering Beratung. Wir haben uber 30 produktive AI-Agent-Implementierungen ausgeliefert und stellen unsere Tools als Open Source auf [github.com/vstorm-co](https://github.com/vstorm-co) zur Verfugung. Vernetzen Sie sich mit mir auf [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+_Ich bin Kacper, AI Engineer bei [Vstorm](https://vstorm.co) — einer Applied Agentic AI Engineering Beratung. Wir haben uber 30 produktive AI-Agent-Implementierungen ausgeliefert und stellen unsere Tools als Open Source auf [github.com/vstorm-co](https://github.com/vstorm-co) zur Verfugung. Vernetzen Sie sich mit mir auf [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/)._
 
 ---
 
@@ -33,11 +33,12 @@ Sie konnen das mit projektspezifischer Konfiguration beheben. Das Problem: fast 
 
 Jede Codebasis hat Konventionen. Namensmuster. Fehlerbehandlungsansatze. Testorganisation. Import-Reihenfolge. Diese Konventionen existieren in den Kopfen der Entwickler, in README-Dateien die niemand liest, oder in Style-Guides die aus dem Takt geraten.
 
-Wenn ein AI-Coding-Agent Ihrem Projekt beitritt, startet er bei null. Er folgt vielleicht allgemeinen Python-Best-Practices, aber er kennt nicht *Ihre* Best Practices.
+Wenn ein AI-Coding-Agent Ihrem Projekt beitritt, startet er bei null. Er folgt vielleicht allgemeinen Python-Best-Practices, aber er kennt nicht _Ihre_ Best Practices.
 
 Das Ergebnis: Sie verbringen die Halfte Ihrer Zeit damit, die Ausgabe des Agenten zu korrigieren, anstatt Features zu bauen.
 
 Die meisten Teams losen das durch:
+
 1. Konventionen in jeden Prompt einfugen (verschwendet Kontextfenster)
 2. Eine `AGENTS.md`-Datei erstellen (besser, aber begrenzt)
 3. `.cursorrules` verwenden (Cursor-spezifisch)
@@ -82,7 +83,7 @@ Das `.claude/rules/`-Verzeichnis enthalt 8 Markdown-Dateien, die dem Agenten Ihr
 
 **architecture.md** — Projektstruktur. Wo Modelle leben (`app/models/`), wo API-Routen hingehen (`app/api/`), wie die Agent-Schicht sich mit dem WebSocket-Handler verbindet.
 
-**code-style.md** — Formatierung und Benennung. Zeilenlangenlimits, Import-Reihenfolge (stdlib → Drittanbieter → lokal), `snake_case` fur Funktionen, `PascalCase` fur Klassen. Dinge die ruff erzwingt, aber erklart mit *warum*, damit der Agent korrekten Code beim ersten Versuch schreibt.
+**code-style.md** — Formatierung und Benennung. Zeilenlangenlimits, Import-Reihenfolge (stdlib → Drittanbieter → lokal), `snake_case` fur Funktionen, `PascalCase` fur Klassen. Dinge die ruff erzwingt, aber erklart mit _warum_, damit der Agent korrekten Code beim ersten Versuch schreibt.
 
 **schemas.md** — Pydantic-Modell-Konventionen. Basisklassen zum Erben, Feldbenennung, Validator-Muster, die Unterscheidung zwischen Request-Schemas, Response-Schemas und Datenbankmodellen.
 
@@ -112,7 +113,7 @@ Das `.claude/commands/`-Verzeichnis bietet projektspezifische Workflows:
 
 **Eine Datei vs. modulare Regeln.** Eine massive Markdown-Datei wird unhandlich. Acht fokussierte Dateien bedeuten, dass der Agent nur relevanten Kontext ladt.
 
-**Kein Berechtigungsmodell.** `AGENTS.md` kann beschreiben was der Agent tun soll, aber nicht einschranken was er *kann*. `settings.json` bietet echte Leitplanken.
+**Kein Berechtigungsmodell.** `AGENTS.md` kann beschreiben was der Agent tun soll, aber nicht einschranken was er _kann_. `settings.json` bietet echte Leitplanken.
 
 **Keine Workflows.** Sie konnen Prozesse in Markdown beschreiben, aber Slash-Befehle machen sie ausfuhrbar. `/project:add-endpoint` ist schneller als "bitte folgen Sie dem Endpoint-Erstellungsprozess beschrieben in AGENTS.md Abschnitt 4.2."
 

@@ -25,7 +25,7 @@ You can fix this with project-specific configuration. The problem: almost nobody
 
 ---
 
-*I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering Consultancy. We've shipped 30+ production AI agent implementations and open-source our tooling at [github.com/vstorm-co](https://github.com/vstorm-co). Connect with me on [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+_I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering Consultancy. We've shipped 30+ production AI agent implementations and open-source our tooling at [github.com/vstorm-co](https://github.com/vstorm-co). Connect with me on [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/)._
 
 ---
 
@@ -33,11 +33,12 @@ You can fix this with project-specific configuration. The problem: almost nobody
 
 Every codebase has conventions. Naming patterns. Error handling approaches. Test organization. Import ordering. These conventions exist in developers' heads, in README files nobody reads, or in style guides that drift out of sync.
 
-When an AI coding agent joins your project, it starts from zero. It might follow general Python best practices, but it doesn't know *your* best practices.
+When an AI coding agent joins your project, it starts from zero. It might follow general Python best practices, but it doesn't know _your_ best practices.
 
 The result: you spend half your time correcting the agent's output instead of building features.
 
 Most teams solve this by:
+
 1. Pasting conventions into every prompt (wastes context window)
 2. Creating an `AGENTS.md` file (better, but limited)
 3. Using `.cursorrules` (Cursor-specific)
@@ -82,7 +83,7 @@ The `.claude/rules/` directory contains 8 markdown files that teach the agent yo
 
 **architecture.md** — Project structure. Where models live (`app/models/`), where API routes go (`app/api/`), how the agent layer connects to the WebSocket handler. The agent knows the layout before it reads a single file.
 
-**code-style.md** — Formatting and naming. Line length limits, import ordering (stdlib → third-party → local), `snake_case` for functions, `PascalCase` for classes. Things ruff enforces, but explained with *why* so the agent writes correct code on the first try.
+**code-style.md** — Formatting and naming. Line length limits, import ordering (stdlib → third-party → local), `snake_case` for functions, `PascalCase` for classes. Things ruff enforces, but explained with _why_ so the agent writes correct code on the first try.
 
 **schemas.md** — Pydantic model conventions. Base classes to inherit from, field naming, validator patterns, the distinction between request schemas, response schemas, and database models. This is where most generic agents get it wrong.
 
@@ -112,7 +113,7 @@ The `.claude/commands/` directory provides project-specific workflows:
 
 **Single file vs. modular rules.** One massive markdown file gets unwieldy. Eight focused files mean the agent loads only relevant context. Asking about schemas? It reads `schemas.md`, not 2000 lines of everything.
 
-**No permissions model.** `AGENTS.md` can describe what the agent should do, but it can't restrict what it *can* do. `settings.json` provides actual guardrails.
+**No permissions model.** `AGENTS.md` can describe what the agent should do, but it can't restrict what it _can_ do. `settings.json` provides actual guardrails.
 
 **No workflows.** You can describe processes in markdown, but slash commands make them executable. `/project:add-endpoint` is faster than "please follow the endpoint creation process described in AGENTS.md section 4.2."
 

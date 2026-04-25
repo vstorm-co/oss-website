@@ -43,17 +43,17 @@ agent = create_deep_agent(
 )
 ```
 
-| Narzędzie | Co robi |
-|-----------|---------|
-| `navigate(url)` | Nawigacja do URL, zwraca zawartość + opcjonalny screenshot |
-| `click(selector)` | Kliknięcie elementu przez selektor CSS |
-| `type_text(selector, text)` | Wpisanie tekstu w pole |
-| `get_text(selector)` | Wyciągnięcie tekstu z elementu |
-| `screenshot()` | Zapis stanu strony |
-| `scroll(direction, amount)` | Scroll w górę/dół |
-| `go_back()` | Cofnij w przeglądarce |
-| `go_forward()` | Do przodu w przeglądarce |
-| `execute_js(script)` | Wykonanie JavaScript |
+| Narzędzie                   | Co robi                                                    |
+| --------------------------- | ---------------------------------------------------------- |
+| `navigate(url)`             | Nawigacja do URL, zwraca zawartość + opcjonalny screenshot |
+| `click(selector)`           | Kliknięcie elementu przez selektor CSS                     |
+| `type_text(selector, text)` | Wpisanie tekstu w pole                                     |
+| `get_text(selector)`        | Wyciągnięcie tekstu z elementu                             |
+| `screenshot()`              | Zapis stanu strony                                         |
+| `scroll(direction, amount)` | Scroll w górę/dół                                          |
+| `go_back()`                 | Cofnij w przeglądarce                                      |
+| `go_forward()`              | Do przodu w przeglądarce                                   |
+| `execute_js(script)`        | Wykonanie JavaScript                                       |
 
 Każde narzędzie zwraca `BrowseResult`: `url`, `title`, `content`, `screenshot`, `error`.
 
@@ -101,12 +101,14 @@ pydantic-deep run "research competitors on GitHub" \
 Po sesji agenta uruchom `/improve` w TUI. Analizuje pełną sesję i wyciąga dwie kategorie wniosków:
 
 **`UserFactInsight`**, co agent nauczył się o Tobie i Twoich preferencjach:
+
 - Preferencje stylu kodu
 - Preferowane formaty wyjścia
 - Terminologia dziedzinowa, której używasz
 - Wzorce w typach zadań, które dajesz
 
 **`AgentLearningInsight`**, wzorce i strategie, które agent odkrył:
+
 - Podejścia, które działały dla Twojej bazy kodu
 - Efektywne sekwencje wywołań narzędzi
 - Napotkane tryby awaryjne i jak były naprawiane
@@ -117,6 +119,7 @@ Oba typy zapisują do MEMORY.md, ładowanego na początku każdej kolejnej sesji
 ### Odkrycie Meta-Harness: surowe ślady >> podsumowania
 
 Porównaliśmy dwa wejścia dla kroku syntezy:
+
 1. Czytelne dla człowieka podsumowania tego, co się wydarzyło
 2. Surowe ślady narzędzi, faktyczna sekwencja wywołań narzędzi i odpowiedzi
 

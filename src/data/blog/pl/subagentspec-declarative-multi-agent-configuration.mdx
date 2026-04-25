@@ -25,7 +25,7 @@ Trafilismy na to wystarczajaco czesto w ponad 30 wdrozeniach produkcyjnych, ze z
 
 ---
 
-*Jestem Kacper, AI Engineer w [Vstorm](https://vstorm.co) — konsultingu Applied Agentic AI Engineering. Wdrozylismy 30+ produkcyjnych implementacji agentow AI i udostepniamy nasze narzedzia open-source na [github.com/vstorm-co](https://github.com/vstorm-co). Polacz sie ze mna na [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+_Jestem Kacper, AI Engineer w [Vstorm](https://vstorm.co) — konsultingu Applied Agentic AI Engineering. Wdrozylismy 30+ produkcyjnych implementacji agentow AI i udostepniamy nasze narzedzia open-source na [github.com/vstorm-co](https://github.com/vstorm-co). Polacz sie ze mna na [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/)._
 
 ---
 
@@ -72,14 +72,14 @@ agents:
     tools:
       - search_web
       - read_document
-    
+
   - name: summarizer
     model: anthropic:claude-sonnet-4-20250514
     system_prompt: |
       You summarize research findings into concise,
       actionable summaries.
     result_type: Summary
-    
+
   - name: validator
     model: openai:gpt-4.1-mini
     system_prompt: |
@@ -150,7 +150,7 @@ toolset = create_agent_factory_toolset(
 
 Lancuch priorytetow: `agent` (gotowy) > `agent_factory` (fabryka per-spec) > `default_agent_factory` (globalna domyslna) > prosty `Agent()`.
 
-YAML definiuje *co* kazdy agent powinien byc. Fabryka definiuje *jak* go zbudowac.
+YAML definiuje _co_ kazdy agent powinien byc. Fabryka definiuje _jak_ go zbudowac.
 
 ## Sledzenie tokenow miedzy subagentami
 
@@ -172,7 +172,7 @@ total = get_total_usage(all_task_handles)
 
 Kazdy `TaskHandle` przechowuje obiekt `RunUsage` z uruchomienia subagenta. `check_task` wyswietla liczniki tokenow input/output dla pojedynczego zadania. `get_total_usage()` agreguje miedzy wszystkimi uchwytami zadan.
 
-Sledzenie na poziomie zadan mowi ci, ktore *logiczne zadanie* zuzylo jakie zasoby, nie tylko ktore wywolanie modelu.
+Sledzenie na poziomie zadan mowi ci, ktore _logiczne zadanie_ zuzylo jakie zasoby, nie tylko ktore wywolanie modelu.
 
 ## Serializacja strukturalnych wynikow
 
@@ -253,7 +253,8 @@ pip install pydantic-ai-subagents
 
 ---
 
-*Wiecej z naszych narzedzi open-source:*
-- *[pydantic-ai-shields: 10 Guardrails, Zero Dependencies](/blog/pydantic-ai-shields-10-guardrails-zero-dependencies)*
-- *[5 Frameworks, 1 Template: Architecture Deep Dive](/blog/5-ai-frameworks-1-template-architecture)*
-- *[Full-Stack AI Agent Template](https://github.com/vstorm-co/full-stack-ai-agent-template)*
+_Wiecej z naszych narzedzi open-source:_
+
+- _[pydantic-ai-shields: 10 Guardrails, Zero Dependencies](/blog/pydantic-ai-shields-10-guardrails-zero-dependencies)_
+- _[5 Frameworks, 1 Template: Architecture Deep Dive](/blog/5-ai-frameworks-1-template-architecture)_
+- _[Full-Stack AI Agent Template](https://github.com/vstorm-co/full-stack-ai-agent-template)_
