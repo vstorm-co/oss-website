@@ -1,0 +1,19 @@
+---
+export interface Props {
+  value: string;
+  label: string;
+  trend?: "up" | "down" | "neutral";
+}
+const { value, label, trend = "neutral" } = Astro.props;
+const trendColor = trend === "up" ? "text-emerald-400" : trend === "down" ? "text-rose-400" : "text-accent";
+---
+{/* @mdx-label Stat */}
+{/* @mdx-description Big-number callout (optional trend: up | down | neutral) */}
+{/* @mdx-snippet
+<Stat value="10×" label="Faster than manual setup" trend="up" />
+*/}
+
+<div class="not-prose my-6 inline-flex flex-col items-start rounded-xl border border-border bg-surface/50 px-5 py-4">
+  <div class={`text-4xl font-bold tracking-tight ${trendColor}`}>{value}</div>
+  <div class="mt-1 text-sm text-text-secondary">{label}</div>
+</div>

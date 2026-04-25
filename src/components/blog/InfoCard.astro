@@ -1,0 +1,31 @@
+---
+export interface Props {
+  title: string;
+  icon?: string;
+  href?: string;
+}
+const { title, icon, href } = Astro.props;
+const Tag = href ? "a" : "div";
+---
+{/* @mdx-label InfoCard */}
+{/* @mdx-description Titled card — optional icon and link */}
+{/* @mdx-snippet
+<InfoCard title="Your title" icon="📘" href="/optional-link">
+  Body content with **markdown** and links.
+</InfoCard>
+*/}
+
+<Tag
+  href={href}
+  class={`not-prose my-6 block rounded-xl border border-border bg-surface/50 p-5 transition ${href ? "hover:border-accent/50 hover:bg-surface" : ""}`}
+>
+  <div class="flex items-start gap-3">
+    {icon && <span class="text-2xl leading-none">{icon}</span>}
+    <div class="flex-1 min-w-0">
+      <div class="font-semibold text-text mb-1">{title}</div>
+      <div class="text-sm text-text-secondary leading-relaxed [&>p]:mb-2 [&>p:last-child]:mb-0 [&_a]:text-accent [&_a:hover]:underline">
+        <slot />
+      </div>
+    </div>
+  </div>
+</Tag>

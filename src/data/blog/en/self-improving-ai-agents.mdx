@@ -1,0 +1,201 @@
+---
+title: "What If Your AI Agent Could Learn From Its Mistakes?"
+seoTitle: "Self-Improving AI Agents: Automated Learning From Session History"
+description: "Build self-improving AI agents that extract 7 types of insights from past sessions and automatically update their own context files. Open-source Python framework."
+pubDate: 2026-04-13
+updatedDate: 2026-04-13
+author: "Kacper Włodarczyk"
+lang: en
+translationKey: self-improving-ai-agents
+tags: ["self-improving-agents", "ai-agents", "pydantic-ai", "python", "machine-learning"]
+category: open-source
+draft: false
+---
+
+> **TL;DR:** AI agents repeat the same mistakes across sessions because every conversation starts from a blank slate. The `/improve` command in pydantic-deep analyzes past sessions, extracts 7 types of structured insights (AgentLearning, Failure, Pattern, UserFact, Preference, Context, Decision), and automatically proposes updates to context files (SOUL.md, AGENTS.md, MEMORY.md). No fine-tuning, no RAG — just structured extraction from what the agent already experienced, fed back into context. Every repeated mistake costs API credits and engineer time. /improve turns failures into permanent improvements.
+
+Run your AI agent on Monday. It looks for config files in the project root instead of the `config/` directory. You correct it. It works.
+
+Run the same agent on Tuesday. It looks for config files in the project root again. You correct it again. It works again.
+
+Run it on Wednesday. Same mistake. Same correction. Same wasted tokens and time.
+
+This isn't a model intelligence problem. GPT-4.1, Claude, Gemini — they all do this. Every session starts from a blank slate. The context window fills up, the session ends, and everything the agent learned vanishes.
+
+After shipping 30+ production AI agent implementations at [Vstorm](https://vstorm.co), we stopped accepting this as normal. The pattern was consistent: agents repeat the same failure modes across sessions because they have no mechanism to learn from past experience.
+
+So we built `/improve`.
+
+---
+
+*I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering Consultancy. We've shipped 30+ production AI agent implementations and open-source our tooling at [github.com/vstorm-co](https://github.com/vstorm-co). Connect with me on [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+
+---
+
+## The Problem: Stateless Agents in a Stateful World
+
+Let's be precise about what "agent learning" means. I'm not talking about fine-tuning, RLHF, or training loops. I'm talking about something simpler and more practical: **an agent that doesn't repeat the same mistakes**.
+
+Today's agent frameworks — [Pydantic AI](https://ai.pydantic.dev/), LangChain, CrewAI, AutoGen — all treat sessions as independent events. The agent has a system prompt, maybe some context files, and a conversation history that resets every session. If the agent discovers that your tests live in `tests/` (not `test/`), that your build command is `make build` (not `npm run build`), or that you prefer tabs over spaces — that knowledge dies with the session.
+
+The workaround most teams use: manually update the system prompt or context files. After watching an agent struggle, a developer opens `CLAUDE.md` or equivalent and adds a note. It works. But it doesn't scale.
+
+Consider what happens over 50 sessions:
+
+- **Session 12:** Agent discovers that `docker-compose.yml` is in `infra/`, not the project root
+- **Session 23:** Agent learns that the database migration tool is Alembic, not raw SQL
+- **Session 31:** Agent figures out the CI pipeline runs `pytest -x --tb=short`
+- **Session 47:** Agent discovers that the monorepo uses workspace-level dependencies
+
+Each of these discoveries costs tokens, time, and human patience. And they're all things the agent already "knew" at some point — just in a different session that's gone forever.
+
+## Introducing /improve: Automated Session Analysis
+
+`/improve` is a command in [pydantic-deep](https://github.com/vstorm-co/pydantic-deep), our open-source AI agent framework that implements the "deep agent pattern" (the same architecture used by Claude Code, Manus, and Devin).
+
+At a high level, `/improve` does three things:
+
+1. **Analyzes past sessions** — reads through conversation logs from the last N days
+2. **Extracts structured insights** — identifies 7 types of learnings from those sessions
+3. **Updates context files** — proposes changes to SOUL.md, AGENTS.md, and MEMORY.md
+
+The result: the agent gets smarter after every batch of sessions, without anyone manually editing files.
+
+```python
+from pydantic_deep.improve.analyzer import ImprovementAnalyzer
+
+analyzer = ImprovementAnalyzer(
+    model="anthropic:claude-opus-4-6",
+    sessions_dir=get_sessions_dir(),
+    working_dir=Path("."),
+)
+report = await analyzer.analyze(days=7)
+# report.proposed_changes → automatic MEMORY.md updates
+```
+
+One command. Seven days of sessions analyzed. Context files updated.
+
+## 7 Types of Insights
+
+The core of `/improve` is its insight extraction system. Rather than dumping raw session data into a prompt, it categorizes discoveries into 7 structured types:
+
+**1. AgentLearning** — things the agent figured out through trial and error:
+
+```python
+@dataclass
+class AgentLearningInsight:
+    learning: str     # e.g. "tests are in tests/ dir"
+    category: str     # tool_chain, file_location, build_command...
+    evidence: str     # Tool calls that proved this
+    confidence: float # 0.0-1.0
+```
+
+*Example: "The project uses `make test` not `pytest` directly. Confidence: 0.95 (observed in 4 sessions)."*
+
+**2. Failure** — what went wrong and how it was resolved:
+
+```python
+@dataclass
+class FailureInsight:
+    description: str  # What went wrong
+    root_cause: str   # Why it happened
+    resolution: str   # How it was fixed
+```
+
+*Example: "Agent tried to edit `/src/main.py` but the actual path is `/app/main.py`. Root cause: assumed standard Python project structure. Resolution: always check file tree first."*
+
+**3. Pattern** — recurring workflows the agent follows:
+
+```python
+@dataclass
+class PatternInsight:
+    pattern: str      # e.g. "read -> edit -> test -> commit"
+    frequency: int    # How many times observed
+    context: str      # When this pattern applies
+```
+
+*Example: "Read file -> edit -> run tests -> commit. Frequency: 12. Context: all code modification tasks."*
+
+**4. UserFact** — things the agent learned about the user's preferences and environment.
+
+**5. Preference** — how the user likes things done (code style, communication style, tool choices).
+
+**6. Context** — project-specific facts (tech stack, architecture decisions, team conventions).
+
+**7. Decision** — key decisions made during sessions that should persist.
+
+Each insight type has a specific structure, specific evidence requirements, and a specific target file (SOUL.md, AGENTS.md, or MEMORY.md) where it belongs.
+
+## Why This Matters: The Cost of Repetition
+
+The business case for self-improving agents is straightforward:
+
+**API credit waste.** Every repeated mistake burns tokens. An agent that spends 5 tool calls discovering your file structure — in every session — might consume 2,000-3,000 extra tokens per session. Across 50 sessions per week, that's 100K-150K wasted tokens. At GPT-4.1 or Claude pricing, it adds up.
+
+**Engineer time waste.** Every time an engineer watches an agent make a known mistake and manually corrects it, that's context-switching overhead. Multiply by the number of developers on your team using AI agents daily.
+
+**Compounding learning.** The inverse of compounding mistakes is compounding knowledge. An agent that learns from 50 sessions has context that would take a human hours to document manually. And unlike manual documentation, `/improve` captures things humans wouldn't think to write down — tool chain quirks, error patterns, implicit preferences.
+
+## What /improve Is Not
+
+To be clear about boundaries:
+
+- **Not fine-tuning.** The model weights don't change. /improve updates context files that get loaded into the system prompt.
+- **Not RAG.** There's no vector database or semantic search. Insights are structured, categorized, and written to specific files.
+- **Not magic.** If your agent fundamentally can't do a task, /improve won't help. It optimizes what the agent already knows how to do.
+
+Think of it as the difference between a developer who keeps a personal wiki of lessons learned vs. one who starts fresh every morning. Same skills, wildly different effectiveness.
+
+## Getting Started
+
+pydantic-deep is open source:
+
+```bash
+pip install pydantic-deep
+```
+
+```python
+from pydantic_deep.improve.analyzer import ImprovementAnalyzer
+from pydantic_deep.config import get_sessions_dir
+from pathlib import Path
+
+analyzer = ImprovementAnalyzer(
+    model="anthropic:claude-opus-4-6",
+    sessions_dir=get_sessions_dir(),
+    working_dir=Path("."),
+)
+
+# Analyze last 7 days of sessions
+report = await analyzer.analyze(days=7)
+
+# Review proposed changes
+for change in report.proposed_changes:
+    print(f"File: {change.target_file}")
+    print(f"Action: {change.action}")
+    print(f"Content: {change.content}")
+```
+
+The framework implements the deep agent pattern — the same architecture powering Claude Code, Manus, and Devin — with built-in session recording, context management, and now self-improvement.
+
+- GitHub: [github.com/vstorm-co/pydantic-deep](https://github.com/vstorm-co/pydantic-deep)
+- OSS Portal: [oss.vstorm.co](https://oss.vstorm.co)
+
+## Key Takeaways
+
+- **AI agents are stateless by default.** Every session starts from zero, even if the agent solved the same problem yesterday.
+- **Self-improvement doesn't require fine-tuning.** Structured insight extraction from past sessions, fed back into context files, is enough for significant improvement.
+- **7 insight types cover the full learning spectrum:** failures, patterns, learnings, user facts, preferences, context, and decisions.
+- **The cost of repetition compounds.** Wasted tokens + wasted engineer time, every session, every day.
+- **/improve automates what good engineers do manually:** reviewing past work and writing down lessons learned.
+
+## What's Next
+
+This is post 1 of 3 in the Self-Improving Agents series.
+
+**Wednesday:** I'll break down the architecture under the hood — the 4-stage pipeline (Discovery, Extraction, Raw Traces, Synthesis), how we handle 140K-token session logs, and why structured insight types matter more than raw summaries.
+
+**Friday:** Real results from running /improve on 50 sessions. What it found, what it missed, and the actual impact on agent performance.
+
+---
+
+*Follow me on [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/) or [X](https://x.com/kacper_wlodar) for daily posts on AI agent engineering. All our tools are open-source at [github.com/vstorm-co](https://github.com/vstorm-co).*

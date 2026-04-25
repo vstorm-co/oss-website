@@ -1,0 +1,35 @@
+---
+export interface Props {
+  type?: "info" | "warn" | "success" | "danger";
+  title?: string;
+}
+const { type = "info", title } = Astro.props;
+
+const styles = {
+  info: { bar: "border-sky-500/60", bg: "bg-sky-500/5", text: "text-sky-300", icon: "i" },
+  warn: { bar: "border-amber-500/60", bg: "bg-amber-500/5", text: "text-amber-300", icon: "!" },
+  success: { bar: "border-emerald-500/60", bg: "bg-emerald-500/5", text: "text-emerald-300", icon: "✓" },
+  danger: { bar: "border-rose-500/60", bg: "bg-rose-500/5", text: "text-rose-300", icon: "×" },
+}[type];
+---
+{/* @mdx-label Callout */}
+{/* @mdx-description Highlighted box — variants: info | warn | success | danger */}
+{/* @mdx-snippet
+<Callout type="info" title="Heads up">
+  Your message here.
+</Callout>
+*/}
+
+<div class={`my-6 rounded-lg border-l-4 ${styles.bar} ${styles.bg} px-4 py-3 not-prose`}>
+  <div class="flex items-start gap-3">
+    <span class={`flex-shrink-0 h-6 w-6 rounded-full border ${styles.bar} ${styles.text} flex items-center justify-center text-xs font-bold`}>
+      {styles.icon}
+    </span>
+    <div class="flex-1 min-w-0">
+      {title && <div class={`font-semibold mb-1 ${styles.text}`}>{title}</div>}
+      <div class="text-text-secondary text-sm leading-relaxed [&>p]:mb-2 [&>p:last-child]:mb-0">
+        <slot />
+      </div>
+    </div>
+  </div>
+</div>

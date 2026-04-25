@@ -1,0 +1,149 @@
+---
+title: "Directorio .claude/: configuracion de AI-Agent en cada proyecto generado"
+description: "Cada proyecto de nuestro template open-source incluye un directorio .claude/ — 8 archivos de reglas, 3 comandos slash y una configuracion de permisos. El agente AI conoce tus convenciones desde el primer prompt."
+pubDate: 2026-04-09
+updatedDate: 2026-04-09
+author: "Kacper Włodarczyk"
+lang: es
+translationKey: claude-directory-ai-agent-config-generated-projects
+tags: ["claude-code", "python", "developer-tools", "ai-agents", "fastapi"]
+category: tutorial
+draft: false
+---
+
+> **TL;DR:** Los agentes de programacion AI (Claude Code, Cursor, Copilot) funcionan mejor con reglas especificas del proyecto, pero nadie los configura. En [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-ai-agent-template) v0.2.3, cada proyecto generado incluye un directorio `.claude/` con un archivo de permisos `settings.json`, 8 archivos de reglas cubriendo desde arquitectura hasta convenciones de testing, y 3 comandos slash para workflows comunes. El agente conoce la estructura de tu proyecto, convenciones de nombres y patrones desde el primer prompt — sin entrenamiento, sin desperdiciar la ventana de contexto explicando tu base de codigo.
+
+Arrancas un nuevo proyecto. Abres Claude Code. Escribes "agrega un nuevo endpoint para notificaciones de usuarios."
+
+Claude genera un endpoint. Convencion de nombres incorrecta. Patron de manejo de errores incorrecto. Estructura de tests incorrecta. Pasas 15 minutos corrigiendo, pegas tus convenciones, intentas de nuevo.
+
+Te suena familiar?
+
+Los agentes de programacion AI son poderosos, pero son genericos por defecto. No saben que tu proyecto usa `snake_case` para rutas API. No saben que tus modelos Pydantic heredan de un `BaseSchema` personalizado. No saben que tienes una jerarquia especifica de excepciones.
+
+Puedes solucionar esto con configuracion especifica del proyecto. El problema: casi nadie lo hace.
+
+---
+
+*Soy Kacper, AI Engineer en [Vstorm](https://vstorm.co) — una consultoria de Applied Agentic AI Engineering. Hemos entregado mas de 30 implementaciones de agentes AI en produccion y compartimos nuestras herramientas como open source en [github.com/vstorm-co](https://github.com/vstorm-co). Conecta conmigo en [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+
+---
+
+## El problema: agentes genericos en bases de codigo especificas
+
+Cada base de codigo tiene convenciones. Patrones de nombres. Enfoques de manejo de errores. Organizacion de tests. Orden de imports. Estas convenciones existen en las cabezas de los desarrolladores, en archivos README que nadie lee, o en guias de estilo que se dessincronizan.
+
+Cuando un agente de programacion AI se une a tu proyecto, empieza desde cero. Puede seguir buenas practicas generales de Python, pero no conoce *tus* buenas practicas.
+
+El resultado: pasas la mitad de tu tiempo corrigiendo la salida del agente en lugar de construir funcionalidades.
+
+La mayoria de equipos resuelven esto:
+1. Pegando convenciones en cada prompt (desperdicia ventana de contexto)
+2. Creando un archivo `AGENTS.md` (mejor, pero limitado)
+3. Usando `.cursorrules` (especifico de Cursor)
+4. Sin configurar nada (lo mas comun)
+
+Queriamos algo mas estructurado. Algo que se entrega con el proyecto desde el primer dia.
+
+## Que incluye .claude/
+
+En [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-ai-agent-template) v0.2.3 (lanzado el 5 de abril), cada proyecto generado incluye un directorio `.claude/` completo. Esto es lo que contiene.
+
+### settings.json — Configuracion de permisos
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Bash(git status)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(git branch*)",
+      "Bash(git checkout*)",
+      "Bash(pytest*)",
+      "Bash(ruff*)",
+      "Bash(ty*)",
+      "Bash(alembic*)"
+    ]
+  }
+}
+```
+
+Esto le dice a Claude Code que puede hacer sin preguntar. Lectura de archivos, busquedas, operaciones git, ejecutar tests, linting con ruff, verificacion de tipos con ty (el nuevo type checker basado en Rust de Astral), y migraciones de base de datos con Alembic. Operaciones seguras que un desarrollador ejecuta constantemente.
+
+Sin `Bash(rm*)`. Sin `Bash(docker*)`. Sin acceso arbitrario a shell. El agente puede explorar y validar, pero no puede romper cosas.
+
+### 8 archivos de reglas
+
+El directorio `.claude/rules/` contiene 8 archivos markdown que ensenan al agente las convenciones de tu proyecto:
+
+**architecture.md** — Estructura del proyecto. Donde viven los modelos (`app/models/`), donde van las rutas API (`app/api/`), como la capa del agente se conecta con el handler WebSocket.
+
+**code-style.md** — Formato y nombres. Limites de longitud de linea, orden de imports (stdlib → terceros → local), `snake_case` para funciones, `PascalCase` para clases. Cosas que ruff impone, pero explicadas con *por que* para que el agente escriba codigo correcto al primer intento.
+
+**schemas.md** — Convenciones de modelos Pydantic. Clases base para heredar, nombres de campos, patrones de validadores, la distincion entre schemas de request, schemas de response y modelos de base de datos.
+
+**exceptions.md** — Manejo de errores. La jerarquia personalizada de excepciones, cuando lanzar `HTTPException` vs excepciones de dominio, formato de respuesta de error.
+
+**api-conventions.md** — Patrones de FastAPI. Nombres de rutas, uso de dependency injection, declaraciones de modelos de respuesta, patrones de paginacion.
+
+**testing.md** — Convenciones de pytest. Organizacion de fixtures, patrones factory, setup de tests async, que mockear y que testear contra servicios reales. Nombres: `test_<feature>_<scenario>_<expected>`.
+
+**frontend.md** — Convenciones de Next.js y React. Estructura de componentes, patrones de gestion de estado, uso de Tailwind v4, patrones de cliente API.
+
+**general.md** — Temas transversales. Manejo de variables de entorno, patrones de logging, gestion de configuracion, estandares de documentacion.
+
+### 3 comandos slash
+
+El directorio `.claude/commands/` proporciona workflows especificos del proyecto:
+
+**`/project:review`** — Workflow de code review. El agente verifica archivos modificados contra todos los archivos de reglas, ejecuta ruff y ty, ejecuta tests relevantes y produce un review estructurado con niveles de severidad.
+
+**`/project:add-endpoint`** — Crear nuevo endpoint API. Crea ruta, schema, capa de servicio y archivo de test — todo siguiendo las convenciones de los archivos de reglas. Un comando, cuatro archivos, cero correcciones necesarias.
+
+**`/project:fix-issue`** — Workflow de correccion de bugs. Acepta una descripcion del problema, encuentra codigo relevante, propone un fix, escribe tests y valida con la suite de tests existente.
+
+## Por que no solo AGENTS.md?
+
+`AGENTS.md` (o `CLAUDE.md` en la raiz del repo) funciona. Tambien lo usamos. Pero hay compromisos:
+
+**Un archivo vs. reglas modulares.** Un archivo markdown masivo se vuelve inmanejable. Ocho archivos enfocados significan que el agente carga solo el contexto relevante.
+
+**Sin modelo de permisos.** `AGENTS.md` puede describir lo que el agente debe hacer, pero no puede restringir lo que *puede* hacer. `settings.json` proporciona barandillas reales.
+
+**Sin workflows.** Puedes describir procesos en markdown, pero los comandos slash los hacen ejecutables. `/project:add-endpoint` es mas rapido que "por favor sigue el proceso de creacion de endpoints descrito en AGENTS.md seccion 4.2."
+
+**Complementarios, no competidores.** Seguimos usando un `CLAUDE.md` de nivel superior para contexto de alto nivel del proyecto. El directorio `.claude/` maneja la configuracion detallada y estructurada. Trabajan juntos.
+
+### Comparacion con .cursorrules
+
+`.cursorrules` sirve un proposito similar para Cursor. Las diferencias clave:
+
+- `.cursorrules` es un solo archivo; `.claude/` es un directorio con archivos modulares
+- `.cursorrules` no tiene modelo de permisos
+- `.cursorrules` no tiene sistema de comandos
+- `.claude/` es especifico de Claude Code (por ahora — la estructura es portable)
+
+## Tambien en v0.2.3
+
+Este release no fue solo sobre `.claude/`. Tambien:
+
+- **Reemplazamos mypy con ty** — type checker basado en Rust de Astral, de los creadores de ruff y uv. Significativamente mas rapido.
+- **Grandes actualizaciones de dependencias** — FastAPI 0.135.3, Pydantic 2.12.0, Pydantic AI 1.77.0, y mas de 50 otras dependencias actualizadas.
+
+## Conclusiones clave
+
+1. **Los agentes de programacion AI son tan buenos como su contexto.** Agentes genericos producen codigo generico. Reglas especificas del proyecto los hacen productivos desde el primer prompt.
+2. **Entrega la configuracion con el proyecto.** No dependas de que los desarrolladores configuren el agente manualmente.
+3. **Modular supera a monolitico.** Ocho archivos de reglas enfocados > un documento markdown de 2000 lineas.
+4. **Los permisos importan.** Permitir al agente ejecutar tests y linters libremente mientras se restringen operaciones destructivas es el equilibrio correcto.
+5. **Los comandos slash convierten documentacion en workflows.** Convenciones ejecutables > convenciones que esperas que alguien lea.
+
+---
+
+Pruebalo tu mismo: genera un proyecto desde [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-ai-agent-template), abrelo en Claude Code y observa como el agente sigue las convenciones de tu proyecto desde la primera interaccion.
+
+Mas deep dives tecnicos sobre herramientas de agentes AI en [oss.vstorm.co](https://oss.vstorm.co).

@@ -1,0 +1,151 @@
+---
+title: ".claude/ Directory: AI-Agent Config in Every Generated Project"
+description: "Every project from our open-source template ships with a .claude/ directory — 8 rule files, 3 slash commands, and a permissions config. The AI coding agent knows your conventions from the first prompt."
+pubDate: 2026-04-09
+updatedDate: 2026-04-09
+author: "Kacper Włodarczyk"
+lang: en
+translationKey: claude-directory-ai-agent-config-generated-projects
+tags: ["claude-code", "python", "developer-tools", "ai-agents", "fastapi"]
+category: tutorial
+draft: false
+---
+
+> **TL;DR:** AI coding agents (Claude Code, Cursor, Copilot) work better with project-specific rules, but nobody configures them. In [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-ai-agent-template) v0.2.3, every generated project ships with a `.claude/` directory containing a `settings.json` permissions file, 8 rule files covering architecture through testing conventions, and 3 slash commands for common workflows. The agent knows your project structure, naming conventions, and patterns from the first prompt — no training, no context window wasted on explaining your codebase.
+
+You spin up a new project. You open Claude Code. You type "add a new endpoint for user notifications."
+
+Claude generates an endpoint. Wrong naming convention. Wrong error handling pattern. Wrong test structure. You spend 15 minutes correcting it, paste your conventions, try again.
+
+Sound familiar?
+
+AI coding agents are powerful, but they're generic by default. They don't know your project uses `snake_case` for API routes. They don't know your Pydantic models inherit from a custom `BaseSchema`. They don't know you have a specific exception hierarchy.
+
+You can fix this with project-specific configuration. The problem: almost nobody does.
+
+---
+
+*I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co) — an Applied Agentic AI Engineering Consultancy. We've shipped 30+ production AI agent implementations and open-source our tooling at [github.com/vstorm-co](https://github.com/vstorm-co). Connect with me on [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+
+---
+
+## The Problem: Generic Agents in Specific Codebases
+
+Every codebase has conventions. Naming patterns. Error handling approaches. Test organization. Import ordering. These conventions exist in developers' heads, in README files nobody reads, or in style guides that drift out of sync.
+
+When an AI coding agent joins your project, it starts from zero. It might follow general Python best practices, but it doesn't know *your* best practices.
+
+The result: you spend half your time correcting the agent's output instead of building features.
+
+Most teams solve this by:
+1. Pasting conventions into every prompt (wastes context window)
+2. Creating an `AGENTS.md` file (better, but limited)
+3. Using `.cursorrules` (Cursor-specific)
+4. Not configuring at all (most common)
+
+We wanted something more structured. Something that ships with the project from day one.
+
+## What Ships in .claude/
+
+In [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-ai-agent-template) v0.2.3 (released April 5), every generated project includes a complete `.claude/` directory. Here's what's inside.
+
+### settings.json — Permissions Config
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Bash(git status)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(git branch*)",
+      "Bash(git checkout*)",
+      "Bash(pytest*)",
+      "Bash(ruff*)",
+      "Bash(ty*)",
+      "Bash(alembic*)"
+    ]
+  }
+}
+```
+
+This tells Claude Code what it can do without asking. File reads, searches, git operations, running tests, linting with ruff, type-checking with ty (Astral's new Rust-based type checker), and database migrations with Alembic. Safe operations that a developer would run constantly.
+
+No `Bash(rm*)`. No `Bash(docker*)`. No arbitrary shell access. The agent can explore and validate, but it can't break things.
+
+### 8 Rule Files
+
+The `.claude/rules/` directory contains 8 markdown files that teach the agent your project's conventions:
+
+**architecture.md** — Project structure. Where models live (`app/models/`), where API routes go (`app/api/`), how the agent layer connects to the WebSocket handler. The agent knows the layout before it reads a single file.
+
+**code-style.md** — Formatting and naming. Line length limits, import ordering (stdlib → third-party → local), `snake_case` for functions, `PascalCase` for classes. Things ruff enforces, but explained with *why* so the agent writes correct code on the first try.
+
+**schemas.md** — Pydantic model conventions. Base classes to inherit from, field naming, validator patterns, the distinction between request schemas, response schemas, and database models. This is where most generic agents get it wrong.
+
+**exceptions.md** — Error handling. The custom exception hierarchy, when to raise `HTTPException` vs domain exceptions, error response format. Consistent error handling across every generated endpoint.
+
+**api-conventions.md** — FastAPI patterns. Route naming, dependency injection usage, response model declarations, pagination patterns. The difference between your project's style and FastAPI's docs examples.
+
+**testing.md** — pytest conventions. Fixture organization, factory patterns, async test setup, what to mock and what to test against real services. Naming: `test_<feature>_<scenario>_<expected>`.
+
+**frontend.md** — Next.js and React conventions. Component structure, state management patterns, Tailwind v4 usage, API client patterns. Keeps the agent consistent across the full stack.
+
+**general.md** — Cross-cutting concerns. Environment variable handling, logging patterns, configuration management, documentation standards. The glue between all other rules.
+
+### 3 Slash Commands
+
+The `.claude/commands/` directory provides project-specific workflows:
+
+**`/project:review`** — Code review workflow. The agent checks changed files against all rule files, runs ruff and ty, executes relevant tests, and produces a structured review with severity levels.
+
+**`/project:add-endpoint`** — Scaffold a new API endpoint. Creates the route, schema, service layer, and test file — all following the conventions in the rule files. One command, four files, zero corrections needed.
+
+**`/project:fix-issue`** — Bug fix workflow. Takes an issue description, finds relevant code, proposes a fix, writes tests for the fix, and validates with the existing test suite.
+
+## Why Not Just AGENTS.md?
+
+`AGENTS.md` (or `CLAUDE.md` at the repo root) works. We use it too. But there are trade-offs:
+
+**Single file vs. modular rules.** One massive markdown file gets unwieldy. Eight focused files mean the agent loads only relevant context. Asking about schemas? It reads `schemas.md`, not 2000 lines of everything.
+
+**No permissions model.** `AGENTS.md` can describe what the agent should do, but it can't restrict what it *can* do. `settings.json` provides actual guardrails.
+
+**No workflows.** You can describe processes in markdown, but slash commands make them executable. `/project:add-endpoint` is faster than "please follow the endpoint creation process described in AGENTS.md section 4.2."
+
+**Complementary, not competing.** We still use a top-level `CLAUDE.md` for high-level project context. The `.claude/` directory handles the detailed, structured configuration. They work together.
+
+### How It Compares to .cursorrules
+
+`.cursorrules` serves a similar purpose for Cursor. The key differences:
+
+- `.cursorrules` is a single file; `.claude/` is a directory with modular files
+- `.cursorrules` has no permissions model
+- `.cursorrules` has no command system
+- `.claude/` is specific to Claude Code (for now — the structure is portable)
+
+If your team uses Cursor, you could generate `.cursorrules` from the same rule files. The conventions are the same; the delivery mechanism differs.
+
+## Also in v0.2.3
+
+This release wasn't just about `.claude/`. We also:
+
+- **Replaced mypy with ty** — Astral's Rust-based type checker, from the makers of ruff and uv. Significantly faster, and the `settings.json` already includes `ty` permissions.
+- **Major dependency upgrades** — FastAPI 0.135.3, Pydantic 2.12.0, Pydantic AI 1.77.0, and 50+ other dependencies updated.
+
+## Key Takeaways
+
+1. **AI coding agents are only as good as their context.** Generic agents produce generic code. Project-specific rules make them productive from the first prompt.
+2. **Ship the config with the project.** Don't rely on developers to set up agent configuration manually. Generate it alongside the code.
+3. **Modular beats monolithic.** Eight focused rule files > one 2000-line markdown document. The agent loads what it needs.
+4. **Permissions matter.** Letting the agent run tests and linters freely while restricting destructive operations is the right balance.
+5. **Slash commands turn documentation into workflows.** Executable conventions > conventions you hope someone reads.
+
+---
+
+Try it yourself: generate a project from the [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-ai-agent-template), open it in Claude Code, and watch the agent follow your project's conventions from the first interaction.
+
+More technical deep dives on AI agent tooling at [oss.vstorm.co](https://oss.vstorm.co).

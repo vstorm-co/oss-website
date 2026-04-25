@@ -1,0 +1,30 @@
+---
+export interface Props {
+  src: string;
+  alt: string;
+  caption?: string;
+  width?: number | string;
+  height?: number | string;
+}
+const { src, alt, caption, width, height } = Astro.props;
+---
+{/* @mdx-label Figure */}
+{/* @mdx-description Image with optional caption */}
+{/* @mdx-snippet
+<Figure src="/images/blog/your-slug/image.png" alt="Alt text" caption="Optional caption" />
+*/}
+
+<figure class="not-prose my-8">
+  <img
+    src={src}
+    alt={alt}
+    width={width}
+    height={height}
+    loading="lazy"
+    decoding="async"
+    class="w-full rounded-lg border border-border"
+  />
+  {caption && (
+    <figcaption class="mt-2 text-center text-sm text-text-tertiary italic">{caption}</figcaption>
+  )}
+</figure>

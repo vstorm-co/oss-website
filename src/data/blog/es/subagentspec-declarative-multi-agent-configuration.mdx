@@ -1,0 +1,259 @@
+---
+title: "SubAgentSpec: Configura sistemas multi-agente en YAML, ejecutalos en Python"
+description: "Declara sistemas multi-agente en YAML, obtiene agentes Python con tipado seguro. Seguimiento de tokens, fabricas de agentes, serializacion de salidas estructuradas. pip install pydantic-ai-subagents."
+pubDate: 2026-04-11
+updatedDate: 2026-04-11
+author: "Kacper Włodarczyk"
+lang: es
+translationKey: subagentspec-declarative-multi-agent-configuration
+tags: ["pydantic-ai", "python", "multi-agent", "ai-agents", "configuration"]
+category: tutorial
+draft: false
+---
+
+> **TL;DR:** SubAgentSpec es un modelo Pydantic para configuracion declarativa multi-agente. Define nombre del agente, modelo, system prompt, herramientas y esquema de salida en YAML/JSON — obtiene agentes Pydantic AI con tipado seguro automaticamente. La version v0.2.0 agrega soporte para agentes personalizados (fabricas de agentes), seguimiento de tokens por tarea (TaskHandle.usage, get_total_usage()) y serializacion correcta de salidas estructuradas (model_dump_json() para Pydantic, json.dumps(asdict()) para dataclasses). Parte de pydantic-ai-subagents: `pip install pydantic-ai-subagents`.
+
+Estas construyendo un sistema multi-agente. El Agente A investiga. El Agente B resume. El Agente C valida. Cada uno necesita su propio modelo, system prompt, herramientas y esquema de salida.
+
+Donde vive esa configuracion?
+
+En la mayoria de los setups, esta dispersa en archivos Python. Defines agentes en un modulo, herramientas en otro, prompts en un archivo de constantes, nombres de modelos en variables de entorno. Quieres cambiar el modelo del Agente B de GPT-4.1 a Claude Sonnet? Encuentra el archivo correcto, encuentra la linea correcta, cambialo, despliega de nuevo.
+
+Ahora multiplica eso por un equipo de cuatro. Alguien cambia un system prompt en una rama. Alguien mas intercambia un modelo en staging. Nadie sabe que esta corriendo donde.
+
+Nos encontramos con esto suficientes veces en mas de 30 despliegues en produccion que construimos una solucion: [SubAgentSpec](https://github.com/vstorm-co/pydantic-ai-subagents) — un modelo de configuracion declarativa para sistemas multi-agente construido sobre [Pydantic AI](https://ai.pydantic.dev).
+
+---
+
+*Soy Kacper, AI Engineer en [Vstorm](https://vstorm.co) — una consultoria de Applied Agentic AI Engineering. Hemos desplegado mas de 30 implementaciones de agentes AI en produccion y compartimos nuestras herramientas como open-source en [github.com/vstorm-co](https://github.com/vstorm-co). Conecta conmigo en [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+
+---
+
+## El problema: Los agentes definidos en codigo no escalan en equipos
+
+Asi se ve un setup multi-agente tipico en codigo:
+
+```python
+research_agent = Agent(
+    "openai:gpt-4.1",
+    system_prompt="You are a research assistant...",
+    tools=[search_web, read_document],
+)
+
+summary_agent = Agent(
+    "anthropic:claude-sonnet-4-20250514",
+    system_prompt="You summarize research findings...",
+    result_type=Summary,
+)
+
+validation_agent = Agent(
+    "openai:gpt-4.1-mini",
+    system_prompt="You validate summaries against source material...",
+    result_type=ValidationResult,
+)
+```
+
+Tres agentes, tres selecciones de modelo, tres system prompts, todo hardcodeado. Quieres experimentar con diferentes modelos? Edita archivos Python. Quieres que un no-desarrollador ajuste un system prompt? Necesita tocar codigo. Quieres versionar las configuraciones de agentes por separado de la logica de la aplicacion? Buena suerte.
+
+Esto funciona para un prototipo. En equipos de produccion se desmorona.
+
+## SubAgentSpec: Configuracion declarativa, agentes con tipado seguro
+
+SubAgentSpec es un modelo Pydantic que representa una especificacion completa de agente. Lo defines en YAML o JSON, y `pydantic-ai-subagents` crea agentes Pydantic AI completamente configurados a partir de el.
+
+```yaml
+# agents.yaml
+agents:
+  - name: research
+    model: openai:gpt-4.1
+    system_prompt: |
+      You are a research assistant. Search for information
+      and return structured findings.
+    tools:
+      - search_web
+      - read_document
+    
+  - name: summarizer
+    model: anthropic:claude-sonnet-4-20250514
+    system_prompt: |
+      You summarize research findings into concise,
+      actionable summaries.
+    result_type: Summary
+    
+  - name: validator
+    model: openai:gpt-4.1-mini
+    system_prompt: |
+      You validate summaries against source material.
+      Flag any unsupported claims.
+    result_type: ValidationResult
+```
+
+Cargalo en Python:
+
+```python
+from pydantic_ai_subagents import SubAgentSpec, create_agent_factory_toolset
+
+# Load specs from YAML
+specs = SubAgentSpec.from_yaml("agents.yaml")
+
+# Create agent factory toolset
+toolset = create_agent_factory_toolset(specs)
+```
+
+Tu configuracion de agentes ahora esta separada de la logica de la aplicacion. Guardala en control de versiones, intercambiala entre entornos, deja que el equipo itere en prompts sin tocar Python.
+
+Las specs son modelos Pydantic — obtienes validacion, serializacion y autocompletado del IDE gratis. Un error tipografico en el nombre del modelo? Error de validacion al cargar, no un crash en runtime 20 minutos dentro de la sesion.
+
+## Soporte para agentes personalizados: El patron `agent_factory`
+
+No todos los subagentes son un simple `Agent()`. Quizas tu agente de investigacion necesita dependencias personalizadas. Quizas usa un framework especializado. Quizas necesita middleware, memoria o logica de inicializacion especifica.
+
+SubAgentSpec v0.2.0 introdujo los campos `agent` y `agent_factory`:
+
+```python
+from pydantic_ai import Agent
+from pydantic_ai_subagents import create_agent_factory_toolset
+
+# Opcion 1: Pasar un agente pre-construido directamente
+custom_research_agent = Agent(
+    "openai:gpt-4.1",
+    system_prompt="Custom research agent with special deps",
+    deps_type=ResearchDeps,
+)
+
+toolset = create_agent_factory_toolset(
+    specs,
+    agents={"research": custom_research_agent},
+)
+
+# Opcion 2: Usar una funcion fabrica
+def create_research_agent(spec: SubAgentSpec) -> Agent:
+    agent = Agent(
+        spec.model,
+        system_prompt=spec.system_prompt,
+        deps_type=ResearchDeps,
+    )
+    agent.tool(custom_search)
+    return agent
+
+toolset = create_agent_factory_toolset(
+    specs,
+    agent_factories={"research": create_research_agent},
+)
+
+# Opcion 3: Establecer una fabrica predeterminada para TODOS los agentes
+toolset = create_agent_factory_toolset(
+    specs,
+    default_agent_factory=my_custom_factory,
+)
+```
+
+La cadena de prioridad: `agent` (pre-construido) > `agent_factory` (fabrica por spec) > `default_agent_factory` (predeterminado global) > simple `Agent()`.
+
+YAML define *que* debe ser cada agente. La fabrica define *como* construirlo.
+
+## Seguimiento de tokens entre subagentes
+
+Cuando ejecutas multiples subagentes, necesitas saber a donde van tus tokens. Cual agente es caro? Cual es eficiente?
+
+v0.2.0 agrego seguimiento de uso de tokens a nivel de tarea:
+
+```python
+from pydantic_ai_subagents import check_task, get_total_usage
+
+# Despues de ejecutar tareas...
+result = check_task(task_handle)
+# Muestra: input_tokens, output_tokens, total_tokens
+
+# Agregar entre todas las tareas
+total = get_total_usage(all_task_handles)
+# Retorna: RunUsage con conteos acumulativos de tokens
+```
+
+Cada `TaskHandle` almacena un objeto `RunUsage` de la ejecucion del subagente. `check_task` muestra conteos de tokens de entrada/salida para una sola tarea. `get_total_usage()` agrega entre todos los handles de tareas.
+
+El seguimiento a nivel de tarea te dice cual *tarea logica* consumio cuales recursos, no solo cual llamada al modelo.
+
+## Serializacion de salidas estructuradas
+
+Cuando los subagentes retornan salida estructurada, la serializacion importa. SubAgentSpec maneja tanto modelos Pydantic como dataclasses:
+
+```python
+# Para modelos Pydantic → model_dump_json()
+class Summary(BaseModel):
+    title: str
+    key_points: list[str]
+    confidence: float
+
+# Para dataclasses → json.dumps(asdict())
+@dataclass
+class ValidationResult:
+    is_valid: bool
+    issues: list[str]
+```
+
+La serializacion preserva la estructura JSON correcta para el agente padre. Los modelos Pydantic usan `model_dump_json()` para serializacion eficiente y consciente del esquema. Los dataclasses usan `json.dumps(asdict())` para compatibilidad JSON sin requerir Pydantic.
+
+Esto importa al encadenar agentes: la salida del resumidor se convierte en la entrada del validador. Si la serializacion pierde estructura (ej. conversion via `str()`), el agente receptor tiene que parsear texto libre en lugar de datos estructurados.
+
+## Todo junto
+
+Un pipeline multi-agente completo con SubAgentSpec:
+
+```python
+from pydantic_ai_subagents import (
+    SubAgentSpec,
+    create_agent_factory_toolset,
+    check_task,
+    get_total_usage,
+)
+
+# 1. Load agent specs from YAML
+specs = SubAgentSpec.from_yaml("agents.yaml")
+
+# 2. Create toolset with custom factories where needed
+toolset = create_agent_factory_toolset(
+    specs,
+    agent_factories={"research": create_research_agent},
+    default_agent_factory=standard_factory,
+)
+
+# 3. Run tasks
+research_handle = await toolset.run("research", query="...")
+summary_handle = await toolset.run("summarizer", input=research_handle.result)
+validation_handle = await toolset.run("validator", input=summary_handle.result)
+
+# 4. Check token usage per task
+for handle in [research_handle, summary_handle, validation_handle]:
+    check_task(handle)
+
+# 5. Get total usage
+total = get_total_usage([research_handle, summary_handle, validation_handle])
+print(f"Total: {total.total_tokens} tokens")
+```
+
+La configuracion vive en YAML. La logica de negocio vive en Python. El seguimiento de tokens es automatico. Las salidas estructuradas fluyen entre agentes sin hacks de serializacion.
+
+## Conclusiones clave
+
+- **SubAgentSpec** separa la configuracion de agentes (YAML/JSON) de la logica de la aplicacion (Python) — iteracion mas segura, mejor colaboracion en equipo
+- **Fabricas de agentes personalizados** permiten mezclar agentes simples y complejos en el mismo sistema
+- **Seguimiento de tokens a nivel de tarea** muestra cual tarea logica consume recursos
+- **Serializacion de salidas estructuradas** preserva la estructura JSON entre agentes encadenados
+- **Validacion Pydantic** detecta errores de configuracion al cargar, no en runtime
+
+## Pruebalo
+
+```bash
+pip install pydantic-ai-subagents
+```
+
+- GitHub: [github.com/vstorm-co/pydantic-ai-subagents](https://github.com/vstorm-co/pydantic-ai-subagents)
+- Mas de Vstorm OSS: [oss.vstorm.co](https://oss.vstorm.co)
+
+---
+
+*Mas de nuestras herramientas open-source:*
+- *[pydantic-ai-shields: 10 Guardrails, Zero Dependencies](/blog/pydantic-ai-shields-10-guardrails-zero-dependencies)*
+- *[5 Frameworks, 1 Template: Architecture Deep Dive](/blog/5-ai-frameworks-1-template-architecture)*
+- *[Full-Stack AI Agent Template](https://github.com/vstorm-co/full-stack-ai-agent-template)*

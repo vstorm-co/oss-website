@@ -1,0 +1,31 @@
+---
+import AdminApp from '../../components/admin/AdminApp.tsx';
+
+const isDev = import.meta.env.DEV;
+---
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Blog Admin · Local</title>
+    <link rel="icon" href="/favicon.svg" />
+    <style is:global>
+      html, body { margin: 0; padding: 0; height: 100%; background: #09090b; color: #fafafa; font-family: Inter, system-ui, sans-serif; }
+      #admin-root { height: 100vh; }
+    </style>
+  </head>
+  <body>
+    {isDev ? (
+      <div id="admin-root">
+        <AdminApp client:only="react" />
+      </div>
+    ) : (
+      <div style="padding:2rem;font-family:system-ui;max-width:40rem;margin:4rem auto">
+        <h1 style="font-size:1.5rem;margin-bottom:1rem">Admin panel is dev-only</h1>
+        <p style="color:#a1a1aa">This route is only available when running <code>bun run dev</code> locally.</p>
+      </div>
+    )}
+  </body>
+</html>

@@ -52,6 +52,7 @@ const postCount = t["blog.tag.postCount"].replace("{count}", String(posts.length
   lang={lang}
   alternates={alternates}
   schemas={[collectionPageSchema({ name: pageTitle, description: `Browse ${postCount} tagged "${tag}" — tutorials, guides, and deep dives on building production AI agents with Python.`, url: SITE_URL + `/blog/tag/${tag}/` })]}
+  noindex={true}
 >
   <Navbar currentLang={lang} languageLinks={alternates} />
   <Breadcrumbs items={[

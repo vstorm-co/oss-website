@@ -1,0 +1,142 @@
+---
+title: "/improve: Wie pydantic-deep-Agenten aus ihrer eigenen Sitzungshistorie lernen"
+description: "Wie /improve UserFactInsight und AgentLearningInsight aus rohen Tool-Traces extrahiert, um MEMORY.md zu aktualisieren, und warum rohe Traces Zusammenfassungen schlagen."
+pubDate: 2026-04-19
+updatedDate: 2026-04-19
+author: "Kacper Włodarczyk"
+lang: de
+translationKey: self-improving-ai-agents-improve-pipeline-pydantic-deep
+tags: ["pydantic-ai", "python", "ai-agents", "open-source", "developer-tools"]
+category: article
+draft: false
+---
+
+> Diese Woche habe ich pydantic-deeps neue Features vorgestellt, [StuckLoopDetection](https://oss.vstorm.co/blog/stuck-loop-detection-ai-agents-pydantic-deep/), [Kontextfenster-Warnungen](https://oss.vstorm.co/blog/context-window-blindness-ai-agents-limit-warner/), [curl-Installation](https://oss.vstorm.co/blog/ai-agent-install-curl-bash-pydantic-deep/), [Docker-Sandbox](https://oss.vstorm.co/blog/docker-sandbox-ai-agent-pydantic-deep/), [Browser-Automatisierung](https://oss.vstorm.co/blog/browser-automation-ai-agent-pydantic-deep/) und [TUI-Observability](https://oss.vstorm.co/blog/ai-agent-tui-observability-pydantic-deep/). Heute: die Funktion, die am meisten für langfristige Agenten-Deployments bedeutet, /improve.
+
+*Kacper Włodarczyk, KI-Engineering-Berater bei Vstorm. Wir haben 30+ produktive KI-Agentensysteme implementiert. pydantic-deep ist unser Open-Source-KI-Coding-Agent, die modulare Agent-Runtime fur Python.*
+
+## 1. Das Problem: KI-Agenten sind standardmäßig zustandslos
+
+Jedes Mal, wenn du eine Agenten-Sitzung startest, beginnt der Agent bei null.
+
+Er erinnert sich nicht, dass er letzte Woche GitHub nach "pydantic" durchsucht und 0 Ergebnisse erhalten hat, dann "pydantic-ai" versucht und 47 bekommen hat. Er erinnert sich nicht, dass du asynchrone Muster bevorzugst.
+
+/improve ist unsere Lösung dafür.
+
+## 2. Was /improve tut: die Pipeline
+
+/improve ist eine Post-Session-Pipeline, die extrahiert, was in einer Sitzung passiert ist, Erkenntnisse destilliert und sie in eine persistente Wissensdatei (MEMORY.md) schreibt, die zukünftige Sitzungen automatisch laden.
+
+Der Ablauf:
+
+```
+Sitzung endet
+    ↓
+tool_log.jsonl gespeichert (rohe Tool-Aufrufe, bis 20K Zeichen)
+    ↓
+/improve-Befehl ausgelöst
+    ↓
+Extraktions-Agent liest rohe Tool-Traces
+    ↓
+Extrahiert: UserFactInsight + AgentLearningInsight
+    ↓
+Synthese-Agent: Insights + rohe Traces → strukturierte Verbesserungen
+    ↓
+MEMORY.md aktualisiert
+    ↓
+Nächste Sitzung: Agent lädt MEMORY.md beim Start
+```
+
+## 3. UserFactInsight vs AgentLearningInsight
+
+**UserFactInsight**, Fakten über *dich*:
+- "Benutzer bevorzugt asynchrone Python-Muster"
+- "Benutzer arbeitet an pydantic-deep"
+- "Projekte des Benutzers liegen in ~/Projects/"
+
+**AgentLearningInsight**, Fakten über die *Domäne, Tools, Muster*:
+- "GitHub: 'pydantic-ai' liefert bessere Suchergebnisse als 'pydantic'"
+- "Tool X schlägt bei leerem Input lautlos fehl"
+
+UserFactInsight personalisiert das Verhalten. AgentLearningInsight verbessert die Korrektheit.
+
+## 4. Der Meta-Harness-Befund: Rohe Traces schlagen Zusammenfassungen
+
+Wir testeten zwei Ansätze für die Eingaben des Synthese-Agenten. Rohe Tool-Traces gewannen deutlich.
+
+Warum:
+
+**Zusammenfassung:** "Agent durchsuchte GitHub und fand das relevante Repository."
+
+**Roher Trace:**
+```python
+browser.navigate("github.com/search?q=pydantic+agent")
+# → 0 Ergebnisse
+
+browser.navigate("github.com/search?q=pydantic-ai+agent")
+# → 47 Ergebnisse
+
+browser.click("vstorm-co/pydantic-deep")
+# → Erfolg
+```
+
+Aus dem rohen Trace kann der Synthese-Agent extrahieren: "Verwende 'pydantic-ai' statt 'pydantic' für GitHub-Suchen."
+
+Aus der Zusammenfassung: nichts Nützliches.
+
+**Zusammenfassungen optimieren für Lesbarkeit, aber Synthese braucht den Entscheidungspfad.** Der rohe Trace ist der eigentliche Beweis.
+
+Praktische Auswirkung: `tool_log.jsonl` speichert jetzt bis zu 20K Zeichen rohe Tool-Call-Daten pro Sitzung (vorheriges Limit: 2K).
+
+## 5. MEMORY.md als sich entwickelnde Wissensbasis des Agenten
+
+MEMORY.md liegt unter `.pydantic-deep/main/MEMORY.md`. Der Agent lädt sie beim Start vor der Verarbeitung von Benutzerprompts.
+
+Nach einigen Sitzungen mit /improve könnte sie so aussehen:
+
+```markdown
+# Memory
+
+## User Facts
+- Prefers async Python patterns
+- Working on pydantic-deep (github.com/vstorm-co/pydantic-deep)
+
+## Agent Learnings
+- GitHub: use "pydantic-ai" not "pydantic" for better search results
+- Check for empty input before calling file read tools
+```
+
+## 6. Behobene Bugs, Shipping-Realität
+
+- **Absturz bei `{}` in Prompt-Templates**, `str.format()` warf KeyError; behoben durch Escaping
+- **Stille Fehler**, meldet jetzt `failed_sessions` + `last_error`
+- **Fehlender API-Key**, lädt jetzt Keys aus dem Keystore vor der Agenten-Erstellung
+- **Falsches Modell**, hardcodierter OpenRouter-Fallback ersetzt durch Modell aus `config.toml`
+- **MEMORY.md-Pfad-Mismatch**, schrieb in `./MEMORY.md` statt `.pydantic-deep/main/MEMORY.md`
+
+## 7. Den Bogen schließen
+
+Diese Woche erhielt pydantic-deep: StuckLoopDetection · LimitWarnerCapability · curl-Installation · Docker-Sandbox · Browser-Automatisierung · TUI-Observability · /improve.
+
+Kombiniere alles und du hast einen Agenten, der sich nicht festfährt, nicht kontext-blind wird, sicher isoliert läuft, das Web sehen kann, dir zeigt was er tut und kostet, und **mit jeder Sitzung besser wird**.
+
+## Wichtigste Erkenntnisse
+
+- KI-Agenten sind standardmäßig zustandslos, /improve behebt das
+- Zwei Insight-Typen: UserFactInsight (über dich) und AgentLearningInsight (über die Domäne)
+- Rohe Traces schlagen Zusammenfassungen, der Entscheidungspfad ist das eigentliche Signal
+- MEMORY.md als sich entwickelnde Wissensbasis des Agenten
+- 5 behobene Bugs in v0.3.4, Zuverlässigkeit ist schwer
+- Kein Retraining nötig, Verbesserung kommt aus dem Kontext, nicht aus Modellgewichten
+
+Diese ganze Woche drehte sich um pydantic-deep. Wenn du es in eine Full-Stack-App integrieren willst, liefert [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-ai-agent-template) es fertig integriert, von FastAPI-Backend bis Next.js-Frontend.
+
+## Ausprobieren
+
+```bash
+curl -fsSL https://oss.vstorm.co/install.sh | bash
+```
+
+GitHub: [github.com/vstorm-co/pydantic-deep](https://github.com/vstorm-co/pydantic-deep)
+
+Für welche Sitzungen würdest du /improve zuerst ausführen?

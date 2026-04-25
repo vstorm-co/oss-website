@@ -1,0 +1,197 @@
+---
+title: "/improve: How pydantic-deep Agents Learn from Their Own Session History"
+seoTitle: "Self-Improving AI Agents: /improve Pipeline in pydantic-deep"
+description: "How /improve extracts UserFactInsight and AgentLearningInsight from raw tool traces to update MEMORY.md, and why raw traces beat summaries for synthesis."
+pubDate: 2026-04-19
+updatedDate: 2026-04-19
+author: "Kacper Włodarczyk"
+lang: en
+translationKey: self-improving-ai-agents-improve-pipeline-pydantic-deep
+tags: ["pydantic-ai", "python", "ai-agents", "open-source", "developer-tools"]
+category: article
+draft: false
+---
+
+For three months my AI agent made the same wrong query every morning.
+
+Search "pydantic", zero results. Search "pydantic-ai", forty-seven. Click the right repo. Every. Single. Session.
+
+I would watch it happen, sigh, and move on, because I knew correcting the agent was pointless. By tomorrow it would forget the correction anyway. This is the default state of most AI agents today, and it's the reason we built `/improve`.
+
+*Kacper Włodarczyk, AI engineering consultant at Vstorm. We've shipped 30+ production AI agent systems. pydantic-deep is our open-source agent runtime for Python, built on what we've learned from those deployments.*
+
+## 1. The problem: AI agents are stateless by default
+
+Every time you start an agent session, the agent starts from zero.
+
+It doesn't remember that last Tuesday it tried searching GitHub for "pydantic" and got 0 results, then tried "pydantic-ai" and got 47. It doesn't remember that you prefer async patterns over sync. It doesn't remember that the API you're working with returns paginated results and needs special handling.
+
+For a single-use tool, this is fine. For a coding agent you use every day, it's a significant limitation. You end up re-explaining the same context repeatedly. The agent makes the same mistakes across sessions.
+
+/improve is our solution to this.
+
+## 2. What /improve does: the pipeline
+
+/improve is a post-session pipeline that extracts what happened in a session, distills learnings, and writes them to a persistent knowledge file (MEMORY.md) that future sessions load automatically.
+
+Here's the flow:
+
+```
+Session ends
+    ↓
+tool_log.jsonl saved (raw tool calls, up to 20K chars)
+    ↓
+/improve command triggered
+    ↓
+Extraction agent reads raw tool traces
+    ↓
+Extracts: UserFactInsight + AgentLearningInsight
+    ↓
+Synthesis agent: insights + raw traces → structured improvements
+    ↓
+MEMORY.md updated
+    ↓
+Next session: agent loads MEMORY.md on startup
+```
+
+The output isn't a log file you read later. It's living documentation that changes how the agent behaves in the next session.
+
+## 3. UserFactInsight vs AgentLearningInsight
+
+We designed two distinct insight categories because they serve different purposes.
+
+**UserFactInsight** captures facts about *you*:
+- "User prefers async Python patterns over sync"
+- "User is working on pydantic-deep, an AI coding agent"
+- "User wants concise responses, not extensive explanations"
+- "User's projects live in ~/Projects, not ~/code"
+
+**AgentLearningInsight** captures what the agent learned about the *domain, tools, and patterns*:
+- "GitHub search works better with 'pydantic-ai' than 'pydantic'"
+- "The Anthropic API returns usage data in stream chunks, not just at completion"
+- "Tool X fails silently on empty input, check before calling"
+
+UserFactInsight personalizes behavior. AgentLearningInsight improves correctness. Both live in MEMORY.md, organized by category.
+
+One design decision worth noting: we relaxed the synthesis rules so that UserFactInsight can be extracted from a single session. Previously, a fact needed to appear across multiple sessions to be included. In practice, a user preference stated clearly once should be remembered.
+
+## 4. The Meta-Harness finding: raw traces beat summaries
+
+This is the part that surprised us most during development.
+
+We tested two approaches for what input the synthesis agent receives:
+
+**Approach A:** Extraction agent produces summaries → synthesis works from summaries.
+
+**Approach B:** Extraction agent produces insights AND passes raw tool traces → synthesis works from both.
+
+Approach B won clearly. We called this the Meta-Harness finding.
+
+Here's why. Consider a session where the agent searched GitHub:
+
+**Summary:** "Agent searched GitHub and found the relevant repository."
+
+**Raw trace:**
+```python
+browser.navigate("github.com/search?q=pydantic+agent")
+# → 0 results
+
+browser.navigate("github.com/search?q=pydantic-ai+agent")
+# → 47 results
+
+browser.click("vstorm-co/pydantic-deep")
+# → success
+```
+
+The summary is accurate but loses everything interesting: what the first query was, that it failed, what the agent tried next. The raw trace preserves the full decision path.
+
+From the raw trace, the synthesis agent can extract: "Use 'pydantic-ai' not 'pydantic' for GitHub searches, the exact package name gets significantly more results."
+
+From the summary: "GitHub search succeeded." Useless.
+
+**Summaries optimize for readability, but synthesis needs the decision path.** The raw trace is the actual evidence. Summaries are lossy compression of that evidence.
+
+Practical implication: `tool_log.jsonl` now stores up to 20K characters of raw tool call data per session. (The previous limit was 2K, which silently truncated most real sessions.)
+
+## 5. MEMORY.md as evolving agent knowledge base
+
+MEMORY.md lives at `.pydantic-deep/main/MEMORY.md`. The agent loads it on startup before any user prompt is processed.
+
+After a few sessions with /improve, it might look like:
+
+```markdown
+# Memory
+
+## User Facts
+- Prefers async Python patterns
+- Working on pydantic-deep (github.com/vstorm-co/pydantic-deep)
+- Projects live in ~/Projects/
+- Prefers minimal output, not verbose explanations
+
+## Agent Learnings
+- GitHub: use "pydantic-ai" not "pydantic" for better search results
+- Anthropic API usage data available in stream (not just completion)
+- Project uses underscores in filenames, not hyphens
+- Check for empty input before calling file read tools
+```
+
+This file grows and refines with each /improve run. Conflicting information gets resolved. Stale facts get updated.
+
+Key constraint: /improve writes to this file, it doesn't read from it during extraction. This prevents circular reinforcement of existing beliefs.
+
+## 6. The bugs we fixed, shipping reality
+
+/improve v0.3.4 shipped with significant reliability fixes:
+
+**Crash on `{}` in prompt templates**
+Template strings passed through `str.format()`. Any `{}` in user content caused a `KeyError`. Fix: escape `{` → `{{` before format, unescape after.
+
+**Silent failures**
+/improve could fail mid-session and report success. We added: `failed_sessions` count and `last_error` message.
+
+**API key not loaded**
+The synthesis agent was created before the keystore was queried. Fix: load API keys before instantiating agents.
+
+**Wrong model used**
+The synthesis agent was hardcoded to an OpenRouter fallback model. Fixed to use the model from `config.toml`.
+
+**MEMORY.md path mismatch**
+/improve was writing to `./MEMORY.md` (project root) rather than `.pydantic-deep/main/MEMORY.md` (where the agent reads it). The writes were succeeding, but the agent wasn't reading them.
+
+This last one is the kind of bug that's invisible until you check: "wait, why isn't the agent remembering anything?"
+
+## 7. Closing the arc
+
+This week, pydantic-deep got:
+
+- **[StuckLoopDetection](https://oss.vstorm.co/blog/stuck-loop-detection-ai-agents-pydantic-deep/)**, stops agents from running 47 identical tool calls
+- **[LimitWarnerCapability](https://oss.vstorm.co/blog/context-window-blindness-ai-agents-limit-warner/)**, warns before context fills and degrades
+- **[curl install](https://oss.vstorm.co/blog/ai-agent-install-curl-bash-pydantic-deep/)**, one command, no pip environment management
+- **[Docker sandbox + CI runner](https://oss.vstorm.co/blog/docker-sandbox-ai-agent-pydantic-deep/)**, isolated execution, safe for automation
+- **[Browser automation](https://oss.vstorm.co/blog/browser-automation-ai-agent-pydantic-deep/)**, real web access, not just API calls
+- **[TUI observability](https://oss.vstorm.co/blog/ai-agent-tui-observability-pydantic-deep/)**, per-turn tokens, live thinking, cost tracking
+- **[/improve](https://oss.vstorm.co/blog/self-improving-ai-agents-improve-pipeline-pydantic-deep/)**, session analysis, insight extraction, MEMORY.md updates
+
+Combine all of these and you have an agent that doesn't get stuck, doesn't go blind, runs safely in isolation, can see the web, shows you everything it does and costs, and gets better every time you use it.
+
+## Key Takeaways
+
+- **AI agents are stateless by default**, every session starts from zero without explicit memory
+- **`/improve` runs post-session**, reads `tool_log.jsonl`, extracts insights, updates MEMORY.md
+- **Two insight types**: `UserFactInsight` (about you) and `AgentLearningInsight` (about the domain)
+- **Raw traces beat summaries** (Meta-Harness finding), the full decision path is the evidence; summaries are lossy
+- **MEMORY.md** is the agent's evolving knowledge base, loaded on startup, updated after /improve
+- **Reliability matters**, 5 bugs fixed in v0.3.4 that made /improve unreliable in real conditions
+- **No retraining required**, improvement comes from context, not model weights
+
+This whole week was about pydantic-deep. If you want it plugged into a full-stack app, [full-stack-ai-agent-template](https://github.com/vstorm-co/full-stack-ai-agent-template) ships it integrated, from FastAPI backend to Next.js frontend, with pydantic-deep wired in.
+
+## Try it
+
+```bash
+curl -fsSL https://oss.vstorm.co/install.sh | bash
+```
+
+GitHub: [github.com/vstorm-co/pydantic-deep](https://github.com/vstorm-co/pydantic-deep)
+
+What sessions would you run /improve on first?

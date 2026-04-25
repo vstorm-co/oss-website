@@ -1,0 +1,201 @@
+---
+title: "Was waere, wenn Ihr KI-Agent aus seinen Fehlern lernen koennte?"
+seoTitle: "Selbstverbessernde KI-Agenten: Automatisches Lernen aus Sitzungsverlaeufen"
+description: "Bauen Sie selbstverbessernde KI-Agenten, die 7 Arten von Erkenntnissen aus vergangenen Sitzungen extrahieren und ihre eigenen Kontextdateien automatisch aktualisieren. Open-Source Python-Framework."
+pubDate: 2026-04-13
+updatedDate: 2026-04-13
+author: "Kacper Włodarczyk"
+lang: de
+translationKey: self-improving-ai-agents
+tags: ["self-improving-agents", "ai-agents", "pydantic-ai", "python", "machine-learning"]
+category: open-source
+draft: false
+---
+
+> **TL;DR:** KI-Agenten wiederholen dieselben Fehler zwischen Sitzungen, weil jede Konversation bei Null beginnt. Der `/improve`-Befehl in pydantic-deep analysiert vergangene Sitzungen, extrahiert 7 Typen strukturierter Erkenntnisse (AgentLearning, Failure, Pattern, UserFact, Preference, Context, Decision) und schlaegt automatisch Aktualisierungen der Kontextdateien vor (SOUL.md, AGENTS.md, MEMORY.md). Kein Fine-Tuning, kein RAG — nur strukturierte Extraktion aus dem, was der Agent bereits erlebt hat, zurueckgefuehrt in den Kontext. Jeder wiederholte Fehler kostet API-Credits und Ingenieurzeit. /improve verwandelt Fehler in dauerhafte Verbesserungen.
+
+Starten Sie Ihren KI-Agenten am Montag. Er sucht Konfigurationsdateien im Projektstammverzeichnis statt im `config/`-Verzeichnis. Sie korrigieren ihn. Es funktioniert.
+
+Starten Sie denselben Agenten am Dienstag. Er sucht wieder Konfigurationsdateien im Stammverzeichnis. Sie korrigieren erneut. Es funktioniert erneut.
+
+Starten Sie ihn am Mittwoch. Derselbe Fehler. Dieselbe Korrektur. Dieselben verschwendeten Tokens und Zeit.
+
+Das ist kein Problem der Modellintelligenz. GPT-4.1, Claude, Gemini — alle machen das. Jede Sitzung beginnt bei Null. Das Kontextfenster fuellt sich, die Sitzung endet und alles, was der Agent gelernt hat, verschwindet.
+
+Nach der Auslieferung von ueber 30 produktiven KI-Agenten-Implementierungen bei [Vstorm](https://vstorm.co) haben wir aufgehoert, das als normal zu akzeptieren. Das Muster war konsistent: Agenten wiederholen dieselben Fehlermodi zwischen Sitzungen, weil sie keinen Mechanismus haben, aus vergangenen Erfahrungen zu lernen.
+
+Also haben wir `/improve` gebaut.
+
+---
+
+*Ich bin Kacper, KI-Ingenieur bei [Vstorm](https://vstorm.co) — einer Applied Agentic AI Engineering Consultancy. Wir haben ueber 30 produktive KI-Agenten-Implementierungen ausgeliefert und veroeffentlichen unsere Tools als Open Source auf [github.com/vstorm-co](https://github.com/vstorm-co). Vernetzen Sie sich mit mir auf [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+
+---
+
+## Das Problem: Zustandslose Agenten in einer zustandsbehafteten Welt
+
+Lassen Sie uns praezisieren, was "Agent-Lernen" bedeutet. Ich spreche nicht ueber Fine-Tuning, RLHF oder Trainingsschleifen. Ich spreche ueber etwas Einfacheres und Praktischeres: **einen Agenten, der nicht dieselben Fehler wiederholt**.
+
+Heutige Agenten-Frameworks — [Pydantic AI](https://ai.pydantic.dev/), LangChain, CrewAI, AutoGen — behandeln Sitzungen als unabhaengige Ereignisse. Der Agent hat einen System-Prompt, vielleicht einige Kontextdateien und eine Konversationshistorie, die jede Sitzung zurueckgesetzt wird. Wenn der Agent entdeckt, dass Ihre Tests in `tests/` (nicht `test/`) liegen, dass Ihr Build-Befehl `make build` (nicht `npm run build`) ist, oder dass Sie Tabs statt Leerzeichen bevorzugen — dieses Wissen stirbt mit der Sitzung.
+
+Der Workaround, den die meisten Teams verwenden: manuelle Aktualisierung des System-Prompts oder der Kontextdateien. Nachdem man dem Agenten beim Kampf zugesehen hat, oeffnet ein Entwickler `CLAUDE.md` oder Aequivalent und fuegt eine Notiz hinzu. Funktioniert. Skaliert aber nicht.
+
+Betrachten Sie, was ueber 50 Sitzungen passiert:
+
+- **Sitzung 12:** Agent entdeckt, dass `docker-compose.yml` in `infra/` liegt, nicht im Projektstammverzeichnis
+- **Sitzung 23:** Agent lernt, dass das Datenbank-Migrationstool Alembic ist, nicht reines SQL
+- **Sitzung 31:** Agent findet heraus, dass die CI-Pipeline `pytest -x --tb=short` ausfuehrt
+- **Sitzung 47:** Agent entdeckt, dass das Monorepo Workspace-Level-Abhaengigkeiten verwendet
+
+Jede dieser Entdeckungen kostet Tokens, Zeit und menschliche Geduld. Und alles sind Dinge, die der Agent irgendwann schon "wusste" — nur in einer anderen Sitzung, die fuer immer verschwunden ist.
+
+## Vorstellung von /improve: Automatisierte Sitzungsanalyse
+
+`/improve` ist ein Befehl in [pydantic-deep](https://github.com/vstorm-co/pydantic-deep), unserem Open-Source-KI-Agenten-Framework, das das "Deep Agent Pattern" implementiert (dieselbe Architektur wie Claude Code, Manus und Devin).
+
+Auf hoher Ebene macht `/improve` drei Dinge:
+
+1. **Analysiert vergangene Sitzungen** — liest Konversationsprotokolle der letzten N Tage
+2. **Extrahiert strukturierte Erkenntnisse** — identifiziert 7 Typen von Learnings aus diesen Sitzungen
+3. **Aktualisiert Kontextdateien** — schlaegt Aenderungen an SOUL.md, AGENTS.md und MEMORY.md vor
+
+Das Ergebnis: Der Agent wird nach jeder Charge von Sitzungen klueger, ohne dass jemand manuell Dateien bearbeitet.
+
+```python
+from pydantic_deep.improve.analyzer import ImprovementAnalyzer
+
+analyzer = ImprovementAnalyzer(
+    model="anthropic:claude-opus-4-6",
+    sessions_dir=get_sessions_dir(),
+    working_dir=Path("."),
+)
+report = await analyzer.analyze(days=7)
+# report.proposed_changes → automatic MEMORY.md updates
+```
+
+Ein Befehl. Sieben Tage Sitzungen analysiert. Kontextdateien aktualisiert.
+
+## 7 Typen von Erkenntnissen
+
+Der Kern von `/improve` ist sein Erkenntnisextraktionssystem. Anstatt rohe Sitzungsdaten in einen Prompt zu werfen, kategorisiert es Entdeckungen in 7 strukturierte Typen:
+
+**1. AgentLearning** — Dinge, die der Agent durch Versuch und Irrtum herausgefunden hat:
+
+```python
+@dataclass
+class AgentLearningInsight:
+    learning: str     # e.g. "tests are in tests/ dir"
+    category: str     # tool_chain, file_location, build_command...
+    evidence: str     # Tool calls that proved this
+    confidence: float # 0.0-1.0
+```
+
+*Beispiel: "Das Projekt verwendet `make test`, nicht `pytest` direkt. Konfidenz: 0.95 (in 4 Sitzungen beobachtet)."*
+
+**2. Failure** — was schiefging und wie es geloest wurde:
+
+```python
+@dataclass
+class FailureInsight:
+    description: str  # What went wrong
+    root_cause: str   # Why it happened
+    resolution: str   # How it was fixed
+```
+
+*Beispiel: "Agent versuchte `/src/main.py` zu bearbeiten, aber der tatsaechliche Pfad ist `/app/main.py`. Ursache: Standard-Python-Projektstruktur angenommen. Loesung: immer zuerst den Dateibaum pruefen."*
+
+**3. Pattern** — wiederkehrende Workflows des Agenten:
+
+```python
+@dataclass
+class PatternInsight:
+    pattern: str      # e.g. "read -> edit -> test -> commit"
+    frequency: int    # How many times observed
+    context: str      # When this pattern applies
+```
+
+*Beispiel: "Datei lesen -> bearbeiten -> Tests ausfuehren -> committen. Haeufigkeit: 12. Kontext: alle Code-Modifikationsaufgaben."*
+
+**4. UserFact** — Dinge, die der Agent ueber die Praeferenzen und Umgebung des Benutzers gelernt hat.
+
+**5. Preference** — wie der Benutzer Dinge erledigt haben moechte (Code-Stil, Kommunikationsstil, Tool-Auswahl).
+
+**6. Context** — projektspezifische Fakten (Tech-Stack, Architekturentscheidungen, Team-Konventionen).
+
+**7. Decision** — Schluesselentscheidungen waehrend Sitzungen, die persistent bleiben sollten.
+
+Jeder Erkenntnistyp hat eine spezifische Struktur, spezifische Beweisanforderungen und eine spezifische Zieldatei (SOUL.md, AGENTS.md oder MEMORY.md).
+
+## Warum das wichtig ist: Die Kosten der Wiederholung
+
+Der Business Case fuer selbstverbessernde Agenten ist einfach:
+
+**Verschwendete API-Credits.** Jeder wiederholte Fehler verbrennt Tokens. Ein Agent, der 5 Tool-Aufrufe damit verbringt, Ihre Dateistruktur zu entdecken — in jeder Sitzung — verbraucht moeglicherweise 2.000-3.000 zusaetzliche Tokens pro Sitzung. Bei 50 Sitzungen pro Woche sind das 100K-150K verschwendete Tokens. Bei GPT-4.1- oder Claude-Preisen summiert sich das.
+
+**Verschwendete Ingenieurzeit.** Jedes Mal, wenn ein Ingenieur einen bekannten Agentenfehler beobachtet und manuell korrigiert, ist das Overhead durch Kontextwechsel. Multiplizieren Sie das mit der Anzahl der Entwickler in Ihrem Team, die taeglich KI-Agenten nutzen.
+
+**Kumulierendes Wissen.** Die Umkehrung von sich kumulierenden Fehlern ist sich kumulierendes Wissen. Ein Agent, der aus 50 Sitzungen lernt, hat Kontext, dessen manuelle Dokumentation Stunden dauern wuerde. Und anders als manuelle Dokumentation erfasst `/improve` Dinge, an die Menschen nicht denken wuerden — Tool-Chain-Eigenheiten, Fehlermuster, implizite Praeferenzen.
+
+## Was /improve NICHT ist
+
+Um die Grenzen klar abzustecken:
+
+- **Kein Fine-Tuning.** Die Modellgewichte aendern sich nicht. /improve aktualisiert Kontextdateien, die in den System-Prompt geladen werden.
+- **Kein RAG.** Es gibt keine Vektordatenbank oder semantische Suche. Erkenntnisse sind strukturiert, kategorisiert und in spezifische Dateien geschrieben.
+- **Keine Magie.** Wenn Ihr Agent eine Aufgabe grundsaetzlich nicht ausfuehren kann, hilft /improve nicht. Es optimiert das, was der Agent bereits kann.
+
+Denken Sie an den Unterschied zwischen einem Entwickler, der ein persoenliches Wiki mit Lessons Learned fuehrt, und einem, der jeden Morgen bei Null anfaengt. Dieselben Faehigkeiten, voellig unterschiedliche Effektivitaet.
+
+## Erste Schritte
+
+pydantic-deep ist Open Source:
+
+```bash
+pip install pydantic-deep
+```
+
+```python
+from pydantic_deep.improve.analyzer import ImprovementAnalyzer
+from pydantic_deep.config import get_sessions_dir
+from pathlib import Path
+
+analyzer = ImprovementAnalyzer(
+    model="anthropic:claude-opus-4-6",
+    sessions_dir=get_sessions_dir(),
+    working_dir=Path("."),
+)
+
+# Analyze last 7 days of sessions
+report = await analyzer.analyze(days=7)
+
+# Review proposed changes
+for change in report.proposed_changes:
+    print(f"File: {change.target_file}")
+    print(f"Action: {change.action}")
+    print(f"Content: {change.content}")
+```
+
+Das Framework implementiert das Deep Agent Pattern — dieselbe Architektur, die Claude Code, Manus und Devin antreibt — mit integrierter Sitzungsaufzeichnung, Kontextverwaltung und jetzt Selbstverbesserung.
+
+- GitHub: [github.com/vstorm-co/pydantic-deep](https://github.com/vstorm-co/pydantic-deep)
+- OSS-Portal: [oss.vstorm.co](https://oss.vstorm.co)
+
+## Wichtigste Erkenntnisse
+
+- **KI-Agenten sind standardmaessig zustandslos.** Jede Sitzung beginnt bei Null, selbst wenn der Agent dasselbe Problem gestern geloest hat.
+- **Selbstverbesserung erfordert kein Fine-Tuning.** Strukturierte Erkenntnisextraktion aus vergangenen Sitzungen, zurueckgefuehrt in Kontextdateien, reicht fuer signifikante Verbesserungen.
+- **7 Erkenntnistypen decken das volle Lernspektrum ab:** Fehler, Muster, Learnings, Benutzerfakten, Praeferenzen, Kontext und Entscheidungen.
+- **Die Kosten der Wiederholung kumulieren sich.** Verschwendete Tokens + verschwendete Ingenieurzeit, jede Sitzung, jeden Tag.
+- **/improve automatisiert, was gute Ingenieure manuell tun:** vergangene Arbeit ueberpruefen und Lessons Learned aufschreiben.
+
+## Was kommt als Naechstes
+
+Dies ist Post 1 von 3 in der Serie Selbstverbessernde Agenten.
+
+**Mittwoch:** Ich zerlege die Architektur unter der Haube — die 4-stufige Pipeline (Discovery, Extraction, Raw Traces, Synthesis), wie wir 140K-Token-Sitzungsprotokolle verarbeiten und warum strukturierte Erkenntnistypen wichtiger sind als rohe Zusammenfassungen.
+
+**Freitag:** Echte Ergebnisse aus der Ausfuehrung von /improve auf 50 Sitzungen. Was es gefunden hat, was es uebersehen hat und die tatsaechliche Auswirkung auf die Agentenleistung.
+
+---
+
+*Folgen Sie mir auf [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/) oder [X](https://x.com/kacper_wlodar) fuer taegliche Posts ueber KI-Agenten-Engineering. Alle unsere Tools sind Open Source auf [github.com/vstorm-co](https://github.com/vstorm-co).*

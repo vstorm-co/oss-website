@@ -1,0 +1,29 @@
+---
+export interface Props {
+  items: Array<{ title: string; body?: string }>;
+}
+const { items } = Astro.props;
+---
+{/* @mdx-label Steps */}
+{/* @mdx-description Numbered step-by-step list */}
+{/* @mdx-snippet
+<Steps items={[
+  { title: "Install", body: "Run the install command." },
+  { title: "Configure", body: "Edit the config file." },
+  { title: "Ship", body: "Deploy to production." },
+]} />
+*/}
+
+<ol class="not-prose my-6 space-y-4">
+  {items.map((item, i) => (
+    <li class="flex gap-4">
+      <span class="flex-shrink-0 w-8 h-8 rounded-full bg-accent/10 border border-accent/40 text-accent flex items-center justify-center font-semibold text-sm">
+        {i + 1}
+      </span>
+      <div class="flex-1 min-w-0 pt-1">
+        <div class="font-semibold text-text">{item.title}</div>
+        {item.body && <div class="mt-1 text-sm text-text-secondary">{item.body}</div>}
+      </div>
+    </li>
+  ))}
+</ol>

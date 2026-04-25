@@ -1,0 +1,33 @@
+---
+export interface Props {
+  src: string;
+  title?: string;
+}
+const { src, title = "Embedded video" } = Astro.props;
+
+// Normalize YouTube URLs to /embed/ form
+function toEmbed(url: string): string {
+  const ytWatch = url.match(/youtube\.com\/watch\?v=([\w-]+)/);
+  if (ytWatch) return `https://www.youtube.com/embed/${ytWatch[1]}`;
+  const ytShort = url.match(/youtu\.be\/([\w-]+)/);
+  if (ytShort) return `https://www.youtube.com/embed/${ytShort[1]}`;
+  return url;
+}
+const embed = toEmbed(src);
+---
+{/* @mdx-label VideoEmbed */}
+{/* @mdx-description Responsive iframe (YouTube URLs auto-converted to /embed/) */}
+{/* @mdx-snippet
+<VideoEmbed src="https://www.youtube.com/watch?v=VIDEO_ID" title="Video title" />
+*/}
+
+<div class="not-prose my-8 aspect-video w-full overflow-hidden rounded-lg border border-border">
+  <iframe
+    src={embed}
+    title={title}
+    loading="lazy"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen
+    class="h-full w-full"
+  ></iframe>
+</div>

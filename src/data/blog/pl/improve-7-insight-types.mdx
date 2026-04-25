@@ -1,0 +1,239 @@
+---
+title: "Wewnątrz /improve: Jak wyciągamy 7 typów insightów z sesji agentów AI"
+seoTitle: "Wewnątrz /improve: 7 typów insightów z sesji agentów AI"
+description: "Szczegółowy opis 4-etapowego pipeline'u w komendzie /improve z pydantic-deep — jak dzieli sesje na chunki, wyciąga 7 typowanych kategorii insightów i syntetyzuje proponowane zmiany z oceną pewności."
+pubDate: 2026-04-15
+updatedDate: 2026-04-15
+author: "Kacper Włodarczyk"
+lang: pl
+translationKey: improve-7-insight-types
+tags: ["self-improving-agents", "ai-agents", "pydantic-ai", "python", "session-analysis"]
+category: open-source
+draft: false
+---
+
+> **TL;DR:** Komenda /improve w pydantic-deep uruchamia 4-etapowy pipeline — Discovery, Extraction, Raw Traces, Synthesis — który analizuje przeszłe sesje agenta i proponuje zmiany w plikach kontekstowych. Etap ekstrakcji dzieli sesje na okna 140K tokenów z 5-wiadomościowym overlapem i wyciąga 7 strukturalnych typów insightów za pomocą agentów Pydantic AI. Etap syntezy łączy insighty z wielu sesji, ocenia pewność i proponuje tylko zmiany powyżej 0.7. Cały pipeline jest zautomatyzowany — zero ręcznego czytania logów.
+
+---
+
+W poniedziałek pisałem o prostym problemie: agenty AI nie uczą się na swoich błędach. Powtarzają te same porażki sesja po sesji, bo nic nie jest zachowywane między uruchomieniami.
+
+Dziś chcę pokazać architekturę, która to naprawia — jak `/improve` faktycznie działa pod spodem.
+
+---
+
+*Jestem Kacper, AI Engineer w [Vstorm](https://vstorm.co) — konsultingu inżynieryjnym Applied Agentic AI. Wdrożyliśmy 30+ produkcyjnych agentów AI i publikujemy nasze narzędzia open source na [oss.vstorm.co](https://oss.vstorm.co). Połącz się ze mną na [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/).*
+
+---
+
+## Pipeline
+
+`/improve` to nie jedno wywołanie LLM. To 4-etapowy pipeline orchestrowany przez klasę `ImprovementAnalyzer`:
+
+```python
+async def analyze(self, days=7, max_sessions=20, focus=None) -> ImprovementReport:
+    # 1. Discover sessions
+    session_paths = self._discover_sessions(days)
+    session_paths = session_paths[:max_sessions]
+
+    # 2. Extract insights per session
+    insights: list[SessionInsights] = []
+    for path in session_paths:
+        session_insights, chunks = await self._extractor.extract(path)
+        insights.append(session_insights)
+
+    # 3. Load current context + raw tool sequences
+    current_context = self._load_current_context()
+    tool_sequences = self._load_tool_sequences(session_paths)
+
+    # 4. Synthesize
+    proposed_changes = await self._synthesizer.synthesize(
+        insights, current_context, tool_sequences=tool_sequences
+    )
+    return ImprovementReport(...)
+```
+
+Każdy etap ma konkretne zadanie. Omówię je po kolei.
+
+## Etap 1: Discovery
+
+Najprostszy etap. `/improve` skanuje `~/.pydantic-deep/sessions/` szukając katalogów sesji z ostatnich N dni (domyślnie: 7). Każda sesja to katalog zawierający logi konwersacji i ślady wykonania narzędzi.
+
+Możesz kontrolować zakres: `days=7` patrzy na ostatni tydzień, `max_sessions=20` ogranicza analizę. Parametr `focus` mówi ekstraktorowi na czym się skupić.
+
+Nic wymyślnego — proste przeszukiwanie systemu plików z filtrowaniem po dacie.
+
+## Etap 2: Extraction — serce pipeline'u
+
+Tu dzieje się najważniejsze. `SessionExtractor` przetwarza każdą sesję i wyciąga 7 typów strukturalnych insightów.
+
+### Problem chunkingu
+
+Sesje agentów bywają ogromne. 2-godzinna sesja kodowania łatwo przekracza 500K tokenów. Nie da się tego podać do LLM w jednym strzale.
+
+Rozwiązanie: okna po 140 000 tokenów z 5-wiadomościowym overlapem między chunkami dla ciągłości kontekstu:
+
+- **MAX_TOKENS_PER_CHUNK = 140 000** — mieści się komfortowo w większości okien kontekstowych modeli
+- **OVERLAP_MESSAGES = 5** — ostatnie 5 wiadomości chunka N staje się pierwszymi 5 chunka N+1
+- **Estymacja tokenów** — ~4 znaki na token (szybka heurystyka, wystarczająca do chunkingu)
+- **Obcinanie outputów narzędzi** — 70% głowa, 30% ogon (zachowuje początek i koniec długich outputów)
+
+Podział 70/30 na obcinanie outputów jest celowy. Początek outputu narzędzia zwykle zawiera komendę i początkowe wyniki. Koniec ma status końcowy lub komunikat błędu. Środek to często powtarzalny output, który można bezpiecznie odrzucić.
+
+### 7 typów insightów
+
+Każdy chunk jest analizowany przez agenta Pydantic AI ze structured output — nie wolny tekst, ale typowane dataclasses:
+
+**1. FailureInsight** — Co poszło nie tak, dlaczego i jak zostało naprawione.
+
+```python
+@dataclass
+class FailureInsight:
+    description: str  # What went wrong
+    root_cause: str   # Why it happened
+    resolution: str   # How it was fixed
+    tool_calls: list[str] = field(default_factory=list)
+```
+
+Najcenniejszy typ insightu. Jeśli agent nie uruchomił testów bo zapomniał aktywować virtualenv, `FailureInsight` to łapie — a synteza może wpisać "zawsze aktywuj .venv przed pytest" do kontekstu agenta.
+
+**2. PatternInsight** — Powtarzające się sekwencje wywołań narzędzi.
+
+```python
+@dataclass
+class PatternInsight:
+    pattern: str      # e.g., "read → edit → test → commit"
+    frequency: int
+    context: str
+```
+
+Jeśli agent konsekwentnie robi `read file → edit → run tests → commit` przy naprawianiu bugów, to wzorzec wart skodyfikowania.
+
+**3. PreferenceInsight** — Preferencje stylu użytkownika wyciągnięte z korekt.
+
+```python
+@dataclass
+class PreferenceInsight:
+    preference: str
+    evidence: str     # User correction or explicit request
+```
+
+"Nie używaj typu `any` w TypeScript" — wychwycone z sesji, w której poprawiłeś agenta. Evidence to faktyczna wiadomość użytkownika.
+
+**4. ContextInsight** — Fakty architektoniczne o projekcie.
+
+```python
+@dataclass
+class ContextInsight:
+    fact: str
+    confidence: float
+```
+
+"Projekt używa Alembic do migracji bazy danych" — odkryte z tool traces pokazujących komendy `alembic upgrade head`.
+
+**5. DecisionInsight** — Ważne decyzje podjęte podczas sesji.
+
+```python
+@dataclass
+class DecisionInsight:
+    decision: str
+    reasoning: str
+    confirmed: bool
+```
+
+"Przejście z REST na WebSocket do streamingu odpowiedzi" — z uzasadnieniem. Flaga `confirmed` wskazuje czy użytkownik jawnie zatwierdził.
+
+**6. UserFactInsight** — Fakty o tobie, deweloperze.
+
+```python
+@dataclass
+class UserFactInsight:
+    fact: str
+    category: str     # identity, role, language, expertise, preference
+    confidence: float
+```
+
+Kategorie: identity, role, language, expertise, preference. "Użytkownik woli komentarze po polsku ale kod po angielsku" — wyciągnięte z faktycznych interakcji.
+
+**7. AgentLearningInsight** — Rzeczy które agent odkrył o środowisku.
+
+```python
+@dataclass
+class AgentLearningInsight:
+    learning: str
+    category: str     # tool_chain, file_location, build_command, environment
+    evidence: str
+    confidence: float
+```
+
+"pytest uruchamia się z roota projektu przez `python -m pytest`" — z faktycznym tool trace jako dowodem.
+
+## Etap 3: Raw Tool Traces
+
+Tu `/improve` odchodzi od prostszych podejść.
+
+Zamiast przekazywać do syntezy tylko wyciągnięte insighty, ładujemy też surowe pliki `tool_log.jsonl` z każdej sesji. To realizuje zasadę **Meta-Harness**: surowe ślady wykonania zawierają informacje diagnostyczne, które giną gdy LLM je podsumowuje.
+
+Pomyśl — LLM wyciągający insighty może zanotować "test się nie powiódł." Surowy trace pokazuje *dokładnie* która asercja zawiodła, jakie były oczekiwane vs. faktyczne wartości i jaka komenda została uruchomiona.
+
+## Etap 4: Synteza
+
+Syntezator bierze wszystko — wyciągnięte insighty ze wszystkich sesji, aktualne pliki kontekstowe i surowe traces — i produkuje proponowane zmiany.
+
+```python
+agent: Agent[None, _SynthesisOutput] = Agent(
+    model=self._model,
+    output_type=_SynthesisOutput,
+    instructions=prompt,
+)
+result = await agent.run(user_prompt)
+```
+
+Znów structured output przez Pydantic AI. Każda proponowana zmiana zawiera:
+
+- **target_file** — który plik zaktualizować (SOUL.md, AGENTS.md lub MEMORY.md)
+- **change_type** — create (nowy plik), append (dodaj sekcję), update (zamień sekcję)
+- **confidence** — 0.0 do 1.0. Tylko zmiany z wynikiem **>= 0.7** są proponowane
+- **source_sessions** — które sesje dostarczyły dowodów
+
+Próg pewności jest kluczowy. Jedna sesja z `npm run build` nie oznacza, że to zawsze twoja komenda build. Ale jeśli 8 z 10 sesji jej używa — pewność jest wysoka i zmiana jest proponowana.
+
+### Aplikacja zmian
+
+Trzy typy zmian z jasnymi semantykami:
+
+- **create** — Nowy plik (np. pierwsze generowanie MEMORY.md)
+- **append** — Dodanie treści na koniec istniejącego pliku
+- **update** — Znalezienie sekcji po nagłówku, zamiana treści do następnego nagłówka tego samego lub wyższego poziomu
+
+Zmiany przechodzą przez review w TUI przed aplikacją. Widzisz dokładnie co `/improve` chce zmienić i zatwierdzasz lub odrzucasz każdą zmianę.
+
+## Persistence stanu
+
+`/improve` śledzi swoją historię w `.pydantic-deep/improve_state.json`:
+
+- Liczba uruchomień
+- Przeanalizowane sesje
+- Zaakceptowane vs. odrzucone zmiany
+
+To znaczy, że `/improve` nie re-analizuje sesji, które już przetworzył, i uczy się z twoich decyzji akceptuj/odrzuć.
+
+## Dlaczego structured output ma znaczenie
+
+Każdy krok ekstrakcji i syntezy używa agentów Pydantic AI z typowanymi schematami outputu. Żadnego parsowania regexem. Żadnego "wyciągnij JSON z bloku markdown." Model zwraca typowane dataclasses, walidowane na granicy.
+
+To nie jest tylko czysty kod — to niezawodność. Gdy przetwarzasz 20 sesji z wieloma chunkami każda, jedna źle sformatowana ekstrakcja psuje cały pipeline. Structured output przez Pydantic AI eliminuje ten tryb awarii.
+
+---
+
+## Co dalej
+
+Architektura to jedno. Wyniki to drugie.
+
+W piątek pokażę co `/improve` faktycznie znalazł gdy uruchomiliśmy go na 50 prawdziwych sesjach agentów — odkryte wzorce, złapane błędy i jak to zmieniło zachowanie agenta.
+
+Chcesz spróbować wcześniej: [github.com/vstorm-co/pydantic-deep](https://github.com/vstorm-co/pydantic-deep)
+
+---
+
+*To część 2 z 3-częściowej serii o samodoskonalących się agentach. [Część 1: A gdyby twój agent AI mógł uczyć się na błędach?](/blog/what-if-agent-could-learn/) opisała problem i rozwiązanie na wysokim poziomie. Część 3 (piątek) pokaże realne wyniki z uruchomienia /improve na 50 sesjach.*

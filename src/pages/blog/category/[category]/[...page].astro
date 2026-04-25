@@ -46,6 +46,7 @@ const languageLinks = [{ lang: defaultLang, href: `/blog/category/${category}/` 
   lang={lang}
   schemas={[collectionPageSchema({ name: `${categoryLabel} — ${t["blog.title"]}`, description: t["blog.subtitle"], url: SITE_URL + `/blog/category/${category}/` })]}
   theme="light"
+  noindex={true}
 >
   <Navbar currentLang={lang} languageLinks={languageLinks} />
 

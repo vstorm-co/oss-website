@@ -25,6 +25,7 @@ interface Props {
   ogType?: "website" | "article";
   articleDates?: { published: string; modified?: string };
   theme?: "light" | "dark";
+  noindex?: boolean;
 }
 
 const {
@@ -38,6 +39,7 @@ const {
   ogType = "website",
   articleDates,
   theme = "light",
+  noindex = false,
 } = Astro.props;
 
 const isLight = theme === "light";
@@ -89,6 +91,7 @@ const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbItems);
     <meta name="keywords" content={keywords} />
     <meta name="author" content="vstorm" />
     <meta name="generator" content={Astro.generator} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
 
     <link rel="canonical" href={canonicalURL} />
     <link rel="alternate" type="application/rss+xml" title="Vstorm OSS Blog" href="/rss.xml" />

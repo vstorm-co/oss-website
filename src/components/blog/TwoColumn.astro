@@ -1,0 +1,30 @@
+---
+export interface Props {
+  leftTitle?: string;
+  rightTitle?: string;
+}
+const { leftTitle, rightTitle } = Astro.props;
+---
+{/* @mdx-label TwoColumn */}
+{/* @mdx-description Side-by-side comparison — uses named slots: left and right */}
+{/* @mdx-snippet
+<TwoColumn leftTitle="Before" rightTitle="After">
+  <Fragment slot="left">
+    Left column content.
+  </Fragment>
+  <Fragment slot="right">
+    Right column content.
+  </Fragment>
+</TwoColumn>
+*/}
+
+<div class="not-prose my-6 grid gap-4 sm:grid-cols-2">
+  <div class="rounded-lg border border-border bg-surface/50 p-4">
+    {leftTitle && <div class="font-semibold text-text mb-2">{leftTitle}</div>}
+    <div class="text-sm text-text-secondary [&>p]:mb-2 [&>p:last-child]:mb-0"><slot name="left" /></div>
+  </div>
+  <div class="rounded-lg border border-border bg-surface/50 p-4">
+    {rightTitle && <div class="font-semibold text-text mb-2">{rightTitle}</div>}
+    <div class="text-sm text-text-secondary [&>p]:mb-2 [&>p:last-child]:mb-0"><slot name="right" /></div>
+  </div>
+</div>

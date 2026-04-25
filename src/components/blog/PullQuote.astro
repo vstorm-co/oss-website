@@ -1,0 +1,24 @@
+---
+export interface Props {
+  author?: string;
+  role?: string;
+}
+const { author, role } = Astro.props;
+---
+{/* @mdx-label PullQuote */}
+{/* @mdx-description Highlighted pull quote with optional attribution */}
+{/* @mdx-snippet
+<PullQuote author="Jane Doe" role="Staff Engineer">
+  The quote text goes here.
+</PullQuote>
+*/}
+
+<blockquote class="not-prose my-8 border-l-4 border-accent/60 pl-6 py-2">
+  <p class="text-xl leading-snug text-text italic [&>p]:m-0"><slot /></p>
+  {(author || role) && (
+    <footer class="mt-3 text-sm text-text-tertiary not-italic">
+      {author && <span class="font-semibold text-text-secondary">— {author}</span>}
+      {role && <span>, {role}</span>}
+    </footer>
+  )}
+</blockquote>
