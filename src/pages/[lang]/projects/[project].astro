@@ -35,7 +35,7 @@ const schemas: JsonLdSchema[] = project.status === "released" ? [
   softwareApplicationSchema({
     name: project.name,
     description: project.description[lang],
-    url: SITE_URL + `/projects/${project.slug}/`,
+    url: SITE_URL + `/${lang}/projects/${project.slug}/`,
     github: project.github,
     pypi: project.pypi,
   }),

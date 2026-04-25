@@ -44,7 +44,7 @@ const steps = [
   keywords="ai agent generator, ai project configurator, fastapi ai template, nextjs ai template, python ai project generator, free ai tool"
   lang={lang}
   alternates={alternates}
-  schemas={[softwareApplicationSchema({ name: "AI Agent Project Configurator", description: t["tools.configurator.subtitle"] ?? "Free online tool to configure and download a production-ready FastAPI + Next.js AI agent project with 75+ options.", url: SITE_URL + "/tools/ai-agent-configurator/", operatingSystem: "Web", featureList: "5 AI frameworks, 4 databases, JWT/API key auth, streaming, Docker, Kubernetes, observability" })]}
+  schemas={[softwareApplicationSchema({ name: "AI Agent Project Configurator", description: t["tools.configurator.subtitle"] ?? "Free online tool to configure and download a production-ready FastAPI + Next.js AI agent project with 75+ options.", url: SITE_URL + `/${lang}/tools/ai-agent-configurator/`, operatingSystem: "Web", featureList: "5 AI frameworks, 4 databases, JWT/API key auth, streaming, Docker, Kubernetes, observability" })]}
   theme="light"
 >
   <Navbar currentLang={lang} />

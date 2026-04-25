@@ -45,7 +45,7 @@ const alternates = [
   keywords="fastapi template, nextjs ai, ai agent template, python fullstack, pydantic ai template, production ai app, ai starter kit"
   lang={lang}
   alternates={alternates}
-  schemas={[softwareApplicationSchema({ name: "Fullstack AI Agent Template", description: t["meta.description"], url: SITE_URL + "/projects/full-stack-ai-agent-template/", programmingLanguage: ["Python", "TypeScript"] })]}
+  schemas={[softwareApplicationSchema({ name: "Fullstack AI Agent Template", description: t["meta.description"], url: SITE_URL + `/${lang}/projects/full-stack-ai-agent-template/`, programmingLanguage: ["Python", "TypeScript"] })]}
 >
   <Navbar currentLang={lang} project={project} pathSuffix="projects/full-stack-ai-agent-template/" />
   <Breadcrumbs items={[

@@ -54,7 +54,10 @@ export default defineConfig({
     }),
     mdx(),
     sitemap({
-      filter: (page) => !page.includes("/admin"),
+      filter: (page) =>
+        !page.includes("/admin") &&
+        !page.includes("/blog/tag/") &&
+        !page.includes("/blog/category/"),
       serialize(item) {
         const url = new URL(item.url);
         const realDate = blogDateMap.get(url.pathname);

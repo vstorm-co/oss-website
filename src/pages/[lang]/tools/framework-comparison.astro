@@ -30,7 +30,7 @@ const alternates = [
   keywords="ai framework comparison, pydantic ai vs langchain, langgraph vs crewai, best python ai framework, ai agent framework comparison"
   lang={lang}
   alternates={alternates}
-  schemas={[softwareApplicationSchema({ name: "AI Framework Comparison Calculator", description: t["tools.comparison.subtitle"] ?? "Free interactive tool to compare Python AI agent frameworks. Answer 6 questions and get a personalized recommendation.", url: SITE_URL + "/tools/framework-comparison/", operatingSystem: "Web" })]}
+  schemas={[softwareApplicationSchema({ name: "AI Framework Comparison Calculator", description: t["tools.comparison.subtitle"] ?? "Free interactive tool to compare Python AI agent frameworks. Answer 6 questions and get a personalized recommendation.", url: SITE_URL + `/${lang}/tools/framework-comparison/`, operatingSystem: "Web" })]}
   theme="light"
 >
   <Navbar currentLang={lang} />

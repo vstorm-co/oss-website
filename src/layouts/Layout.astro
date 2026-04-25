@@ -52,16 +52,19 @@ const ogImageURL = ogImage ?? new URL(`${base}og-image.png`, siteUrl).href;
 
 const keywords = keywordsOverride ?? "pydantic ai, ai agents, python, fastapi, langchain, langgraph, crewai, deepagents, llm, open source, vstorm, template, middleware, subagents";
 
-// Auto-generate WebSite schema
-const websiteSchema = buildWebsiteSchema();
+// Auto-generate WebSite schema (lang-aware so translated pages don't claim inLanguage:"en")
+const websiteSchema = buildWebsiteSchema(lang as any);
 
-// Auto-generate BreadcrumbList from URL path
+// Auto-generate BreadcrumbList from URL path. Keep the lang prefix in every
+// item URL so translated pages don't emit English URLs as canonical signals
+// in their structured data — that was causing Google to refuse indexing them.
 const pathSegments = Astro.url.pathname.split('/').filter(Boolean);
 const knownLangs = ['pl', 'de', 'es'];
+const langPrefix = knownLangs.includes(pathSegments[0]) ? `/${pathSegments[0]}` : '';
 const cleanSegments = knownLangs.includes(pathSegments[0]) ? pathSegments.slice(1) : [...pathSegments];
 
 const breadcrumbItems: { name: string; item: string }[] = [
-  { name: "Home", item: siteUrl },
+  { name: "Home", item: new URL(langPrefix + '/', siteUrl).href },
 ];
 
 if (cleanSegments.length > 0) {
@@ -74,7 +77,7 @@ if (cleanSegments.length > 0) {
       : seg.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
     breadcrumbItems.push({
       name,
-      item: new URL(currentPath + '/', siteUrl).href,
+      item: new URL(langPrefix + currentPath + '/', siteUrl).href,
     });
   });
 }
