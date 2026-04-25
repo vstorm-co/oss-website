@@ -1,4 +1,5 @@
 ---
+import { isPublished } from "@/lib/blog";
 import Layout from "../../../layouts/Layout.astro";
 import Navbar from "../../../components/Navbar.astro";
 import Footer from "../../../components/landing/Footer.astro";
@@ -9,7 +10,7 @@ import { translations, languages, defaultLang } from "../../../i18n/translations
 import { collectionPageSchema, SITE_URL } from "../../../lib/schemas";
 
 export async function getStaticPaths() {
-  const posts = await getCollection("blog", ({ data }) => data.lang === "en" && !data.draft);
+  const posts = await getCollection("blog", ({ data }) => data.lang === "en" && isPublished(data));
 
   const tagMap = new Map<string, typeof posts>();
   for (const post of posts) {
@@ -32,7 +33,7 @@ const { tag, posts } = Astro.props;
 const lang = defaultLang;
 const t = translations[lang];
 
-const allPosts = await getCollection("blog", ({ data }) => !data.draft);
+const allPosts = await getCollection("blog", ({ data }) => isPublished(data));
 const alternates = Object.keys(languages)
   .filter((locale) =>
     allPosts.some((p) => p.data.lang === locale && (p.data.tags ?? []).includes(tag)),

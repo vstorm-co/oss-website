@@ -163,6 +163,14 @@
   border-radius: 4px;
   margin-left: auto;
 }
+.ap-scheduled-pill {
+  font-size: 11px;
+  margin-left: auto;
+  opacity: 0.8;
+}
+.ap-post-date-scheduled {
+  color: #f59e0b;
+}
 .ap-post-title {
   font-weight: 500;
   overflow: hidden;

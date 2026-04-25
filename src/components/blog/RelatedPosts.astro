@@ -1,4 +1,5 @@
 ---
+import { isPublished } from "@/lib/blog";
 import { getCollection } from "astro:content";
 import type { Lang } from "../../i18n/translations";
 import { defaultLang } from "../../i18n/translations";
@@ -13,7 +14,7 @@ interface Props {
 const { currentSlug, currentTags, lang, t } = Astro.props;
 
 const allPosts = (
-  await getCollection("blog", ({ data }) => data.lang === lang && !data.draft)
+  await getCollection("blog", ({ data }) => data.lang === lang && isPublished(data))
 ).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 // Filter out the current post

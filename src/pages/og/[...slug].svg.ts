@@ -1,8 +1,9 @@
+import { isPublished } from "@/lib/blog";
 import type { APIRoute, GetStaticPaths } from "astro";
 import { getCollection } from "astro:content";
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const posts = await getCollection("blog", ({ data }) => data.lang === "en" && !data.draft);
+  const posts = await getCollection("blog", ({ data }) => data.lang === "en" && isPublished(data));
   return posts.map((post) => {
     const slug = post.id.split("/").slice(1).join("/");
     return {

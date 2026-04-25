@@ -1,0 +1,31 @@
+name: Scheduled Publish
+
+# Triggers a Vercel rebuild every day at 08:00 UTC.
+# Posts with a future pubDate are excluded at build time — once the date
+# passes and Vercel rebuilds, they go live automatically.
+#
+# Setup (one-time):
+#   1. Vercel Dashboard → Project → Settings → Git → Deploy Hooks
+#   2. Create hook: name "Scheduled Publish", branch "main"
+#   3. Copy the hook URL
+#   4. GitHub repo → Settings → Secrets → Actions → New secret
+#      Name: VERCEL_DEPLOY_HOOK_URL   Value: <paste URL>
+
+on:
+  schedule:
+    - cron: "0 8 * * *" # 08:00 UTC daily
+  workflow_dispatch: # allow manual trigger from GitHub Actions UI
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel deploy
+        run: |
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}")
+          echo "Vercel responded: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" != "201" ]; then
+            echo "Deploy hook failed (expected 201, got $HTTP_STATUS)"
+            exit 1
+          fi

@@ -9,6 +9,8 @@ export interface NewPostDialogProps {
     slug: string;
     title: string;
     description: string;
+    pubDate: string;
+    draft: boolean;
     translationKey?: string;
     category?: string;
   }) => Promise<void>;
@@ -33,9 +35,13 @@ export function NewPostDialog({ initialLang = "en", onCancel, onCreate }: NewPos
   const [slug, setSlug] = useState("");
   const [translationKey, setTranslationKey] = useState("");
   const [category, setCategory] = useState<(typeof CATEGORIES)[number]>("open-source");
+  const [pubDate, setPubDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [draft, setDraft] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const titleRef = useRef<HTMLInputElement>(null);
+
+  const isScheduled = !draft && pubDate > new Date().toISOString().slice(0, 10);
 
   useEffect(() => {
     titleRef.current?.focus();
@@ -57,6 +63,8 @@ export function NewPostDialog({ initialLang = "en", onCancel, onCreate }: NewPos
         slug: autoSlug,
         title,
         description,
+        pubDate,
+        draft,
         translationKey: finalTranslationKey,
         category,
       });
@@ -145,6 +153,48 @@ export function NewPostDialog({ initialLang = "en", onCancel, onCreate }: NewPos
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
+        </div>
+        <div className="ap-form-row">
+          <label htmlFor="np-pubdate">Publish date</label>
+          <input
+            id="np-pubdate"
+            type="date"
+            className="ap-input"
+            value={pubDate}
+            onChange={(e) => setPubDate(e.target.value)}
+          />
+        </div>
+        <div className="ap-form-row">
+          <label>Status</label>
+          <div style={{ display: "flex", gap: "1rem" }}>
+            <label
+              style={{ display: "flex", alignItems: "center", gap: "0.4rem", cursor: "pointer" }}
+            >
+              <input
+                type="radio"
+                name="np-status"
+                checked={draft}
+                onChange={() => setDraft(true)}
+              />
+              Draft
+            </label>
+            <label
+              style={{ display: "flex", alignItems: "center", gap: "0.4rem", cursor: "pointer" }}
+            >
+              <input
+                type="radio"
+                name="np-status"
+                checked={!draft}
+                onChange={() => setDraft(false)}
+              />
+              {isScheduled ? "⏰ Scheduled" : "Published"}
+            </label>
+          </div>
+          {isScheduled && (
+            <p style={{ margin: "0.35rem 0 0", fontSize: "0.78rem", color: "#f59e0b" }}>
+              Goes live on {pubDate} — needs a deploy after that date.
+            </p>
+          )}
         </div>
         {error && <div className="ap-error">{error}</div>}
         <div className="ap-modal-actions">

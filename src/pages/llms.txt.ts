@@ -1,3 +1,4 @@
+import { isPublished } from "@/lib/blog";
 import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
 import { projects } from "../data/projects";
@@ -14,9 +15,9 @@ export const GET: APIRoute = async ({ site }) => {
     })
     .join("\n");
 
-  const posts = (await getCollection("blog", ({ data }) => data.lang === "en" && !data.draft)).sort(
-    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-  );
+  const posts = (
+    await getCollection("blog", ({ data }) => data.lang === "en" && isPublished(data))
+  ).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
   const blogList = posts
     .map((post) => {

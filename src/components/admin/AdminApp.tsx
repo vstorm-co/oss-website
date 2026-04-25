@@ -360,20 +360,21 @@ export default function AdminApp() {
     slug: string;
     title: string;
     description: string;
+    pubDate: string;
+    draft: boolean;
     translationKey?: string;
     category?: string;
   }) => {
-    const today = new Date().toISOString().slice(0, 10);
     const frontmatter: Record<string, unknown> = {
       title: values.title,
       description: values.description,
-      pubDate: today,
+      pubDate: values.pubDate,
       author: "Kacper Włodarczyk",
       lang: values.lang,
       translationKey: values.translationKey || values.slug,
       tags: [],
       category: values.category || "open-source",
-      draft: true,
+      draft: values.draft,
     };
     await api.createPost({
       lang: values.lang,
@@ -478,6 +479,9 @@ export default function AdminApp() {
         <div className="ap-post-list">
           {visiblePosts.map((p) => {
             const isSel = selection?.lang === p.lang && selection.slug === p.slug;
+            const today = new Date().toISOString().slice(0, 10);
+            const pubDateStr = p.pubDate ? new Date(p.pubDate).toISOString().slice(0, 10) : null;
+            const isScheduled = !p.draft && pubDateStr !== null && pubDateStr > today;
             const dateLabel = p.pubDate
               ? new Date(p.pubDate).toLocaleDateString("en-US", {
                   month: "short",
@@ -502,8 +506,17 @@ export default function AdminApp() {
                     </span>
                   )}
                   {p.draft && <span className="ap-draft-pill">draft</span>}
+                  {isScheduled && (
+                    <span className="ap-scheduled-pill" title={`Publishes on ${pubDateStr}`}>
+                      ⏰
+                    </span>
+                  )}
                 </div>
-                {dateLabel && <div className="ap-post-date">{dateLabel}</div>}
+                {dateLabel && (
+                  <div className={`ap-post-date${isScheduled ? "ap-post-date-scheduled" : ""}`}>
+                    {isScheduled ? `⏰ ${dateLabel}` : dateLabel}
+                  </div>
+                )}
                 {p.tags.length > 0 && (
                   <div className="ap-post-tags">
                     {p.tags.slice(0, 3).map((t) => (

@@ -1,4 +1,5 @@
 ---
+import { isPublished } from "@/lib/blog";
 import type { translations, Lang } from "../../i18n/translations";
 import { getCollection } from "astro:content";
 import { projects } from "../../data/projects";
@@ -21,7 +22,7 @@ const toolsHref = `${langPrefix}/tools/`;
 const compareHref = `${langPrefix}/compare/`;
 const aboutHref = `${langPrefix}/about/`;
 
-const allPosts = await getCollection("blog", ({ data }) => data.lang === lang && !data.draft);
+const allPosts = await getCollection("blog", ({ data }) => data.lang === lang && isPublished(data));
 const recentPosts = allPosts
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 5);

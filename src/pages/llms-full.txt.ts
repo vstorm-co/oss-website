@@ -1,3 +1,4 @@
+import { isPublished } from "@/lib/blog";
 import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
 import { projects, categories } from "../data/projects";
@@ -35,9 +36,9 @@ ${entries}`;
     .filter(Boolean)
     .join("\n\n---\n\n");
 
-  const posts = (await getCollection("blog", ({ data }) => data.lang === "en" && !data.draft)).sort(
-    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-  );
+  const posts = (
+    await getCollection("blog", ({ data }) => data.lang === "en" && isPublished(data))
+  ).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
   const blogList = posts
     .map((post) => {

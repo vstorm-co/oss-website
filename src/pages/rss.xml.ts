@@ -1,10 +1,11 @@
+import { isPublished } from "@/lib/blog";
 import rss from "@astrojs/rss";
 import { getCollection } from "astro:content";
 
 export async function GET(context: any) {
-  const posts = (await getCollection("blog", ({ data }) => data.lang === "en" && !data.draft)).sort(
-    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-  );
+  const posts = (
+    await getCollection("blog", ({ data }) => data.lang === "en" && isPublished(data))
+  ).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
   return rss({
     title: "Vstorm OSS Blog",

@@ -1,4 +1,5 @@
 ---
+import { isPublished } from "@/lib/blog";
 import { getCollection, render } from "astro:content";
 import BlogLayout from "../../../layouts/BlogLayout.astro";
 import { languages, defaultLang, type Lang } from "../../../i18n/translations";
@@ -8,7 +9,7 @@ export async function getStaticPaths() {
 
   const posts = await getCollection(
     "blog",
-    ({ data }) => nonDefaultLocales.includes(data.lang) && !data.draft,
+    ({ data }) => nonDefaultLocales.includes(data.lang) && isPublished(data),
   );
 
   return posts.map((post) => {
@@ -29,7 +30,7 @@ const readingTime = post.body
 
 const allPosts = await getCollection(
   "blog",
-  ({ data }) => data.translationKey === post.data.translationKey && !data.draft,
+  ({ data }) => data.translationKey === post.data.translationKey && isPublished(data),
 );
 const allTranslations = allPosts.map((p) => ({
   lang: p.data.lang as Lang,
