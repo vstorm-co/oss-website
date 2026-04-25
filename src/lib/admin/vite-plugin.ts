@@ -286,17 +286,18 @@ async function listComponents() {
     if (!file.endsWith(".astro") && !file.endsWith(".tsx") && !file.endsWith(".jsx")) continue;
     const raw = await fs.readFile(path.join(COMPONENTS_DIR, file), "utf8");
     const name = file.replace(/\.(astro|tsx|jsx)$/, "");
+    // Allow optional whitespace between { and /* (prettier splits them across lines)
     const snippetMatch =
-      raw.match(/\{\/\*\s*@mdx-snippet([\s\S]*?)\*\/\}/) ||
+      raw.match(/\{\s*\/\*\s*@mdx-snippet([\s\S]*?)\*\/\s*\}/) ||
       raw.match(/<!--\s*@mdx-snippet([\s\S]*?)-->/);
     const labelMatch =
-      raw.match(/\{\/\*\s*@mdx-label\s+(.+?)\s*\*\/\}/) ||
+      raw.match(/\{\s*\/\*\s*@mdx-label\s+(.+?)\s*\*\/\s*\}/) ||
       raw.match(/<!--\s*@mdx-label\s+(.+?)\s*-->/);
     const descMatch =
-      raw.match(/\{\/\*\s*@mdx-description\s+(.+?)\s*\*\/\}/) ||
+      raw.match(/\{\s*\/\*\s*@mdx-description\s+(.+?)\s*\*\/\s*\}/) ||
       raw.match(/<!--\s*@mdx-description\s+(.+?)\s*-->/);
     const previewMatch =
-      raw.match(/\{\/\*\s*@mdx-preview\s*([\s\S]*?)\*\/\}/) ||
+      raw.match(/\{\s*\/\*\s*@mdx-preview\s*([\s\S]*?)\*\/\s*\}/) ||
       raw.match(/<!--\s*@mdx-preview\s*([\s\S]*?)-->/);
     if (snippetMatch) {
       out.push({

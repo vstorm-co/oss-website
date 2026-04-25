@@ -2,14 +2,13 @@
 import type { GetStaticPaths } from "astro";
 import { getCollection, render, type CollectionEntry } from "astro:content";
 import "@/styles/global.css";
+import "@/styles/prose.css";
 import ImageZoom from "@/components/blog/ImageZoom.astro";
 
 type Post = CollectionEntry<"blog">;
 
 export const getStaticPaths: GetStaticPaths = async () => {
   if (!import.meta.env.DEV) return [];
-  // oss-website has multilingual blog. Admin only edits English posts —
-  // limit preview to English so slugs match what the editor saves.
   const posts = await getCollection("blog", ({ data }) => data.lang === "en");
   return posts.map((post) => {
     const slug = post.id.replace(/^en\//, "");
@@ -32,9 +31,7 @@ const { data } = post;
       body {
         margin: 0;
         padding: 2rem 1.5rem 4rem;
-        background: var(--color-bg);
-        color: var(--color-text);
-        font-family: var(--font-sans);
+        font-family: var(--font-sans, Inter, system-ui, sans-serif);
         -webkit-font-smoothing: antialiased;
       }
       .preview-wrap {
@@ -90,25 +87,17 @@ const { data } = post;
         gap: 0.4rem;
         font-size: 0.75rem;
         font-weight: 700;
-        color: #f59e0b;
-        background: rgba(245, 158, 11, 0.1);
-        border: 1px solid rgba(245, 158, 11, 0.25);
+        color: #b45309;
+        background: rgba(180, 83, 9, 0.1);
+        border: 1px solid rgba(180, 83, 9, 0.25);
         padding: 0.15em 0.6em;
         border-radius: 4px;
         margin-bottom: 0.75rem;
       }
     </style>
-    <script is:inline>
-      // Inherit theme from admin parent (avoids FOUC)
-      try {
-        const t = window.parent?.document?.documentElement?.getAttribute?.("data-theme");
-        if (t === "light") document.documentElement.setAttribute("data-theme", "light");
-      } catch {
-        /* cross-origin read — ignore */
-      }
-    </script>
   </head>
-  <body>
+  <!-- section-light gives the exact same CSS variable values as the real blog -->
+  <body class="section-light">
     <ImageZoom />
     <div class="preview-wrap">
       <div class="preview-meta">
