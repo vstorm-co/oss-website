@@ -33,19 +33,20 @@ export function getTemplateComparison(t: Record<string, string>): ComparisonData
 
 export function getDeepagentsComparison(t: Record<string, string>): ComparisonData {
   return {
-    columns: [
-      t["comparison.deepagents.col.ours"],
-      "LangChain",
-      "CrewAI",
-      "AutoGen",
-    ],
+    columns: [t["comparison.deepagents.col.ours"], "LangChain", "CrewAI", "AutoGen"],
     highlightColumn: 0,
     rows: [
       { feature: t["comparison.deepagents.row.typesafe"], values: [true, false, false, false] },
       { feature: t["comparison.deepagents.row.subagents"], values: [true, false, true, true] },
       { feature: t["comparison.deepagents.row.tools"], values: [true, true, true, true] },
-      { feature: t["comparison.deepagents.row.multiprovider"], values: [true, true, "Partial", true] },
-      { feature: t["comparison.deepagents.row.observability"], values: [true, "Partial", false, false] },
+      {
+        feature: t["comparison.deepagents.row.multiprovider"],
+        values: [true, true, "Partial", true],
+      },
+      {
+        feature: t["comparison.deepagents.row.observability"],
+        values: [true, "Partial", false, false],
+      },
       { feature: t["comparison.deepagents.row.production"], values: [true, true, false, false] },
     ],
   };

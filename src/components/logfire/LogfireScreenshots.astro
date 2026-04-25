@@ -1,5 +1,5 @@
 ---
-import type { translations } from '../../i18n/translations';
+import type { translations } from "../../i18n/translations";
 
 interface Props {
   t: typeof translations.en;
@@ -10,39 +10,77 @@ const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith("/") ? rawBase : rawBase + "/";
 
 const screenshots = [
-  { src: `${base}logfire/chat-results.png`, alt: "AI responses with data tables", caption: t["logfire.screenshots.chat"] },
-  { src: `${base}logfire/chart-view.png`, alt: "Auto-generated charts from query results", caption: t["logfire.screenshots.chart"] },
-  { src: `${base}logfire/sql-query.png`, alt: "Generated SQL query display", caption: t["logfire.screenshots.sql"] },
-  { src: `${base}logfire/span-select.png`, alt: "Span selection and context capture", caption: t["logfire.screenshots.span"] },
-  { src: `${base}logfire/prompts-config.png`, alt: "Custom prompts with slash commands", caption: t["logfire.screenshots.prompts"] },
-  { src: `${base}logfire/conversations.png`, alt: "Conversation history with search", caption: t["logfire.screenshots.conversations"] },
+  {
+    src: `${base}logfire/chat-results.png`,
+    alt: "AI responses with data tables",
+    caption: t["logfire.screenshots.chat"],
+  },
+  {
+    src: `${base}logfire/chart-view.png`,
+    alt: "Auto-generated charts from query results",
+    caption: t["logfire.screenshots.chart"],
+  },
+  {
+    src: `${base}logfire/sql-query.png`,
+    alt: "Generated SQL query display",
+    caption: t["logfire.screenshots.sql"],
+  },
+  {
+    src: `${base}logfire/span-select.png`,
+    alt: "Span selection and context capture",
+    caption: t["logfire.screenshots.span"],
+  },
+  {
+    src: `${base}logfire/prompts-config.png`,
+    alt: "Custom prompts with slash commands",
+    caption: t["logfire.screenshots.prompts"],
+  },
+  {
+    src: `${base}logfire/conversations.png`,
+    alt: "Conversation history with search",
+    caption: t["logfire.screenshots.conversations"],
+  },
 ];
 ---
 
 <section class="section-stack px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
   <div class="mx-auto max-w-6xl">
     <div class="reveal text-center">
-      <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl">{t["logfire.screenshots.title"]}</h2>
-      <p class="mt-4 text-lg text-text-secondary">{t["logfire.screenshots.subtitle"]}</p>
+      <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl">
+        {t["logfire.screenshots.title"]}
+      </h2>
+      <p class="text-text-secondary mt-4 text-lg">{t["logfire.screenshots.subtitle"]}</p>
     </div>
 
     <!-- Animated demo -->
-    <div class="reveal mt-16 mx-auto max-w-3xl">
+    <div class="reveal mx-auto mt-16 max-w-3xl">
       <button
         type="button"
-        class="lf-gallery-thumb group/thumb relative w-full overflow-hidden rounded-2xl border border-border bg-surface transition-all hover:border-pink-500/40"
+        class="lf-gallery-thumb group/thumb border-border bg-surface relative w-full overflow-hidden rounded-2xl border transition-all hover:border-pink-500/40"
         data-full={`${base}logfire/demo.gif`}
         data-alt="Logfire Assistant animated demo"
       >
         <img
           src={`${base}logfire/demo.gif`}
           alt="Logfire Assistant animated demo"
-          class="w-full h-auto"
+          class="h-auto w-full"
           loading="lazy"
         />
-        <div class="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover/thumb:bg-black/20">
-          <svg class="h-10 w-10 text-white opacity-0 transition-opacity group-hover/thumb:opacity-100 drop-shadow-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6" />
+        <div
+          class="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover/thumb:bg-black/20"
+        >
+          <svg
+            class="h-10 w-10 text-white opacity-0 drop-shadow-lg transition-opacity group-hover/thumb:opacity-100"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6"
+            ></path>
           </svg>
         </div>
       </button>
@@ -50,77 +88,99 @@ const screenshots = [
 
     <!-- Screenshot grid -->
     <div class="reveal-group mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {screenshots.map((ss) => (
-        <div class="reveal">
-          <button
-            type="button"
-            class="lf-gallery-thumb group/thumb relative w-full overflow-hidden rounded-xl border border-border bg-surface transition-all hover:border-pink-500/40"
-            data-full={ss.src}
-            data-alt={ss.alt}
-          >
-            <img
-              src={ss.src}
-              alt={ss.alt}
-              class="w-full h-auto object-cover"
-              loading="lazy"
-            />
-            <div class="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover/thumb:bg-black/20">
-              <svg class="h-8 w-8 text-white opacity-0 transition-opacity group-hover/thumb:opacity-100 drop-shadow-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6" />
-              </svg>
-            </div>
-          </button>
-          <p class="mt-2 text-center text-xs text-text-tertiary">{ss.caption}</p>
-        </div>
-      ))}
+      {
+        screenshots.map((ss) => (
+          <div class="reveal">
+            <button
+              type="button"
+              class="lf-gallery-thumb group/thumb border-border bg-surface relative w-full overflow-hidden rounded-xl border transition-all hover:border-pink-500/40"
+              data-full={ss.src}
+              data-alt={ss.alt}
+            >
+              <img src={ss.src} alt={ss.alt} class="h-auto w-full object-cover" loading="lazy" />
+              <div class="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover/thumb:bg-black/20">
+                <svg
+                  class="h-8 w-8 text-white opacity-0 drop-shadow-lg transition-opacity group-hover/thumb:opacity-100"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6"
+                  />
+                </svg>
+              </div>
+            </button>
+            <p class="text-text-tertiary mt-2 text-center text-xs">{ss.caption}</p>
+          </div>
+        ))
+      }
     </div>
   </div>
 </section>
 
 <!-- Lightbox -->
-<div id="lf-lightbox" role="dialog" aria-modal="true" aria-label="Image preview" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-8">
-  <button type="button" id="lf-lightbox-close" class="absolute top-4 right-4 z-10 rounded-full bg-black/50 p-2 text-white transition-colors hover:bg-black/70">
+<div
+  id="lf-lightbox"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Image preview"
+  class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 p-4 backdrop-blur-sm sm:p-8"
+>
+  <button
+    type="button"
+    id="lf-lightbox-close"
+    class="absolute top-4 right-4 z-10 rounded-full bg-black/50 p-2 text-white transition-colors hover:bg-black/70"
+  >
     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
     </svg>
   </button>
-  <img id="lf-lightbox-img" src="" alt="" class="max-h-[90vh] max-w-[90vw] rounded-xl object-contain shadow-2xl" />
+  <img
+    id="lf-lightbox-img"
+    src=""
+    alt=""
+    class="max-h-[90vh] max-w-[90vw] rounded-xl object-contain shadow-2xl"
+  />
 </div>
 
 <script>
-  const lightbox = document.getElementById('lf-lightbox');
-  const lightboxImg = document.getElementById('lf-lightbox-img') as HTMLImageElement | null;
-  const lightboxClose = document.getElementById('lf-lightbox-close');
+  const lightbox = document.getElementById("lf-lightbox");
+  const lightboxImg = document.getElementById("lf-lightbox-img") as HTMLImageElement | null;
+  const lightboxClose = document.getElementById("lf-lightbox-close");
 
-  document.querySelectorAll<HTMLElement>('.lf-gallery-thumb').forEach((thumb) => {
-    thumb.addEventListener('click', () => {
+  document.querySelectorAll<HTMLElement>(".lf-gallery-thumb").forEach((thumb) => {
+    thumb.addEventListener("click", () => {
       const src = thumb.dataset.full;
-      const alt = thumb.dataset.alt || '';
+      const alt = thumb.dataset.alt || "";
       if (!lightbox || !lightboxImg || !src) return;
       lightboxImg.src = src;
       lightboxImg.alt = alt;
-      lightbox.classList.remove('hidden');
-      lightbox.classList.add('flex');
+      lightbox.classList.remove("hidden");
+      lightbox.classList.add("flex");
     });
   });
 
-  lightboxClose?.addEventListener('click', () => {
+  lightboxClose?.addEventListener("click", () => {
     if (!lightbox) return;
-    lightbox.classList.add('hidden');
-    lightbox.classList.remove('flex');
+    lightbox.classList.add("hidden");
+    lightbox.classList.remove("flex");
   });
 
-  lightbox?.addEventListener('click', (e) => {
+  lightbox?.addEventListener("click", (e) => {
     if (e.target === lightbox) {
-      lightbox.classList.add('hidden');
-      lightbox.classList.remove('flex');
+      lightbox.classList.add("hidden");
+      lightbox.classList.remove("flex");
     }
   });
 
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && lightbox && !lightbox.classList.contains('hidden')) {
-      lightbox.classList.add('hidden');
-      lightbox.classList.remove('flex');
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && lightbox && !lightbox.classList.contains("hidden")) {
+      lightbox.classList.add("hidden");
+      lightbox.classList.remove("flex");
     }
   });
 </script>

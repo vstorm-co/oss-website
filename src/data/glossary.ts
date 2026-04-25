@@ -56,7 +56,12 @@ export const glossaryTerms: GlossaryTerm[] = [
     definition:
       "LangChain is a popular open-source framework for building applications with large language models. It provides abstractions for chains (sequential LLM calls), tools, memory, retrieval, and output parsing. LangChain supports a wide range of LLM providers and integrations, making it a versatile toolkit for prototyping. While its flexibility makes it easy to get started, its extensive abstraction layers can add complexity and make debugging difficult in production systems. LangChain has a large community and ecosystem, including LangSmith for observability and LangGraph for agent orchestration.",
     category: "frameworks",
-    relatedTerms: ["langgraph", "large-language-models", "rag-retrieval-augmented-generation", "pydantic-ai"],
+    relatedTerms: [
+      "langgraph",
+      "large-language-models",
+      "rag-retrieval-augmented-generation",
+      "pydantic-ai",
+    ],
   },
   {
     slug: "langgraph",
@@ -136,7 +141,12 @@ export const glossaryTerms: GlossaryTerm[] = [
     definition:
       "pgvector is a PostgreSQL extension that adds vector similarity search capabilities to PostgreSQL, enabling it to function as a vector database within your existing relational database. It supports storing embeddings as vector columns, creating HNSW or IVFFlat indexes for approximate nearest neighbor search, and filtering by metadata using standard SQL WHERE clauses. pgvector is popular for small to medium RAG deployments because it eliminates the need for a separate vector database — you can store both application data and embeddings in one place. It supports cosine distance, L2 distance, and inner product similarity metrics.",
     category: "frameworks",
-    relatedTerms: ["postgresql", "vector-database", "vector-embedding", "rag-retrieval-augmented-generation"],
+    relatedTerms: [
+      "postgresql",
+      "vector-database",
+      "vector-embedding",
+      "rag-retrieval-augmented-generation",
+    ],
   },
   {
     slug: "milvus",
@@ -144,7 +154,12 @@ export const glossaryTerms: GlossaryTerm[] = [
     definition:
       "Milvus is an open-source, cloud-native vector database built for scalable similarity search and AI applications. It supports billion-scale vector storage with multiple index types (HNSW, IVF, DiskANN), hybrid search combining vector and scalar filtering, and multi-tenancy. Milvus is designed for high-throughput production workloads and offers features like data partitioning, replicas, and dynamic schema. It is available as a self-hosted solution or as a managed cloud service (Zilliz Cloud), making it suitable for large-scale RAG and recommendation systems.",
     category: "frameworks",
-    relatedTerms: ["vector-database", "rag-retrieval-augmented-generation", "semantic-search", "qdrant"],
+    relatedTerms: [
+      "vector-database",
+      "rag-retrieval-augmented-generation",
+      "semantic-search",
+      "qdrant",
+    ],
   },
   {
     slug: "qdrant",
@@ -176,7 +191,12 @@ export const glossaryTerms: GlossaryTerm[] = [
     definition:
       "LlamaIndex (formerly GPT Index) is a data framework for building LLM-powered applications that connect to external data sources. It specializes in data ingestion, indexing, and retrieval, providing connectors for 160+ data sources (PDFs, databases, APIs, Slack, Notion, etc.) and various index structures (vector, keyword, knowledge graph, tree). LlamaIndex handles the RAG pipeline from document loading through query engines, with built-in re-ranking, query transformation, and response synthesis. It is often used alongside agent frameworks like Pydantic AI or LangChain for the retrieval layer.",
     category: "frameworks",
-    relatedTerms: ["rag-retrieval-augmented-generation", "vector-database", "document-chunking", "langchain"],
+    relatedTerms: [
+      "rag-retrieval-augmented-generation",
+      "vector-database",
+      "document-chunking",
+      "langchain",
+    ],
   },
   {
     slug: "logfire",
@@ -497,7 +517,12 @@ export const glossaryTerms: GlossaryTerm[] = [
     definition:
       "The App Router is Next.js's file-system-based routing architecture (introduced in Next.js 13) that uses React Server Components by default, supports nested layouts, loading states, error boundaries, and parallel routes. Routes are defined by directory structure in the app/ folder, with special files like page.tsx, layout.tsx, loading.tsx, and error.tsx. The App Router replaces the older Pages Router, offering improved performance through server-side rendering, streaming, and partial prerendering. It is the recommended architecture for new Next.js applications.",
     category: "frontend",
-    relatedTerms: ["nextjs-framework", "server-component", "route-handler", "react-server-components"],
+    relatedTerms: [
+      "nextjs-framework",
+      "server-component",
+      "route-handler",
+      "react-server-components",
+    ],
   },
   {
     slug: "server-component",
@@ -585,7 +610,12 @@ export const glossaryTerms: GlossaryTerm[] = [
     definition:
       "Frontend streaming in Next.js and React refers to progressively sending rendered HTML and data to the client as it becomes available, rather than waiting for the entire page to be ready. Next.js implements streaming through React Suspense boundaries — loading.tsx files show fallback UI while server components fetch data. For AI chat interfaces, streaming is critical: LLM tokens are displayed to the user as they arrive (via SSE or WebSocket), providing a responsive 'typing' experience. The Vercel AI SDK provides React hooks for easy streaming chat UI implementation.",
     category: "frontend",
-    relatedTerms: ["server-sent-events", "websocket-streaming", "nextjs-framework", "server-component"],
+    relatedTerms: [
+      "server-sent-events",
+      "websocket-streaming",
+      "nextjs-framework",
+      "server-component",
+    ],
   },
   {
     slug: "image-optimization",
@@ -724,7 +754,12 @@ export const glossaryTerms: GlossaryTerm[] = [
     definition:
       "An inference pipeline is a production system that orchestrates the complete flow of processing an AI prediction request — from receiving input, through preprocessing, model inference, postprocessing, and returning results. For LLM applications, the inference pipeline includes prompt assembly (combining system prompt, user input, retrieved context), model invocation (with retry and fallback logic), output parsing (extracting structured data), guardrail validation, and response formatting. Production inference pipelines include caching, load balancing, cost tracking, and observability at each stage.",
     category: "cloud",
-    relatedTerms: ["inference", "model-serving", "rag-retrieval-augmented-generation", "data-pipeline"],
+    relatedTerms: [
+      "inference",
+      "model-serving",
+      "rag-retrieval-augmented-generation",
+      "data-pipeline",
+    ],
   },
 
   // ── Security & Ethics (security) ────────────────────────────────────────────
@@ -767,7 +802,12 @@ export const glossaryTerms: GlossaryTerm[] = [
     definition:
       "Differential privacy is a mathematical framework for quantifying and limiting the privacy risk of individual data points when sharing aggregate statistics or training machine learning models. It works by adding calibrated noise to computations, ensuring that the output does not significantly change whether any individual's data is included or not. Differential privacy is used in federated learning, census data, and model training to provide provable privacy guarantees. It enables organizations to derive insights from sensitive data while protecting individual privacy, with an epsilon parameter controlling the privacy-utility trade-off.",
     category: "security",
-    relatedTerms: ["federated-learning", "privacy-enhancing-technologies", "ai-governance", "zero-data-retention"],
+    relatedTerms: [
+      "federated-learning",
+      "privacy-enhancing-technologies",
+      "ai-governance",
+      "zero-data-retention",
+    ],
   },
   {
     slug: "zero-data-retention",
@@ -775,7 +815,12 @@ export const glossaryTerms: GlossaryTerm[] = [
     definition:
       "Zero data retention (ZDR) is a data handling policy where an AI service provider commits to not storing, logging, or using customer input data and model outputs after the API request is completed. This is critical for organizations handling sensitive data (healthcare, legal, financial) that need LLM capabilities without the risk of data exposure. Major LLM providers offer ZDR options, typically at enterprise tiers — OpenAI's Enterprise API and Anthropic's API both offer ZDR commitments. ZDR policies must be verified through contracts, audits, and compliance certifications.",
     category: "security",
-    relatedTerms: ["differential-privacy", "hipaa-compliance", "ai-governance", "privacy-enhancing-technologies"],
+    relatedTerms: [
+      "differential-privacy",
+      "hipaa-compliance",
+      "ai-governance",
+      "privacy-enhancing-technologies",
+    ],
   },
   {
     slug: "hipaa-compliance",
@@ -791,7 +836,12 @@ export const glossaryTerms: GlossaryTerm[] = [
     definition:
       "Privacy-Enhancing Technologies (PETs) are a collection of techniques and tools designed to protect personal data while still enabling useful computation and AI model training. PETs include differential privacy (adding noise to preserve individual privacy), federated learning (training models without centralizing data), homomorphic encryption (computing on encrypted data), secure multi-party computation (jointly computing without revealing inputs), and synthetic data generation. PETs are increasingly important for AI applications that process sensitive data, enabling organizations to leverage AI while complying with privacy regulations like GDPR.",
     category: "security",
-    relatedTerms: ["differential-privacy", "federated-learning", "zero-data-retention", "ai-governance"],
+    relatedTerms: [
+      "differential-privacy",
+      "federated-learning",
+      "zero-data-retention",
+      "ai-governance",
+    ],
   },
   {
     slug: "bias-auditing",
@@ -908,9 +958,7 @@ export const termToProjectMap: Record<string, { slug: string; name: string }[]> 
     { slug: "pydantic-deepagents", name: "Pydantic Deep Agents" },
     { slug: "full-stack-ai-agent-template", name: "Full-Stack AI Agent Template" },
   ],
-  "agentic-ai": [
-    { slug: "pydantic-deepagents", name: "Pydantic Deep Agents" },
-  ],
+  "agentic-ai": [{ slug: "pydantic-deepagents", name: "Pydantic Deep Agents" }],
   "multi-agent-system": [
     { slug: "pydantic-deepagents", name: "Pydantic Deep Agents" },
     { slug: "subagents-pydantic-ai", name: "Subagents for Pydantic AI" },
@@ -919,9 +967,7 @@ export const termToProjectMap: Record<string, { slug: string; name: string }[]> 
     { slug: "subagents-pydantic-ai", name: "Subagents for Pydantic AI" },
     { slug: "pydantic-deepagents", name: "Pydantic Deep Agents" },
   ],
-  "agent-orchestration": [
-    { slug: "pydantic-deepagents", name: "Pydantic Deep Agents" },
-  ],
+  "agent-orchestration": [{ slug: "pydantic-deepagents", name: "Pydantic Deep Agents" }],
   "agentic-workflow": [
     { slug: "pydantic-deepagents", name: "Pydantic Deep Agents" },
     { slug: "full-stack-ai-agent-template", name: "Full-Stack AI Agent Template" },
@@ -934,16 +980,12 @@ export const termToProjectMap: Record<string, { slug: string; name: string }[]> 
     { slug: "pydantic-deepagents", name: "Pydantic Deep Agents" },
     { slug: "pydantic-ai-middleware", name: "Pydantic AI Middleware" },
   ],
-  "human-in-the-loop": [
-    { slug: "pydantic-deepagents", name: "Pydantic Deep Agents" },
-  ],
+  "human-in-the-loop": [{ slug: "pydantic-deepagents", name: "Pydantic Deep Agents" }],
   "agent-memory": [
     { slug: "pydantic-deepagents", name: "Pydantic Deep Agents" },
     { slug: "pydantic-ai-backend", name: "Pydantic AI Backend" },
   ],
-  "guardrails": [
-    { slug: "pydantic-ai-middleware", name: "Pydantic AI Middleware" },
-  ],
+  guardrails: [{ slug: "pydantic-ai-middleware", name: "Pydantic AI Middleware" }],
   "agent-observability": [
     { slug: "logfire-assistant", name: "Logfire Assistant" },
     { slug: "pydantic-ai-middleware", name: "Pydantic AI Middleware" },
@@ -952,15 +994,9 @@ export const termToProjectMap: Record<string, { slug: string; name: string }[]> 
     { slug: "pydantic-ai-middleware", name: "Pydantic AI Middleware" },
     { slug: "logfire-assistant", name: "Logfire Assistant" },
   ],
-  "token-budget": [
-    { slug: "pydantic-ai-middleware", name: "Pydantic AI Middleware" },
-  ],
-  "logfire": [
-    { slug: "logfire-assistant", name: "Logfire Assistant" },
-  ],
-  "opentelemetry": [
-    { slug: "logfire-assistant", name: "Logfire Assistant" },
-  ],
+  "token-budget": [{ slug: "pydantic-ai-middleware", name: "Pydantic AI Middleware" }],
+  logfire: [{ slug: "logfire-assistant", name: "Logfire Assistant" }],
+  opentelemetry: [{ slug: "logfire-assistant", name: "Logfire Assistant" }],
   "rag-retrieval-augmented-generation": [
     { slug: "full-stack-ai-agent-template", name: "Full-Stack AI Agent Template" },
     { slug: "pydantic-ai-backend", name: "Pydantic AI Backend" },
@@ -971,56 +1007,38 @@ export const termToProjectMap: Record<string, { slug: string; name: string }[]> 
   "semantic-search": [
     { slug: "full-stack-ai-agent-template", name: "Full-Stack AI Agent Template" },
   ],
-  "fastapi": [
+  fastapi: [
     { slug: "full-stack-ai-agent-template", name: "Full-Stack AI Agent Template" },
     { slug: "pydantic-ai-backend", name: "Pydantic AI Backend" },
   ],
-  "docker": [
-    { slug: "full-stack-ai-agent-template", name: "Full-Stack AI Agent Template" },
-  ],
+  docker: [{ slug: "full-stack-ai-agent-template", name: "Full-Stack AI Agent Template" }],
   "websocket-streaming": [
     { slug: "full-stack-ai-agent-template", name: "Full-Stack AI Agent Template" },
     { slug: "pydantic-ai-backend", name: "Pydantic AI Backend" },
   ],
-  "pydantic": [
+  pydantic: [
     { slug: "pydantic-ai-backend", name: "Pydantic AI Backend" },
     { slug: "pydantic-ai-middleware", name: "Pydantic AI Middleware" },
   ],
-  "prompt-injection": [
-    { slug: "pydantic-ai-middleware", name: "Pydantic AI Middleware" },
-  ],
-  "postgresql": [
+  "prompt-injection": [{ slug: "pydantic-ai-middleware", name: "Pydantic AI Middleware" }],
+  postgresql: [
     { slug: "full-stack-ai-agent-template", name: "Full-Stack AI Agent Template" },
     { slug: "database-pydantic-ai", name: "Database Pydantic AI" },
   ],
-  "pgvector": [
-    { slug: "full-stack-ai-agent-template", name: "Full-Stack AI Agent Template" },
-  ],
-  "celery": [
-    { slug: "full-stack-ai-agent-template", name: "Full-Stack AI Agent Template" },
-  ],
-  "redis": [
-    { slug: "full-stack-ai-agent-template", name: "Full-Stack AI Agent Template" },
-  ],
-  "agent-sandbox": [
-    { slug: "pydantic-deepagents", name: "Pydantic Deep Agents" },
-  ],
+  pgvector: [{ slug: "full-stack-ai-agent-template", name: "Full-Stack AI Agent Template" }],
+  celery: [{ slug: "full-stack-ai-agent-template", name: "Full-Stack AI Agent Template" }],
+  redis: [{ slug: "full-stack-ai-agent-template", name: "Full-Stack AI Agent Template" }],
+  "agent-sandbox": [{ slug: "pydantic-deepagents", name: "Pydantic Deep Agents" }],
   "large-language-models": [
     { slug: "pydantic-deepagents", name: "Pydantic Deep Agents" },
     { slug: "full-stack-ai-agent-template", name: "Full-Stack AI Agent Template" },
   ],
-  "mcp-model-context-protocol": [
-    { slug: "pydantic-deepagents", name: "Pydantic Deep Agents" },
-  ],
+  "mcp-model-context-protocol": [{ slug: "pydantic-deepagents", name: "Pydantic Deep Agents" }],
   "document-chunking": [
     { slug: "full-stack-ai-agent-template", name: "Full-Stack AI Agent Template" },
   ],
-  "hybrid-search": [
-    { slug: "full-stack-ai-agent-template", name: "Full-Stack AI Agent Template" },
-  ],
-  "summarization-pydantic-ai": [
-    { slug: "summarization-pydantic-ai", name: "Summarization Agent" },
-  ],
+  "hybrid-search": [{ slug: "full-stack-ai-agent-template", name: "Full-Stack AI Agent Template" }],
+  "summarization-pydantic-ai": [{ slug: "summarization-pydantic-ai", name: "Summarization Agent" }],
   "database-migration": [
     { slug: "full-stack-ai-agent-template", name: "Full-Stack AI Agent Template" },
   ],
@@ -1031,152 +1049,251 @@ export const termToProjectMap: Record<string, { slug: string; name: string }[]> 
   "ci-cd-pipeline": [
     { slug: "full-stack-ai-agent-template", name: "Full-Stack AI Agent Template" },
   ],
-  "containerization": [
+  containerization: [
     { slug: "full-stack-ai-agent-template", name: "Full-Stack AI Agent Template" },
   ],
-  "agent-planning": [
-    { slug: "pydantic-deepagents", name: "Pydantic Deep Agents" },
-  ],
+  "agent-planning": [{ slug: "pydantic-deepagents", name: "Pydantic Deep Agents" }],
 };
 
 export const termToBlogMap: Record<string, { slug: string; title: string }[]> = {
   "rag-retrieval-augmented-generation": [
-    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+    {
+      slug: "full-rag-pipeline-4-vector-stores",
+      title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking",
+    },
   ],
   "vector-database": [
-    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+    {
+      slug: "full-rag-pipeline-4-vector-stores",
+      title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking",
+    },
   ],
   "hybrid-search": [
-    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+    {
+      slug: "full-rag-pipeline-4-vector-stores",
+      title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking",
+    },
   ],
   "semantic-search": [
-    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+    {
+      slug: "full-rag-pipeline-4-vector-stores",
+      title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking",
+    },
   ],
   "re-ranking": [
-    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+    {
+      slug: "full-rag-pipeline-4-vector-stores",
+      title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking",
+    },
   ],
   "document-chunking": [
-    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+    {
+      slug: "full-rag-pipeline-4-vector-stores",
+      title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking",
+    },
   ],
   "pydantic-ai": [
-    { slug: "choosing-ai-framework", title: "Pydantic AI vs LangChain vs LangGraph vs CrewAI: Which to Choose?" },
-    { slug: "pydantic-ai-vs-langchain", title: "Pydantic AI vs LangChain for Production AI Agents" },
+    {
+      slug: "choosing-ai-framework",
+      title: "Pydantic AI vs LangChain vs LangGraph vs CrewAI: Which to Choose?",
+    },
+    {
+      slug: "pydantic-ai-vs-langchain",
+      title: "Pydantic AI vs LangChain for Production AI Agents",
+    },
   ],
-  "langchain": [
-    { slug: "choosing-ai-framework", title: "Pydantic AI vs LangChain vs LangGraph vs CrewAI: Which to Choose?" },
+  langchain: [
+    {
+      slug: "choosing-ai-framework",
+      title: "Pydantic AI vs LangChain vs LangGraph vs CrewAI: Which to Choose?",
+    },
     { slug: "same-chat-app-4-frameworks", title: "Same Chat App, 4 AI Frameworks" },
   ],
-  "langgraph": [
-    { slug: "choosing-ai-framework", title: "Pydantic AI vs LangChain vs LangGraph vs CrewAI: Which to Choose?" },
+  langgraph: [
+    {
+      slug: "choosing-ai-framework",
+      title: "Pydantic AI vs LangChain vs LangGraph vs CrewAI: Which to Choose?",
+    },
     { slug: "same-chat-app-4-frameworks", title: "Same Chat App, 4 AI Frameworks" },
   ],
-  "crewai": [
-    { slug: "choosing-ai-framework", title: "Pydantic AI vs LangChain vs LangGraph vs CrewAI: Which to Choose?" },
+  crewai: [
+    {
+      slug: "choosing-ai-framework",
+      title: "Pydantic AI vs LangChain vs LangGraph vs CrewAI: Which to Choose?",
+    },
     { slug: "same-chat-app-4-frameworks", title: "Same Chat App, 4 AI Frameworks" },
   ],
   "ai-agent": [
-    { slug: "open-source-claude-code-alternative", title: "Building an Open-Source Claude Code Alternative" },
+    {
+      slug: "open-source-claude-code-alternative",
+      title: "Building an Open-Source Claude Code Alternative",
+    },
     { slug: "choosing-ai-framework", title: "Which AI Agent Framework to Choose?" },
   ],
   "agentic-ai": [
-    { slug: "open-source-claude-code-alternative", title: "Building an Open-Source Claude Code Alternative" },
+    {
+      slug: "open-source-claude-code-alternative",
+      title: "Building an Open-Source Claude Code Alternative",
+    },
   ],
   "multi-agent-system": [
-    { slug: "ai-pr-reviewer-parallel-subagents", title: "AI PR Reviewer with 3 Parallel Subagents" },
+    {
+      slug: "ai-pr-reviewer-parallel-subagents",
+      title: "AI PR Reviewer with 3 Parallel Subagents",
+    },
   ],
   "agent-memory": [
-    { slug: "ai-agent-memory-management", title: "AI Agent Memory: Why Your Agent Forgets After 50 Messages" },
-    { slug: "ai-agent-selective-memory", title: "AI Agent Selective Memory: Stop Storing Everything" },
+    {
+      slug: "ai-agent-memory-management",
+      title: "AI Agent Memory: Why Your Agent Forgets After 50 Messages",
+    },
+    {
+      slug: "ai-agent-selective-memory",
+      title: "AI Agent Selective Memory: Stop Storing Everything",
+    },
   ],
   "agent-observability": [
-    { slug: "ai-agent-observability", title: "Observability for AI Agents Is Broken. Here's What We Built." },
+    {
+      slug: "ai-agent-observability",
+      title: "Observability for AI Agents Is Broken. Here's What We Built.",
+    },
   ],
   "agent-planning": [
-    { slug: "task-planning-ai-agents", title: "Task Planning for AI Agents: Dependencies and Hierarchical Todos" },
+    {
+      slug: "task-planning-ai-agents",
+      title: "Task Planning for AI Agents: Dependencies and Hierarchical Todos",
+    },
   ],
   "websocket-streaming": [
-    { slug: "websocket-streaming-ai-agents", title: "Real-Time AI Agent Streaming with WebSockets and FastAPI" },
+    {
+      slug: "websocket-streaming-ai-agents",
+      title: "Real-Time AI Agent Streaming with WebSockets and FastAPI",
+    },
   ],
-  "fastapi": [
-    { slug: "fastapi-nextjs-ai-template-guide", title: "Build a Full-Stack AI App with FastAPI and Next.js" },
+  fastapi: [
+    {
+      slug: "fastapi-nextjs-ai-template-guide",
+      title: "Build a Full-Stack AI App with FastAPI and Next.js",
+    },
     { slug: "ship-production-ai-app-fast", title: "Ship a Production AI App in 5 Minutes" },
   ],
-  "docker": [
+  docker: [
     { slug: "predictive-ai-docker-sandbox", title: "Give Your Agent a Docker Lab to Run Models" },
-    { slug: "daytona-sub-90ms-code-execution", title: "Sub-90ms Cloud Code Execution with Daytona" },
+    {
+      slug: "daytona-sub-90ms-code-execution",
+      title: "Sub-90ms Cloud Code Execution with Daytona",
+    },
   ],
   "agent-sandbox": [
     { slug: "predictive-ai-docker-sandbox", title: "Give Your Agent a Docker Lab to Run Models" },
-    { slug: "daytona-sub-90ms-code-execution", title: "Sub-90ms Cloud Code Execution with Daytona" },
+    {
+      slug: "daytona-sub-90ms-code-execution",
+      title: "Sub-90ms Cloud Code Execution with Daytona",
+    },
   ],
   "human-in-the-loop": [
-    { slug: "open-source-claude-code-alternative", title: "Building an Open-Source Claude Code Alternative" },
+    {
+      slug: "open-source-claude-code-alternative",
+      title: "Building an Open-Source Claude Code Alternative",
+    },
   ],
-  "tool-calling": [
-    { slug: "choosing-ai-framework", title: "Which AI Agent Framework to Choose?" },
-  ],
+  "tool-calling": [{ slug: "choosing-ai-framework", title: "Which AI Agent Framework to Choose?" }],
   "function-calling": [
     { slug: "choosing-ai-framework", title: "Which AI Agent Framework to Choose?" },
   ],
   "prompt-engineering": [
-    { slug: "agents-md-ai-friendly-codebase", title: "AGENTS.md: Making Your Codebase AI-Agent Friendly" },
+    {
+      slug: "agents-md-ai-friendly-codebase",
+      title: "AGENTS.md: Making Your Codebase AI-Agent Friendly",
+    },
   ],
-  "guardrails": [
-    { slug: "open-source-claude-code-alternative", title: "Building an Open-Source Claude Code Alternative" },
+  guardrails: [
+    {
+      slug: "open-source-claude-code-alternative",
+      title: "Building an Open-Source Claude Code Alternative",
+    },
   ],
   "prompt-injection": [
-    { slug: "open-source-claude-code-alternative", title: "Building an Open-Source Claude Code Alternative" },
+    {
+      slug: "open-source-claude-code-alternative",
+      title: "Building an Open-Source Claude Code Alternative",
+    },
   ],
   "knowledge-distillation": [
     { slug: "ai-agent-memory-management", title: "AI Agent Memory Management" },
   ],
-  "transformer": [
-    { slug: "choosing-ai-framework", title: "Which AI Agent Framework to Choose?" },
+  transformer: [{ slug: "choosing-ai-framework", title: "Which AI Agent Framework to Choose?" }],
+  "fine-tuning": [{ slug: "choosing-ai-framework", title: "Which AI Agent Framework to Choose?" }],
+  hallucination: [
+    {
+      slug: "full-rag-pipeline-4-vector-stores",
+      title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking",
+    },
   ],
-  "fine-tuning": [
-    { slug: "choosing-ai-framework", title: "Which AI Agent Framework to Choose?" },
+  milvus: [
+    {
+      slug: "full-rag-pipeline-4-vector-stores",
+      title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking",
+    },
   ],
-  "hallucination": [
-    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+  qdrant: [
+    {
+      slug: "full-rag-pipeline-4-vector-stores",
+      title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking",
+    },
   ],
-  "milvus": [
-    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+  chromadb: [
+    {
+      slug: "full-rag-pipeline-4-vector-stores",
+      title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking",
+    },
   ],
-  "qdrant": [
-    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+  pgvector: [
+    {
+      slug: "full-rag-pipeline-4-vector-stores",
+      title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking",
+    },
   ],
-  "chromadb": [
-    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
-  ],
-  "pgvector": [
-    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
-  ],
-  "pinecone": [
-    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+  pinecone: [
+    {
+      slug: "full-rag-pipeline-4-vector-stores",
+      title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking",
+    },
   ],
   "embedding-model": [
-    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+    {
+      slug: "full-rag-pipeline-4-vector-stores",
+      title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking",
+    },
   ],
   "vector-embedding": [
-    { slug: "full-rag-pipeline-4-vector-stores", title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking" },
+    {
+      slug: "full-rag-pipeline-4-vector-stores",
+      title: "Full RAG Pipeline: 4 Vector Stores, Hybrid Search, and Reranking",
+    },
   ],
   "subagent-delegation": [
-    { slug: "ai-pr-reviewer-parallel-subagents", title: "AI PR Reviewer with 3 Parallel Subagents" },
+    {
+      slug: "ai-pr-reviewer-parallel-subagents",
+      title: "AI PR Reviewer with 3 Parallel Subagents",
+    },
   ],
-  "task-decomposition": [
-    { slug: "task-planning-ai-agents", title: "Task Planning for AI Agents" },
+  "task-decomposition": [{ slug: "task-planning-ai-agents", title: "Task Planning for AI Agents" }],
+  "cost-tracking": [{ slug: "ai-agent-observability", title: "Observability for AI Agents" }],
+  nextjs: [
+    {
+      slug: "fastapi-nextjs-ai-template-guide",
+      title: "Build a Full-Stack AI App with FastAPI and Next.js",
+    },
+    {
+      slug: "zero-to-production-ai-agent-30-minutes",
+      title: "Zero to Production AI Agent in 30 Minutes",
+    },
   ],
-  "cost-tracking": [
-    { slug: "ai-agent-observability", title: "Observability for AI Agents" },
-  ],
-  "nextjs": [
-    { slug: "fastapi-nextjs-ai-template-guide", title: "Build a Full-Stack AI App with FastAPI and Next.js" },
-    { slug: "zero-to-production-ai-agent-30-minutes", title: "Zero to Production AI Agent in 30 Minutes" },
-  ],
-  "kubernetes": [
+  kubernetes: [
     { slug: "ship-production-ai-app-fast", title: "Ship a Production AI App in 5 Minutes" },
   ],
-  "containerization": [
+  containerization: [
     { slug: "ship-production-ai-app-fast", title: "Ship a Production AI App in 5 Minutes" },
   ],
 };

@@ -28,13 +28,13 @@ export function PresetSelector() {
 
   return (
     <div className="space-y-2.5">
-      <p className="text-xs text-text-tertiary font-medium uppercase tracking-wider">Presets</p>
+      <p className="text-text-tertiary text-xs font-medium tracking-wider uppercase">Presets</p>
       <div className="flex flex-col gap-2">
         {PRESETS.map(({ name, label, desc, icon: Icon }) => (
           <button
             key={name}
             onClick={() => applyPreset(name)}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+            className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-all ${
               activePreset === name
                 ? "border-accent/50 bg-accent/10"
                 : "border-border bg-surface hover:border-border-hover"
@@ -45,8 +45,8 @@ export function PresetSelector() {
               className={activePreset === name ? "text-accent" : "text-text-tertiary"}
             />
             <div className="min-w-0">
-              <div className="text-sm font-medium text-text">{label}</div>
-              <div className="text-[11px] text-text-tertiary truncate">{desc}</div>
+              <div className="text-text text-sm font-medium">{label}</div>
+              <div className="text-text-tertiary truncate text-[11px]">{desc}</div>
             </div>
           </button>
         ))}

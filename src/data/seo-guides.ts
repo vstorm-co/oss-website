@@ -227,7 +227,8 @@ async def search_faq(ctx: RunContext, query: str) -> str:
         for r in results
     )`,
     toolNames: "search_faq",
-    systemPrompt: "You are a helpful customer support agent. Use search_faq to find answers from the knowledge base before responding. Always cite the source FAQ.",
+    systemPrompt:
+      "You are a helpful customer support agent. Use search_faq to find answers from the knowledge base before responding. Always cite the source FAQ.",
     userQuery: "How do I reset my password?",
   },
   "rag-pipeline": {
@@ -248,7 +249,8 @@ async def search_documents(ctx: RunContext, query: str, top_k: int = 5) -> str:
         for i, r in enumerate(results)
     )`,
     toolNames: "search_documents",
-    systemPrompt: "You are a document Q&A assistant. Search documents before answering. Cite sources using [1], [2] format.",
+    systemPrompt:
+      "You are a document Q&A assistant. Search documents before answering. Cite sources using [1], [2] format.",
     userQuery: "What does the refund policy say about digital products?",
   },
   "research-agent": {
@@ -271,7 +273,8 @@ async def web_search(ctx: RunContext, query: str, max_results: int = 3) -> str:
         f"**{r['title']}**\\n{r['content']}" for r in results["results"]
     )`,
     toolNames: "web_search",
-    systemPrompt: "You are a research assistant. Search the web to gather information, then synthesize findings into a structured report with citations.",
+    systemPrompt:
+      "You are a research assistant. Search the web to gather information, then synthesize findings into a structured report with citations.",
     userQuery: "Compare the latest developments in AI agent frameworks in 2025",
   },
   "text-to-sql": {
@@ -292,9 +295,11 @@ async def run_query(ctx: RunContext, sql: str) -> str:
     rows = result.fetchmany(10)
     return "\\n".join(str(row) for row in rows)`,
     toolNames: "sql_tools",
-    systemPrompt: "You are a SQL analyst. Convert natural language questions into SQL queries. Only use SELECT statements. Limit results to 10 rows.",
+    systemPrompt:
+      "You are a SQL analyst. Convert natural language questions into SQL queries. Only use SELECT statements. Limit results to 10 rows.",
     userQuery: "Show me top 5 customers by total spending this quarter",
-    extraImports: "from langchain_community.utilities import SQLDatabase\nfrom langchain_community.agent_toolkits import SQLDatabaseToolkit",
+    extraImports:
+      "from langchain_community.utilities import SQLDatabase\nfrom langchain_community.agent_toolkits import SQLDatabaseToolkit",
   },
   "content-generation": {
     langchain: `@tool
@@ -324,7 +329,8 @@ async def save_content(ctx: RunContext, filename: str, content: str) -> str:
     Path(f"output/{filename}").write_text(content)
     return f"Saved to output/{filename}"`,
     toolNames: "web_search, save_content",
-    systemPrompt: "You are a content writer. Research the topic first, then write engaging content. Save the final output using save_content.",
+    systemPrompt:
+      "You are a content writer. Research the topic first, then write engaging content. Save the final output using save_content.",
     userQuery: "Write a blog post about the benefits of AI agents in customer service",
   },
   "code-review-agent": {
@@ -369,7 +375,8 @@ async def search_code(ctx: RunContext, pattern: str, path: str = ".") -> str:
     )
     return result.stdout[:3000] or "No matches found."`,
     toolNames: "read_file, find_files, search_code",
-    systemPrompt: "You are a code reviewer. Find relevant files, read them, search for patterns, and provide a structured review covering security, performance, and best practices.",
+    systemPrompt:
+      "You are a code reviewer. Find relevant files, read them, search for patterns, and provide a structured review covering security, performance, and best practices.",
     userQuery: "Review the Python files in src/ for common security issues",
   },
   "data-analysis-agent": {
@@ -406,7 +413,8 @@ async def read_csv_info(ctx: RunContext, path: str) -> str:
     df = pd.read_csv(path)
     return f"Shape: {df.shape}\\nColumns: {list(df.columns)}\\nTypes:\\n{df.dtypes}"`,
     toolNames: "execute_python, read_csv_info",
-    systemPrompt: "You are a data analyst. Explore datasets using read_csv_info, then use execute_python to run analysis code. Present findings clearly with numbers.",
+    systemPrompt:
+      "You are a data analyst. Explore datasets using read_csv_info, then use execute_python to run analysis code. Present findings clearly with numbers.",
     userQuery: "Analyze sales_data.csv and find the top performing products by revenue",
   },
   "email-assistant": {
@@ -439,8 +447,10 @@ async def draft_email(ctx: RunContext, to: str, subject: str, body: str) -> str:
     draft_id = await email_client.create_draft(to=to, subject=subject, body=body)
     return f"Draft created (ID: {draft_id}). Review before sending."`,
     toolNames: "search_emails, draft_email",
-    systemPrompt: "You are an email assistant. Search emails to find context, then help draft professional replies. Always create drafts — never send directly.",
-    userQuery: "Find the latest email from the marketing team and draft a reply confirming the deadline",
+    systemPrompt:
+      "You are an email assistant. Search emails to find context, then help draft professional replies. Always create drafts — never send directly.",
+    userQuery:
+      "Find the latest email from the marketing team and draft a reply confirming the deadline",
   },
   "web-scraper": {
     langchain: `@tool
@@ -470,8 +480,10 @@ async def extract_data(ctx: RunContext, text: str, instruction: str) -> str:
     """Extract structured data from text based on instruction."""
     return f"Extracting from {len(text)} chars: {instruction}"`,
     toolNames: "fetch_url, extract_data",
-    systemPrompt: "You are a web scraping agent. Fetch pages, extract the requested data, and return it in structured format. Respect robots.txt.",
-    userQuery: "Scrape the pricing page at example.com/pricing and extract all plan names and prices",
+    systemPrompt:
+      "You are a web scraping agent. Fetch pages, extract the requested data, and return it in structured format. Respect robots.txt.",
+    userQuery:
+      "Scrape the pricing page at example.com/pricing and extract all plan names and prices",
   },
   "task-automation": {
     langchain: `@tool
@@ -509,7 +521,8 @@ async def update_task(ctx: RunContext, task_id: int, status: str) -> str:
     await project.update_task(task_id, status=status)
     return f"Task #{task_id} updated to {status}"`,
     toolNames: "create_task, list_tasks, update_task",
-    systemPrompt: "You are a project management assistant. Help organize tasks: create new ones, track progress, and update statuses. Be proactive about suggesting task breakdowns.",
+    systemPrompt:
+      "You are a project management assistant. Help organize tasks: create new ones, track progress, and update statuses. Be proactive about suggesting task breakdowns.",
     userQuery: "Break down 'Launch new website' into subtasks and assign them to the team",
   },
 };
@@ -616,21 +629,25 @@ export function getGuideCode(frameworkSlug: string, useCaseSlug: string): string
   if (!config) return "// Code example not available";
 
   switch (frameworkSlug) {
-    case "pydantic-ai": return buildPydanticAiCode(config);
-    case "langchain": return buildLangChainCode(config);
-    case "langgraph": return buildLangGraphCode(config);
-    case "crewai": return buildCrewAICode(config);
-    case "deepagents": return buildDeepAgentsCode(config);
-    default: return "// Code example not available";
+    case "pydantic-ai":
+      return buildPydanticAiCode(config);
+    case "langchain":
+      return buildLangChainCode(config);
+    case "langgraph":
+      return buildLangGraphCode(config);
+    case "crewai":
+      return buildCrewAICode(config);
+    case "deepagents":
+      return buildDeepAgentsCode(config);
+    default:
+      return "// Code example not available";
   }
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────
 
 export function getAllGuideSlugs(): string[] {
-  return seoFrameworks.flatMap((fw) =>
-    seoUseCases.map((uc) => `${uc.slug}-with-${fw.slug}`)
-  );
+  return seoFrameworks.flatMap((fw) => seoUseCases.map((uc) => `${uc.slug}-with-${fw.slug}`));
 }
 
 export function getGuideBySlug(slug: string): SeoGuide | undefined {

@@ -38,48 +38,61 @@ const formatDate = (dateStr: string) => {
 };
 ---
 
-<section class="section-light px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40 border-t border-[#e5e7eb]">
+<section
+  class="section-light border-t border-[#e5e7eb] px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40"
+>
   <div class="mx-auto max-w-3xl">
-    <div class="reveal text-center mb-12">
-      <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl heading-accent">{t["oss.changelog.title"]}</h2>
-      <p class="mt-4 text-lg text-text-secondary">{t["oss.changelog.subtitle"]}</p>
+    <div class="reveal mb-12 text-center">
+      <h2 class="heading-accent text-3xl font-bold tracking-[-0.02em] sm:text-4xl">
+        {t["oss.changelog.title"]}
+      </h2>
+      <p class="text-text-secondary mt-4 text-lg">{t["oss.changelog.subtitle"]}</p>
     </div>
 
     <div class="reveal space-y-0">
-      {releases.map((release, i) => (
-        <div class="relative flex gap-5 pb-8 last:pb-0">
-          {/* Timeline line */}
-          {i < releases.length - 1 && (
-            <div class="absolute left-[11px] top-6 bottom-0 w-px bg-border"></div>
-          )}
+      {
+        releases.map((release, i) => (
+          <div class="relative flex gap-5 pb-8 last:pb-0">
+            {/* Timeline line */}
+            {i < releases.length - 1 && (
+              <div class="bg-border absolute top-6 bottom-0 left-[11px] w-px" />
+            )}
 
-          {/* Dot */}
-          <div class="relative z-10 mt-1.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-accent bg-bg">
-            <div class="h-2 w-2 rounded-full bg-accent"></div>
-          </div>
-
-          {/* Content */}
-          <div class="flex-1 glass-card rounded-xl p-4 sm:p-5">
-            <div class="flex items-center gap-2 mb-1.5 flex-wrap">
-              <span class="text-xs font-mono text-text-tertiary">{formatDate(release.date)}</span>
-              <span class="rounded-full bg-accent/10 px-2 py-0.5 text-[11px] font-semibold text-accent">{release.version}</span>
-              <span class="rounded-full border border-border px-2 py-0.5 text-[11px] text-text-tertiary">{release.project}</span>
+            {/* Dot */}
+            <div class="border-accent bg-bg relative z-10 mt-1.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2">
+              <div class="bg-accent h-2 w-2 rounded-full" />
             </div>
-            <h3 class="font-semibold text-sm sm:text-base">{release.title}</h3>
-            <p class="mt-1 text-sm text-text-secondary leading-relaxed">{release.description}</p>
+
+            {/* Content */}
+            <div class="glass-card flex-1 rounded-xl p-4 sm:p-5">
+              <div class="mb-1.5 flex flex-wrap items-center gap-2">
+                <span class="text-text-tertiary font-mono text-xs">{formatDate(release.date)}</span>
+                <span class="bg-accent/10 text-accent rounded-full px-2 py-0.5 text-[11px] font-semibold">
+                  {release.version}
+                </span>
+                <span class="border-border text-text-tertiary rounded-full border px-2 py-0.5 text-[11px]">
+                  {release.project}
+                </span>
+              </div>
+              <h3 class="text-sm font-semibold sm:text-base">{release.title}</h3>
+              <p class="text-text-secondary mt-1 text-sm leading-relaxed">{release.description}</p>
+            </div>
           </div>
-        </div>
-      ))}
+        ))
+      }
     </div>
 
     <div class="reveal mt-8 text-center">
       <a
         href="/changelog/"
-        class="inline-flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-accent transition-colors"
+        class="text-text-secondary hover:text-accent inline-flex items-center gap-2 text-sm font-medium transition-colors"
       >
         {t["oss.changelog.viewAll"]}
         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path>
         </svg>
       </a>
     </div>

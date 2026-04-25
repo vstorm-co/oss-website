@@ -17,10 +17,7 @@ export function shouldShowOAuth(config: ProjectConfig): boolean {
 
 /** Show session management toggle when JWT auth is available AND a database is selected. */
 export function shouldShowSessionManagement(config: ProjectConfig): boolean {
-  return (
-    (config.auth === "jwt" || config.auth === "both") &&
-    config.database !== "none"
-  );
+  return (config.auth === "jwt" || config.auth === "both") && config.database !== "none";
 }
 
 /** Show AI framework / LLM provider options when AI agent is enabled. */
@@ -78,10 +75,7 @@ export function shouldShowPgVector(config: ProjectConfig): boolean {
 
 /** Show image description toggle when parser supports image extraction. */
 export function shouldShowImageDescription(config: ProjectConfig): boolean {
-  return (
-    config.enable_rag &&
-    (config.pdf_parser === "pymupdf" || config.pdf_parser === "all")
-  );
+  return config.enable_rag && (config.pdf_parser === "pymupdf" || config.pdf_parser === "all");
 }
 
 /** Show admin panel sub-options (environments, auth) when admin panel is enabled. */

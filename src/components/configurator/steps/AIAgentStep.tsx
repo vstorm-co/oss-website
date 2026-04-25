@@ -1,20 +1,32 @@
 import { useWizard } from "../WizardProvider";
 import { RadioGroup, Toggle } from "../FormControls";
 import {
-  aiFrameworkValues, aiFrameworkLabels,
-  llmProviderValues, llmProviderLabels,
-  websocketAuthValues, websocketAuthLabels,
-  sandboxBackendValues, sandboxBackendLabels,
+  aiFrameworkValues,
+  aiFrameworkLabels,
+  llmProviderValues,
+  llmProviderLabels,
+  websocketAuthValues,
+  websocketAuthLabels,
+  sandboxBackendValues,
+  sandboxBackendLabels,
 } from "../../../lib/types";
 import {
-  shouldShowAIOptions, shouldShowOpenRouter,
-  shouldShowWebSocketAuth, shouldShowConversationPersistence,
-  shouldShowLangsmith, shouldShowSandboxBackend, shouldShowDaytona,
+  shouldShowAIOptions,
+  shouldShowOpenRouter,
+  shouldShowWebSocketAuth,
+  shouldShowConversationPersistence,
+  shouldShowLangsmith,
+  shouldShowSandboxBackend,
+  shouldShowDaytona,
 } from "../../../lib/validation";
 
 export function AIAgentStep() {
   const { form } = useWizard();
-  const { register, watch, formState: { errors } } = form;
+  const {
+    register,
+    watch,
+    formState: { errors },
+  } = form;
   const config = watch();
 
   const availableProviders = llmProviderValues.filter((p) => {
@@ -30,8 +42,8 @@ export function AIAgentStep() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-text tracking-tight">AI</h2>
-        <p className="text-sm text-text-tertiary mt-1">Configure AI framework and LLM provider</p>
+        <h2 className="text-text text-xl font-semibold tracking-tight">AI</h2>
+        <p className="text-text-tertiary mt-1 text-sm">Configure AI framework and LLM provider</p>
       </div>
 
       <div className="grid gap-5">
@@ -45,7 +57,7 @@ export function AIAgentStep() {
         {shouldShowAIOptions(config) && (
           <>
             <div>
-              <label className="block text-sm font-medium text-text mb-2">AI Framework</label>
+              <label className="text-text mb-2 block text-sm font-medium">AI Framework</label>
               <RadioGroup
                 options={aiFrameworkValues.map((v) => ({ value: v, label: aiFrameworkLabels[v] }))}
                 value={config.ai_framework}
@@ -55,7 +67,7 @@ export function AIAgentStep() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-text mb-2">LLM Provider</label>
+              <label className="text-text mb-2 block text-sm font-medium">LLM Provider</label>
               <RadioGroup
                 options={availableProviders.map((v) => ({ value: v, label: llmProviderLabels[v] }))}
                 value={config.llm_provider}
@@ -66,9 +78,12 @@ export function AIAgentStep() {
 
             {shouldShowSandboxBackend(config) && (
               <div>
-                <label className="block text-sm font-medium text-text mb-2">Sandbox Backend</label>
+                <label className="text-text mb-2 block text-sm font-medium">Sandbox Backend</label>
                 <RadioGroup
-                  options={availableSandboxBackends.map((v) => ({ value: v, label: sandboxBackendLabels[v] }))}
+                  options={availableSandboxBackends.map((v) => ({
+                    value: v,
+                    label: sandboxBackendLabels[v],
+                  }))}
                   value={config.sandbox_backend}
                   register={register("sandbox_backend")}
                   columns={2}
@@ -87,10 +102,12 @@ export function AIAgentStep() {
 
             {shouldShowWebSocketAuth(config) && (
               <div>
-                <label className="block text-sm font-medium text-text mb-2">WebSocket Auth</label>
+                <label className="text-text mb-2 block text-sm font-medium">WebSocket Auth</label>
                 <select {...register("websocket_auth")} className="input">
                   {websocketAuthValues.map((v) => (
-                    <option key={v} value={v}>{websocketAuthLabels[v]}</option>
+                    <option key={v} value={v}>
+                      {websocketAuthLabels[v]}
+                    </option>
                   ))}
                 </select>
               </div>

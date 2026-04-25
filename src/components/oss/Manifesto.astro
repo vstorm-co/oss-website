@@ -26,35 +26,47 @@ const principles = [
 
 <section class="px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40" style="background: #111118;">
   <div class="mx-auto max-w-4xl">
-    <div class="reveal text-center mb-12">
-      <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl heading-accent">{t["oss.manifesto.title"]}</h2>
+    <div class="reveal mb-12 text-center">
+      <h2 class="heading-accent text-3xl font-bold tracking-[-0.02em] sm:text-4xl">
+        {t["oss.manifesto.title"]}
+      </h2>
     </div>
 
     <div class="reveal mx-auto max-w-3xl">
-      <blockquote class="relative rounded-2xl border border-border bg-surface/50 px-8 py-8 sm:px-12 sm:py-10">
-        <svg class="absolute top-6 left-6 h-8 w-8 text-accent/20 sm:top-8 sm:left-8" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151C7.546 6.068 5.983 8.789 5.983 11H10v10H0z"/>
+      <blockquote
+        class="border-border bg-surface/50 relative rounded-2xl border px-8 py-8 sm:px-12 sm:py-10"
+      >
+        <svg
+          class="text-accent/20 absolute top-6 left-6 h-8 w-8 sm:top-8 sm:left-8"
+          fill="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151C7.546 6.068 5.983 8.789 5.983 11H10v10H0z"
+          ></path>
         </svg>
-        <p class="relative z-10 text-base leading-relaxed text-text-secondary sm:text-lg">
+        <p class="text-text-secondary relative z-10 text-base leading-relaxed sm:text-lg">
           {t["oss.manifesto.quote"]}
         </p>
         <footer class="mt-6 flex items-center gap-3">
-          <div class="h-px flex-1 bg-border"></div>
-          <span class="text-sm font-medium text-text-tertiary">{t["oss.manifesto.author"]}</span>
+          <div class="bg-border h-px flex-1"></div>
+          <span class="text-text-tertiary text-sm font-medium">{t["oss.manifesto.author"]}</span>
         </footer>
       </blockquote>
     </div>
 
     <div class="reveal-group mt-12 grid gap-6 sm:grid-cols-3">
-      {principles.map((p) => (
-        <div class="reveal flex flex-col items-center text-center rounded-2xl border border-border bg-surface/30 p-6 transition-colors hover:border-accent/30">
-          <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-accent mb-4">
-            <Fragment set:html={p.icon} />
+      {
+        principles.map((p) => (
+          <div class="reveal border-border bg-surface/30 hover:border-accent/30 flex flex-col items-center rounded-2xl border p-6 text-center transition-colors">
+            <div class="bg-accent/10 text-accent mb-4 flex h-10 w-10 items-center justify-center rounded-xl">
+              <Fragment set:html={p.icon} />
+            </div>
+            <h3 class="mb-2 text-sm font-semibold">{p.title}</h3>
+            <p class="text-text-secondary text-xs leading-relaxed">{p.desc}</p>
           </div>
-          <h3 class="text-sm font-semibold mb-2">{p.title}</h3>
-          <p class="text-xs leading-relaxed text-text-secondary">{p.desc}</p>
-        </div>
-      ))}
+        ))
+      }
     </div>
   </div>
 </section>

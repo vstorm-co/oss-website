@@ -36,21 +36,21 @@ export function CopyCommand({ config }: CopyCommandProps) {
   return (
     <div className="space-y-5">
       <div>
-        <p className="text-sm text-text-secondary mb-2">1. Install the generator:</p>
-        <code className="block bg-surface border border-border rounded-xl p-3.5 text-sm text-emerald-400 font-mono">
+        <p className="text-text-secondary mb-2 text-sm">1. Install the generator:</p>
+        <code className="bg-surface border-border block rounded-xl border p-3.5 font-mono text-sm text-emerald-400">
           pip install fastapi-fullstack
         </code>
       </div>
 
       <div>
-        <p className="text-sm text-text-secondary mb-2">2. Run this command:</p>
+        <p className="text-text-secondary mb-2 text-sm">2. Run this command:</p>
         <div className="relative">
-          <pre className="bg-surface border border-border rounded-xl p-4 text-sm text-text font-mono overflow-x-auto">
+          <pre className="bg-surface border-border text-text overflow-x-auto rounded-xl border p-4 font-mono text-sm">
             <code>{command}</code>
           </pre>
           <button
             onClick={handleCopy}
-            className="absolute top-3 right-3 p-2 rounded-lg bg-surface-hover hover:bg-border border border-border-hover transition-colors"
+            className="bg-surface-hover hover:bg-border border-border-hover absolute top-3 right-3 rounded-lg border p-2 transition-colors"
             title="Copy command"
           >
             {copied ? (
@@ -65,14 +65,14 @@ export function CopyCommand({ config }: CopyCommandProps) {
       <div className="flex gap-3">
         <button
           onClick={handleCopy}
-          className="flex items-center gap-2 px-6 py-2.5 bg-accent hover:bg-accent-hover text-white rounded-full text-sm font-medium transition-colors"
+          className="bg-accent hover:bg-accent-hover flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-medium text-white transition-colors"
         >
           {copied ? <Check size={16} /> : <Copy size={16} />}
           {copied ? "Copied!" : "Copy Command"}
         </button>
         <button
           onClick={handleDownload}
-          className="flex items-center gap-2 px-5 py-2.5 border border-border-hover hover:border-text-tertiary text-text rounded-full text-sm transition-colors"
+          className="border-border-hover hover:border-text-tertiary text-text flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm transition-colors"
         >
           <Download size={16} />
           Download JSON

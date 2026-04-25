@@ -14,7 +14,13 @@ export type FrontendType = "none" | "nextjs";
 export type WebSocketAuthType = "none" | "jwt" | "api_key";
 export type AdminEnvironmentType = "all" | "dev_only" | "dev_staging" | "disabled";
 export type OAuthProvider = "none" | "google";
-export type AIFrameworkType = "pydantic_ai" | "langchain" | "langgraph" | "crewai" | "deepagents" | "pydantic_deep";
+export type AIFrameworkType =
+  | "pydantic_ai"
+  | "langchain"
+  | "langgraph"
+  | "crewai"
+  | "deepagents"
+  | "pydantic_deep";
 export type LLMProviderType = "openai" | "anthropic" | "google" | "openrouter";
 export type RateLimitStorageType = "memory" | "redis";
 export type ReverseProxyType =

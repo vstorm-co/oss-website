@@ -1,5 +1,5 @@
 ---
-import type { translations } from '../../i18n/translations';
+import type { translations } from "../../i18n/translations";
 
 interface Props {
   t: typeof translations.en;
@@ -60,51 +60,53 @@ const presets = [
   <div class="mx-auto max-w-6xl">
     <div class="reveal text-center">
       <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl">{t["presets.title"]}</h2>
-      <p class="mt-4 text-lg text-text-secondary">
+      <p class="text-text-secondary mt-4 text-lg">
         {t["presets.subtitle"]}
       </p>
     </div>
 
     <div class="reveal-group mt-16 grid gap-6 lg:grid-cols-3">
-      {presets.map((preset) => (
-        <div
-          class={`reveal glow-card relative flex flex-col rounded-2xl border p-6 pt-5 transition-colors ${
-            preset.highlighted
-              ? "border-accent/40 bg-surface"
-              : "border-border bg-surface hover:border-border-hover"
-          }`}
-        >
-          <div class="flex items-center gap-2 mb-1">
-            <h3 class="text-lg font-semibold">{preset.name}</h3>
-            {preset.tag && (
-              <span class="rounded-full bg-accent px-2.5 py-0.5 text-[11px] font-medium text-white">
-                {preset.tag}
-              </span>
-            )}
-          </div>
-          <p class="mt-2 text-sm text-text-secondary">{preset.description}</p>
-
-          <ul class="mt-6 flex-1 space-y-2.5">
-            {preset.features.map((feature) => (
-              <li class="flex items-center gap-2.5 text-sm text-text-secondary">
-                <span class="text-text-tertiary">&mdash;</span>
-                {feature}
-              </li>
-            ))}
-          </ul>
-
-          <a
-            href={preset.href}
-            class={`mt-8 block rounded-full py-2.5 text-center text-sm font-semibold transition-colors ${
+      {
+        presets.map((preset) => (
+          <div
+            class={`reveal glow-card relative flex flex-col rounded-2xl border p-6 pt-5 transition-colors ${
               preset.highlighted
-                ? "bg-accent text-white hover:bg-accent-hover"
-                : "border border-border text-text hover:border-border-hover hover:bg-surface-hover"
+                ? "border-accent/40 bg-surface"
+                : "border-border bg-surface hover:border-border-hover"
             }`}
           >
-            {preset.cta}
-          </a>
-        </div>
-      ))}
+            <div class="mb-1 flex items-center gap-2">
+              <h3 class="text-lg font-semibold">{preset.name}</h3>
+              {preset.tag && (
+                <span class="bg-accent rounded-full px-2.5 py-0.5 text-[11px] font-medium text-white">
+                  {preset.tag}
+                </span>
+              )}
+            </div>
+            <p class="text-text-secondary mt-2 text-sm">{preset.description}</p>
+
+            <ul class="mt-6 flex-1 space-y-2.5">
+              {preset.features.map((feature) => (
+                <li class="text-text-secondary flex items-center gap-2.5 text-sm">
+                  <span class="text-text-tertiary">&mdash;</span>
+                  {feature}
+                </li>
+              ))}
+            </ul>
+
+            <a
+              href={preset.href}
+              class={`mt-8 block rounded-full py-2.5 text-center text-sm font-semibold transition-colors ${
+                preset.highlighted
+                  ? "bg-accent hover:bg-accent-hover text-white"
+                  : "border-border text-text hover:border-border-hover hover:bg-surface-hover border"
+              }`}
+            >
+              {preset.cta}
+            </a>
+          </div>
+        ))
+      }
     </div>
   </div>
 </section>

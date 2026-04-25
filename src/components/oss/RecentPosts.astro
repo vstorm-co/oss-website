@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection } from "astro:content";
 
 interface Props {
   t: Record<string, string>;
@@ -7,44 +7,57 @@ interface Props {
 }
 
 const { t, lang } = Astro.props;
-const blogHref = lang === 'en' ? '/blog/' : `/${lang}/blog/`;
+const blogHref = lang === "en" ? "/blog/" : `/${lang}/blog/`;
 
-const posts = (
-  await getCollection('blog', ({ data }) => data.lang === lang && !data.draft)
-).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()).slice(0, 3);
+const posts = (await getCollection("blog", ({ data }) => data.lang === lang && !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
 
 const formatDate = (date: Date) =>
   date.toLocaleDateString(lang, { year: "numeric", month: "short", day: "numeric" });
 
 const postHref = (postId: string) => {
-  const slug = postId.split('/').slice(1).join('/');
-  return lang === 'en' ? `/blog/${slug}/` : `/${lang}/blog/${slug}/`;
+  const slug = postId.split("/").slice(1).join("/");
+  return lang === "en" ? `/blog/${slug}/` : `/${lang}/blog/${slug}/`;
 };
 ---
 
-<section class="section-light px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40 border-t border-[#e5e7eb]">
+<section
+  class="section-light border-t border-[#e5e7eb] px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40"
+>
   <div class="mx-auto max-w-4xl">
-    <div class="reveal text-center mb-12">
-      <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl heading-accent">{t["oss.recentPosts.title"]}</h2>
-      <p class="mt-4 text-lg text-text-secondary">{t["oss.recentPosts.subtitle"]}</p>
+    <div class="reveal mb-12 text-center">
+      <h2 class="heading-accent text-3xl font-bold tracking-[-0.02em] sm:text-4xl">
+        {t["oss.recentPosts.title"]}
+      </h2>
+      <p class="text-text-secondary mt-4 text-lg">{t["oss.recentPosts.subtitle"]}</p>
     </div>
 
-    {posts.length > 0 && (
-      <div class="reveal grid gap-6 sm:grid-cols-3">
-        {posts.map((post) => (
-          <a href={postHref(post.id)} class="rounded-xl border border-border bg-white p-6 transition-all hover:border-accent/40 hover:shadow-md shadow-sm block">
-            <time class="text-xs font-mono text-text-tertiary">{formatDate(post.data.pubDate)}</time>
-            <h3 class="mt-3 font-semibold text-base leading-snug">{post.data.title}</h3>
-            <p class="mt-2 text-sm text-text-secondary leading-relaxed line-clamp-2">{post.data.description}</p>
-          </a>
-        ))}
-      </div>
-    )}
+    {
+      posts.length > 0 && (
+        <div class="reveal grid gap-6 sm:grid-cols-3">
+          {posts.map((post) => (
+            <a
+              href={postHref(post.id)}
+              class="border-border hover:border-accent/40 block rounded-xl border bg-white p-6 shadow-sm transition-all hover:shadow-md"
+            >
+              <time class="text-text-tertiary font-mono text-xs">
+                {formatDate(post.data.pubDate)}
+              </time>
+              <h3 class="mt-3 text-base leading-snug font-semibold">{post.data.title}</h3>
+              <p class="text-text-secondary mt-2 line-clamp-2 text-sm leading-relaxed">
+                {post.data.description}
+              </p>
+            </a>
+          ))}
+        </div>
+      )
+    }
 
     <div class="reveal mt-8 text-center">
       <a
         href={blogHref}
-        class="inline-flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-accent transition-colors"
+        class="text-text-secondary hover:text-accent inline-flex items-center gap-2 text-sm font-medium transition-colors"
       >
         {t["oss.recentPosts.viewAll"]}
       </a>

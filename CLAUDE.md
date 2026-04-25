@@ -39,6 +39,7 @@ bun run preview      # Preview production build
 ### Translation Keys
 
 All translation keys live in `src/i18n/translations.ts`. When adding new keys:
+
 1. Add to ALL 4 language blocks (en, pl, de, es)
 2. Keep the same key count across all languages
 3. Verify with build (type errors if keys are missing)
@@ -61,17 +62,17 @@ Client-side template rendering using Nunjucks + JSZip. Templates are bundled at 
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `src/i18n/translations.ts` | All translation strings (344 keys × 4 langs) |
-| `src/layouts/Layout.astro` | Base layout (meta, JSON-LD, breadcrumbs, skip-to-content) |
-| `src/layouts/BlogLayout.astro` | Blog post layout (BlogPosting schema, reading time) |
-| `src/data/projects.ts` | Project catalog (names, slugs, GitHub repos, descriptions) |
-| `src/data/faq.ts` | FAQ items with categories |
-| `src/data/comparisons.ts` | Feature comparison data per product |
-| `src/components/Navbar.astro` | Site-wide navigation |
-| `astro.config.mjs` | Astro configuration |
-| `vercel.json` | Vercel redirects |
+| File                           | Purpose                                                    |
+| ------------------------------ | ---------------------------------------------------------- |
+| `src/i18n/translations.ts`     | All translation strings (344 keys × 4 langs)               |
+| `src/layouts/Layout.astro`     | Base layout (meta, JSON-LD, breadcrumbs, skip-to-content)  |
+| `src/layouts/BlogLayout.astro` | Blog post layout (BlogPosting schema, reading time)        |
+| `src/data/projects.ts`         | Project catalog (names, slugs, GitHub repos, descriptions) |
+| `src/data/faq.ts`              | FAQ items with categories                                  |
+| `src/data/comparisons.ts`      | Feature comparison data per product                        |
+| `src/components/Navbar.astro`  | Site-wide navigation                                       |
+| `astro.config.mjs`             | Astro configuration                                        |
+| `vercel.json`                  | Vercel redirects                                           |
 
 ## Style Guide
 

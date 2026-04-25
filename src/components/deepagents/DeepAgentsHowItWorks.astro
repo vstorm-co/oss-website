@@ -1,5 +1,5 @@
 ---
-import type { translations } from '../../i18n/translations';
+import type { translations } from "../../i18n/translations";
 
 interface Props {
   t: typeof translations.en;
@@ -8,35 +8,55 @@ interface Props {
 const { t } = Astro.props;
 
 const steps = [
-  { number: "1", title: t["deepagents.howitworks.step1.title"], desc: t["deepagents.howitworks.step1.desc"] },
-  { number: "2", title: t["deepagents.howitworks.step2.title"], desc: t["deepagents.howitworks.step2.desc"] },
-  { number: "3", title: t["deepagents.howitworks.step3.title"], desc: t["deepagents.howitworks.step3.desc"] },
-  { number: "4", title: t["deepagents.howitworks.step4.title"], desc: t["deepagents.howitworks.step4.desc"] },
+  {
+    number: "1",
+    title: t["deepagents.howitworks.step1.title"],
+    desc: t["deepagents.howitworks.step1.desc"],
+  },
+  {
+    number: "2",
+    title: t["deepagents.howitworks.step2.title"],
+    desc: t["deepagents.howitworks.step2.desc"],
+  },
+  {
+    number: "3",
+    title: t["deepagents.howitworks.step3.title"],
+    desc: t["deepagents.howitworks.step3.desc"],
+  },
+  {
+    number: "4",
+    title: t["deepagents.howitworks.step4.title"],
+    desc: t["deepagents.howitworks.step4.desc"],
+  },
 ];
 ---
 
 <section class="section-stack reveal px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
   <div class="mx-auto max-w-5xl">
-    <div class="text-center mb-16">
-      <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl heading-accent">{t["deepagents.howitworks.title"]}</h2>
-      <p class="mt-4 text-lg text-text-secondary">{t["deepagents.howitworks.subtitle"]}</p>
+    <div class="mb-16 text-center">
+      <h2 class="heading-accent text-3xl font-bold tracking-[-0.02em] sm:text-4xl">
+        {t["deepagents.howitworks.title"]}
+      </h2>
+      <p class="text-text-secondary mt-4 text-lg">{t["deepagents.howitworks.subtitle"]}</p>
     </div>
 
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-      {steps.map((step, i) => (
-        <div class="relative flex flex-col items-center text-center">
-          {/* Connecting line */}
-          {i < steps.length - 1 && (
-            <div class="pointer-events-none absolute top-5 left-[calc(50%+24px)] hidden h-px w-[calc(100%-48px)] border-t border-dashed border-border lg:block"></div>
-          )}
-          {/* Number circle */}
-          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent/40 text-sm font-semibold text-accent">
-            {step.number}
+      {
+        steps.map((step, i) => (
+          <div class="relative flex flex-col items-center text-center">
+            {/* Connecting line */}
+            {i < steps.length - 1 && (
+              <div class="border-border pointer-events-none absolute top-5 left-[calc(50%+24px)] hidden h-px w-[calc(100%-48px)] border-t border-dashed lg:block" />
+            )}
+            {/* Number circle */}
+            <div class="border-accent/40 text-accent flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-sm font-semibold">
+              {step.number}
+            </div>
+            <h3 class="mt-4 text-sm font-semibold">{step.title}</h3>
+            <p class="text-text-secondary mt-2 text-xs leading-relaxed">{step.desc}</p>
           </div>
-          <h3 class="mt-4 text-sm font-semibold">{step.title}</h3>
-          <p class="mt-2 text-xs leading-relaxed text-text-secondary">{step.desc}</p>
-        </div>
-      ))}
+        ))
+      }
     </div>
   </div>
 </section>

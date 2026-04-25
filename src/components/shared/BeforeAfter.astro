@@ -13,49 +13,69 @@ const { title, subtitle, beforeTitle, afterTitle, beforeItems, afterItems } = As
 
 <section class="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
   <div class="mx-auto max-w-5xl">
-    <div class="reveal text-center mb-12">
+    <div class="reveal mb-12 text-center">
       <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">{title}</h2>
-      {subtitle && <p class="mt-3 text-text-secondary">{subtitle}</p>}
+      {subtitle && <p class="text-text-secondary mt-3">{subtitle}</p>}
     </div>
 
     <div class="reveal grid gap-6 md:grid-cols-2">
       <!-- Before -->
       <div class="rounded-2xl border border-red-500/20 bg-red-500/[0.03] p-6 sm:p-8">
         <div class="mb-6 flex items-center gap-2">
-          <span class="flex h-8 w-8 items-center justify-center rounded-full bg-red-500/10 text-red-400">
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          <span
+            class="flex h-8 w-8 items-center justify-center rounded-full bg-red-500/10 text-red-400"
+          >
+            <svg
+              class="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </span>
           <h3 class="text-lg font-semibold text-red-400">{beforeTitle}</h3>
         </div>
         <ul class="space-y-3">
-          {beforeItems.map((item) => (
-            <li class="flex items-start gap-3 text-sm text-text-secondary">
-              <span class="mt-0.5 text-red-400/60 shrink-0">&#10007;</span>
-              <span>{item}</span>
-            </li>
-          ))}
+          {
+            beforeItems.map((item) => (
+              <li class="text-text-secondary flex items-start gap-3 text-sm">
+                <span class="mt-0.5 shrink-0 text-red-400/60">&#10007;</span>
+                <span>{item}</span>
+              </li>
+            ))
+          }
         </ul>
       </div>
 
       <!-- After -->
       <div class="rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.03] p-6 sm:p-8">
         <div class="mb-6 flex items-center gap-2">
-          <span class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400">
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          <span
+            class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400"
+          >
+            <svg
+              class="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
             </svg>
           </span>
           <h3 class="text-lg font-semibold text-emerald-400">{afterTitle}</h3>
         </div>
         <ul class="space-y-3">
-          {afterItems.map((item) => (
-            <li class="flex items-start gap-3 text-sm text-text-secondary">
-              <span class="mt-0.5 text-emerald-400 shrink-0">&#10003;</span>
-              <span>{item}</span>
-            </li>
-          ))}
+          {
+            afterItems.map((item) => (
+              <li class="text-text-secondary flex items-start gap-3 text-sm">
+                <span class="mt-0.5 shrink-0 text-emerald-400">&#10003;</span>
+                <span>{item}</span>
+              </li>
+            ))
+          }
         </ul>
       </div>
     </div>

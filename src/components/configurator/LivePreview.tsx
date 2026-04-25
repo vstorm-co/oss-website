@@ -30,9 +30,10 @@ export function LivePreview() {
   lines.push(["Frontend", enumLabels.frontend[config.frontend]]);
 
   if (config.enable_docker) {
-    const proxy = config.reverse_proxy !== "none"
-      ? ` + ${enumLabels.reverse_proxy[config.reverse_proxy].split(" (")[0]}`
-      : "";
+    const proxy =
+      config.reverse_proxy !== "none"
+        ? ` + ${enumLabels.reverse_proxy[config.reverse_proxy].split(" (")[0]}`
+        : "";
     lines.push(["Docker", `Yes${proxy}`]);
   }
 
@@ -58,13 +59,15 @@ export function LivePreview() {
   }
 
   return (
-    <div className="rounded-xl border border-border bg-surface p-4">
-      <h3 className="text-xs text-text-tertiary font-medium uppercase tracking-wider mb-3">Preview</h3>
+    <div className="border-border bg-surface rounded-xl border p-4">
+      <h3 className="text-text-tertiary mb-3 text-xs font-medium tracking-wider uppercase">
+        Preview
+      </h3>
       <div className="space-y-2 font-mono text-xs">
         {lines.map(([key, value]) => (
           <div key={key} className="flex justify-between gap-2">
             <span className="text-text-tertiary shrink-0">{key}</span>
-            <span className="text-text text-right truncate">{value}</span>
+            <span className="text-text truncate text-right">{value}</span>
           </div>
         ))}
       </div>

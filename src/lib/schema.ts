@@ -152,10 +152,20 @@ const baseConfigSchema = z.object({
 
   // Frontend
   frontend: frontendSchema.default("nextjs"),
-  frontend_port: z.number().int().min(1024, "Port must be 1024-65535").max(65535, "Port must be 1024-65535").default(3000),
+  frontend_port: z
+    .number()
+    .int()
+    .min(1024, "Port must be 1024-65535")
+    .max(65535, "Port must be 1024-65535")
+    .default(3000),
 
   // Backend
-  backend_port: z.number().int().min(1024, "Port must be 1024-65535").max(65535, "Port must be 1024-65535").default(8000),
+  backend_port: z
+    .number()
+    .int()
+    .min(1024, "Port must be 1024-65535")
+    .max(65535, "Port must be 1024-65535")
+    .default(8000),
 });
 
 // ---- Full schema with cross-field validation (superRefine) ----------------

@@ -1,5 +1,5 @@
 ---
-import type { translations } from '../../i18n/translations';
+import type { translations } from "../../i18n/translations";
 
 interface Props {
   t: typeof translations.en;
@@ -23,27 +23,39 @@ const techItems = [
 
 <section class="section-stack reveal px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
   <div class="mx-auto max-w-5xl text-center">
-    <p class="text-xs font-medium uppercase tracking-[0.2em] text-text-tertiary">{t["logfire.tech.title"]}</p>
+    <p class="text-text-tertiary text-xs font-medium tracking-[0.2em] uppercase">
+      {t["logfire.tech.title"]}
+    </p>
 
     <!-- Marquee wrapper with fade edges -->
-    <div class="lf-marquee-wrapper mt-8 relative overflow-hidden">
-      <div class="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 sm:w-20 bg-gradient-to-r from-bg to-transparent"></div>
-      <div class="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 sm:w-20 bg-gradient-to-l from-bg to-transparent"></div>
+    <div class="lf-marquee-wrapper relative mt-8 overflow-hidden">
+      <div
+        class="from-bg pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r to-transparent sm:w-20"
+      >
+      </div>
+      <div
+        class="from-bg pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l to-transparent sm:w-20"
+      >
+      </div>
 
       <div class="lf-marquee-track flex w-max items-center gap-10 sm:gap-14">
-        {[...techItems, ...techItems].map((item) => (
-          <div class="flex-shrink-0 flex items-center gap-2.5" title={item.name}>
-            {item.logo ? (
-              <img
-                src={`${base}logos/${item.logo}`}
-                alt={item.name}
-                class="lf-tech-logo h-6 sm:h-8 w-auto object-contain"
-                loading="lazy"
-              />
-            ) : null}
-            <span class="lf-tech-label text-sm font-medium text-text-tertiary whitespace-nowrap">{item.name}</span>
-          </div>
-        ))}
+        {
+          [...techItems, ...techItems].map((item) => (
+            <div class="flex flex-shrink-0 items-center gap-2.5" title={item.name}>
+              {item.logo ? (
+                <img
+                  src={`${base}logos/${item.logo}`}
+                  alt={item.name}
+                  class="lf-tech-logo h-6 w-auto object-contain sm:h-8"
+                  loading="lazy"
+                />
+              ) : null}
+              <span class="lf-tech-label text-text-tertiary text-sm font-medium whitespace-nowrap">
+                {item.name}
+              </span>
+            </div>
+          ))
+        }
       </div>
     </div>
   </div>
@@ -51,8 +63,12 @@ const techItems = [
 
 <style>
   @keyframes lf-marquee {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
   }
 
   .lf-marquee-track {

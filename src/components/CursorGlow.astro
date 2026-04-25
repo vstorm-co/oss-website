@@ -2,31 +2,52 @@
 // Subtle radial glow that follows the cursor — desktop only, GPU-accelerated.
 ---
 
-<div id="cursor-glow" class="pointer-events-none fixed inset-0 z-30 hidden lg:block" aria-hidden="true">
-  <div id="cursor-glow-inner" class="absolute h-[600px] w-[600px] rounded-full bg-accent/[0.04] blur-[120px] will-change-transform" style="transform: translate(-50%, -50%) translate3d(-1000px, -1000px, 0);"></div>
+<div
+  id="cursor-glow"
+  class="pointer-events-none fixed inset-0 z-30 hidden lg:block"
+  aria-hidden="true"
+>
+  <div
+    id="cursor-glow-inner"
+    class="bg-accent/[0.04] absolute h-[600px] w-[600px] rounded-full blur-[120px] will-change-transform"
+    style="transform: translate(-50%, -50%) translate3d(-1000px, -1000px, 0);"
+  >
+  </div>
 </div>
 
 <script is:inline>
-  document.addEventListener('astro:page-load', function() {
-    var inner = document.getElementById('cursor-glow-inner');
-    if (!inner || inner.dataset.init || window.matchMedia('(pointer: coarse)').matches) return;
-    inner.dataset.init = '1';
-    var x = -1000, y = -1000, cx = -1000, cy = -1000;
-    var active = false;
+  document.addEventListener("astro:page-load", function () {
+    const inner = document.getElementById("cursor-glow-inner");
+    if (!inner || inner.dataset.init || window.matchMedia("(pointer: coarse)").matches) return;
+    inner.dataset.init = "1";
+    let x = -1000,
+      y = -1000,
+      cx = -1000,
+      cy = -1000;
+    let active = false;
 
-    document.addEventListener('mousemove', function(e) {
-      x = e.clientX; y = e.clientY;
-      if (!active) { active = true; raf(); }
-    }, { passive: true });
+    document.addEventListener(
+      "mousemove",
+      function (e) {
+        x = e.clientX;
+        y = e.clientY;
+        if (!active) {
+          active = true;
+          raf();
+        }
+      },
+      { passive: true },
+    );
 
-    document.addEventListener('mouseleave', function() {
-      x = -1000; y = -1000;
+    document.addEventListener("mouseleave", function () {
+      x = -1000;
+      y = -1000;
     });
 
     function raf() {
       cx += (x - cx) * 0.15;
       cy += (y - cy) * 0.15;
-      inner.style.transform = 'translate(-50%, -50%) translate3d(' + cx + 'px,' + cy + 'px,0)';
+      inner.style.transform = "translate(-50%, -50%) translate3d(" + cx + "px," + cy + "px,0)";
       if (Math.abs(x - cx) > 0.5 || Math.abs(y - cy) > 0.5) {
         requestAnimationFrame(raf);
       } else {

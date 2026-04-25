@@ -15,17 +15,17 @@ Open-source portfolio and technical blog for [Vstorm](https://vstorm.co) — an 
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | [Astro](https://astro.build) 5.4 (static output) |
-| UI | [React](https://react.dev) 19 (interactive islands) |
-| Styling | [Tailwind CSS](https://tailwindcss.com) 4 |
-| Blog | MDX + [Expressive Code](https://expressive-code.com) |
+| Layer           | Technology                                                                 |
+| --------------- | -------------------------------------------------------------------------- |
+| Framework       | [Astro](https://astro.build) 5.4 (static output)                           |
+| UI              | [React](https://react.dev) 19 (interactive islands)                        |
+| Styling         | [Tailwind CSS](https://tailwindcss.com) 4                                  |
+| Blog            | MDX + [Expressive Code](https://expressive-code.com)                       |
 | Template Engine | [Nunjucks](https://mozilla.github.io/nunjucks/) (client-side configurator) |
-| ZIP Generation | [JSZip](https://stuk.github.io/jszip/) (client-side) |
-| Package Manager | [Bun](https://bun.sh) |
-| Deployment | [Vercel](https://vercel.com) |
-| Analytics | Vercel Analytics + Speed Insights |
+| ZIP Generation  | [JSZip](https://stuk.github.io/jszip/) (client-side)                       |
+| Package Manager | [Bun](https://bun.sh)                                                      |
+| Deployment      | [Vercel](https://vercel.com)                                               |
+| Analytics       | Vercel Analytics + Speed Insights                                          |
 
 ## Getting Started
 
@@ -88,6 +88,7 @@ public/
 ## SEO & Structured Data
 
 Every page includes:
+
 - **BreadcrumbList** JSON-LD (auto-generated from URL path)
 - **WebSite** schema with publisher info
 - **SoftwareApplication** schema on product pages
@@ -100,6 +101,7 @@ Every page includes:
 ## Build Output
 
 85 static pages across 4 languages:
+
 - 4 OSS home pages (EN + 3 langs)
 - 12 product landing pages (3 products × 4 langs)
 - 4 configurator pages

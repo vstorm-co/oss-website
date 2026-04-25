@@ -1,6 +1,6 @@
 ---
-import type { Lang } from '../../i18n/translations';
-import { projects, categories } from '../../data/projects';
+import type { Lang } from "../../i18n/translations";
+import { projects, categories } from "../../data/projects";
 
 interface Props {
   lang: Lang;
@@ -18,9 +18,7 @@ const featuredSlugs = [
   "pydantic-ai-middleware",
 ];
 
-const featured = featuredSlugs
-  .map((slug) => projects.find((p) => p.slug === slug))
-  .filter(Boolean);
+const featured = featuredSlugs.map((slug) => projects.find((p) => p.slug === slug)).filter(Boolean);
 
 const projectsHref = lang === "en" ? "/projects/" : `/${lang}/projects/`;
 
@@ -32,81 +30,108 @@ const getCategoryLabel = (catId: string) => {
 
 <section id="projects" class="section-light px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
   <div class="mx-auto max-w-6xl">
-    <div class="reveal text-center mb-16">
-      <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl heading-accent">{t["oss.projects.title"]}</h2>
-      <p class="mt-4 text-lg text-text-secondary max-w-2xl mx-auto">{t["oss.projects.subtitle"]}</p>
+    <div class="reveal mb-16 text-center">
+      <h2 class="heading-accent text-3xl font-bold tracking-[-0.02em] sm:text-4xl">
+        {t["oss.projects.title"]}
+      </h2>
+      <p class="text-text-secondary mx-auto mt-4 max-w-2xl text-lg">{t["oss.projects.subtitle"]}</p>
     </div>
 
     <div class="reveal-group grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {featured.map((project) => {
-        const p = project!;
-        const isComingSoon = p.status === "coming-soon";
-        const href = lang === "en" ? `/projects/${p.slug}/` : `/${lang}/projects/${p.slug}/`;
-        return (
-          <div class="reveal h-full">
-            <a
-              href={href}
-              class:list={[
-                "group relative flex h-full flex-col rounded-2xl border bg-white p-7 sm:p-8 shadow-sm hover:shadow-lg card-hover",
-                isComingSoon
-                  ? "border-border/50 opacity-60 pointer-events-none"
-                  : "border-border hover:border-accent/40",
-              ]}
-            >
-              {/* Category badge */}
-              <div class="flex items-center gap-2 mb-4">
-                <span class="rounded-full bg-accent/10 px-3 py-1 text-[11px] font-semibold text-accent uppercase tracking-wider badge-hover">
-                  {getCategoryLabel(p.category)}
-                </span>
-                {isComingSoon && (
-                  <span class="rounded-full bg-surface-hover px-2.5 py-0.5 text-[11px] font-medium text-text-tertiary">
-                    {t["oss.card.comingSoon"]}
+      {
+        featured.map((project) => {
+          const p = project!;
+          const isComingSoon = p.status === "coming-soon";
+          const href = lang === "en" ? `/projects/${p.slug}/` : `/${lang}/projects/${p.slug}/`;
+          return (
+            <div class="reveal h-full">
+              <a
+                href={href}
+                class:list={[
+                  "group card-hover relative flex h-full flex-col rounded-2xl border bg-white p-7 shadow-sm hover:shadow-lg sm:p-8",
+                  isComingSoon
+                    ? "border-border/50 pointer-events-none opacity-60"
+                    : "border-border hover:border-accent/40",
+                ]}
+              >
+                {/* Category badge */}
+                <div class="mb-4 flex items-center gap-2">
+                  <span class="bg-accent/10 text-accent badge-hover rounded-full px-3 py-1 text-[11px] font-semibold tracking-wider uppercase">
+                    {getCategoryLabel(p.category)}
                   </span>
-                )}
-              </div>
-
-              {/* Title */}
-              <h3 class="text-lg font-bold group-hover:text-accent transition-colors">{p.name}</h3>
-
-              {/* Description */}
-              <p class="mt-2 text-sm text-text-secondary leading-relaxed line-clamp-3">{p.tagline[lang]}</p>
-
-              {/* Features */}
-              {p.features[lang] && p.features[lang].length > 0 && (
-                <div class="mt-4 flex flex-wrap gap-1.5">
-                  {p.features[lang].slice(0, 3).map((feat: string) => (
-                    <span class="rounded-md border border-border bg-surface/50 px-2 py-0.5 text-[11px] text-text-tertiary tag-hover">
-                      {feat}
+                  {isComingSoon && (
+                    <span class="bg-surface-hover text-text-tertiary rounded-full px-2.5 py-0.5 text-[11px] font-medium">
+                      {t["oss.card.comingSoon"]}
                     </span>
-                  ))}
+                  )}
                 </div>
-              )}
 
-              <div class="flex-1"></div>
+                {/* Title */}
+                <h3 class="group-hover:text-accent text-lg font-bold transition-colors">
+                  {p.name}
+                </h3>
 
-              {/* CTA */}
-              {!isComingSoon && (
-                <div class="mt-6 flex items-center text-sm font-medium text-accent arrow-slide">
-                  <span>{t["oss.card.viewProject"]}</span>
-                  <svg class="ml-1.5 w-4 h-4 transition-transform group-hover:translate-x-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                  </svg>
-                </div>
-              )}
-            </a>
-          </div>
-        );
-      })}
+                {/* Description */}
+                <p class="text-text-secondary mt-2 line-clamp-3 text-sm leading-relaxed">
+                  {p.tagline[lang]}
+                </p>
+
+                {/* Features */}
+                {p.features[lang] && p.features[lang].length > 0 && (
+                  <div class="mt-4 flex flex-wrap gap-1.5">
+                    {p.features[lang].slice(0, 3).map((feat: string) => (
+                      <span class="border-border bg-surface/50 text-text-tertiary tag-hover rounded-md border px-2 py-0.5 text-[11px]">
+                        {feat}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <div class="flex-1" />
+
+                {/* CTA */}
+                {!isComingSoon && (
+                  <div class="text-accent arrow-slide mt-6 flex items-center text-sm font-medium">
+                    <span>{t["oss.card.viewProject"]}</span>
+                    <svg
+                      class="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-1.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                      />
+                    </svg>
+                  </div>
+                )}
+              </a>
+            </div>
+          );
+        })
+      }
     </div>
 
     <div class="reveal mt-12 text-center">
       <a
         href={projectsHref}
-        class="inline-flex items-center gap-2 rounded-full border border-border bg-white px-6 py-3 text-sm font-semibold text-text-secondary hover:text-accent hover:border-accent/40 shadow-sm hover:shadow-md btn-press group"
+        class="border-border text-text-secondary hover:text-accent hover:border-accent/40 btn-press group inline-flex items-center gap-2 rounded-full border bg-white px-6 py-3 text-sm font-semibold shadow-sm hover:shadow-md"
       >
         {t["oss.projects.viewAll"]}
-        <svg class="w-4 h-4 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+        <svg
+          class="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"></path>
         </svg>
       </a>
     </div>

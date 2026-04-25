@@ -36,22 +36,42 @@ export interface Project {
 export const categories: ProjectCategory[] = [
   {
     id: "template",
-    label: { en: "Project Template", pl: "Szablon Projektu", de: "Projektvorlage", es: "Plantilla de Proyecto" },
+    label: {
+      en: "Project Template",
+      pl: "Szablon Projektu",
+      de: "Projektvorlage",
+      es: "Plantilla de Proyecto",
+    },
     order: 1,
   },
   {
     id: "framework",
-    label: { en: "Agent Framework", pl: "Framework Agentów", de: "Agent-Framework", es: "Framework de Agentes" },
+    label: {
+      en: "Agent Framework",
+      pl: "Framework Agentów",
+      de: "Agent-Framework",
+      es: "Framework de Agentes",
+    },
     order: 2,
   },
   {
     id: "toolset",
-    label: { en: "Agent Toolsets", pl: "Narzędzia Agentów", de: "Agent-Toolsets", es: "Herramientas de Agentes" },
+    label: {
+      en: "Agent Toolsets",
+      pl: "Narzędzia Agentów",
+      de: "Agent-Toolsets",
+      es: "Herramientas de Agentes",
+    },
     order: 3,
   },
   {
     id: "resource",
-    label: { en: "Resources & Examples", pl: "Zasoby i Przykłady", de: "Ressourcen & Beispiele", es: "Recursos y Ejemplos" },
+    label: {
+      en: "Resources & Examples",
+      pl: "Zasoby i Przykłady",
+      de: "Ressourcen & Beispiele",
+      es: "Recursos y Ejemplos",
+    },
     order: 4,
   },
 ];
@@ -80,9 +100,24 @@ export const projects: Project[] = [
     installCommand: "pip install fastapi-fullstack",
     features: {
       en: ["5 AI Frameworks", "75+ Config Options", "Web Configurator", "Docker + Kubernetes"],
-      pl: ["5 Frameworków AI", "75+ Opcji Konfiguracji", "Konfigurator Webowy", "Docker + Kubernetes"],
-      de: ["5 KI-Frameworks", "75+ Konfigurationsoptionen", "Web-Konfigurator", "Docker + Kubernetes"],
-      es: ["5 Frameworks de IA", "75+ Opciones de Config", "Configurador Web", "Docker + Kubernetes"],
+      pl: [
+        "5 Frameworków AI",
+        "75+ Opcji Konfiguracji",
+        "Konfigurator Webowy",
+        "Docker + Kubernetes",
+      ],
+      de: [
+        "5 KI-Frameworks",
+        "75+ Konfigurationsoptionen",
+        "Web-Konfigurator",
+        "Docker + Kubernetes",
+      ],
+      es: [
+        "5 Frameworks de IA",
+        "75+ Opciones de Config",
+        "Configurador Web",
+        "Docker + Kubernetes",
+      ],
     },
     hasCustomLanding: true,
     hasConfigurator: true,
@@ -113,7 +148,12 @@ export const projects: Project[] = [
       en: ["Unlimited Context", "Subagent Delegation", "Persistent Memory", "CLI Assistant"],
       pl: ["Nieograniczony Kontekst", "Delegacja Subagentów", "Trwała Pamięć", "Asystent CLI"],
       de: ["Unbegrenzter Kontext", "Subagent-Delegation", "Persistenter Speicher", "CLI-Assistent"],
-      es: ["Contexto Ilimitado", "Delegación de Subagentes", "Memoria Persistente", "Asistente CLI"],
+      es: [
+        "Contexto Ilimitado",
+        "Delegación de Subagentes",
+        "Memoria Persistente",
+        "Asistente CLI",
+      ],
     },
     hasCustomLanding: true,
   },
@@ -141,7 +181,12 @@ export const projects: Project[] = [
     installCommand: "pip install pydantic-ai-middleware",
     features: {
       en: ["7 Lifecycle Hooks", "Async Guardrails", "Cost Tracking", "Permission System"],
-      pl: ["7 Hooków Cyklu Życia", "Asynchroniczne Guardrails", "Śledzenie Kosztów", "System Uprawnień"],
+      pl: [
+        "7 Hooków Cyklu Życia",
+        "Asynchroniczne Guardrails",
+        "Śledzenie Kosztów",
+        "System Uprawnień",
+      ],
       de: ["7 Lifecycle-Hooks", "Async Guardrails", "Kostentracking", "Berechtigungssystem"],
       es: ["7 Hooks de Ciclo", "Guardrails Async", "Seguimiento de Costos", "Sistema de Permisos"],
     },
@@ -182,28 +227,92 @@ result = await agent.run("Hello, how are you?")`,
     },
     useCases: {
       en: [
-        { name: "Cost Tracking & Budgets", description: "Monitor token usage per run, set spending limits, and get alerts when agents exceed budget thresholds." },
-        { name: "Content Filtering & Guardrails", description: "Block prompt injection attempts, redact PII from outputs, and enforce content safety policies." },
-        { name: "Permission Control", description: "Authorize tool calls based on user roles, block dangerous operations, and enforce fine-grained access policies." },
-        { name: "Logging & Observability", description: "Audit every agent decision, track request/response pairs, and integrate with observability platforms." },
+        {
+          name: "Cost Tracking & Budgets",
+          description:
+            "Monitor token usage per run, set spending limits, and get alerts when agents exceed budget thresholds.",
+        },
+        {
+          name: "Content Filtering & Guardrails",
+          description:
+            "Block prompt injection attempts, redact PII from outputs, and enforce content safety policies.",
+        },
+        {
+          name: "Permission Control",
+          description:
+            "Authorize tool calls based on user roles, block dangerous operations, and enforce fine-grained access policies.",
+        },
+        {
+          name: "Logging & Observability",
+          description:
+            "Audit every agent decision, track request/response pairs, and integrate with observability platforms.",
+        },
       ],
       pl: [
-        { name: "Śledzenie Kosztów i Budżetów", description: "Monitoruj zużycie tokenów na uruchomienie, ustaw limity wydatków i otrzymuj alerty gdy agenci przekroczą próg budżetu." },
-        { name: "Filtrowanie Treści i Guardrails", description: "Blokuj próby prompt injection, redaguj PII z wyników i egzekwuj polityki bezpieczeństwa treści." },
-        { name: "Kontrola Uprawnień", description: "Autoryzuj wywołania narzędzi na podstawie ról użytkowników, blokuj niebezpieczne operacje i egzekwuj szczegółowe polityki dostępu." },
-        { name: "Logowanie i Obserwowalność", description: "Audytuj każdą decyzję agenta, śledź pary request/response i integruj z platformami obserwacyjnymi." },
+        {
+          name: "Śledzenie Kosztów i Budżetów",
+          description:
+            "Monitoruj zużycie tokenów na uruchomienie, ustaw limity wydatków i otrzymuj alerty gdy agenci przekroczą próg budżetu.",
+        },
+        {
+          name: "Filtrowanie Treści i Guardrails",
+          description:
+            "Blokuj próby prompt injection, redaguj PII z wyników i egzekwuj polityki bezpieczeństwa treści.",
+        },
+        {
+          name: "Kontrola Uprawnień",
+          description:
+            "Autoryzuj wywołania narzędzi na podstawie ról użytkowników, blokuj niebezpieczne operacje i egzekwuj szczegółowe polityki dostępu.",
+        },
+        {
+          name: "Logowanie i Obserwowalność",
+          description:
+            "Audytuj każdą decyzję agenta, śledź pary request/response i integruj z platformami obserwacyjnymi.",
+        },
       ],
       de: [
-        { name: "Kostentracking & Budgets", description: "Token-Verbrauch pro Lauf überwachen, Ausgabenlimits setzen und Benachrichtigungen bei Budgetüberschreitung erhalten." },
-        { name: "Inhaltsfilterung & Guardrails", description: "Prompt-Injection-Versuche blockieren, PII aus Ausgaben entfernen und Inhaltssicherheitsrichtlinien durchsetzen." },
-        { name: "Berechtigungskontrolle", description: "Tool-Aufrufe basierend auf Benutzerrollen autorisieren, gefährliche Operationen blockieren und feingranulare Zugriffsrichtlinien durchsetzen." },
-        { name: "Logging & Observability", description: "Jede Agentenentscheidung auditieren, Request/Response-Paare tracken und mit Observability-Plattformen integrieren." },
+        {
+          name: "Kostentracking & Budgets",
+          description:
+            "Token-Verbrauch pro Lauf überwachen, Ausgabenlimits setzen und Benachrichtigungen bei Budgetüberschreitung erhalten.",
+        },
+        {
+          name: "Inhaltsfilterung & Guardrails",
+          description:
+            "Prompt-Injection-Versuche blockieren, PII aus Ausgaben entfernen und Inhaltssicherheitsrichtlinien durchsetzen.",
+        },
+        {
+          name: "Berechtigungskontrolle",
+          description:
+            "Tool-Aufrufe basierend auf Benutzerrollen autorisieren, gefährliche Operationen blockieren und feingranulare Zugriffsrichtlinien durchsetzen.",
+        },
+        {
+          name: "Logging & Observability",
+          description:
+            "Jede Agentenentscheidung auditieren, Request/Response-Paare tracken und mit Observability-Plattformen integrieren.",
+        },
       ],
       es: [
-        { name: "Seguimiento de Costos y Presupuestos", description: "Monitorea el uso de tokens por ejecución, establece límites de gasto y recibe alertas cuando los agentes exceden umbrales de presupuesto." },
-        { name: "Filtrado de Contenido y Guardrails", description: "Bloquea intentos de inyección de prompts, redacta PII de las salidas y aplica políticas de seguridad de contenido." },
-        { name: "Control de Permisos", description: "Autoriza llamadas a herramientas según roles de usuario, bloquea operaciones peligrosas y aplica políticas de acceso granulares." },
-        { name: "Logging y Observabilidad", description: "Audita cada decisión del agente, rastrea pares request/response e integra con plataformas de observabilidad." },
+        {
+          name: "Seguimiento de Costos y Presupuestos",
+          description:
+            "Monitorea el uso de tokens por ejecución, establece límites de gasto y recibe alertas cuando los agentes exceden umbrales de presupuesto.",
+        },
+        {
+          name: "Filtrado de Contenido y Guardrails",
+          description:
+            "Bloquea intentos de inyección de prompts, redacta PII de las salidas y aplica políticas de seguridad de contenido.",
+        },
+        {
+          name: "Control de Permisos",
+          description:
+            "Autoriza llamadas a herramientas según roles de usuario, bloquea operaciones peligrosas y aplica políticas de acceso granulares.",
+        },
+        {
+          name: "Logging y Observabilidad",
+          description:
+            "Audita cada decisión del agente, rastrea pares request/response e integra con plataformas de observabilidad.",
+        },
       ],
     },
     mermaidDiagram: `flowchart LR
@@ -240,10 +349,30 @@ result = await agent.run("Hello, how are you?")`,
     pypi: "subagents-pydantic-ai",
     installCommand: "pip install subagents-pydantic-ai",
     features: {
-      en: ["Sync/Async/Auto Modes", "Nested Subagents", "Runtime Agent Creation", "Parent-Child Comms"],
-      pl: ["Tryby Sync/Async/Auto", "Zagnieżdżone Subagenty", "Dynamiczne Tworzenie", "Komunikacja Rodzic-Dziecko"],
-      de: ["Sync/Async/Auto-Modi", "Verschachtelte Subagenten", "Laufzeit-Erstellung", "Eltern-Kind-Komm."],
-      es: ["Modos Sync/Async/Auto", "Subagentes Anidados", "Creación en Runtime", "Comunicación Padre-Hijo"],
+      en: [
+        "Sync/Async/Auto Modes",
+        "Nested Subagents",
+        "Runtime Agent Creation",
+        "Parent-Child Comms",
+      ],
+      pl: [
+        "Tryby Sync/Async/Auto",
+        "Zagnieżdżone Subagenty",
+        "Dynamiczne Tworzenie",
+        "Komunikacja Rodzic-Dziecko",
+      ],
+      de: [
+        "Sync/Async/Auto-Modi",
+        "Verschachtelte Subagenten",
+        "Laufzeit-Erstellung",
+        "Eltern-Kind-Komm.",
+      ],
+      es: [
+        "Modos Sync/Async/Auto",
+        "Subagentes Anidados",
+        "Creación en Runtime",
+        "Comunicación Padre-Hijo",
+      ],
     },
     longDescription: {
       en: "Define specialist subagents and let a parent agent delegate tasks to them automatically. Three execution modes give you full control: synchronous (blocking — wait for results), asynchronous (background — fire tasks and check later), and auto (the agent chooses the best mode). Subagents can spawn their own subagents for deep delegation chains, and a questions feature lets child agents ask the parent for clarification mid-task.",
@@ -294,28 +423,92 @@ result = agent.run_sync("Research Python async patterns and write a blog post", 
     },
     useCases: {
       en: [
-        { name: "Research Pipelines", description: "Delegate research to specialist agents that gather, analyze, and synthesize information from multiple sources." },
-        { name: "Code Review Delegation", description: "Spawn parallel review agents for security, style, and performance analysis, then merge their findings." },
-        { name: "Multi-Step Analysis", description: "Chain agents for complex workflows — researcher gathers data, analyst interprets it, writer produces the report." },
-        { name: "Parallel Task Execution", description: "Fire multiple background tasks simultaneously and collect results as they complete, with automatic status tracking." },
+        {
+          name: "Research Pipelines",
+          description:
+            "Delegate research to specialist agents that gather, analyze, and synthesize information from multiple sources.",
+        },
+        {
+          name: "Code Review Delegation",
+          description:
+            "Spawn parallel review agents for security, style, and performance analysis, then merge their findings.",
+        },
+        {
+          name: "Multi-Step Analysis",
+          description:
+            "Chain agents for complex workflows — researcher gathers data, analyst interprets it, writer produces the report.",
+        },
+        {
+          name: "Parallel Task Execution",
+          description:
+            "Fire multiple background tasks simultaneously and collect results as they complete, with automatic status tracking.",
+        },
       ],
       pl: [
-        { name: "Pipeline Badawcze", description: "Deleguj badania do specjalistycznych agentów, którzy gromadzą, analizują i syntezują informacje z wielu źródeł." },
-        { name: "Delegacja Code Review", description: "Uruchamiaj równolegle agentów do przeglądu bezpieczeństwa, stylu i wydajności, a następnie łącz ich wnioski." },
-        { name: "Analiza Wieloetapowa", description: "Łącz agentów w złożone przepływy — badacz zbiera dane, analityk je interpretuje, pisarz tworzy raport." },
-        { name: "Równoległe Wykonywanie Zadań", description: "Uruchamiaj wiele zadań w tle jednocześnie i zbieraj wyniki w miarę ich ukończenia, z automatycznym śledzeniem statusu." },
+        {
+          name: "Pipeline Badawcze",
+          description:
+            "Deleguj badania do specjalistycznych agentów, którzy gromadzą, analizują i syntezują informacje z wielu źródeł.",
+        },
+        {
+          name: "Delegacja Code Review",
+          description:
+            "Uruchamiaj równolegle agentów do przeglądu bezpieczeństwa, stylu i wydajności, a następnie łącz ich wnioski.",
+        },
+        {
+          name: "Analiza Wieloetapowa",
+          description:
+            "Łącz agentów w złożone przepływy — badacz zbiera dane, analityk je interpretuje, pisarz tworzy raport.",
+        },
+        {
+          name: "Równoległe Wykonywanie Zadań",
+          description:
+            "Uruchamiaj wiele zadań w tle jednocześnie i zbieraj wyniki w miarę ich ukończenia, z automatycznym śledzeniem statusu.",
+        },
       ],
       de: [
-        { name: "Research-Pipelines", description: "Forschung an Spezialagenten delegieren, die Informationen aus mehreren Quellen sammeln, analysieren und synthetisieren." },
-        { name: "Code-Review-Delegation", description: "Parallele Review-Agenten für Sicherheit, Stil und Performance spawnen, dann ihre Ergebnisse zusammenführen." },
-        { name: "Mehrstufige Analyse", description: "Agenten für komplexe Workflows verketten — Forscher sammelt Daten, Analyst interpretiert, Autor erstellt den Bericht." },
-        { name: "Parallele Aufgabenausführung", description: "Mehrere Hintergrundaufgaben gleichzeitig starten und Ergebnisse bei Fertigstellung sammeln, mit automatischem Status-Tracking." },
+        {
+          name: "Research-Pipelines",
+          description:
+            "Forschung an Spezialagenten delegieren, die Informationen aus mehreren Quellen sammeln, analysieren und synthetisieren.",
+        },
+        {
+          name: "Code-Review-Delegation",
+          description:
+            "Parallele Review-Agenten für Sicherheit, Stil und Performance spawnen, dann ihre Ergebnisse zusammenführen.",
+        },
+        {
+          name: "Mehrstufige Analyse",
+          description:
+            "Agenten für komplexe Workflows verketten — Forscher sammelt Daten, Analyst interpretiert, Autor erstellt den Bericht.",
+        },
+        {
+          name: "Parallele Aufgabenausführung",
+          description:
+            "Mehrere Hintergrundaufgaben gleichzeitig starten und Ergebnisse bei Fertigstellung sammeln, mit automatischem Status-Tracking.",
+        },
       ],
       es: [
-        { name: "Pipelines de Investigación", description: "Delega investigación a agentes especializados que recopilan, analizan y sintetizan información de múltiples fuentes." },
-        { name: "Delegación de Code Review", description: "Lanza agentes paralelos de revisión para seguridad, estilo y rendimiento, luego combina sus hallazgos." },
-        { name: "Análisis Multi-Paso", description: "Encadena agentes para flujos complejos — investigador recopila datos, analista interpreta, escritor produce el informe." },
-        { name: "Ejecución Paralela de Tareas", description: "Lanza múltiples tareas en segundo plano simultáneamente y recopila resultados a medida que se completan, con seguimiento automático." },
+        {
+          name: "Pipelines de Investigación",
+          description:
+            "Delega investigación a agentes especializados que recopilan, analizan y sintetizan información de múltiples fuentes.",
+        },
+        {
+          name: "Delegación de Code Review",
+          description:
+            "Lanza agentes paralelos de revisión para seguridad, estilo y rendimiento, luego combina sus hallazgos.",
+        },
+        {
+          name: "Análisis Multi-Paso",
+          description:
+            "Encadena agentes para flujos complejos — investigador recopila datos, analista interpreta, escritor produce el informe.",
+        },
+        {
+          name: "Ejecución Paralela de Tareas",
+          description:
+            "Lanza múltiples tareas en segundo plano simultáneamente y recopila resultados a medida que se completan, con seguimiento automático.",
+        },
       ],
     },
   },
@@ -340,10 +533,30 @@ result = agent.run_sync("Research Python async patterns and write a blog post", 
     pypi: "pydantic-ai-backend",
     installCommand: "pip install pydantic-ai-backend",
     features: {
-      en: ["State/Local/Docker Backends", "Console Toolset", "Permission Presets", "Docker Runtimes"],
-      pl: ["Backendy State/Local/Docker", "Narzędzia Konsolowe", "Presety Uprawnień", "Runtime Docker"],
-      de: ["State/Local/Docker-Backends", "Konsolen-Toolset", "Berechtigungs-Presets", "Docker-Runtimes"],
-      es: ["Backends State/Local/Docker", "Toolset de Consola", "Presets de Permisos", "Runtimes Docker"],
+      en: [
+        "State/Local/Docker Backends",
+        "Console Toolset",
+        "Permission Presets",
+        "Docker Runtimes",
+      ],
+      pl: [
+        "Backendy State/Local/Docker",
+        "Narzędzia Konsolowe",
+        "Presety Uprawnień",
+        "Runtime Docker",
+      ],
+      de: [
+        "State/Local/Docker-Backends",
+        "Konsolen-Toolset",
+        "Berechtigungs-Presets",
+        "Docker-Runtimes",
+      ],
+      es: [
+        "Backends State/Local/Docker",
+        "Toolset de Consola",
+        "Presets de Permisos",
+        "Runtimes Docker",
+      ],
     },
     longDescription: {
       en: "Choose from three backend options depending on your needs: StateBackend (in-memory, ephemeral — perfect for tests), LocalBackend (real filesystem with a sandboxed root directory), or DockerSandbox (full Docker container isolation with pre-configured runtimes for Python, Node.js, and data science). The console toolset provides 7 tools (ls, read_file, write_file, edit_file, glob, grep, execute) with a permission system offering 4 presets: DEFAULT, PERMISSIVE, READONLY, and STRICT.",
@@ -394,28 +607,92 @@ result = agent.run_sync(
     },
     useCases: {
       en: [
-        { name: "AI Coding Assistants", description: "Give agents full file read/write/execute capabilities with sandboxed access to your project workspace." },
-        { name: "Sandboxed Code Execution", description: "Run untrusted agent-generated code safely inside Docker containers with pre-configured Python and Node.js runtimes." },
-        { name: "File Management Agents", description: "Build agents that organize, search, and transform files using grep, glob, and edit tools with permission guardrails." },
-        { name: "Testing & CI Pipelines", description: "Use ephemeral in-memory backends for fast, isolated test runs that leave no artifacts behind." },
+        {
+          name: "AI Coding Assistants",
+          description:
+            "Give agents full file read/write/execute capabilities with sandboxed access to your project workspace.",
+        },
+        {
+          name: "Sandboxed Code Execution",
+          description:
+            "Run untrusted agent-generated code safely inside Docker containers with pre-configured Python and Node.js runtimes.",
+        },
+        {
+          name: "File Management Agents",
+          description:
+            "Build agents that organize, search, and transform files using grep, glob, and edit tools with permission guardrails.",
+        },
+        {
+          name: "Testing & CI Pipelines",
+          description:
+            "Use ephemeral in-memory backends for fast, isolated test runs that leave no artifacts behind.",
+        },
       ],
       pl: [
-        { name: "Asystenci Kodowania AI", description: "Daj agentom pełne możliwości odczytu/zapisu/wykonywania plików z sandboxowanym dostępem do przestrzeni roboczej projektu." },
-        { name: "Sandboxowane Wykonywanie Kodu", description: "Bezpiecznie uruchamiaj niezaufany kod generowany przez agentów w kontenerach Docker z prekonfigurowanymi runtimeami Python i Node.js." },
-        { name: "Agenci Zarządzania Plikami", description: "Buduj agentów organizujących, przeszukujących i transformujących pliki używając grep, glob i narzędzi edycji z guardrails uprawnień." },
-        { name: "Testy i Pipelines CI", description: "Używaj efemerycznych backendów w pamięci do szybkich, izolowanych uruchomień testów, które nie zostawiają artefaktów." },
+        {
+          name: "Asystenci Kodowania AI",
+          description:
+            "Daj agentom pełne możliwości odczytu/zapisu/wykonywania plików z sandboxowanym dostępem do przestrzeni roboczej projektu.",
+        },
+        {
+          name: "Sandboxowane Wykonywanie Kodu",
+          description:
+            "Bezpiecznie uruchamiaj niezaufany kod generowany przez agentów w kontenerach Docker z prekonfigurowanymi runtimeami Python i Node.js.",
+        },
+        {
+          name: "Agenci Zarządzania Plikami",
+          description:
+            "Buduj agentów organizujących, przeszukujących i transformujących pliki używając grep, glob i narzędzi edycji z guardrails uprawnień.",
+        },
+        {
+          name: "Testy i Pipelines CI",
+          description:
+            "Używaj efemerycznych backendów w pamięci do szybkich, izolowanych uruchomień testów, które nie zostawiają artefaktów.",
+        },
       ],
       de: [
-        { name: "KI-Coding-Assistenten", description: "Agenten volle Lese-/Schreib-/Ausführungsrechte mit sandboxed Zugriff auf den Projekt-Workspace geben." },
-        { name: "Sandboxed Code-Ausführung", description: "Nicht vertrauenswürdigen, vom Agenten generierten Code sicher in Docker-Containern mit vorkonfigurierten Python- und Node.js-Runtimes ausführen." },
-        { name: "Dateiverwaltungs-Agenten", description: "Agenten bauen, die Dateien mit grep, glob und Edit-Tools mit Berechtigungs-Guardrails organisieren, suchen und transformieren." },
-        { name: "Tests & CI-Pipelines", description: "Ephemere In-Memory-Backends für schnelle, isolierte Testläufe nutzen, die keine Artefakte hinterlassen." },
+        {
+          name: "KI-Coding-Assistenten",
+          description:
+            "Agenten volle Lese-/Schreib-/Ausführungsrechte mit sandboxed Zugriff auf den Projekt-Workspace geben.",
+        },
+        {
+          name: "Sandboxed Code-Ausführung",
+          description:
+            "Nicht vertrauenswürdigen, vom Agenten generierten Code sicher in Docker-Containern mit vorkonfigurierten Python- und Node.js-Runtimes ausführen.",
+        },
+        {
+          name: "Dateiverwaltungs-Agenten",
+          description:
+            "Agenten bauen, die Dateien mit grep, glob und Edit-Tools mit Berechtigungs-Guardrails organisieren, suchen und transformieren.",
+        },
+        {
+          name: "Tests & CI-Pipelines",
+          description:
+            "Ephemere In-Memory-Backends für schnelle, isolierte Testläufe nutzen, die keine Artefakte hinterlassen.",
+        },
       ],
       es: [
-        { name: "Asistentes de Codificación IA", description: "Da a los agentes capacidades completas de lectura/escritura/ejecución de archivos con acceso aislado al workspace del proyecto." },
-        { name: "Ejecución de Código en Sandbox", description: "Ejecuta código no confiable generado por agentes de forma segura dentro de contenedores Docker con runtimes preconfigurados de Python y Node.js." },
-        { name: "Agentes de Gestión de Archivos", description: "Construye agentes que organizan, buscan y transforman archivos usando grep, glob y herramientas de edición con guardrails de permisos." },
-        { name: "Tests y Pipelines CI", description: "Usa backends efímeros en memoria para ejecuciones de tests rápidas y aisladas que no dejan artefactos." },
+        {
+          name: "Asistentes de Codificación IA",
+          description:
+            "Da a los agentes capacidades completas de lectura/escritura/ejecución de archivos con acceso aislado al workspace del proyecto.",
+        },
+        {
+          name: "Ejecución de Código en Sandbox",
+          description:
+            "Ejecuta código no confiable generado por agentes de forma segura dentro de contenedores Docker con runtimes preconfigurados de Python y Node.js.",
+        },
+        {
+          name: "Agentes de Gestión de Archivos",
+          description:
+            "Construye agentes que organizan, buscan y transforman archivos usando grep, glob y herramientas de edición con guardrails de permisos.",
+        },
+        {
+          name: "Tests y Pipelines CI",
+          description:
+            "Usa backends efímeros en memoria para ejecuciones de tests rápidas y aisladas que no dejan artefactos.",
+        },
       ],
     },
   },
@@ -442,8 +719,18 @@ result = agent.run_sync(
     features: {
       en: ["Subtask Hierarchy", "Dependency Tracking", "Cycle Detection", "PostgreSQL Backend"],
       pl: ["Hierarchia Podzadań", "Śledzenie Zależności", "Wykrywanie Cykli", "Backend PostgreSQL"],
-      de: ["Unteraufgaben-Hierarchie", "Abhängigkeits-Tracking", "Zykluserkennung", "PostgreSQL-Backend"],
-      es: ["Jerarquía de Subtareas", "Seguimiento de Dependencias", "Detección de Ciclos", "Backend PostgreSQL"],
+      de: [
+        "Unteraufgaben-Hierarchie",
+        "Abhängigkeits-Tracking",
+        "Zykluserkennung",
+        "PostgreSQL-Backend",
+      ],
+      es: [
+        "Jerarquía de Subtareas",
+        "Seguimiento de Dependencias",
+        "Detección de Ciclos",
+        "Backend PostgreSQL",
+      ],
     },
     longDescription: {
       en: "Give your AI agents the ability to break down complex tasks into manageable subtasks with dependency tracking. The toolset provides 8 tools including add_todo, add_subtask, set_dependency, complete_todo, and get_available_tasks. Automatic cycle detection prevents circular dependencies. Choose between in-memory storage for quick sessions or PostgreSQL for persistent, multi-tenant task management with session-based isolation.",
@@ -474,28 +761,92 @@ result = await agent.run("Create a todo list for building a REST API")`,
     },
     useCases: {
       en: [
-        { name: "Project Planning Agents", description: "Let agents decompose complex features into trackable task hierarchies with dependencies and subtasks." },
-        { name: "Development Workflow", description: "Automate sprint planning — agents create, prioritize, and track tasks with dependency-aware ordering." },
-        { name: "Task Decomposition", description: "Break vague requests into concrete, actionable steps with clear completion criteria and blocking relationships." },
-        { name: "Multi-User Apps", description: "Use PostgreSQL backend for persistent, session-isolated task management across multiple users and conversations." },
+        {
+          name: "Project Planning Agents",
+          description:
+            "Let agents decompose complex features into trackable task hierarchies with dependencies and subtasks.",
+        },
+        {
+          name: "Development Workflow",
+          description:
+            "Automate sprint planning — agents create, prioritize, and track tasks with dependency-aware ordering.",
+        },
+        {
+          name: "Task Decomposition",
+          description:
+            "Break vague requests into concrete, actionable steps with clear completion criteria and blocking relationships.",
+        },
+        {
+          name: "Multi-User Apps",
+          description:
+            "Use PostgreSQL backend for persistent, session-isolated task management across multiple users and conversations.",
+        },
       ],
       pl: [
-        { name: "Agenci Planowania Projektów", description: "Pozwól agentom dekomponować złożone funkcje na śledzone hierarchie zadań z zależnościami i podzadaniami." },
-        { name: "Przepływ Pracy Deweloperskiej", description: "Automatyzuj planowanie sprintów — agenci tworzą, priorytetyzują i śledzą zadania z kolejnością uwzględniającą zależności." },
-        { name: "Dekompozycja Zadań", description: "Rozbijaj niejasne żądania na konkretne, wykonalne kroki z jasnymi kryteriami ukończenia i relacjami blokowania." },
-        { name: "Aplikacje Wieloużytkownikowe", description: "Używaj backendu PostgreSQL do trwałego, izolowanego sesyjnie zarządzania zadaniami dla wielu użytkowników i rozmów." },
+        {
+          name: "Agenci Planowania Projektów",
+          description:
+            "Pozwól agentom dekomponować złożone funkcje na śledzone hierarchie zadań z zależnościami i podzadaniami.",
+        },
+        {
+          name: "Przepływ Pracy Deweloperskiej",
+          description:
+            "Automatyzuj planowanie sprintów — agenci tworzą, priorytetyzują i śledzą zadania z kolejnością uwzględniającą zależności.",
+        },
+        {
+          name: "Dekompozycja Zadań",
+          description:
+            "Rozbijaj niejasne żądania na konkretne, wykonalne kroki z jasnymi kryteriami ukończenia i relacjami blokowania.",
+        },
+        {
+          name: "Aplikacje Wieloużytkownikowe",
+          description:
+            "Używaj backendu PostgreSQL do trwałego, izolowanego sesyjnie zarządzania zadaniami dla wielu użytkowników i rozmów.",
+        },
       ],
       de: [
-        { name: "Projektplanungs-Agenten", description: "Agenten komplexe Features in verfolgbare Aufgabenhierarchien mit Abhängigkeiten und Unteraufgaben zerlegen lassen." },
-        { name: "Entwicklungs-Workflow", description: "Sprint-Planung automatisieren — Agenten erstellen, priorisieren und tracken Aufgaben mit abhängigkeitsbewusster Reihenfolge." },
-        { name: "Aufgabenzerlegung", description: "Vage Anfragen in konkrete, umsetzbare Schritte mit klaren Abschlusskriterien und Blockierungsbeziehungen zerlegen." },
-        { name: "Multi-User-Apps", description: "PostgreSQL-Backend für persistentes, session-isoliertes Aufgabenmanagement über mehrere Benutzer und Konversationen nutzen." },
+        {
+          name: "Projektplanungs-Agenten",
+          description:
+            "Agenten komplexe Features in verfolgbare Aufgabenhierarchien mit Abhängigkeiten und Unteraufgaben zerlegen lassen.",
+        },
+        {
+          name: "Entwicklungs-Workflow",
+          description:
+            "Sprint-Planung automatisieren — Agenten erstellen, priorisieren und tracken Aufgaben mit abhängigkeitsbewusster Reihenfolge.",
+        },
+        {
+          name: "Aufgabenzerlegung",
+          description:
+            "Vage Anfragen in konkrete, umsetzbare Schritte mit klaren Abschlusskriterien und Blockierungsbeziehungen zerlegen.",
+        },
+        {
+          name: "Multi-User-Apps",
+          description:
+            "PostgreSQL-Backend für persistentes, session-isoliertes Aufgabenmanagement über mehrere Benutzer und Konversationen nutzen.",
+        },
       ],
       es: [
-        { name: "Agentes de Planificación", description: "Deja que los agentes descompongan funcionalidades complejas en jerarquías de tareas rastreables con dependencias y subtareas." },
-        { name: "Flujo de Trabajo de Desarrollo", description: "Automatiza la planificación de sprints — los agentes crean, priorizan y rastrean tareas con ordenamiento consciente de dependencias." },
-        { name: "Descomposición de Tareas", description: "Divide solicitudes vagas en pasos concretos y accionables con criterios claros de finalización y relaciones de bloqueo." },
-        { name: "Apps Multi-Usuario", description: "Usa el backend PostgreSQL para gestión de tareas persistente y aislada por sesión a través de múltiples usuarios y conversaciones." },
+        {
+          name: "Agentes de Planificación",
+          description:
+            "Deja que los agentes descompongan funcionalidades complejas en jerarquías de tareas rastreables con dependencias y subtareas.",
+        },
+        {
+          name: "Flujo de Trabajo de Desarrollo",
+          description:
+            "Automatiza la planificación de sprints — los agentes crean, priorizan y rastrean tareas con ordenamiento consciente de dependencias.",
+        },
+        {
+          name: "Descomposición de Tareas",
+          description:
+            "Divide solicitudes vagas en pasos concretos y accionables con criterios claros de finalización y relaciones de bloqueo.",
+        },
+        {
+          name: "Apps Multi-Usuario",
+          description:
+            "Usa el backend PostgreSQL para gestión de tareas persistente y aislada por sesión a través de múltiples usuarios y conversaciones.",
+        },
       ],
     },
   },
@@ -523,7 +874,12 @@ result = await agent.run("Create a todo list for building a REST API")`,
       en: ["LLM Summarization", "Sliding Window", "Real-time Context Manager", "Token Tracking"],
       pl: ["Podsumowanie LLM", "Przesuwane Okno", "Real-time Context Manager", "Śledzenie Tokenów"],
       de: ["LLM-Zusammenfassung", "Sliding Window", "Echtzeit-Context-Manager", "Token-Tracking"],
-      es: ["Resumen LLM", "Ventana Deslizante", "Context Manager Real-time", "Seguimiento de Tokens"],
+      es: [
+        "Resumen LLM",
+        "Ventana Deslizante",
+        "Context Manager Real-time",
+        "Seguimiento de Tokens",
+      ],
     },
     longDescription: {
       en: "Two strategies for keeping agent conversations within context limits. LLM-based summarization intelligently compresses older messages while preserving key information — triggered by message count, token count, or context fraction. Zero-cost sliding window trimming simply drops the oldest messages with a safe cutoff that never breaks tool call/response pairs. A real-time context manager middleware tracks token usage live, truncates long tool outputs, and auto-detects model context windows.",
@@ -564,28 +920,92 @@ result = await agent.run("Hello!")`,
     },
     useCases: {
       en: [
-        { name: "Long Conversations", description: "Keep agents running for hours without hitting context limits — older messages get summarized automatically." },
-        { name: "Customer Support Bots", description: "Preserve key customer details (name, issue, order ID) while discarding routine back-and-forth exchanges." },
-        { name: "Research Assistants", description: "Maintain research context across deep investigation sessions where accumulated findings would exceed the context window." },
-        { name: "Cost-Sensitive Apps", description: "Choose zero-cost sliding window for maximum throughput, or LLM summarization when quality matters more than speed." },
+        {
+          name: "Long Conversations",
+          description:
+            "Keep agents running for hours without hitting context limits — older messages get summarized automatically.",
+        },
+        {
+          name: "Customer Support Bots",
+          description:
+            "Preserve key customer details (name, issue, order ID) while discarding routine back-and-forth exchanges.",
+        },
+        {
+          name: "Research Assistants",
+          description:
+            "Maintain research context across deep investigation sessions where accumulated findings would exceed the context window.",
+        },
+        {
+          name: "Cost-Sensitive Apps",
+          description:
+            "Choose zero-cost sliding window for maximum throughput, or LLM summarization when quality matters more than speed.",
+        },
       ],
       pl: [
-        { name: "Długie Rozmowy", description: "Utrzymuj agentów przez godziny bez przekraczania limitów kontekstu — starsze wiadomości są automatycznie podsumowywane." },
-        { name: "Boty Obsługi Klienta", description: "Zachowuj kluczowe dane klienta (imię, problem, ID zamówienia) odrzucając rutynową wymianę wiadomości." },
-        { name: "Asystenci Badawczy", description: "Utrzymuj kontekst badawczy w długich sesjach, gdzie zgromadzone wyniki przekroczyłyby okno kontekstowe." },
-        { name: "Aplikacje Wrażliwe na Koszty", description: "Wybierz przesuwane okno bez kosztu dla maksymalnej przepustowości, lub podsumowanie LLM gdy jakość jest ważniejsza niż szybkość." },
+        {
+          name: "Długie Rozmowy",
+          description:
+            "Utrzymuj agentów przez godziny bez przekraczania limitów kontekstu — starsze wiadomości są automatycznie podsumowywane.",
+        },
+        {
+          name: "Boty Obsługi Klienta",
+          description:
+            "Zachowuj kluczowe dane klienta (imię, problem, ID zamówienia) odrzucając rutynową wymianę wiadomości.",
+        },
+        {
+          name: "Asystenci Badawczy",
+          description:
+            "Utrzymuj kontekst badawczy w długich sesjach, gdzie zgromadzone wyniki przekroczyłyby okno kontekstowe.",
+        },
+        {
+          name: "Aplikacje Wrażliwe na Koszty",
+          description:
+            "Wybierz przesuwane okno bez kosztu dla maksymalnej przepustowości, lub podsumowanie LLM gdy jakość jest ważniejsza niż szybkość.",
+        },
       ],
       de: [
-        { name: "Lange Konversationen", description: "Agenten stundenlang laufen lassen ohne Kontextlimits zu erreichen — ältere Nachrichten werden automatisch zusammengefasst." },
-        { name: "Kundensupport-Bots", description: "Wichtige Kundendaten (Name, Problem, Bestell-ID) bewahren und routinemäßigen Austausch verwerfen." },
-        { name: "Forschungsassistenten", description: "Forschungskontext über tiefe Untersuchungssessions bewahren, in denen gesammelte Ergebnisse das Kontextfenster überschreiten würden." },
-        { name: "Kostensensitive Apps", description: "Kostenfreies Sliding Window für maximalen Durchsatz wählen, oder LLM-Zusammenfassung wenn Qualität wichtiger als Geschwindigkeit ist." },
+        {
+          name: "Lange Konversationen",
+          description:
+            "Agenten stundenlang laufen lassen ohne Kontextlimits zu erreichen — ältere Nachrichten werden automatisch zusammengefasst.",
+        },
+        {
+          name: "Kundensupport-Bots",
+          description:
+            "Wichtige Kundendaten (Name, Problem, Bestell-ID) bewahren und routinemäßigen Austausch verwerfen.",
+        },
+        {
+          name: "Forschungsassistenten",
+          description:
+            "Forschungskontext über tiefe Untersuchungssessions bewahren, in denen gesammelte Ergebnisse das Kontextfenster überschreiten würden.",
+        },
+        {
+          name: "Kostensensitive Apps",
+          description:
+            "Kostenfreies Sliding Window für maximalen Durchsatz wählen, oder LLM-Zusammenfassung wenn Qualität wichtiger als Geschwindigkeit ist.",
+        },
       ],
       es: [
-        { name: "Conversaciones Largas", description: "Mantén agentes ejecutándose por horas sin alcanzar límites de contexto — los mensajes antiguos se resumen automáticamente." },
-        { name: "Bots de Soporte al Cliente", description: "Preserva datos clave del cliente (nombre, problema, ID de pedido) mientras descartas intercambios rutinarios." },
-        { name: "Asistentes de Investigación", description: "Mantén el contexto de investigación en sesiones profundas donde los hallazgos acumulados excederían la ventana de contexto." },
-        { name: "Apps Sensibles al Costo", description: "Elige ventana deslizante sin costo para máximo rendimiento, o resumen LLM cuando la calidad importa más que la velocidad." },
+        {
+          name: "Conversaciones Largas",
+          description:
+            "Mantén agentes ejecutándose por horas sin alcanzar límites de contexto — los mensajes antiguos se resumen automáticamente.",
+        },
+        {
+          name: "Bots de Soporte al Cliente",
+          description:
+            "Preserva datos clave del cliente (nombre, problema, ID de pedido) mientras descartas intercambios rutinarios.",
+        },
+        {
+          name: "Asistentes de Investigación",
+          description:
+            "Mantén el contexto de investigación en sesiones profundas donde los hallazgos acumulados excederían la ventana de contexto.",
+        },
+        {
+          name: "Apps Sensibles al Costo",
+          description:
+            "Elige ventana deslizante sin costo para máximo rendimiento, o resumen LLM cuando la calidad importa más que la velocidad.",
+        },
       ],
     },
   },
@@ -611,9 +1031,24 @@ result = await agent.run("Hello!")`,
     installCommand: "pip install database-pydantic-ai",
     features: {
       en: ["SQL Query Execution", "Schema Introspection", "Result Formatting", "Safe by Default"],
-      pl: ["Wykonywanie Zapytań SQL", "Introspekcja Schematu", "Formatowanie Wyników", "Bezpieczne Domyślnie"],
-      de: ["SQL-Abfrageausführung", "Schema-Introspektion", "Ergebnisformatierung", "Standardmäßig sicher"],
-      es: ["Ejecución de Consultas SQL", "Introspección de Esquema", "Formateo de Resultados", "Seguro por Defecto"],
+      pl: [
+        "Wykonywanie Zapytań SQL",
+        "Introspekcja Schematu",
+        "Formatowanie Wyników",
+        "Bezpieczne Domyślnie",
+      ],
+      de: [
+        "SQL-Abfrageausführung",
+        "Schema-Introspektion",
+        "Ergebnisformatierung",
+        "Standardmäßig sicher",
+      ],
+      es: [
+        "Ejecución de Consultas SQL",
+        "Introspección de Esquema",
+        "Formateo de Resultados",
+        "Seguro por Defecto",
+      ],
     },
     longDescription: {
       en: "Five tools give agents full database interaction: list_tables, get_schema, describe_table, explain_query, and query. Supports both SQLite (via aiosqlite) and PostgreSQL (via asyncpg) with a unified interface. Security-first: read-only mode blocks 15+ dangerous SQL keywords including DROP, DELETE, and ALTER. Resource control with configurable query timeouts (30s default) and row limits (100 default). Comment-aware parsing detects dangerous keywords hidden behind -- and /* */ comments.",
@@ -660,28 +1095,92 @@ async with SQLiteDatabase("data.db") as db:
     },
     useCases: {
       en: [
-        { name: "Data Analysis Agents", description: "Let agents explore schemas, write queries, and analyze results from SQLite or PostgreSQL databases using natural language." },
-        { name: "Report Generation", description: "Build agents that query production databases, format results, and generate human-readable reports automatically." },
-        { name: "Database Administration", description: "Create assistants that help with schema discovery, query optimization via EXPLAIN, and database documentation." },
-        { name: "Business Intelligence", description: "Give non-technical users natural language access to their data with read-only safety guarantees and query timeouts." },
+        {
+          name: "Data Analysis Agents",
+          description:
+            "Let agents explore schemas, write queries, and analyze results from SQLite or PostgreSQL databases using natural language.",
+        },
+        {
+          name: "Report Generation",
+          description:
+            "Build agents that query production databases, format results, and generate human-readable reports automatically.",
+        },
+        {
+          name: "Database Administration",
+          description:
+            "Create assistants that help with schema discovery, query optimization via EXPLAIN, and database documentation.",
+        },
+        {
+          name: "Business Intelligence",
+          description:
+            "Give non-technical users natural language access to their data with read-only safety guarantees and query timeouts.",
+        },
       ],
       pl: [
-        { name: "Agenci Analizy Danych", description: "Pozwól agentom eksplorować schematy, pisać zapytania i analizować wyniki z baz SQLite lub PostgreSQL używając języka naturalnego." },
-        { name: "Generowanie Raportów", description: "Buduj agentów odpytujących produkcyjne bazy danych, formatujących wyniki i automatycznie generujących czytelne raporty." },
-        { name: "Administracja Bazami Danych", description: "Twórz asystentów pomagających w odkrywaniu schematów, optymalizacji zapytań przez EXPLAIN i dokumentacji baz danych." },
-        { name: "Business Intelligence", description: "Daj nietechnicznym użytkownikom dostęp do danych w języku naturalnym z gwarancjami bezpieczeństwa read-only i timeoutami zapytań." },
+        {
+          name: "Agenci Analizy Danych",
+          description:
+            "Pozwól agentom eksplorować schematy, pisać zapytania i analizować wyniki z baz SQLite lub PostgreSQL używając języka naturalnego.",
+        },
+        {
+          name: "Generowanie Raportów",
+          description:
+            "Buduj agentów odpytujących produkcyjne bazy danych, formatujących wyniki i automatycznie generujących czytelne raporty.",
+        },
+        {
+          name: "Administracja Bazami Danych",
+          description:
+            "Twórz asystentów pomagających w odkrywaniu schematów, optymalizacji zapytań przez EXPLAIN i dokumentacji baz danych.",
+        },
+        {
+          name: "Business Intelligence",
+          description:
+            "Daj nietechnicznym użytkownikom dostęp do danych w języku naturalnym z gwarancjami bezpieczeństwa read-only i timeoutami zapytań.",
+        },
       ],
       de: [
-        { name: "Datenanalyse-Agenten", description: "Agenten Schemas erkunden, Queries schreiben und Ergebnisse aus SQLite- oder PostgreSQL-Datenbanken in natürlicher Sprache analysieren lassen." },
-        { name: "Berichterstellung", description: "Agenten bauen, die Produktionsdatenbanken abfragen, Ergebnisse formatieren und automatisch lesbare Berichte generieren." },
-        { name: "Datenbank-Administration", description: "Assistenten erstellen, die bei Schema-Discovery, Query-Optimierung via EXPLAIN und Datenbankdokumentation helfen." },
-        { name: "Business Intelligence", description: "Nicht-technischen Benutzern natürlichsprachigen Datenzugriff mit Read-only-Sicherheitsgarantien und Query-Timeouts geben." },
+        {
+          name: "Datenanalyse-Agenten",
+          description:
+            "Agenten Schemas erkunden, Queries schreiben und Ergebnisse aus SQLite- oder PostgreSQL-Datenbanken in natürlicher Sprache analysieren lassen.",
+        },
+        {
+          name: "Berichterstellung",
+          description:
+            "Agenten bauen, die Produktionsdatenbanken abfragen, Ergebnisse formatieren und automatisch lesbare Berichte generieren.",
+        },
+        {
+          name: "Datenbank-Administration",
+          description:
+            "Assistenten erstellen, die bei Schema-Discovery, Query-Optimierung via EXPLAIN und Datenbankdokumentation helfen.",
+        },
+        {
+          name: "Business Intelligence",
+          description:
+            "Nicht-technischen Benutzern natürlichsprachigen Datenzugriff mit Read-only-Sicherheitsgarantien und Query-Timeouts geben.",
+        },
       ],
       es: [
-        { name: "Agentes de Análisis de Datos", description: "Permite a los agentes explorar esquemas, escribir consultas y analizar resultados de bases SQLite o PostgreSQL usando lenguaje natural." },
-        { name: "Generación de Reportes", description: "Construye agentes que consultan bases de producción, formatean resultados y generan reportes legibles automáticamente." },
-        { name: "Administración de Bases de Datos", description: "Crea asistentes que ayudan con el descubrimiento de esquemas, optimización de consultas via EXPLAIN y documentación de bases de datos." },
-        { name: "Business Intelligence", description: "Da a usuarios no técnicos acceso a sus datos en lenguaje natural con garantías de seguridad read-only y timeouts de consultas." },
+        {
+          name: "Agentes de Análisis de Datos",
+          description:
+            "Permite a los agentes explorar esquemas, escribir consultas y analizar resultados de bases SQLite o PostgreSQL usando lenguaje natural.",
+        },
+        {
+          name: "Generación de Reportes",
+          description:
+            "Construye agentes que consultan bases de producción, formatean resultados y generan reportes legibles automáticamente.",
+        },
+        {
+          name: "Administración de Bases de Datos",
+          description:
+            "Crea asistentes que ayudan con el descubrimiento de esquemas, optimización de consultas via EXPLAIN y documentación de bases de datos.",
+        },
+        {
+          name: "Business Intelligence",
+          description:
+            "Da a usuarios no técnicos acceso a sus datos en lenguaje natural con garantías de seguridad read-only y timeouts de consultas.",
+        },
       ],
     },
   },
@@ -707,9 +1206,24 @@ async with SQLiteDatabase("data.db") as db:
     installCommand: "pip install polly-logfire",
     features: {
       en: ["Trace Analysis", "Natural Language Queries", "Span Debugging", "Production Insights"],
-      pl: ["Analiza Traces", "Zapytania w Języku Naturalnym", "Debugowanie Spans", "Wgląd w Produkcję"],
-      de: ["Trace-Analyse", "Natürlichsprachige Abfragen", "Span-Debugging", "Produktions-Einblicke"],
-      es: ["Análisis de Traces", "Consultas en Lenguaje Natural", "Depuración de Spans", "Insights de Producción"],
+      pl: [
+        "Analiza Traces",
+        "Zapytania w Języku Naturalnym",
+        "Debugowanie Spans",
+        "Wgląd w Produkcję",
+      ],
+      de: [
+        "Trace-Analyse",
+        "Natürlichsprachige Abfragen",
+        "Span-Debugging",
+        "Produktions-Einblicke",
+      ],
+      es: [
+        "Análisis de Traces",
+        "Consultas en Lenguaje Natural",
+        "Depuración de Spans",
+        "Insights de Producción",
+      ],
     },
   },
 
@@ -786,7 +1300,12 @@ async with SQLiteDatabase("data.db") as db:
       en: ["30+ Projects Listed", "Frameworks & Templates", "Case Studies", "Community Curated"],
       pl: ["30+ Projektów", "Frameworki i Szablony", "Studia Przypadków", "Kuratowane"],
       de: ["30+ Projekte", "Frameworks & Templates", "Fallstudien", "Community-kuratiert"],
-      es: ["30+ Proyectos", "Frameworks y Plantillas", "Casos de Estudio", "Curado por la Comunidad"],
+      es: [
+        "30+ Proyectos",
+        "Frameworks y Plantillas",
+        "Casos de Estudio",
+        "Curado por la Comunidad",
+      ],
     },
     longDescription: {
       en: "A comprehensive, community-curated collection of the best Pydantic AI ecosystem resources. Browse production-grade frameworks and libraries (pydantic-deep, middleware, backend, subagents, summarization, database toolsets), full-stack templates with 20+ enterprise integrations, observability tools powered by Pydantic Logfire, and real-world case studies from companies like Mixam, Sophos, and Boosted.ai. Updated regularly with new projects and resources.",

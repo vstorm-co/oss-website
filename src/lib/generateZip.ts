@@ -50,15 +50,13 @@ function preprocessTemplate(template: string): string {
   // Convert list.append(item) → list.concat([item])
   let result = template.replace(
     /\{%-?\s*set\s+_\s*=\s*(\w+)\.append\(([^)]+)\)\s*-?%\}/g,
-    (_m, varname: string, item: string) =>
-      `{% set ${varname} = ${varname}.concat([${item}]) %}`,
+    (_m, varname: string, item: string) => `{% set ${varname} = ${varname}.concat([${item}]) %}`,
   );
 
   // Convert list.extend([items]) → list.concat([items])
   result = result.replace(
     /\{%-?\s*set\s+_\s*=\s*(\w+)\.extend\((\[[^\]]*\])\)\s*-?%\}/g,
-    (_m, varname: string, items: string) =>
-      `{% set ${varname} = ${varname}.concat(${items}) %}`,
+    (_m, varname: string, items: string) => `{% set ${varname} = ${varname}.concat(${items}) %}`,
   );
 
   return result;
@@ -107,28 +105,52 @@ function getExcludedPaths(ctx: Record<string, unknown>): Set<string> {
 
   // --- Example CRUD ---
   if (!ctx.include_example_crud || !ctx.use_database) {
-    for (const f of ["api/routes/v1/items.py", "db/models/item.py", "repositories/item.py", "services/item.py", "schemas/item.py"]) {
+    for (const f of [
+      "api/routes/v1/items.py",
+      "db/models/item.py",
+      "repositories/item.py",
+      "services/item.py",
+      "schemas/item.py",
+    ]) {
       rm(`${b}/${f}`);
     }
   }
 
   // --- Conversation persistence ---
   if (!ctx.enable_conversation_persistence) {
-    for (const f of ["api/routes/v1/conversations.py", "db/models/conversation.py", "repositories/conversation.py", "services/conversation.py", "schemas/conversation.py"]) {
+    for (const f of [
+      "api/routes/v1/conversations.py",
+      "db/models/conversation.py",
+      "repositories/conversation.py",
+      "services/conversation.py",
+      "schemas/conversation.py",
+    ]) {
       rm(`${b}/${f}`);
     }
   }
 
   // --- Webhooks ---
   if (!ctx.enable_webhooks || !ctx.use_database) {
-    for (const f of ["api/routes/v1/webhooks.py", "db/models/webhook.py", "repositories/webhook.py", "services/webhook.py", "schemas/webhook.py"]) {
+    for (const f of [
+      "api/routes/v1/webhooks.py",
+      "db/models/webhook.py",
+      "repositories/webhook.py",
+      "services/webhook.py",
+      "schemas/webhook.py",
+    ]) {
       rm(`${b}/${f}`);
     }
   }
 
   // --- Session management ---
   if (!ctx.enable_session_management || !ctx.use_jwt) {
-    for (const f of ["api/routes/v1/sessions.py", "db/models/session.py", "repositories/session.py", "services/session.py", "schemas/session.py"]) {
+    for (const f of [
+      "api/routes/v1/sessions.py",
+      "db/models/session.py",
+      "repositories/session.py",
+      "services/session.py",
+      "schemas/session.py",
+    ]) {
       rm(`${b}/${f}`);
     }
   }
@@ -157,7 +179,15 @@ function getExcludedPaths(ctx: Record<string, unknown>): Set<string> {
 
   // --- Auth/User ---
   if (!ctx.use_jwt) {
-    for (const f of ["api/routes/v1/auth.py", "api/routes/v1/users.py", "db/models/user.py", "repositories/user.py", "services/user.py", "schemas/user.py", "schemas/token.py"]) {
+    for (const f of [
+      "api/routes/v1/auth.py",
+      "api/routes/v1/users.py",
+      "db/models/user.py",
+      "repositories/user.py",
+      "services/user.py",
+      "schemas/user.py",
+      "schemas/token.py",
+    ]) {
       rm(`${b}/${f}`);
     }
   }

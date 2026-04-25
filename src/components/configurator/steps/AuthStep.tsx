@@ -5,19 +5,25 @@ import { shouldShowOAuth, shouldShowSessionManagement } from "../../../lib/valid
 
 export function AuthStep() {
   const { form } = useWizard();
-  const { register, watch, formState: { errors } } = form;
+  const {
+    register,
+    watch,
+    formState: { errors },
+  } = form;
   const config = watch();
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-text tracking-tight">Authentication</h2>
-        <p className="text-sm text-text-tertiary mt-1">Configure authentication and authorization</p>
+        <h2 className="text-text text-xl font-semibold tracking-tight">Authentication</h2>
+        <p className="text-text-tertiary mt-1 text-sm">
+          Configure authentication and authorization
+        </p>
       </div>
 
       <div className="grid gap-5">
         <div>
-          <label className="block text-sm font-medium text-text mb-2">Auth Method</label>
+          <label className="text-text mb-2 block text-sm font-medium">Auth Method</label>
           <RadioGroup
             options={authValues.map((v) => ({ value: v, label: authLabels[v] }))}
             value={config.auth}
@@ -27,7 +33,7 @@ export function AuthStep() {
 
         {shouldShowOAuth(config) && (
           <div>
-            <label className="block text-sm font-medium text-text mb-2">OAuth Provider</label>
+            <label className="text-text mb-2 block text-sm font-medium">OAuth Provider</label>
             <RadioGroup
               options={[
                 { value: "none", label: "None" },

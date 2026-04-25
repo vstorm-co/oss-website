@@ -101,47 +101,102 @@ export const comparisonPages: ComparisonPage[] = [
         values: ["Pydantic AI", "LangGraph"],
       },
       {
-        feature: { en: "Type Safety", pl: "Bezpieczeństwo typów", de: "Typsicherheit", es: "Seguridad de tipos" },
+        feature: {
+          en: "Type Safety",
+          pl: "Bezpieczeństwo typów",
+          de: "Typsicherheit",
+          es: "Seguridad de tipos",
+        },
         values: [true, false],
       },
       {
-        feature: { en: "Planning (TODOs)", pl: "Planowanie (TODOs)", de: "Planung (TODOs)", es: "Planificación (TODOs)" },
+        feature: {
+          en: "Planning (TODOs)",
+          pl: "Planowanie (TODOs)",
+          de: "Planung (TODOs)",
+          es: "Planificación (TODOs)",
+        },
         values: [true, true],
       },
       {
-        feature: { en: "Filesystem Tools", pl: "Narzędzia plików", de: "Dateisystem-Tools", es: "Herramientas de archivos" },
+        feature: {
+          en: "Filesystem Tools",
+          pl: "Narzędzia plików",
+          de: "Dateisystem-Tools",
+          es: "Herramientas de archivos",
+        },
         values: [true, true],
       },
       {
-        feature: { en: "Subagent Delegation", pl: "Delegacja subagentów", de: "Subagent-Delegation", es: "Delegación de subagentes" },
+        feature: {
+          en: "Subagent Delegation",
+          pl: "Delegacja subagentów",
+          de: "Subagent-Delegation",
+          es: "Delegación de subagentes",
+        },
         values: [true, true],
       },
       {
-        feature: { en: "Context Management", pl: "Zarządzanie kontekstem", de: "Kontextmanagement", es: "Gestión de contexto" },
+        feature: {
+          en: "Context Management",
+          pl: "Zarządzanie kontekstem",
+          de: "Kontextmanagement",
+          es: "Gestión de contexto",
+        },
         values: [true, true],
       },
       {
-        feature: { en: "Structured Output", pl: "Wynik strukturalny", de: "Strukturierte Ausgabe", es: "Salida estructurada" },
+        feature: {
+          en: "Structured Output",
+          pl: "Wynik strukturalny",
+          de: "Strukturierte Ausgabe",
+          es: "Salida estructurada",
+        },
         values: [true, false],
       },
       {
-        feature: { en: "Lifecycle Hooks", pl: "Hooki cyklu życia", de: "Lifecycle-Hooks", es: "Hooks de ciclo de vida" },
+        feature: {
+          en: "Lifecycle Hooks",
+          pl: "Hooki cyklu życia",
+          de: "Lifecycle-Hooks",
+          es: "Hooks de ciclo de vida",
+        },
         values: [true, false],
       },
       {
-        feature: { en: "Cost Tracking", pl: "Śledzenie kosztów", de: "Kostentracking", es: "Seguimiento de costos" },
+        feature: {
+          en: "Cost Tracking",
+          pl: "Śledzenie kosztów",
+          de: "Kostentracking",
+          es: "Seguimiento de costos",
+        },
         values: [true, false],
       },
       {
-        feature: { en: "Agent Teams", pl: "Zespoły agentów", de: "Agenten-Teams", es: "Equipos de agentes" },
+        feature: {
+          en: "Agent Teams",
+          pl: "Zespoły agentów",
+          de: "Agenten-Teams",
+          es: "Equipos de agentes",
+        },
         values: [true, false],
       },
       {
-        feature: { en: "JS/TS Variant", pl: "Wariant JS/TS", de: "JS/TS-Variante", es: "Variante JS/TS" },
+        feature: {
+          en: "JS/TS Variant",
+          pl: "Wariant JS/TS",
+          de: "JS/TS-Variante",
+          es: "Variante JS/TS",
+        },
         values: [false, true],
       },
       {
-        feature: { en: "Sandbox Partners", pl: "Partnerzy sandbox", de: "Sandbox-Partner", es: "Partners de sandbox" },
+        feature: {
+          en: "Sandbox Partners",
+          pl: "Partnerzy sandbox",
+          de: "Sandbox-Partner",
+          es: "Partners de sandbox",
+        },
         values: ["Docker", "Modal, Runloop, Daytona"],
       },
       {
@@ -149,7 +204,12 @@ export const comparisonPages: ComparisonPage[] = [
         values: [true, true],
       },
       {
-        feature: { en: "Persistent Memory", pl: "Trwała pamięć", de: "Persistenter Speicher", es: "Memoria persistente" },
+        feature: {
+          en: "Persistent Memory",
+          pl: "Trwała pamięć",
+          de: "Persistenter Speicher",
+          es: "Memoria persistente",
+        },
         values: [true, true],
       },
     ],
@@ -339,43 +399,93 @@ result = agent.invoke({
         values: ["Pydantic AI", "LiteLLM"],
       },
       {
-        feature: { en: "Agent Pattern", pl: "Wzorzec agenta", de: "Agenten-Muster", es: "Patrón de agente" },
+        feature: {
+          en: "Agent Pattern",
+          pl: "Wzorzec agenta",
+          de: "Agenten-Muster",
+          es: "Patrón de agente",
+        },
         values: ["Deep agent", "Role-based crew"],
       },
       {
-        feature: { en: "Type Safety", pl: "Bezpieczeństwo typów", de: "Typsicherheit", es: "Seguridad de tipos" },
+        feature: {
+          en: "Type Safety",
+          pl: "Bezpieczeństwo typów",
+          de: "Typsicherheit",
+          es: "Seguridad de tipos",
+        },
         values: [true, "Partial"],
       },
       {
-        feature: { en: "Planning (TODOs)", pl: "Planowanie (TODOs)", de: "Planung (TODOs)", es: "Planificación (TODOs)" },
+        feature: {
+          en: "Planning (TODOs)",
+          pl: "Planowanie (TODOs)",
+          de: "Planung (TODOs)",
+          es: "Planificación (TODOs)",
+        },
         values: [true, true],
       },
       {
-        feature: { en: "Filesystem Tools", pl: "Narzędzia plików", de: "Dateisystem-Tools", es: "Herramientas de archivos" },
+        feature: {
+          en: "Filesystem Tools",
+          pl: "Narzędzia plików",
+          de: "Dateisystem-Tools",
+          es: "Herramientas de archivos",
+        },
         values: [true, false],
       },
       {
-        feature: { en: "Context Management", pl: "Zarządzanie kontekstem", de: "Kontextmanagement", es: "Gestión de contexto" },
+        feature: {
+          en: "Context Management",
+          pl: "Zarządzanie kontekstem",
+          de: "Kontextmanagement",
+          es: "Gestión de contexto",
+        },
         values: [true, "Partial"],
       },
       {
-        feature: { en: "Structured Output", pl: "Wynik strukturalny", de: "Strukturierte Ausgabe", es: "Salida estructurada" },
+        feature: {
+          en: "Structured Output",
+          pl: "Wynik strukturalny",
+          de: "Strukturierte Ausgabe",
+          es: "Salida estructurada",
+        },
         values: [true, true],
       },
       {
-        feature: { en: "Role-Based Teams", pl: "Zespoły oparte na rolach", de: "Rollenbasierte Teams", es: "Equipos basados en roles" },
+        feature: {
+          en: "Role-Based Teams",
+          pl: "Zespoły oparte na rolach",
+          de: "Rollenbasierte Teams",
+          es: "Equipos basados en roles",
+        },
         values: ["Manual", true],
       },
       {
-        feature: { en: "Crew Coordination", pl: "Koordynacja zespołów", de: "Crew-Koordination", es: "Coordinación de crews" },
+        feature: {
+          en: "Crew Coordination",
+          pl: "Koordynacja zespołów",
+          de: "Crew-Koordination",
+          es: "Coordinación de crews",
+        },
         values: ["Manual", "Sequential, Hierarchical"],
       },
       {
-        feature: { en: "Lifecycle Hooks", pl: "Hooki cyklu życia", de: "Lifecycle-Hooks", es: "Hooks de ciclo de vida" },
+        feature: {
+          en: "Lifecycle Hooks",
+          pl: "Hooki cyklu życia",
+          de: "Lifecycle-Hooks",
+          es: "Hooks de ciclo de vida",
+        },
         values: [true, "Callbacks"],
       },
       {
-        feature: { en: "Cost Tracking", pl: "Śledzenie kosztów", de: "Kostentracking", es: "Seguimiento de costos" },
+        feature: {
+          en: "Cost Tracking",
+          pl: "Śledzenie kosztów",
+          de: "Kostentracking",
+          es: "Seguimiento de costos",
+        },
         values: [true, false],
       },
       {
@@ -383,11 +493,21 @@ result = agent.invoke({
         values: [true, true],
       },
       {
-        feature: { en: "Multi-Provider Support", pl: "Wsparcie wielu dostawców", de: "Multi-Provider-Unterstützung", es: "Soporte multi-proveedor" },
+        feature: {
+          en: "Multi-Provider Support",
+          pl: "Wsparcie wielu dostawców",
+          de: "Multi-Provider-Unterstützung",
+          es: "Soporte multi-proveedor",
+        },
         values: [true, true],
       },
       {
-        feature: { en: "Persistent Memory", pl: "Trwała pamięć", de: "Persistenter Speicher", es: "Memoria persistente" },
+        feature: {
+          en: "Persistent Memory",
+          pl: "Trwała pamięć",
+          de: "Persistenter Speicher",
+          es: "Memoria persistente",
+        },
         values: [true, true],
       },
     ],
@@ -594,23 +714,48 @@ result = crew.kickoff()`,
         values: ["Pydantic AI", "Custom runtime"],
       },
       {
-        feature: { en: "Agent Pattern", pl: "Wzorzec agenta", de: "Agenten-Muster", es: "Patrón de agente" },
+        feature: {
+          en: "Agent Pattern",
+          pl: "Wzorzec agenta",
+          de: "Agenten-Muster",
+          es: "Patrón de agente",
+        },
         values: ["Deep agent", "Conversational"],
       },
       {
-        feature: { en: "Type Safety", pl: "Bezpieczeństwo typów", de: "Typsicherheit", es: "Seguridad de tipos" },
+        feature: {
+          en: "Type Safety",
+          pl: "Bezpieczeństwo typów",
+          de: "Typsicherheit",
+          es: "Seguridad de tipos",
+        },
         values: [true, "Partial"],
       },
       {
-        feature: { en: "Planning (TODOs)", pl: "Planowanie (TODOs)", de: "Planung (TODOs)", es: "Planificación (TODOs)" },
+        feature: {
+          en: "Planning (TODOs)",
+          pl: "Planowanie (TODOs)",
+          de: "Planung (TODOs)",
+          es: "Planificación (TODOs)",
+        },
         values: [true, false],
       },
       {
-        feature: { en: "Filesystem Tools", pl: "Narzędzia plików", de: "Dateisystem-Tools", es: "Herramientas de archivos" },
+        feature: {
+          en: "Filesystem Tools",
+          pl: "Narzędzia plików",
+          de: "Dateisystem-Tools",
+          es: "Herramientas de archivos",
+        },
         values: [true, false],
       },
       {
-        feature: { en: "Code Execution", pl: "Wykonywanie kodu", de: "Code-Ausführung", es: "Ejecución de código" },
+        feature: {
+          en: "Code Execution",
+          pl: "Wykonywanie kodu",
+          de: "Code-Ausführung",
+          es: "Ejecución de código",
+        },
         values: [true, true],
       },
       {
@@ -618,7 +763,12 @@ result = crew.kickoff()`,
         values: ["Via subagents", true],
       },
       {
-        feature: { en: "Context Management", pl: "Zarządzanie kontekstem", de: "Kontextmanagement", es: "Gestión de contexto" },
+        feature: {
+          en: "Context Management",
+          pl: "Zarządzanie kontekstem",
+          de: "Kontextmanagement",
+          es: "Gestión de contexto",
+        },
         values: [true, false],
       },
       {
@@ -626,15 +776,30 @@ result = crew.kickoff()`,
         values: [true, false],
       },
       {
-        feature: { en: "Cost Tracking", pl: "Śledzenie kosztów", de: "Kostentracking", es: "Seguimiento de costos" },
+        feature: {
+          en: "Cost Tracking",
+          pl: "Śledzenie kosztów",
+          de: "Kostentracking",
+          es: "Seguimiento de costos",
+        },
         values: [true, false],
       },
       {
-        feature: { en: "Human-in-the-Loop", pl: "Człowiek w pętli", de: "Human-in-the-Loop", es: "Humano en el bucle" },
+        feature: {
+          en: "Human-in-the-Loop",
+          pl: "Człowiek w pętli",
+          de: "Human-in-the-Loop",
+          es: "Humano en el bucle",
+        },
         values: [true, true],
       },
       {
-        feature: { en: "Persistent Memory", pl: "Trwała pamięć", de: "Persistenter Speicher", es: "Memoria persistente" },
+        feature: {
+          en: "Persistent Memory",
+          pl: "Trwała pamięć",
+          de: "Persistenter Speicher",
+          es: "Memoria persistente",
+        },
         values: [true, false],
       },
       {
@@ -642,7 +807,12 @@ result = crew.kickoff()`,
         values: [true, false],
       },
       {
-        feature: { en: "Multi-Provider Support", pl: "Wsparcie wielu dostawców", de: "Multi-Provider-Unterstützung", es: "Soporte multi-proveedor" },
+        feature: {
+          en: "Multi-Provider Support",
+          pl: "Wsparcie wielu dostawców",
+          de: "Multi-Provider-Unterstützung",
+          es: "Soporte multi-proveedor",
+        },
         values: [true, true],
       },
     ],
@@ -836,31 +1006,66 @@ result = await team.run(
     tableHighlight: 0,
     tableRows: [
       {
-        feature: { en: "Setup Time", pl: "Czas konfiguracji", de: "Setup-Zeit", es: "Tiempo de configuración" },
+        feature: {
+          en: "Setup Time",
+          pl: "Czas konfiguracji",
+          de: "Setup-Zeit",
+          es: "Tiempo de configuración",
+        },
         values: ["5 min", "2-4 weeks"],
       },
       {
-        feature: { en: "AI Framework Integration", pl: "Integracja frameworków AI", de: "KI-Framework-Integration", es: "Integración de frameworks IA" },
+        feature: {
+          en: "AI Framework Integration",
+          pl: "Integracja frameworków AI",
+          de: "KI-Framework-Integration",
+          es: "Integración de frameworks IA",
+        },
         values: ["5 built-in", "DIY"],
       },
       {
-        feature: { en: "Authentication", pl: "Autoryzacja", de: "Authentifizierung", es: "Autenticación" },
+        feature: {
+          en: "Authentication",
+          pl: "Autoryzacja",
+          de: "Authentifizierung",
+          es: "Autenticación",
+        },
         values: [true, "DIY"],
       },
       {
-        feature: { en: "Database Setup", pl: "Konfiguracja bazy danych", de: "Datenbank-Setup", es: "Configuración de base de datos" },
+        feature: {
+          en: "Database Setup",
+          pl: "Konfiguracja bazy danych",
+          de: "Datenbank-Setup",
+          es: "Configuración de base de datos",
+        },
         values: [true, "DIY"],
       },
       {
-        feature: { en: "Docker & Kubernetes", pl: "Docker i Kubernetes", de: "Docker & Kubernetes", es: "Docker y Kubernetes" },
+        feature: {
+          en: "Docker & Kubernetes",
+          pl: "Docker i Kubernetes",
+          de: "Docker & Kubernetes",
+          es: "Docker y Kubernetes",
+        },
         values: [true, "DIY"],
       },
       {
-        feature: { en: "CI/CD Pipeline", pl: "Pipeline CI/CD", de: "CI/CD-Pipeline", es: "Pipeline CI/CD" },
+        feature: {
+          en: "CI/CD Pipeline",
+          pl: "Pipeline CI/CD",
+          de: "CI/CD-Pipeline",
+          es: "Pipeline CI/CD",
+        },
         values: [true, "DIY"],
       },
       {
-        feature: { en: "Observability", pl: "Obserwowalność", de: "Observability", es: "Observabilidad" },
+        feature: {
+          en: "Observability",
+          pl: "Obserwowalność",
+          de: "Observability",
+          es: "Observabilidad",
+        },
         values: [true, "DIY"],
       },
     ],
@@ -1004,55 +1209,120 @@ uvx fastapi-fullstack my-project \\
     tableHighlight: 0,
     tableRows: [
       {
-        feature: { en: "AI Framework Support", pl: "Wsparcie frameworkow AI", de: "KI-Framework-Unterstutzung", es: "Soporte de frameworks IA" },
+        feature: {
+          en: "AI Framework Support",
+          pl: "Wsparcie frameworkow AI",
+          de: "KI-Framework-Unterstutzung",
+          es: "Soporte de frameworks IA",
+        },
         values: ["5 built-in", false],
       },
       {
-        feature: { en: "WebSocket Streaming", pl: "Streaming WebSocket", de: "WebSocket-Streaming", es: "Streaming WebSocket" },
+        feature: {
+          en: "WebSocket Streaming",
+          pl: "Streaming WebSocket",
+          de: "WebSocket-Streaming",
+          es: "Streaming WebSocket",
+        },
         values: [true, false],
       },
       {
-        feature: { en: "Conversation Persistence", pl: "Persystencja konwersacji", de: "Konversationspersistenz", es: "Persistencia de conversaciones" },
+        feature: {
+          en: "Conversation Persistence",
+          pl: "Persystencja konwersacji",
+          de: "Konversationspersistenz",
+          es: "Persistencia de conversaciones",
+        },
         values: [true, false],
       },
       {
-        feature: { en: "Human-in-the-Loop", pl: "Human-in-the-Loop", de: "Human-in-the-Loop", es: "Human-in-the-Loop" },
+        feature: {
+          en: "Human-in-the-Loop",
+          pl: "Human-in-the-Loop",
+          de: "Human-in-the-Loop",
+          es: "Human-in-the-Loop",
+        },
         values: [true, false],
       },
       {
-        feature: { en: "Visual Configurator", pl: "Wizualny konfigurator", de: "Visueller Konfigurator", es: "Configurador visual" },
+        feature: {
+          en: "Visual Configurator",
+          pl: "Wizualny konfigurator",
+          de: "Visueller Konfigurator",
+          es: "Configurador visual",
+        },
         values: ["9-step wizard", false],
       },
       {
-        feature: { en: "CLI Generator", pl: "Generator CLI", de: "CLI-Generator", es: "Generador CLI" },
+        feature: {
+          en: "CLI Generator",
+          pl: "Generator CLI",
+          de: "CLI-Generator",
+          es: "Generador CLI",
+        },
         values: [true, true],
       },
       {
-        feature: { en: "Config Validation", pl: "Walidacja konfiguracji", de: "Konfigurations-Validierung", es: "Validacion de configuracion" },
+        feature: {
+          en: "Config Validation",
+          pl: "Walidacja konfiguracji",
+          de: "Konfigurations-Validierung",
+          es: "Validacion de configuracion",
+        },
         values: ["11 rules", false],
       },
       {
-        feature: { en: "Full-Stack (Backend + Frontend)", pl: "Full-Stack (Backend + Frontend)", de: "Full-Stack (Backend + Frontend)", es: "Full-Stack (Backend + Frontend)" },
+        feature: {
+          en: "Full-Stack (Backend + Frontend)",
+          pl: "Full-Stack (Backend + Frontend)",
+          de: "Full-Stack (Backend + Frontend)",
+          es: "Full-Stack (Backend + Frontend)",
+        },
         values: [true, "Varies"],
       },
       {
-        feature: { en: "Docker + K8s + CI/CD", pl: "Docker + K8s + CI/CD", de: "Docker + K8s + CI/CD", es: "Docker + K8s + CI/CD" },
+        feature: {
+          en: "Docker + K8s + CI/CD",
+          pl: "Docker + K8s + CI/CD",
+          de: "Docker + K8s + CI/CD",
+          es: "Docker + K8s + CI/CD",
+        },
         values: [true, "Varies"],
       },
       {
-        feature: { en: "Auth (JWT, OAuth, API keys)", pl: "Auth (JWT, OAuth, klucze API)", de: "Auth (JWT, OAuth, API-Keys)", es: "Auth (JWT, OAuth, API keys)" },
+        feature: {
+          en: "Auth (JWT, OAuth, API keys)",
+          pl: "Auth (JWT, OAuth, klucze API)",
+          de: "Auth (JWT, OAuth, API-Keys)",
+          es: "Auth (JWT, OAuth, API keys)",
+        },
         values: [true, "Varies"],
       },
       {
-        feature: { en: "Observability (Logfire, Sentry)", pl: "Obserwowalnosc (Logfire, Sentry)", de: "Observability (Logfire, Sentry)", es: "Observabilidad (Logfire, Sentry)" },
+        feature: {
+          en: "Observability (Logfire, Sentry)",
+          pl: "Obserwowalnosc (Logfire, Sentry)",
+          de: "Observability (Logfire, Sentry)",
+          es: "Observabilidad (Logfire, Sentry)",
+        },
         values: [true, false],
       },
       {
-        feature: { en: "Configuration Presets", pl: "Presety konfiguracji", de: "Konfigurations-Presets", es: "Presets de configuracion" },
+        feature: {
+          en: "Configuration Presets",
+          pl: "Presety konfiguracji",
+          de: "Konfigurations-Presets",
+          es: "Presets de configuracion",
+        },
         values: ["3 presets", false],
       },
       {
-        feature: { en: "Template Variety", pl: "Roznorodnosc szablonow", de: "Template-Vielfalt", es: "Variedad de plantillas" },
+        feature: {
+          en: "Template Variety",
+          pl: "Roznorodnosc szablonow",
+          de: "Template-Vielfalt",
+          es: "Variedad de plantillas",
+        },
         values: ["AI-focused", "4,000+"],
       },
     ],

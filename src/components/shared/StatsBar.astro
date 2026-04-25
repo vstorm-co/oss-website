@@ -12,53 +12,61 @@ interface Props {
 const { items } = Astro.props;
 ---
 
-<section class="border-y border-border bg-surface/50 py-12 sm:py-16">
+<section class="border-border bg-surface/50 border-y py-12 sm:py-16">
   <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
     <div class="reveal grid grid-cols-2 gap-8 sm:grid-cols-4" id="stats-bar">
-      {items.map((item) => (
-        <div class="text-center">
-          <div class="text-3xl font-bold tracking-tight text-accent sm:text-4xl">
-            <span class="stat-number" data-target={item.value}>{item.value}</span>{item.suffix || ""}
+      {
+        items.map((item) => (
+          <div class="text-center">
+            <div class="text-accent text-3xl font-bold tracking-tight sm:text-4xl">
+              <span class="stat-number" data-target={item.value}>
+                {item.value}
+              </span>
+              {item.suffix || ""}
+            </div>
+            <div class="text-text-secondary mt-2 text-sm">{item.label}</div>
           </div>
-          <div class="mt-2 text-sm text-text-secondary">{item.label}</div>
-        </div>
-      ))}
+        ))
+      }
     </div>
   </div>
 </section>
 
 <script is:inline>
-  document.addEventListener('astro:page-load', function() {
-    var bar = document.getElementById('stats-bar');
+  document.addEventListener("astro:page-load", function () {
+    const bar = document.getElementById("stats-bar");
     if (!bar || bar.dataset.animated) return;
 
-    var observer = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-          bar.dataset.animated = '1';
-          var nums = bar.querySelectorAll('.stat-number');
-          nums.forEach(function(el) {
-            var target = el.getAttribute('data-target') || '';
-            var match = target.match(/^(\d+)/);
-            if (!match) return;
-            var end = parseInt(match[1], 10);
-            var duration = 1200;
-            var startTime = null;
-            var rest = target.slice(match[1].length);
-            function animate(ts) {
-              if (!startTime) startTime = ts;
-              var progress = Math.min((ts - startTime) / duration, 1);
-              var eased = 1 - Math.pow(1 - progress, 3);
-              var current = Math.round(end * eased);
-              el.textContent = current + rest;
-              if (progress < 1) requestAnimationFrame(animate);
-            }
-            requestAnimationFrame(animate);
-          });
-          observer.disconnect();
-        }
-      });
-    }, { threshold: 0.3 });
+    const observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            bar.dataset.animated = "1";
+            const nums = bar.querySelectorAll(".stat-number");
+            nums.forEach(function (el) {
+              const target = el.getAttribute("data-target") || "";
+              const match = target.match(/^(\d+)/);
+              if (!match) return;
+              const end = parseInt(match[1], 10);
+              const duration = 1200;
+              let startTime = null;
+              const rest = target.slice(match[1].length);
+              function animate(ts) {
+                if (!startTime) startTime = ts;
+                const progress = Math.min((ts - startTime) / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const current = Math.round(end * eased);
+                el.textContent = current + rest;
+                if (progress < 1) requestAnimationFrame(animate);
+              }
+              requestAnimationFrame(animate);
+            });
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.3 },
+    );
 
     observer.observe(bar);
   });

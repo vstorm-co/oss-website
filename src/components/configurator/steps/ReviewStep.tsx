@@ -1,6 +1,18 @@
 import { useState, useCallback } from "react";
 import { useWizard } from "../WizardProvider";
-import { Copy, Check, FileArchive, FileJson, Loader2, Database, Shield, Bot, Server, Monitor, Code2 } from "lucide-react";
+import {
+  Copy,
+  Check,
+  FileArchive,
+  FileJson,
+  Loader2,
+  Database,
+  Shield,
+  Bot,
+  Server,
+  Monitor,
+  Code2,
+} from "lucide-react";
 import { enumLabels } from "../../../lib/types";
 import type { ProjectConfig } from "../../../lib/types";
 import { generateProjectZip, downloadBlob } from "../../../lib/generateZip";
@@ -72,23 +84,47 @@ export function ReviewStep() {
     <div className="space-y-6">
       {/* Header with project name */}
       <div className="text-center">
-        <p className="text-sm text-text-tertiary mb-1">Your project is ready</p>
-        <h2 className="text-2xl font-bold text-text tracking-tight font-mono">{projectName}</h2>
-        <p className="text-sm text-text-tertiary mt-1">{config.project_description}</p>
+        <p className="text-text-tertiary mb-1 text-sm">Your project is ready</p>
+        <h2 className="text-text font-mono text-2xl font-bold tracking-tight">{projectName}</h2>
+        <p className="text-text-tertiary mt-1 text-sm">{config.project_description}</p>
       </div>
 
       {/* Summary cards grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        <SummaryCard icon={<Database size={16} />} label="Database" value={enumLabels.database[config.database]} />
-        <SummaryCard icon={<Shield size={16} />} label="Auth" value={enumLabels.auth[config.auth]} />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <SummaryCard
+          icon={<Database size={16} />}
+          label="Database"
+          value={enumLabels.database[config.database]}
+        />
+        <SummaryCard
+          icon={<Shield size={16} />}
+          label="Auth"
+          value={enumLabels.auth[config.auth]}
+        />
         {config.enable_ai_agent ? (
-          <SummaryCard icon={<Bot size={16} />} label="AI" value={enumLabels.ai_framework[config.ai_framework]} />
+          <SummaryCard
+            icon={<Bot size={16} />}
+            label="AI"
+            value={enumLabels.ai_framework[config.ai_framework]}
+          />
         ) : (
           <SummaryCard icon={<Bot size={16} />} label="AI" value="None" muted />
         )}
-        <SummaryCard icon={<Monitor size={16} />} label="Frontend" value={enumLabels.frontend[config.frontend]} />
-        <SummaryCard icon={<Server size={16} />} label="Docker" value={config.enable_docker ? "Yes" : "No"} />
-        <SummaryCard icon={<Code2 size={16} />} label="CI/CD" value={enumLabels.ci_type[config.ci_type]} />
+        <SummaryCard
+          icon={<Monitor size={16} />}
+          label="Frontend"
+          value={enumLabels.frontend[config.frontend]}
+        />
+        <SummaryCard
+          icon={<Server size={16} />}
+          label="Docker"
+          value={config.enable_docker ? "Yes" : "No"}
+        />
+        <SummaryCard
+          icon={<Code2 size={16} />}
+          label="CI/CD"
+          value={enumLabels.ci_type[config.ci_type]}
+        />
       </div>
 
       {/* Extra details row */}
@@ -99,7 +135,9 @@ export function ReviewStep() {
         )}
         {config.oauth_provider !== "none" && <Badge>OAuth: Google</Badge>}
         {config.enable_ai_agent && <Badge>{enumLabels.llm_provider[config.llm_provider]}</Badge>}
-        {config.enable_ai_agent && config.enable_conversation_persistence && <Badge>Persistence</Badge>}
+        {config.enable_ai_agent && config.enable_conversation_persistence && (
+          <Badge>Persistence</Badge>
+        )}
         {config.enable_ai_agent && config.enable_langsmith && <Badge>LangSmith</Badge>}
         {config.enable_rag && <Badge>RAG: {config.vector_store}</Badge>}
         {config.use_telegram && <Badge>Telegram</Badge>}
@@ -114,7 +152,7 @@ export function ReviewStep() {
         <button
           onClick={handleDownloadZip}
           disabled={generating}
-          className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-accent hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-colors text-lg shadow-lg shadow-accent/20 hover:shadow-accent/30"
+          className="bg-accent hover:bg-accent-hover shadow-accent/20 hover:shadow-accent/30 flex w-full items-center justify-center gap-3 rounded-xl px-6 py-4 text-lg font-semibold text-white shadow-lg transition-colors disabled:cursor-not-allowed disabled:opacity-50"
         >
           {generating ? (
             <>
@@ -131,9 +169,9 @@ export function ReviewStep() {
 
         {/* Progress bar */}
         {generating && (
-          <div className="w-full h-1.5 rounded-full bg-border overflow-hidden mt-3">
+          <div className="bg-border mt-3 h-1.5 w-full overflow-hidden rounded-full">
             <div
-              className="h-full bg-accent rounded-full transition-all duration-300"
+              className="bg-accent h-full rounded-full transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -144,7 +182,7 @@ export function ReviewStep() {
       <div className="flex items-center justify-center gap-3">
         <button
           onClick={handleCopyCommand}
-          className="flex items-center gap-2 px-4 py-2 text-text-tertiary hover:text-text text-sm transition-colors"
+          className="text-text-tertiary hover:text-text flex items-center gap-2 px-4 py-2 text-sm transition-colors"
         >
           {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
           {copied ? "Copied!" : "Copy CLI Command"}
@@ -152,7 +190,7 @@ export function ReviewStep() {
         <span className="text-border">|</span>
         <button
           onClick={handleDownloadJson}
-          className="flex items-center gap-2 px-4 py-2 text-text-tertiary hover:text-text text-sm transition-colors"
+          className="text-text-tertiary hover:text-text flex items-center gap-2 px-4 py-2 text-sm transition-colors"
         >
           <FileJson size={14} />
           Download JSON
@@ -162,21 +200,35 @@ export function ReviewStep() {
   );
 }
 
-function SummaryCard({ icon, label, value, muted }: { icon: React.ReactNode; label: string; value: string; muted?: boolean }) {
+function SummaryCard({
+  icon,
+  label,
+  value,
+  muted,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  muted?: boolean;
+}) {
   return (
-    <div className="rounded-lg border border-border bg-surface p-3 flex flex-col gap-1.5">
-      <div className="flex items-center gap-1.5 text-text-tertiary">
+    <div className="border-border bg-surface flex flex-col gap-1.5 rounded-lg border p-3">
+      <div className="text-text-tertiary flex items-center gap-1.5">
         {icon}
-        <span className="text-[11px] font-medium uppercase tracking-wider">{label}</span>
+        <span className="text-[11px] font-medium tracking-wider uppercase">{label}</span>
       </div>
-      <span className={`text-sm font-medium truncate ${muted ? "text-text-tertiary" : "text-text"}`}>{value}</span>
+      <span
+        className={`truncate text-sm font-medium ${muted ? "text-text-tertiary" : "text-text"}`}
+      >
+        {value}
+      </span>
     </div>
   );
 }
 
 function Badge({ children }: { children: React.ReactNode }) {
   return (
-    <span className="px-2.5 py-1 rounded-full bg-surface-hover border border-border text-text-secondary text-[11px] font-medium">
+    <span className="bg-surface-hover border-border text-text-secondary rounded-full border px-2.5 py-1 text-[11px] font-medium">
       {children}
     </span>
   );

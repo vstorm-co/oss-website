@@ -1,6 +1,6 @@
 ---
-import type { translations } from '../../i18n/translations';
-import StarsBadge from '../shared/StarsBadge.astro';
+import type { translations } from "../../i18n/translations";
+import StarsBadge from "../shared/StarsBadge.astro";
 
 interface Props {
   t: typeof translations.en;
@@ -11,40 +11,80 @@ const { t } = Astro.props;
 const terminalLines = [
   { prefix: "$", text: "pip install pydantic-deep", color: "text-text" },
   { prefix: "$", text: "python agent.py", color: "text-text" },
-  { prefix: "▸", text: t["deepagents.hero.terminal.planning"], color: "text-text", prefixColor: "text-accent" },
-  { prefix: "▸", text: t["deepagents.hero.terminal.reading"], color: "text-text-secondary", prefixColor: "text-accent" },
-  { prefix: "▸", text: t["deepagents.hero.terminal.editing"], color: "text-text-secondary", prefixColor: "text-accent" },
-  { prefix: "▸", text: t["deepagents.hero.terminal.delegating"], color: "text-text-secondary", prefixColor: "text-accent" },
-  { prefix: "✓", text: t["deepagents.hero.terminal.complete"], color: "text-text", prefixColor: "text-green-400" },
+  {
+    prefix: "▸",
+    text: t["deepagents.hero.terminal.planning"],
+    color: "text-text",
+    prefixColor: "text-accent",
+  },
+  {
+    prefix: "▸",
+    text: t["deepagents.hero.terminal.reading"],
+    color: "text-text-secondary",
+    prefixColor: "text-accent",
+  },
+  {
+    prefix: "▸",
+    text: t["deepagents.hero.terminal.editing"],
+    color: "text-text-secondary",
+    prefixColor: "text-accent",
+  },
+  {
+    prefix: "▸",
+    text: t["deepagents.hero.terminal.delegating"],
+    color: "text-text-secondary",
+    prefixColor: "text-accent",
+  },
+  {
+    prefix: "✓",
+    text: t["deepagents.hero.terminal.complete"],
+    color: "text-text",
+    prefixColor: "text-green-400",
+  },
 ];
 ---
 
-<section class="relative overflow-hidden px-4 pt-32 pb-24 sm:px-6 sm:pt-40 sm:pb-28 lg:px-8 lg:pt-48 lg:pb-36">
+<section
+  class="relative overflow-hidden px-4 pt-32 pb-24 sm:px-6 sm:pt-40 sm:pb-28 lg:px-8 lg:pt-48 lg:pb-36"
+>
   <!-- Subtle gradient glow -->
   <div class="pointer-events-none absolute inset-0">
-    <div class="absolute top-[5%] left-1/2 h-[400px] w-[500px] sm:h-[800px] sm:w-[1000px] -translate-x-1/2 rounded-full bg-accent/[0.08] blur-[120px] sm:blur-[200px]"></div>
-    <div class="absolute top-[10%] left-[40%] h-[300px] w-[350px] sm:h-[600px] sm:w-[700px] -translate-x-1/2 rounded-full bg-violet-500/[0.04] blur-[100px] sm:blur-[160px]"></div>
+    <div
+      class="bg-accent/[0.08] absolute top-[5%] left-1/2 h-[400px] w-[500px] -translate-x-1/2 rounded-full blur-[120px] sm:h-[800px] sm:w-[1000px] sm:blur-[200px]"
+    >
+    </div>
+    <div
+      class="absolute top-[10%] left-[40%] h-[300px] w-[350px] -translate-x-1/2 rounded-full bg-violet-500/[0.04] blur-[100px] sm:h-[600px] sm:w-[700px] sm:blur-[160px]"
+    >
+    </div>
   </div>
   <!-- Bottom fade-out gradient -->
-  <div class="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-bg to-transparent"></div>
+  <div
+    class="from-bg pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t to-transparent"
+  >
+  </div>
 
   <div class="relative mx-auto max-w-4xl text-center">
     <!-- Badge -->
-    <div class="mb-8 inline-flex items-center rounded-full border border-border px-4 py-1.5 text-sm text-text-secondary">
-      <span class="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
+    <div
+      class="border-border text-text-secondary mb-8 inline-flex items-center rounded-full border px-4 py-1.5 text-sm"
+    >
+      <span class="bg-accent mr-2 inline-block h-1.5 w-1.5 rounded-full"></span>
       {t["deepagents.hero.badge"]}
     </div>
 
     <!-- Headline -->
     <h1 class="text-4xl font-bold tracking-[-0.02em] sm:text-5xl lg:text-6xl">
       {t["deepagents.hero.title.line1"]}{" "}
-      <span class="bg-gradient-to-r from-accent to-violet-500 bg-clip-text text-transparent">{t["deepagents.hero.title.highlight"]}</span>
+      <span class="from-accent bg-gradient-to-r to-violet-500 bg-clip-text text-transparent"
+        >{t["deepagents.hero.title.highlight"]}</span
+      >
       <br />
       {t["deepagents.hero.title.line2"]}
     </h1>
 
     <!-- Description -->
-    <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-text-secondary">
+    <p class="text-text-secondary mx-auto mt-6 max-w-2xl text-lg leading-relaxed">
       {t["deepagents.hero.description"]}
     </p>
 
@@ -54,21 +94,29 @@ const terminalLines = [
         href="https://github.com/vstorm-co/pydantic-deepagents#quickstart"
         target="_blank"
         rel="noopener noreferrer"
-        class="inline-flex items-center rounded-full bg-accent px-8 py-3 text-base font-semibold text-white transition-colors hover:bg-accent-hover"
+        class="bg-accent hover:bg-accent-hover inline-flex items-center rounded-full px-8 py-3 text-base font-semibold text-white transition-colors"
       >
         {t["deepagents.hero.cta.getStarted"]}
-        <svg class="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+        <svg
+          class="ml-2 h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
         </svg>
       </a>
       <a
         href="https://github.com/vstorm-co/pydantic-deepagents"
         target="_blank"
         rel="noopener noreferrer"
-        class="inline-flex items-center gap-2 rounded-full border border-border px-8 py-3 text-base font-semibold text-text transition-colors hover:border-border-hover hover:bg-surface"
+        class="border-border text-text hover:border-border-hover hover:bg-surface inline-flex items-center gap-2 rounded-full border px-8 py-3 text-base font-semibold transition-colors"
       >
-        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"
+          ></path>
         </svg>
         {t["deepagents.hero.cta.github"]}
         <StarsBadge repo="vstorm-co/pydantic-deepagents" />
@@ -76,63 +124,81 @@ const terminalLines = [
     </div>
 
     <!-- Terminal Preview -->
-    <div class="mx-auto mt-16 max-w-xl overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl shadow-black/20">
-      <div class="flex items-center gap-2 border-b border-border px-4 py-3">
+    <div
+      class="border-border bg-surface mx-auto mt-16 max-w-xl overflow-hidden rounded-2xl border shadow-2xl shadow-black/20"
+    >
+      <div class="border-border flex items-center gap-2 border-b px-4 py-3">
         <span class="h-2.5 w-2.5 rounded-full bg-red-500/60"></span>
         <span class="h-2.5 w-2.5 rounded-full bg-yellow-500/60"></span>
         <span class="h-2.5 w-2.5 rounded-full bg-green-500/60"></span>
-        <span class="ml-2 text-xs text-text-tertiary">{t["ui.terminal"]}</span>
+        <span class="text-text-tertiary ml-2 text-xs">{t["ui.terminal"]}</span>
       </div>
-      <div id="da-terminal" class="px-5 py-5 text-left font-mono text-sm leading-loose min-h-[240px]">
+      <div
+        id="da-terminal"
+        class="min-h-[240px] px-5 py-5 text-left font-mono text-sm leading-loose"
+      >
         {/* Lines rendered by JS typing animation */}
       </div>
     </div>
   </div>
 
   <!-- Scroll arrow -->
-  <button class="hero-scroll-arrow" aria-label="Scroll down" onclick="this.closest('section').nextElementSibling?.scrollIntoView({behavior:'smooth'})">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10l5 5 5-5"/></svg>
+  <button
+    class="hero-scroll-arrow"
+    aria-label="Scroll down"
+    onclick="this.closest('section').nextElementSibling?.scrollIntoView({behavior:'smooth'})"
+  >
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"><path d="M7 10l5 5 5-5"></path></svg
+    >
   </button>
 </section>
 
 <script is:inline define:vars={{ terminalLines }}>
-  document.addEventListener('astro:page-load', function() {
-    var container = document.getElementById('da-terminal');
+  document.addEventListener("astro:page-load", function () {
+    const container = document.getElementById("da-terminal");
     if (!container || container.dataset.typed) return;
-    container.dataset.typed = '1';
+    container.dataset.typed = "1";
 
-    var charDelay = 28;
-    var lineDelay = 400;
-    var lines = terminalLines;
-    var lineIndex = 0;
+    const charDelay = 28;
+    const lineDelay = 400;
+    const lines = terminalLines;
+    let lineIndex = 0;
 
     function typeLine() {
       if (lineIndex >= lines.length) return;
 
-      var line = lines[lineIndex];
-      var p = document.createElement('p');
-      var prefixSpan = document.createElement('span');
-      prefixSpan.className = line.prefixColor || 'text-text-tertiary';
+      const line = lines[lineIndex];
+      const p = document.createElement("p");
+      const prefixSpan = document.createElement("span");
+      prefixSpan.className = line.prefixColor || "text-text-tertiary";
       prefixSpan.textContent = line.prefix;
       p.appendChild(prefixSpan);
-      p.appendChild(document.createTextNode(' '));
+      p.appendChild(document.createTextNode(" "));
 
-      var textSpan = document.createElement('span');
+      const textSpan = document.createElement("span");
       textSpan.className = line.color;
       p.appendChild(textSpan);
 
-      var cursor = document.createElement('span');
-      cursor.className = 'typing-cursor';
+      const cursor = document.createElement("span");
+      cursor.className = "typing-cursor";
       p.appendChild(cursor);
 
       container.appendChild(p);
 
-      var fullHtml = line.text;
-      var tmp = document.createElement('div');
+      const fullHtml = line.text;
+      const tmp = document.createElement("div");
       tmp.innerHTML = fullHtml;
-      var plainText = tmp.textContent || '';
+      const plainText = tmp.textContent || "";
 
-      var charIndex = 0;
+      let charIndex = 0;
       function typeChar() {
         if (charIndex < plainText.length) {
           textSpan.textContent += plainText[charIndex];

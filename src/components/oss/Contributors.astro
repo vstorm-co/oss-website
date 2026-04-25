@@ -23,25 +23,45 @@ const contributors = [
 <section class="section-light-alt px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
   <div class="mx-auto max-w-4xl text-center">
     <div class="reveal mb-10">
-      <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl heading-accent">{t["oss.contributors.title"]}</h2>
-      <p class="mt-4 text-lg text-text-secondary">{t["oss.contributors.subtitle"]}</p>
+      <h2 class="heading-accent text-3xl font-bold tracking-[-0.02em] sm:text-4xl">
+        {t["oss.contributors.title"]}
+      </h2>
+      <p class="text-text-secondary mt-4 text-lg">{t["oss.contributors.subtitle"]}</p>
     </div>
     <div class="reveal flex flex-wrap items-center justify-center gap-3">
-      {contributors.map(c => (
-        <a href={`https://github.com/${c.username}`} target="_blank" rel="noopener noreferrer" title={c.name}
-           class="group relative">
-          <img src={`https://github.com/${c.username}.png?size=64`} alt={c.name}
-               class="w-11 h-11 rounded-full border-2 border-transparent group-hover:border-accent transition-colors"
-               loading="lazy" width="44" height="44" />
-        </a>
-      ))}
-      <a href="https://github.com/vstorm-co" target="_blank" rel="noopener noreferrer"
-         class="flex items-center justify-center w-11 h-11 rounded-full border-2 border-dashed border-border text-text-tertiary hover:border-accent hover:text-accent transition-colors text-lg">
+      {
+        contributors.map((c) => (
+          <a
+            href={`https://github.com/${c.username}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={c.name}
+            class="group relative"
+          >
+            <img
+              src={`https://github.com/${c.username}.png?size=64`}
+              alt={c.name}
+              class="group-hover:border-accent h-11 w-11 rounded-full border-2 border-transparent transition-colors"
+              loading="lazy"
+              width="44"
+              height="44"
+            />
+          </a>
+        ))
+      }
+      <a
+        href="https://github.com/vstorm-co"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="border-border text-text-tertiary hover:border-accent hover:text-accent flex h-11 w-11 items-center justify-center rounded-full border-2 border-dashed text-lg transition-colors"
+      >
         +
       </a>
     </div>
-    <p class="reveal mt-6 text-sm text-text-secondary">
-      <a href="https://github.com/vstorm-co" target="_blank" class="text-accent hover:underline">{t["oss.contributors.join"]}</a>
+    <p class="reveal text-text-secondary mt-6 text-sm">
+      <a href="https://github.com/vstorm-co" target="_blank" class="text-accent hover:underline"
+        >{t["oss.contributors.join"]}</a
+      >
     </p>
   </div>
 </section>

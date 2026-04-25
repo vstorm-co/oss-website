@@ -95,11 +95,11 @@ const steps = [
       if (block.dataset.bound) return;
       block.dataset.bound = '1';
       block.addEventListener('click', function() {
-        var command = block.dataset.command;
+        const command = block.dataset.command;
         if (!command) return;
 
         navigator.clipboard.writeText(command).catch(function() {
-          var ta = document.createElement('textarea');
+          const ta = document.createElement('textarea');
           ta.value = command;
           ta.style.position = 'fixed';
           ta.style.opacity = '0';
@@ -109,11 +109,11 @@ const steps = [
           document.body.removeChild(ta);
         });
 
-        var label = block.querySelector('.copy-label');
-        var copyIcon = block.querySelector('.copy-icon');
-        var checkIcon = block.querySelector('.check-icon');
+        const label = block.querySelector('.copy-label');
+        const copyIcon = block.querySelector('.copy-icon');
+        const checkIcon = block.querySelector('.check-icon');
 
-        var originalText = label ? label.textContent : '';
+        const originalText = label ? label.textContent : '';
         if (label) label.textContent = label.dataset.copied || 'Copied!';
         if (copyIcon) copyIcon.classList.add('hidden');
         if (checkIcon) checkIcon.classList.remove('hidden');

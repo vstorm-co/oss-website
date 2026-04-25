@@ -5,19 +5,19 @@
 }
 
 .prose h1 {
-  @apply text-3xl font-bold tracking-tight mt-10 mb-4 text-text;
+  @apply text-text mt-10 mb-4 text-3xl font-bold tracking-tight;
 }
 
 .prose h2 {
-  @apply text-2xl font-bold tracking-tight mt-10 mb-4 text-text;
+  @apply text-text mt-10 mb-4 text-2xl font-bold tracking-tight;
 }
 
 .prose h3 {
-  @apply text-xl font-semibold mt-8 mb-3 text-text;
+  @apply text-text mt-8 mb-3 text-xl font-semibold;
 }
 
 .prose h4 {
-  @apply text-lg font-semibold mt-6 mb-2 text-text;
+  @apply text-text mt-6 mb-2 text-lg font-semibold;
 }
 
 .prose p {
@@ -29,7 +29,7 @@
 }
 
 .prose strong {
-  @apply font-semibold text-text;
+  @apply text-text font-semibold;
 }
 
 .prose ul {
@@ -49,35 +49,35 @@
 }
 
 .prose blockquote {
-  @apply border-l-4 border-accent/40 bg-surface/50 pl-4 py-2 my-4 text-text-secondary italic rounded-r;
+  @apply border-accent/40 bg-surface/50 text-text-secondary my-4 rounded-r border-l-4 py-2 pl-4 italic;
 }
 
 .prose hr {
-  @apply my-8 border-border;
+  @apply border-border my-8;
 }
 
 .prose table {
-  @apply w-full mb-4 border-collapse text-sm;
+  @apply mb-4 w-full border-collapse text-sm;
 }
 
 .prose thead {
-  @apply border-b border-border;
+  @apply border-border border-b;
 }
 
 .prose th {
-  @apply px-4 py-2 text-left font-semibold text-text;
+  @apply text-text px-4 py-2 text-left font-semibold;
 }
 
 .prose td {
-  @apply px-4 py-2 border-t border-border text-text-secondary;
+  @apply border-border text-text-secondary border-t px-4 py-2;
 }
 
 .prose img {
-  @apply rounded-lg my-6 max-w-full;
+  @apply my-6 max-w-full rounded-lg;
 }
 
 .prose code:not(pre code) {
-  @apply bg-surface px-1.5 py-0.5 rounded text-sm font-mono text-accent;
+  @apply bg-surface text-accent rounded px-1.5 py-0.5 font-mono text-sm;
 }
 
 /* Expressive Code handles <pre> blocks — no custom styling needed */

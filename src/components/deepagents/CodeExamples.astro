@@ -1,6 +1,6 @@
 ---
-import type { translations } from '../../i18n/translations';
-import { Code } from 'astro-expressive-code/components';
+import type { translations } from "../../i18n/translations";
+import { Code } from "astro-expressive-code/components";
 
 interface Props {
   t: typeof translations.en;
@@ -66,28 +66,35 @@ result = await agent.run("Review the PR changes", deps=deps)`,
 <section class="section-light section-stack reveal px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
   <div class="mx-auto max-w-2xl">
     <div class="text-center">
-      <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl">{t["deepagents.code.title"]}</h2>
-      <p class="mt-4 text-lg text-text-secondary">{t["deepagents.code.subtitle"]}</p>
+      <h2 class="text-3xl font-bold tracking-[-0.02em] sm:text-4xl">
+        {t["deepagents.code.title"]}
+      </h2>
+      <p class="text-text-secondary mt-4 text-lg">{t["deepagents.code.subtitle"]}</p>
     </div>
 
     <div class="mt-16">
       <!-- Tab buttons -->
-      <div class="flex gap-1 rounded-t-xl border border-b-0 border-[#27272a] bg-[#18181b] px-2 pt-2" role="tablist">
-        {tabs.map((tab, i) => (
-          <button
-            role="tab"
-            aria-selected={i === 0 ? "true" : "false"}
-            data-tab={tab.id}
-            class:list={[
-              "da-code-tab px-4 py-2 text-sm font-medium transition-colors rounded-t-lg",
-              i === 0
-                ? "text-[#ef4444] bg-[#09090b]"
-                : "text-[#8b8b93] hover:text-[#a1a1aa] bg-transparent",
-            ]}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div
+        class="flex gap-1 rounded-t-xl border border-b-0 border-[#27272a] bg-[#18181b] px-2 pt-2"
+        role="tablist"
+      >
+        {
+          tabs.map((tab, i) => (
+            <button
+              role="tab"
+              aria-selected={i === 0 ? "true" : "false"}
+              data-tab={tab.id}
+              class:list={[
+                "da-code-tab rounded-t-lg px-4 py-2 text-sm font-medium transition-colors",
+                i === 0
+                  ? "bg-[#09090b] text-[#ef4444]"
+                  : "bg-transparent text-[#8b8b93] hover:text-[#a1a1aa]",
+              ]}
+            >
+              {tab.label}
+            </button>
+          ))
+        }
       </div>
 
       <!-- Tab panels -->
@@ -118,19 +125,19 @@ result = await agent.run("Review the PR changes", deps=deps)`,
 </style>
 
 <script>
-  document.querySelectorAll('.da-code-tab').forEach((btn) => {
-    btn.addEventListener('click', () => {
+  document.querySelectorAll(".da-code-tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
       const tabId = (btn as HTMLElement).dataset.tab;
-      document.querySelectorAll('.da-code-tab').forEach((t) => {
-        t.setAttribute('aria-selected', 'false');
-        t.classList.remove('text-[#ef4444]', 'bg-[#09090b]');
-        t.classList.add('text-[#8b8b93]', 'bg-transparent');
+      document.querySelectorAll(".da-code-tab").forEach((t) => {
+        t.setAttribute("aria-selected", "false");
+        t.classList.remove("text-[#ef4444]", "bg-[#09090b]");
+        t.classList.add("text-[#8b8b93]", "bg-transparent");
       });
-      document.querySelectorAll('.da-code-panel').forEach((p) => p.classList.add('hidden'));
-      btn.setAttribute('aria-selected', 'true');
-      btn.classList.add('text-[#ef4444]', 'bg-[#09090b]');
-      btn.classList.remove('text-[#8b8b93]', 'bg-transparent');
-      document.getElementById(`da-panel-${tabId}`)?.classList.remove('hidden');
+      document.querySelectorAll(".da-code-panel").forEach((p) => p.classList.add("hidden"));
+      btn.setAttribute("aria-selected", "true");
+      btn.classList.add("text-[#ef4444]", "bg-[#09090b]");
+      btn.classList.remove("text-[#8b8b93]", "bg-transparent");
+      document.getElementById(`da-panel-${tabId}`)?.classList.remove("hidden");
     });
   });
 </script>

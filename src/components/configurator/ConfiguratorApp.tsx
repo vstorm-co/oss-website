@@ -17,14 +17,20 @@ import type { PresetName } from "../../lib/presets";
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
   state: { error: Error | null } = { error: null };
-  static getDerivedStateFromError(error: Error) { return { error }; }
-  componentDidCatch(error: Error, info: ErrorInfo) { console.error("Configurator error:", error, info); }
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error("Configurator error:", error, info);
+  }
   render() {
     if (this.state.error) {
       return (
-        <div className="p-8 rounded-xl border border-red-500/30 bg-red-500/5">
-          <h2 className="text-lg font-semibold text-red-400 mb-2">Something went wrong</h2>
-          <pre className="text-sm text-red-300/80 whitespace-pre-wrap">{this.state.error.message}</pre>
+        <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-8">
+          <h2 className="mb-2 text-lg font-semibold text-red-400">Something went wrong</h2>
+          <pre className="text-sm whitespace-pre-wrap text-red-300/80">
+            {this.state.error.message}
+          </pre>
         </div>
       );
     }
@@ -36,9 +42,9 @@ function WizardContent() {
   const { step } = useWizard();
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8">
+    <div className="flex flex-col gap-8 lg:flex-row">
       {/* Main content — takes available space */}
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <WizardShell>
           {step === 1 && <ProjectInfoStep />}
           {step === 2 && <DatabaseStep />}
@@ -54,7 +60,7 @@ function WizardContent() {
       </div>
 
       {/* Sidebar — fixed width, doesn't shrink below it */}
-      <aside className="w-full lg:w-64 shrink-0 space-y-5 lg:sticky lg:top-8 lg:self-start">
+      <aside className="w-full shrink-0 space-y-5 lg:sticky lg:top-8 lg:w-64 lg:self-start">
         <PresetSelector />
         <LivePreview />
       </aside>
@@ -68,9 +74,10 @@ interface ConfiguratorAppProps {
 
 export default function ConfiguratorApp({ initialPreset }: ConfiguratorAppProps) {
   const validPresets = ["minimal", "production", "ai-agent"];
-  const preset = initialPreset && validPresets.includes(initialPreset)
-    ? (initialPreset as PresetName)
-    : undefined;
+  const preset =
+    initialPreset && validPresets.includes(initialPreset)
+      ? (initialPreset as PresetName)
+      : undefined;
 
   return (
     <ErrorBoundary>

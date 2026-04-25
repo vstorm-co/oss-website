@@ -1,4 +1,12 @@
-import { createContext, useContext, useState, useCallback, useEffect, useRef, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+  type ReactNode,
+} from "react";
 import { useForm, type UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ProjectConfig } from "../../lib/types";
@@ -44,9 +52,7 @@ export function WizardProvider({ children, initialPreset }: WizardProviderProps)
   });
 
   const [step, setStep] = useState(initialPreset ? TOTAL_STEPS : 1);
-  const [activePreset, setActivePreset] = useState<PresetName | null>(
-    initialPreset ?? null
-  );
+  const [activePreset, setActivePreset] = useState<PresetName | null>(initialPreset ?? null);
 
   const goToStep = useCallback((s: number) => {
     setStep(Math.max(1, Math.min(TOTAL_STEPS, s)));
@@ -73,7 +79,7 @@ export function WizardProvider({ children, initialPreset }: WizardProviderProps)
     const needsRedis =
       cur.enable_caching ||
       (cur.enable_rate_limiting && cur.rate_limit_storage === "redis") ||
-      (cur.background_tasks !== "none") ||
+      cur.background_tasks !== "none" ||
       (cur.enable_logfire && cur.logfire_features.redis);
 
     if (needsRedis && !cur.enable_redis) {
@@ -129,7 +135,7 @@ export function WizardProvider({ children, initialPreset }: WizardProviderProps)
       setActivePreset(name);
       setStep(TOTAL_STEPS);
     },
-    [form]
+    [form],
   );
 
   return (

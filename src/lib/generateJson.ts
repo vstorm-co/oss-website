@@ -9,10 +9,13 @@ export function generateCookiecutterJson(config: ProjectConfig): Record<string, 
 
   // Derive embedding provider from LLM provider
   const embeddingProvider =
-    config.llm_provider === "anthropic" ? "voyage" :
-    config.llm_provider === "google" ? "gemini" :
-    config.llm_provider === "openrouter" ? "sentence_transformers" :
-    "openai";
+    config.llm_provider === "anthropic"
+      ? "voyage"
+      : config.llm_provider === "google"
+        ? "gemini"
+        : config.llm_provider === "openrouter"
+          ? "sentence_transformers"
+          : "openai";
 
   return {
     project_name: config.project_name,
@@ -126,7 +129,7 @@ export function generateCookiecutterJson(config: ProjectConfig): Record<string, 
     use_cohere_reranker: config.enable_rag && config.reranker_type === "cohere",
     use_cross_encoder_reranker: config.enable_rag && config.reranker_type === "cross_encoder",
     pdf_parser: config.pdf_parser,
-    use_pymupdf: config.enable_rag && (config.pdf_parser === "pymupdf"),
+    use_pymupdf: config.enable_rag && config.pdf_parser === "pymupdf",
     use_llamaparse: config.enable_rag && config.pdf_parser === "llamaparse",
     use_liteparse: config.enable_rag && config.pdf_parser === "liteparse",
     use_all_pdf_parsers: config.enable_rag && config.pdf_parser === "all",
@@ -163,18 +166,14 @@ export function generateCookiecutterJson(config: ProjectConfig): Record<string, 
     reverse_proxy: config.reverse_proxy,
     include_traefik_service: config.reverse_proxy === "traefik_included",
     include_traefik_labels:
-      config.reverse_proxy === "traefik_included" ||
-      config.reverse_proxy === "traefik_external",
+      config.reverse_proxy === "traefik_included" || config.reverse_proxy === "traefik_external",
     use_traefik:
-      config.reverse_proxy === "traefik_included" ||
-      config.reverse_proxy === "traefik_external",
+      config.reverse_proxy === "traefik_included" || config.reverse_proxy === "traefik_external",
     include_nginx_service: config.reverse_proxy === "nginx_included",
     include_nginx_config:
-      config.reverse_proxy === "nginx_included" ||
-      config.reverse_proxy === "nginx_external",
+      config.reverse_proxy === "nginx_included" || config.reverse_proxy === "nginx_external",
     use_nginx:
-      config.reverse_proxy === "nginx_included" ||
-      config.reverse_proxy === "nginx_external",
+      config.reverse_proxy === "nginx_included" || config.reverse_proxy === "nginx_external",
 
     // CI
     ci_type: config.ci_type,

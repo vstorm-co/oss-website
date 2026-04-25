@@ -29,15 +29,11 @@ export function WizardShell({ children }: { children: React.ReactNode }) {
             <button
               key={label}
               onClick={() => goToStep(stepNum)}
-              className="flex-1 flex flex-col items-center gap-1.5 group cursor-pointer"
+              className="group flex flex-1 cursor-pointer flex-col items-center gap-1.5"
             >
               <div
                 className={`h-1 w-full rounded-full transition-colors ${
-                  isActive
-                    ? "bg-accent"
-                    : isCompleted
-                      ? "bg-accent/40"
-                      : "bg-border"
+                  isActive ? "bg-accent" : isCompleted ? "bg-accent/40" : "bg-border"
                 }`}
               />
               <span
@@ -60,11 +56,11 @@ export function WizardShell({ children }: { children: React.ReactNode }) {
       <div className="min-h-[420px]">{children}</div>
 
       {/* Navigation */}
-      <div className="flex justify-between pt-6 border-t border-border">
+      <div className="border-border flex justify-between border-t pt-6">
         <button
           onClick={prevStep}
           disabled={step === 1}
-          className="flex items-center gap-2 px-4 py-2.5 text-sm text-text-secondary hover:text-text disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+          className="text-text-secondary hover:text-text flex items-center gap-2 px-4 py-2.5 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-20"
         >
           <ChevronLeft size={16} />
           Previous
@@ -72,7 +68,7 @@ export function WizardShell({ children }: { children: React.ReactNode }) {
         {step < totalSteps ? (
           <button
             onClick={nextStep}
-            className="flex items-center gap-2 px-6 py-2.5 text-sm bg-accent hover:bg-accent-hover text-white rounded-full font-medium transition-colors"
+            className="bg-accent hover:bg-accent-hover flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-medium text-white transition-colors"
           >
             Next
             <ChevronRight size={16} />
