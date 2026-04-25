@@ -75,4 +75,10 @@ export default defineConfig({
     },
   },
   output: "static",
+  build: {
+    // Inline all stylesheets so the critical CSS request never blocks render.
+    // Trade-off: larger HTML, but pre-compressed it's similar to fetching the
+    // external sheet — and we save the round-trip + render-block.
+    inlineStylesheets: "always",
+  },
 });
