@@ -10,14 +10,30 @@ import { readdir, readFile, writeFile, stat, access } from "node:fs/promises";
 import { join, relative } from "node:path";
 
 // Path to the full-stack-fastapi-nextjs-llm-template repo's template directory
-const TEMPLATE_ROOT = join(import.meta.dir, "../../full-stack-fastapi-nextjs-llm-template/template");
+const TEMPLATE_ROOT = join(
+  import.meta.dir,
+  "../../full-stack-fastapi-nextjs-llm-template/template",
+);
 const SLUG_DIR = join(TEMPLATE_ROOT, "{{cookiecutter.project_slug}}");
 const OUTPUT = join(import.meta.dir, "../public/templates.json");
 
 // Binary extensions to skip (can't be Jinja2-rendered or included as text)
 const BINARY_EXTENSIONS = new Set([
-  ".png", ".jpg", ".jpeg", ".gif", ".ico", ".svg", ".woff", ".woff2",
-  ".ttf", ".eot", ".lock", ".pyc", ".pyo", ".so", ".dylib",
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".gif",
+  ".ico",
+  ".svg",
+  ".woff",
+  ".woff2",
+  ".ttf",
+  ".eot",
+  ".lock",
+  ".pyc",
+  ".pyo",
+  ".so",
+  ".dylib",
 ]);
 
 async function walk(dir: string): Promise<string[]> {
@@ -59,7 +75,9 @@ async function main() {
 
   const stats = await stat(OUTPUT);
   const kb = (stats.size / 1024).toFixed(0);
-  console.log(`Bundled ${Object.keys(files).length} template files → public/templates.json (${kb} KB)`);
+  console.log(
+    `Bundled ${Object.keys(files).length} template files → public/templates.json (${kb} KB)`,
+  );
 }
 
 main().catch(async (err) => {

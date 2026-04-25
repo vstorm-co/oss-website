@@ -1,0 +1,15 @@
+dist/
+node_modules/
+.astro/
+public/templates.json
+bun.lock
+
+# Astro files with HTML comments inside JSX map() expressions —
+# Prettier cannot parse them but Astro renders them fine. Migrate
+# `<!-- ... -->` to `{/* ... */}` inside `{items.map(...)}` to re-enable.
+src/components/deepagents/Showcase.astro
+src/components/landing/QuickStart.astro
+src/components/oss/CommunityRecognition.astro
+src/components/oss/HowWeWork.astro
+src/components/project/ProjectPage.astro
+src/pages/admin/index.astro
