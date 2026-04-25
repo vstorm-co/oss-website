@@ -1,20 +1,20 @@
-import { useState } from "react";
-import type { Lang } from "./api";
+import { useEffect, useRef, useState } from "react";
+import { LANG_LABELS, LANGS, type Lang } from "./api";
 
 export interface NewPostDialogProps {
+  initialLang?: Lang;
   onCancel: () => void;
   onCreate: (values: {
     lang: Lang;
     slug: string;
     title: string;
     description: string;
-    translationKey: string;
+    translationKey?: string;
+    category?: string;
   }) => Promise<void>;
 }
 
-const LANGS: Lang[] = ["en", "pl", "de", "es"];
-
-function slugify(s: string) {
+function slugify(s: string): string {
   return s
     .toLowerCase()
     .normalize("NFKD")
@@ -24,19 +24,29 @@ function slugify(s: string) {
     .slice(0, 80);
 }
 
-export function NewPostDialog({ onCancel, onCreate }: NewPostDialogProps) {
-  const [lang, setLang] = useState<Lang>("en");
+const CATEGORIES = ["open-source", "article", "news", "tutorial"] as const;
+
+export function NewPostDialog({ initialLang = "en", onCancel, onCreate }: NewPostDialogProps) {
+  const [lang, setLang] = useState<Lang>(initialLang);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [slug, setSlug] = useState("");
   const [translationKey, setTranslationKey] = useState("");
+  const [category, setCategory] = useState<(typeof CATEGORIES)[number]>("open-source");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const titleRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    titleRef.current?.focus();
+  }, []);
 
   const autoSlug = slug || slugify(title);
-  const autoKey = translationKey || autoSlug;
+  // translationKey defaults to slug — convention shared across all 4 language
+  // versions of the same post so the language switcher can find them.
+  const finalTranslationKey = translationKey || autoSlug;
 
-  const submit = async (e: React.FormEvent) => {
+  const submit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (!title || !autoSlug) return;
     setBusy(true);
@@ -47,7 +57,8 @@ export function NewPostDialog({ onCancel, onCreate }: NewPostDialogProps) {
         slug: autoSlug,
         title,
         description,
-        translationKey: autoKey,
+        translationKey: finalTranslationKey,
+        category,
       });
     } catch (err) {
       setError((err as Error).message);
@@ -57,31 +68,43 @@ export function NewPostDialog({ onCancel, onCreate }: NewPostDialogProps) {
   };
 
   return (
-    <div className="ap-modal-backdrop" onClick={onCancel}>
-      <form className="ap-modal" onClick={(e) => e.stopPropagation()} onSubmit={submit}>
-        <h2>New post</h2>
+    <div
+      className="ap-modal-backdrop"
+      role="presentation"
+      onClick={onCancel}
+      onKeyDown={(e) => e.key === "Escape" && onCancel()}
+    >
+      <form className="ap-modal" onSubmit={submit}>
+        <h2>New blog post</h2>
         <div className="ap-form-row">
-          <label>Language</label>
-          <select className="ap-input" value={lang} onChange={(e) => setLang(e.target.value as Lang)}>
+          <label htmlFor="np-lang">Language</label>
+          <select
+            id="np-lang"
+            className="ap-input"
+            value={lang}
+            onChange={(e) => setLang(e.target.value as Lang)}
+          >
             {LANGS.map((l) => (
               <option key={l} value={l}>
-                {l}
+                {LANG_LABELS[l]}
               </option>
             ))}
           </select>
         </div>
         <div className="ap-form-row">
-          <label>Title</label>
+          <label htmlFor="np-title">Title</label>
           <input
+            id="np-title"
+            ref={titleRef}
             className="ap-input"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            autoFocus
           />
         </div>
         <div className="ap-form-row">
-          <label>Slug</label>
+          <label htmlFor="np-slug">Slug</label>
           <input
+            id="np-slug"
             className="ap-input"
             value={slug}
             placeholder={slugify(title) || "my-post"}
@@ -89,23 +112,39 @@ export function NewPostDialog({ onCancel, onCreate }: NewPostDialogProps) {
           />
         </div>
         <div className="ap-form-row">
-          <label>Description</label>
+          <label htmlFor="np-trkey">Translation key</label>
+          <input
+            id="np-trkey"
+            className="ap-input"
+            value={translationKey}
+            placeholder={autoSlug || "shared-key-across-languages"}
+            onChange={(e) => setTranslationKey(e.target.value)}
+          />
+        </div>
+        <div className="ap-form-row">
+          <label htmlFor="np-cat">Category</label>
+          <select
+            id="np-cat"
+            className="ap-input"
+            value={category}
+            onChange={(e) => setCategory(e.target.value as (typeof CATEGORIES)[number])}
+          >
+            {CATEGORIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="ap-form-row">
+          <label htmlFor="np-desc">Description</label>
           <textarea
+            id="np-desc"
             className="ap-input"
             rows={3}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
-        </div>
-        <div className="ap-form-row">
-          <label>Translation key</label>
-          <input
-            className="ap-input"
-            value={translationKey}
-            placeholder={autoSlug}
-            onChange={(e) => setTranslationKey(e.target.value)}
-          />
-          <small className="ap-hint">Shared across language versions of the same post.</small>
         </div>
         {error && <div className="ap-error">{error}</div>}
         <div className="ap-modal-actions">

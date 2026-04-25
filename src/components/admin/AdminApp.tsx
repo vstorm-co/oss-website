@@ -4,8 +4,9 @@ import { markdown } from "@codemirror/lang-markdown";
 import { oneDark } from "@codemirror/theme-one-dark";
 import {
   api,
+  LANG_LABELS,
+  LANGS,
   type ComponentMeta,
-  type ImageEntry,
   type ImageGroup,
   type Lang,
   type PostContent,
@@ -16,66 +17,124 @@ import { NewPostDialog } from "./NewPostDialog";
 import "./admin.css";
 
 type SaveState = "idle" | "dirty" | "saving" | "saved" | "error";
-const LANGS: Lang[] = ["en", "pl", "de", "es"];
-const AUTOSAVE_MS = 2000;
+const AUTOSAVE_MS = 900;
 
 interface Selection {
   lang: Lang;
   slug: string;
 }
 
+interface ConfirmState {
+  message: string;
+  onConfirm: () => void;
+}
+
+function ConfirmDialog({
+  message,
+  onConfirm,
+  onCancel,
+}: {
+  message: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <div className="ap-modal-backdrop" onClick={onCancel}>
+      <div className="ap-modal ap-confirm" onClick={(e) => e.stopPropagation()}>
+        <p className="ap-confirm-msg">{message}</p>
+        <div className="ap-modal-actions">
+          <button className="ap-btn" onClick={onCancel}>
+            Cancel
+          </button>
+          <button className="ap-btn ap-btn-danger" onClick={onConfirm}>
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminApp() {
   const [posts, setPosts] = useState<PostSummary[]>([]);
   const [components, setComponents] = useState<ComponentMeta[]>([]);
-  const [selection, setSelection] = useState<Selection | null>(null);
-  const [post, setPost] = useState<PostContent | null>(null);
   const [imageGroups, setImageGroups] = useState<ImageGroup[]>([]);
-  const [langFilter, setLangFilter] = useState<Lang | "all">("all");
+  const [selection, setSelection] = useState<Selection | null>(() => {
+    try {
+      const s = sessionStorage.getItem("ap-sel");
+      return s ? (JSON.parse(s) as Selection) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [post, setPost] = useState<PostContent | null>(null);
   const [search, setSearch] = useState("");
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [saveError, setSaveError] = useState<string | null>(null);
   const [showNew, setShowNew] = useState(false);
+  const [confirmState, setConfirmState] = useState<ConfirmState | null>(null);
   const [rightTab, setRightTab] = useState<"preview" | "components" | "images">("preview");
   const [leftTab, setLeftTab] = useState<"content" | "frontmatter">("content");
-  const [previewNonce, setPreviewNonce] = useState(0);
+  const previewFrameRef = useRef<HTMLIFrameElement>(null);
+  const editorPaneRef = useRef<HTMLDivElement>(null);
+
+  const [rightWidth, setRightWidth] = useState(() => {
+    try {
+      return parseInt(localStorage.getItem("ap-right-width") ?? "460", 10) || 460;
+    } catch {
+      return 460;
+    }
+  });
+  const rootRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef<{ startX: number; startW: number } | null>(null);
+
+  const startDrag = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      dragRef.current = { startX: e.clientX, startW: rightWidth };
+      const onMove = (ev: MouseEvent) => {
+        if (!dragRef.current) return;
+        const delta = dragRef.current.startX - ev.clientX;
+        const newW = Math.max(280, Math.min(900, dragRef.current.startW + delta));
+        setRightWidth(newW);
+        try {
+          localStorage.setItem("ap-right-width", String(newW));
+        } catch {
+          /* */
+        }
+      };
+      const onUp = () => {
+        dragRef.current = null;
+        window.removeEventListener("mousemove", onMove);
+        window.removeEventListener("mouseup", onUp);
+      };
+      window.addEventListener("mousemove", onMove);
+      window.addEventListener("mouseup", onUp);
+    },
+    [rightWidth],
+  );
 
   const editorRef = useRef<ReactCodeMirrorRef>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  // Latest content/frontmatter — refs keep flushes in sync even if state
-  // updates haven't committed yet when a debounced save fires.
   const liveContent = useRef<string>("");
   const liveFrontmatter = useRef<Record<string, unknown>>({});
   const dirtyRef = useRef(false);
-  // Snapshot of what we last persisted, used to skip no-op saves.
   const lastSavedContent = useRef<string>("");
   const lastSavedFrontmatter = useRef<string>("");
 
-  // Prevent Vite from full-reloading the admin page when MDX/content files change
-  // (which happens on every autosave). The iframe preview has its own HMR client
-  // and will still reload on those changes — that's the behaviour we want.
   useEffect(() => {
-    if (!import.meta.hot) return;
-    const block = (e: Event) => e.preventDefault();
-    import.meta.hot.on("vite:beforeFullReload", block);
-    import.meta.hot.on("vite:beforeUpdate", (payload: { updates?: Array<{ path?: string }> }) => {
-      // Drop MDX/content-collection updates that would cascade through the admin bundle.
-      if (!payload?.updates) return;
-      payload.updates = payload.updates.filter((u) => {
-        const p = u.path ?? "";
-        return !p.includes("/src/data/blog/") && !p.includes("astro:content");
-      });
-    });
-    return () => {
-      import.meta.hot?.off("vite:beforeFullReload", block);
-    };
-  }, []);
+    try {
+      if (selection) sessionStorage.setItem("ap-sel", JSON.stringify(selection));
+      else sessionStorage.removeItem("ap-sel");
+    } catch {
+      /* ignore */
+    }
+  }, [selection]);
 
   const refreshImages = useCallback(async () => {
     setImageGroups(await api.listAllImageGroups());
   }, []);
 
-  // Initial load
   useEffect(() => {
     Promise.all([api.listPosts(), api.listComponents(), api.listAllImageGroups()]).then(
       ([p, c, g]) => {
@@ -86,9 +145,7 @@ export default function AdminApp() {
     );
   }, []);
 
-  // Load selected post
   useEffect(() => {
-    // Cancel any pending save from a previous selection
     if (saveTimerRef.current) {
       clearTimeout(saveTimerRef.current);
       saveTimerRef.current = null;
@@ -125,11 +182,10 @@ export default function AdminApp() {
       const doSave = async () => {
         if (!dirtyRef.current) return;
         const nextContent = liveContent.current;
-        const nextFmString = JSON.stringify(liveFrontmatter.current);
-        // Skip no-op saves — avoids triggering Astro content-layer rewrites for nothing.
+        const nextFmStr = JSON.stringify(liveFrontmatter.current);
         if (
           nextContent === lastSavedContent.current &&
-          nextFmString === lastSavedFrontmatter.current
+          nextFmStr === lastSavedFrontmatter.current
         ) {
           dirtyRef.current = false;
           setSaveState("saved");
@@ -144,9 +200,11 @@ export default function AdminApp() {
             content: nextContent,
           });
           lastSavedContent.current = nextContent;
-          lastSavedFrontmatter.current = nextFmString;
+          lastSavedFrontmatter.current = nextFmStr;
           setSaveState("saved");
-          setPreviewNonce((n) => n + 1);
+          try {
+            previewFrameRef.current?.contentWindow?.location.reload();
+          } catch (_) {}
           api.listPosts().then(setPosts);
         } catch (e) {
           setSaveState("error");
@@ -154,9 +212,8 @@ export default function AdminApp() {
           dirtyRef.current = true;
         }
       };
-      if (immediate) {
-        await doSave();
-      } else {
+      if (immediate) await doSave();
+      else {
         setSaveState("dirty");
         saveTimerRef.current = setTimeout(doSave, AUTOSAVE_MS);
       }
@@ -164,7 +221,6 @@ export default function AdminApp() {
     [selection],
   );
 
-  // Cmd/Ctrl+S handler
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") {
@@ -176,28 +232,54 @@ export default function AdminApp() {
     return () => window.removeEventListener("keydown", onKey);
   }, [triggerSave]);
 
-  // Filtered posts
+  const currentImages = useMemo(() => {
+    if (!selection) return [];
+    return imageGroups.find((g) => g.slug === selection.slug)?.images ?? [];
+  }, [imageGroups, selection]);
+
+  const [langFilter, setLangFilter] = useState<Lang | "all">(() => {
+    try {
+      const v = localStorage.getItem("ap-lang-filter");
+      return v && (v === "all" || (LANGS as readonly string[]).includes(v))
+        ? (v as Lang | "all")
+        : "en";
+    } catch {
+      return "en";
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("ap-lang-filter", langFilter);
+    } catch {
+      /* ignore */
+    }
+  }, [langFilter]);
+
   const visiblePosts = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return posts.filter((p) => {
-      if (langFilter !== "all" && p.lang !== langFilter) return false;
-      if (!q) return true;
-      return (
-        p.title.toLowerCase().includes(q) ||
-        p.slug.toLowerCase().includes(q) ||
-        p.tags.some((t) => t.toLowerCase().includes(q))
+    let list = langFilter === "all" ? posts : posts.filter((p) => p.lang === langFilter);
+    if (q) {
+      list = list.filter(
+        (p) =>
+          p.title.toLowerCase().includes(q) ||
+          p.slug.toLowerCase().includes(q) ||
+          p.tags.some((t) => t.toLowerCase().includes(q)),
       );
-    });
+    }
+    return list;
   }, [posts, search, langFilter]);
+
+  const langCounts = useMemo(() => {
+    const counts: Record<Lang | "all", number> = { all: posts.length, en: 0, pl: 0, de: 0, es: 0 };
+    for (const p of posts) counts[p.lang]++;
+    return counts;
+  }, [posts]);
 
   const updateContent = (next: string) => {
     liveContent.current = next;
     dirtyRef.current = true;
-    if (post && next !== post.content) {
-      // Only update React state for display purposes; avoid rerenders during typing
-      // by only setting when materially different.
-      setPost((p) => (p ? { ...p, content: next } : p));
-    }
+    setPost((p) => (p ? { ...p, content: next } : p));
     void triggerSave(false);
   };
 
@@ -208,56 +290,53 @@ export default function AdminApp() {
     void triggerSave(false);
   };
 
+  const flashEditor = () => {
+    const pane = editorPaneRef.current;
+    if (!pane) return;
+    pane.classList.remove("ap-editor-flash");
+    void pane.offsetWidth;
+    pane.classList.add("ap-editor-flash");
+  };
+
   const insertSnippet = (snippet: string, componentName?: string) => {
     const view = editorRef.current?.view;
     if (!view || !post) return;
 
-    // --- Step 1: auto-inject the import (first, so its length shifts positions cleanly) ---
     if (componentName) {
-      const importPath = `../../../components/blog/${componentName}.astro`;
+      const importPath = `@/components/blog/${componentName}.astro`;
       const importStmt = `import ${componentName} from "${importPath}";`;
       const docText = view.state.doc.toString();
       const hasImport =
-        docText.includes(`from "${importPath}"`) ||
-        docText.includes(`from '${importPath}'`);
+        docText.includes(`from "${importPath}"`) || docText.includes(`from '${importPath}'`);
       if (!hasImport) {
-        // Walk from the top and find the end of the leading `import ...` block.
         const lines = docText.split("\n");
         let insertLine = 0;
         let sawImport = false;
         for (let i = 0; i < lines.length; i++) {
-          const line = lines[i];
+          const line = lines[i]!;
           if (/^import\s[^\n]*;?\s*$/.test(line)) {
             insertLine = i + 1;
             sawImport = true;
           } else if (line.trim() === "" && sawImport) {
-            // allow blank lines inside leading import block
             continue;
           } else {
             break;
           }
         }
-        // Convert line index → character offset.
         const offset = lines.slice(0, insertLine).join("\n").length + (insertLine > 0 ? 1 : 0);
         const insertText = sawImport ? `${importStmt}\n` : `${importStmt}\n\n`;
-        view.dispatch({
-          changes: { from: offset, to: offset, insert: insertText },
-        });
+        view.dispatch({ changes: { from: offset, to: offset, insert: insertText } });
       }
     }
 
-    // --- Step 2: insert the snippet at (possibly updated) cursor ---
     const doc = view.state.doc;
     const sel = view.state.selection.main;
     const atDefault = sel.from === 0 && sel.to === 0 && !view.hasFocus;
     const target = atDefault && doc.length > 0 ? doc.length : sel.from;
     const targetTo = atDefault && doc.length > 0 ? doc.length : sel.to;
-
     const beforeCtx = doc.sliceString(Math.max(0, target - 2), target);
     let prefix = "";
-    if (target > 0 && beforeCtx !== "\n\n") {
-      prefix = beforeCtx.endsWith("\n") ? "\n" : "\n\n";
-    }
+    if (target > 0 && beforeCtx !== "\n\n") prefix = beforeCtx.endsWith("\n") ? "\n" : "\n\n";
     const snippetText = prefix + snippet + "\n";
     view.dispatch({
       changes: { from: target, to: targetTo, insert: snippetText },
@@ -265,12 +344,15 @@ export default function AdminApp() {
       scrollIntoView: true,
     });
     view.focus();
-
     const next = view.state.doc.toString();
     liveContent.current = next;
     dirtyRef.current = true;
     setPost((p) => (p ? { ...p, content: next } : p));
     void triggerSave(false);
+
+    // Switch to content tab and flash the editor
+    setLeftTab("content");
+    setTimeout(flashEditor, 20);
   };
 
   const onCreate = async (values: {
@@ -278,104 +360,112 @@ export default function AdminApp() {
     slug: string;
     title: string;
     description: string;
-    translationKey: string;
+    translationKey?: string;
+    category?: string;
   }) => {
     const today = new Date().toISOString().slice(0, 10);
+    const frontmatter: Record<string, unknown> = {
+      title: values.title,
+      description: values.description,
+      pubDate: today,
+      author: "Kacper Włodarczyk",
+      lang: values.lang,
+      translationKey: values.translationKey || values.slug,
+      tags: [],
+      category: values.category || "open-source",
+      draft: true,
+    };
     await api.createPost({
       lang: values.lang,
       slug: values.slug,
-      frontmatter: {
-        title: values.title,
-        description: values.description,
-        pubDate: today,
-        author: "Vstorm",
-        lang: values.lang,
-        translationKey: values.translationKey,
-        tags: [],
-        category: "article",
-        draft: true,
-      },
-      content: "\n## Introduction\n\nStart writing…\n",
+      frontmatter,
+      content: "\nStart writing…\n",
     });
     const fresh = await api.listPosts();
     setPosts(fresh);
     setSelection({ lang: values.lang, slug: values.slug });
+    setLeftTab("content");
+    setRightTab("preview");
     setShowNew(false);
   };
 
-  const onDelete = async () => {
+  const onDelete = () => {
     if (!selection) return;
-    if (!confirm(`Delete ${selection.lang}/${selection.slug}? This cannot be undone.`)) return;
-    await api.deletePost(selection.lang, selection.slug);
-    setPosts(await api.listPosts());
-    setSelection(null);
-    setPost(null);
-  };
-
-  const onRename = async () => {
-    if (!selection) return;
-    const input = prompt("New slug (lowercase, hyphens only):", selection.slug);
-    if (!input || input === selection.slug) return;
-    if (!/^[a-z0-9][a-z0-9-]*$/.test(input)) {
-      alert("Invalid slug");
-      return;
-    }
-    await api.renamePost(selection.lang, selection.slug, input);
-    setPosts(await api.listPosts());
-    setSelection({ lang: selection.lang, slug: input });
-  };
-
-  const onDuplicate = async () => {
-    if (!post || !selection) return;
-    const otherLangs = LANGS.filter((l) => l !== selection.lang);
-    const target = prompt(
-      `Duplicate to which language? Options: ${otherLangs.join(", ")}`,
-      otherLangs[0],
-    );
-    if (!target || !LANGS.includes(target as Lang)) return;
-    const targetLang = target as Lang;
-    const exists = posts.find((p) => p.lang === targetLang && p.slug === selection.slug);
-    if (exists) {
-      alert(`${targetLang}/${selection.slug} already exists`);
-      return;
-    }
-    await api.createPost({
-      lang: targetLang,
-      slug: selection.slug,
-      frontmatter: { ...post.frontmatter, lang: targetLang },
-      content: post.content,
+    setConfirmState({
+      message: `Delete "${selection.slug}"? This cannot be undone.`,
+      onConfirm: async () => {
+        setConfirmState(null);
+        await api.deletePost(selection.lang, selection.slug);
+        setPosts(await api.listPosts());
+        setSelection(null);
+        setPost(null);
+      },
     });
-    setPosts(await api.listPosts());
-    setSelection({ lang: targetLang, slug: selection.slug });
   };
 
-  const previewUrl = selection
-    ? `/admin/preview/${selection.lang}/${selection.slug}/?v=${previewNonce}`
-    : "";
+  const onSlugChange = async (newSlug: string) => {
+    if (!selection || newSlug === selection.slug) return;
+    await api.renamePost(selection.lang, selection.slug, newSlug);
+    setPosts(await api.listPosts());
+    setSelection({ lang: selection.lang, slug: newSlug });
+  };
+
+  const onSetCover = useCallback(
+    (url: string) => {
+      if (!post) return;
+      const fm = { ...liveFrontmatter.current };
+      if (url) {
+        fm.cover = url;
+        delete fm.heroImage;
+      } else {
+        delete fm.cover;
+        delete fm.heroImage;
+      }
+      const next = fm;
+      liveFrontmatter.current = next;
+      dirtyRef.current = true;
+      setPost((p) => (p ? { ...p, frontmatter: next } : p));
+      void triggerSave(false);
+    },
+    [post, triggerSave],
+  );
+
+  const currentCover = String(post?.frontmatter?.cover ?? post?.frontmatter?.heroImage ?? "");
+
+  const previewUrl = (() => {
+    if (!selection) return "";
+    // Preview pre-renders English posts only (admin/preview/[slug].astro).
+    // For pl/de/es show the live URL on the dev server instead.
+    if (selection.lang === "en") return `/admin/preview/${selection.slug}/`;
+    return `/${selection.lang}/blog/${selection.slug}/`;
+  })();
 
   return (
-    <div className="ap-root">
-      {/* SIDEBAR */}
+    <div
+      className="ap-root"
+      ref={rootRef}
+      style={{ gridTemplateColumns: `320px 1fr 4px ${rightWidth}px` }}
+    >
       <aside className="ap-sidebar">
         <div className="ap-sidebar-header">
           <div className="ap-brand">
             <span className="ap-dot" />
-            <span>Blog Admin</span>
+            <span>Admin</span>
           </div>
           <button className="ap-btn ap-btn-primary ap-btn-sm" onClick={() => setShowNew(true)}>
             + New
           </button>
         </div>
         <div className="ap-lang-tabs">
-          <button
-            className={langFilter === "all" ? "on" : ""}
-            onClick={() => setLangFilter("all")}
-          >
-            all ({posts.length})
-          </button>
-          {LANGS.map((l) => (
-            <button key={l} className={langFilter === l ? "on" : ""} onClick={() => setLangFilter(l)}>
-              {l} ({posts.filter((p) => p.lang === l).length})
+          {(["all", ...LANGS] as const).map((lang) => (
+            <button
+              key={lang}
+              className={`ap-lang-tab${langFilter === lang ? "on" : ""}`}
+              onClick={() => setLangFilter(lang)}
+              title={lang === "all" ? "All languages" : LANG_LABELS[lang]}
+            >
+              {lang === "all" ? "All" : lang.toUpperCase()}
+              <span className="ap-lang-count">{langCounts[lang]}</span>
             </button>
           ))}
         </div>
@@ -388,31 +478,56 @@ export default function AdminApp() {
         <div className="ap-post-list">
           {visiblePosts.map((p) => {
             const isSel = selection?.lang === p.lang && selection.slug === p.slug;
+            const dateLabel = p.pubDate
+              ? new Date(p.pubDate).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })
+              : null;
             return (
               <button
                 key={`${p.lang}/${p.slug}`}
-                className={`ap-post-item${isSel ? " on" : ""}`}
+                className={`ap-post-item${isSel ? "on" : ""}`}
                 onClick={() => setSelection({ lang: p.lang, slug: p.slug })}
               >
                 <div className="ap-post-top">
-                  <span className="ap-lang-pill">{p.lang}</span>
+                  <span className="ap-lang-pill" title={LANG_LABELS[p.lang]}>
+                    {p.lang}
+                  </span>
                   <span className="ap-post-title">{p.title || p.slug}</span>
+                  {p.featured && (
+                    <span className="ap-featured-pill" title="Featured">
+                      ★
+                    </span>
+                  )}
                   {p.draft && <span className="ap-draft-pill">draft</span>}
                 </div>
-                <div className="ap-post-sub">{p.slug}</div>
+                {dateLabel && <div className="ap-post-date">{dateLabel}</div>}
+                {p.tags.length > 0 && (
+                  <div className="ap-post-tags">
+                    {p.tags.slice(0, 3).map((t) => (
+                      <span key={t} className="ap-post-tag">
+                        {t}
+                      </span>
+                    ))}
+                    {p.tags.length > 3 && (
+                      <span className="ap-post-tag-more">+{p.tags.length - 3}</span>
+                    )}
+                  </div>
+                )}
               </button>
             );
           })}
-          {visiblePosts.length === 0 && <div className="ap-empty">No posts match</div>}
+          {visiblePosts.length === 0 && <div className="ap-empty">No entries match.</div>}
         </div>
       </aside>
 
-      {/* CENTER */}
       <main className="ap-main">
         {!selection || !post ? (
           <div className="ap-placeholder">
             <div>
-              <h2>Select a post to start editing</h2>
+              <h2>Select an entry to start editing</h2>
               <p>Or create a new one with the + New button.</p>
             </div>
           </div>
@@ -435,20 +550,14 @@ export default function AdminApp() {
               </div>
               <div className="ap-main-actions">
                 <SaveIndicator state={saveState} error={saveError} />
-                <button className="ap-btn ap-btn-sm" onClick={onDuplicate}>
-                  Duplicate →
-                </button>
-                <button className="ap-btn ap-btn-sm" onClick={onRename}>
-                  Rename
-                </button>
                 <button className="ap-btn ap-btn-sm ap-btn-danger" onClick={onDelete}>
                   Delete
                 </button>
               </div>
             </div>
             <div className="ap-editor-wrap">
-              {/* Keep the editor always mounted so cursor/selection survive tab switches. */}
               <div
+                ref={editorPaneRef}
                 className="ap-editor-pane"
                 style={{ display: leftTab === "content" ? "flex" : "none" }}
               >
@@ -475,9 +584,11 @@ export default function AdminApp() {
               >
                 <FrontmatterForm
                   value={post.frontmatter}
-                  lang={selection.lang}
                   slug={selection.slug}
+                  content={post.content}
+                  images={currentImages}
                   onChange={updateFrontmatter}
+                  onSlugChange={onSlugChange}
                 />
               </div>
             </div>
@@ -485,19 +596,28 @@ export default function AdminApp() {
         )}
       </main>
 
-      {/* RIGHT */}
+      <div className="ap-resize-handle" onMouseDown={startDrag} title="Drag to resize" />
       <aside className="ap-right">
         <div className="ap-right-tabs">
-          <button className={rightTab === "preview" ? "on" : ""} onClick={() => setRightTab("preview")}>
+          <button
+            className={rightTab === "preview" ? "on" : ""}
+            onClick={() => setRightTab("preview")}
+          >
             Preview
           </button>
           <button
             className={rightTab === "components" ? "on" : ""}
-            onClick={() => setRightTab("components")}
+            onClick={() => {
+              setRightTab("components");
+              api.listComponents().then(setComponents);
+            }}
           >
             Components
           </button>
-          <button className={rightTab === "images" ? "on" : ""} onClick={() => setRightTab("images")}>
+          <button
+            className={rightTab === "images" ? "on" : ""}
+            onClick={() => setRightTab("images")}
+          >
             Images
           </button>
           {selection && (
@@ -505,29 +625,26 @@ export default function AdminApp() {
               className="ap-right-open"
               href={previewUrl}
               target="_blank"
-              rel="noopener noreferrer"
-              title="Open preview in new tab"
+              rel="noopener"
+              title="Open preview"
             >
               ↗
             </a>
           )}
         </div>
         <div className="ap-right-body">
-          {rightTab === "preview" && (
-            <>
-              {selection ? (
-                <iframe
-                  ref={iframeRef}
-                  key={`${selection.lang}/${selection.slug}`}
-                  src={previewUrl}
-                  className="ap-preview-frame"
-                  title="Post preview"
-                />
-              ) : (
-                <div className="ap-empty ap-pad">Select a post to preview.</div>
-              )}
-            </>
-          )}
+          {rightTab === "preview" &&
+            (selection ? (
+              <iframe
+                ref={previewFrameRef}
+                key={`${selection.lang}/${selection.slug}`}
+                src={previewUrl}
+                className="ap-preview-frame"
+                title="Preview"
+              />
+            ) : (
+              <div className="ap-empty ap-pad">Select an entry to preview.</div>
+            ))}
           {rightTab === "components" && (
             <ComponentPalette components={components} onInsert={insertSnippet} disabled={!post} />
           )}
@@ -536,15 +653,30 @@ export default function AdminApp() {
               slug={selection?.slug ?? null}
               groups={imageGroups}
               onRefresh={refreshImages}
-              onInsert={(url) =>
-                insertSnippet(`<Figure src="${url}" alt="" caption="" />`, "Figure")
-              }
+              currentCover={currentCover}
+              onInsert={(url) => {
+                insertSnippet(`<Figure src="${url}" alt="" caption="" />`, "Figure");
+              }}
+              onSetCover={post ? onSetCover : undefined}
             />
           )}
         </div>
       </aside>
 
-      {showNew && <NewPostDialog onCancel={() => setShowNew(false)} onCreate={onCreate} />}
+      {showNew && (
+        <NewPostDialog
+          initialLang={langFilter === "all" ? "en" : langFilter}
+          onCancel={() => setShowNew(false)}
+          onCreate={onCreate}
+        />
+      )}
+      {confirmState && (
+        <ConfirmDialog
+          message={confirmState.message}
+          onConfirm={confirmState.onConfirm}
+          onCancel={() => setConfirmState(null)}
+        />
+      )}
     </div>
   );
 }
@@ -554,12 +686,12 @@ function SaveIndicator({ state, error }: { state: SaveState; error: string | nul
     state === "idle"
       ? ""
       : state === "dirty"
-      ? "● Unsaved"
-      : state === "saving"
-      ? "Saving…"
-      : state === "saved"
-      ? "✓ Saved"
-      : `✕ ${error ?? "Error"}`;
+        ? "● Unsaved"
+        : state === "saving"
+          ? "Saving…"
+          : state === "saved"
+            ? "✓ Saved"
+            : `✕ ${error ?? "Error"}`;
   const cls =
     state === "error" ? "err" : state === "saved" ? "ok" : state === "saving" ? "info" : "dim";
   return <span className={`ap-save ap-save-${cls}`}>{label}</span>;
@@ -571,45 +703,64 @@ function ComponentPalette({
   disabled,
 }: {
   components: ComponentMeta[];
-  onInsert: (snippet: string, componentName: string) => void;
+  onInsert: (snippet: string, name: string) => void;
   disabled: boolean;
 }) {
+  const [showingCode, setShowingCode] = useState<Record<string, boolean>>({});
+  const toggleCode = (name: string) => setShowingCode((p) => ({ ...p, [name]: !p[name] }));
+
   if (components.length === 0) {
     return (
       <div className="ap-pad ap-empty">
-        No components registered. Add <code>@mdx-snippet</code> metadata comments to files in{" "}
+        No components registered. Add <code>@mdx-snippet</code> metadata to{" "}
         <code>src/components/blog/</code>.
       </div>
     );
   }
   return (
     <div className="ap-palette">
-      <div className="ap-palette-intro">
-        Click <b>Insert</b> to drop the snippet at the cursor (or append if the editor isn't focused
-        yet). The matching <code>import</code> is added to the top of the file automatically if
-        it's not already there.
-      </div>
-      {components.map((c) => (
-        <div key={c.name} className="ap-palette-item">
-          <div className="ap-palette-head">
-            <div>
-              <div className="ap-palette-label">{c.label}</div>
-              {c.description && <div className="ap-palette-desc">{c.description}</div>}
+      <div className="ap-palette-grid">
+        {components.map((c) => {
+          const isCode = showingCode[c.name] || !c.preview;
+          return (
+            <div key={c.name} className="ap-card">
+              <div className="ap-card-body">
+                {isCode ? (
+                  <pre className="ap-card-code">{c.snippet}</pre>
+                ) : (
+                  <div
+                    className="ap-card-preview"
+                    dangerouslySetInnerHTML={{ __html: c.preview }}
+                  />
+                )}
+              </div>
+              <div className="ap-card-foot">
+                <div className="ap-card-info">
+                  <span className="ap-card-label">{c.label}</span>
+                </div>
+                <div className="ap-card-actions">
+                  {c.preview && (
+                    <button
+                      className="ap-btn ap-btn-sm ap-btn-ghost"
+                      onClick={() => toggleCode(c.name)}
+                      title={isCode ? "Show preview" : "Show code"}
+                    >
+                      {isCode ? "↩" : "</>"}
+                    </button>
+                  )}
+                  <button
+                    className="ap-btn ap-btn-sm ap-btn-primary"
+                    disabled={disabled}
+                    onClick={() => onInsert(c.snippet, c.name)}
+                  >
+                    Insert
+                  </button>
+                </div>
+              </div>
             </div>
-            <button
-              className="ap-btn ap-btn-sm ap-btn-primary"
-              disabled={disabled}
-              onClick={() => onInsert(c.snippet, c.name)}
-            >
-              Insert
-            </button>
-          </div>
-          <pre className="ap-palette-snippet">{c.snippet}</pre>
-          <div className="ap-palette-import">
-            <code>{`import ${c.name} from "../../../components/blog/${c.name}.astro";`}</code>
-          </div>
-        </div>
-      ))}
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -619,27 +770,35 @@ function ImagePanel({
   groups,
   onRefresh,
   onInsert,
+  onSetCover,
+  currentCover,
 }: {
   slug: string | null;
   groups: ImageGroup[];
   onRefresh: () => Promise<void>;
   onInsert: (url: string) => void;
+  onSetCover?: (url: string) => void;
+  currentCover?: string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+  const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
+  const [confirmState, setConfirmState] = useState<{
+    message: string;
+    onConfirm: () => void;
+  } | null>(null);
 
   const handleFiles = async (files: FileList | null) => {
     if (!files || files.length === 0 || !slug) return;
     setUploading(true);
     setError(null);
     try {
-      for (const file of Array.from(files)) {
-        await api.uploadImage(slug, file);
-      }
+      for (const file of Array.from(files)) await api.uploadImage(slug, file);
       await onRefresh();
+      if (slug) setOpenGroups((prev) => ({ ...prev, [`images/blog/${slug}`]: true }));
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -648,7 +807,13 @@ function ImagePanel({
     }
   };
 
-  // Filter groups/images by search and inject an empty group for the current post if it has no folder yet
+  const copyUrl = (url: string) => {
+    navigator.clipboard.writeText(url).then(() => {
+      setCopiedUrl(url);
+      setTimeout(() => setCopiedUrl((c) => (c === url ? null : c)), 1500);
+    });
+  };
+
   const filteredGroups = useMemo<ImageGroup[]>(() => {
     const q = search.trim().toLowerCase();
     const base = q
@@ -656,14 +821,11 @@ function ImagePanel({
           .map((g) => ({
             ...g,
             images: g.images.filter(
-              (img) =>
-                img.name.toLowerCase().includes(q) ||
-                g.label.toLowerCase().includes(q),
+              (img) => img.name.toLowerCase().includes(q) || g.label.toLowerCase().includes(q),
             ),
           }))
           .filter((g) => g.images.length > 0)
-      : groups;
-
+      : [...groups];
     if (slug && !base.some((g) => g.slug === slug)) {
       return [
         {
@@ -676,23 +838,20 @@ function ImagePanel({
         ...base,
       ];
     }
-    // Make sure the current post's group is first
     if (slug) {
       const idx = base.findIndex((g) => g.slug === slug);
       if (idx > 0) {
         const [g] = base.splice(idx, 1);
-        base.unshift(g);
+        if (g) base.unshift(g);
       }
     }
     return base;
   }, [groups, search, slug]);
 
   const isOpen = (key: string) => {
-    if (key in openGroups) return openGroups[key];
-    // By default, expand the current post's group and collapse others.
+    if (key in openGroups) return openGroups[key]!;
     return slug ? key === `images/blog/${slug}` : false;
   };
-
   const toggle = (key: string) => setOpenGroups((o) => ({ ...o, [key]: !isOpen(key) }));
 
   return (
@@ -737,58 +896,83 @@ function ImagePanel({
           const open = isOpen(g.key);
           const isCurrent = g.slug === slug;
           return (
-            <div key={g.key} className={`ap-image-group${isCurrent ? " ap-image-group-current" : ""}`}>
+            <div
+              key={g.key}
+              className={`ap-image-group${isCurrent ? "ap-image-group-current" : ""}`}
+            >
               <button className="ap-image-group-head" onClick={() => toggle(g.key)}>
                 <span className="ap-image-group-chevron">{open ? "▾" : "▸"}</span>
-                <span className="ap-image-group-kind">{g.kind === "blog" ? "blog" : "public"}</span>
+                <span className="ap-image-group-kind">{g.kind}</span>
                 <span className="ap-image-group-label">{g.label.replace(/^blog \//, "")}</span>
                 <span className="ap-image-group-count">{g.images.length}</span>
               </button>
               {open && (
                 <div className="ap-image-grid">
-                  {g.images.map((img) => (
-                    <div key={img.url} className="ap-image-card">
-                      <img src={img.url} alt={img.name} loading="lazy" />
-                      <div className="ap-image-meta">
-                        <span className="ap-image-name" title={img.name}>
-                          {img.name}
-                        </span>
-                        <div className="ap-image-actions">
-                          <button
-                            className="ap-btn ap-btn-sm"
-                            onClick={() => navigator.clipboard.writeText(img.url)}
-                            title="Copy URL"
-                          >
-                            Copy
-                          </button>
-                          <button
-                            className="ap-btn ap-btn-sm ap-btn-primary"
-                            onClick={() => onInsert(img.url)}
-                            disabled={!slug}
-                            title={!slug ? "Select a post first" : "Insert <Figure> at cursor"}
-                          >
-                            Insert
-                          </button>
-                          {isCurrent && (
+                  {g.images.map((img) => {
+                    const isCover = currentCover === img.url;
+                    return (
+                      <div
+                        key={img.url}
+                        className={`ap-image-card${isCover ? "ap-image-card-cover" : ""}`}
+                      >
+                        <div className="ap-image-thumb-wrap">
+                          <img src={img.url} alt={img.name} loading="eager" />
+                          {isCover && <span className="ap-cover-badge">Cover</span>}
+                        </div>
+                        <div className="ap-image-meta">
+                          <span className="ap-image-name" title={img.name}>
+                            {img.name}
+                          </span>
+                          <div className="ap-image-actions">
                             <button
-                              className="ap-btn ap-btn-sm ap-btn-danger"
-                              onClick={async () => {
-                                if (!slug) return;
-                                if (!confirm(`Delete ${img.name}?`)) return;
-                                await api.deleteImage(slug, img.name);
-                                await onRefresh();
-                              }}
+                              className={`ap-btn ap-btn-sm${copiedUrl === img.url ? "ap-btn-copied" : ""}`}
+                              onClick={() => copyUrl(img.url)}
+                              title="Copy URL"
                             >
-                              ×
+                              {copiedUrl === img.url ? "✓ Copied" : "Copy"}
                             </button>
-                          )}
+                            {onSetCover && (
+                              <button
+                                className={`ap-btn ap-btn-sm${isCover ? "ap-btn-cover-active" : ""}`}
+                                onClick={() => onSetCover(isCover ? "" : img.url)}
+                                title={isCover ? "Remove cover" : "Set as cover image"}
+                              >
+                                {isCover ? "★ Cover" : "☆ Cover"}
+                              </button>
+                            )}
+                            <button
+                              className="ap-btn ap-btn-sm ap-btn-primary"
+                              onClick={() => onInsert(img.url)}
+                              disabled={!slug}
+                            >
+                              Insert
+                            </button>
+                            {isCurrent && (
+                              <button
+                                className="ap-btn ap-btn-sm ap-btn-danger"
+                                onClick={() => {
+                                  if (!slug) return;
+                                  setConfirmState({
+                                    message: `Delete ${img.name}?`,
+                                    onConfirm: async () => {
+                                      setConfirmState(null);
+                                      await api.deleteImage(slug, img.name);
+                                      await onRefresh();
+                                    },
+                                  });
+                                }}
+                              >
+                                ×
+                              </button>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                   {g.images.length === 0 && (
                     <div className="ap-empty ap-pad">
-                      {isCurrent ? "No images yet — drop some above." : "No images in this folder."}
+                      {isCurrent ? "No images yet — drop some above." : "No images."}
                     </div>
                   )}
                 </div>
@@ -798,6 +982,13 @@ function ImagePanel({
         })}
         {filteredGroups.length === 0 && <div className="ap-empty ap-pad">No matches.</div>}
       </div>
+      {confirmState && (
+        <ConfirmDialog
+          message={confirmState.message}
+          onConfirm={confirmState.onConfirm}
+          onCancel={() => setConfirmState(null)}
+        />
+      )}
     </div>
   );
 }

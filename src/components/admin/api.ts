@@ -1,23 +1,37 @@
+export type Collection = "blog";
 export type Lang = "en" | "pl" | "de" | "es";
 
+export const LANGS: readonly Lang[] = ["en", "pl", "de", "es"] as const;
+
+export const LANG_LABELS: Record<Lang, string> = {
+  en: "English",
+  pl: "Polski",
+  de: "Deutsch",
+  es: "Español",
+};
+
 export interface PostSummary {
+  collection: Collection;
   lang: Lang;
   slug: string;
   title: string;
   description: string;
   pubDate: string | null;
   updatedDate: string | null;
-  translationKey: string;
   tags: string[];
-  category: string;
   draft: boolean;
+  featured: boolean;
+  translationKey: string | null;
+  category: string | null;
   path: string;
 }
 
 export interface PostContent {
+  collection: Collection;
+  lang: Lang;
+  slug: string;
   frontmatter: Record<string, unknown>;
   content: string;
-  raw: string;
 }
 
 export interface ComponentMeta {
@@ -25,6 +39,7 @@ export interface ComponentMeta {
   label: string;
   description: string;
   snippet: string;
+  preview: string;
 }
 
 export interface ImageEntry {
@@ -58,13 +73,22 @@ async function json<T>(url: string, init?: RequestInit): Promise<T> {
 export const api = {
   listPosts: () => json<PostSummary[]>("/api/admin/posts"),
   readPost: (lang: Lang, slug: string) => json<PostContent>(`/api/admin/posts/${lang}/${slug}`),
-  savePost: (lang: Lang, slug: string, body: { frontmatter: Record<string, unknown>; content: string }) =>
+  savePost: (
+    lang: Lang,
+    slug: string,
+    body: { frontmatter: Record<string, unknown>; content: string },
+  ) =>
     json<{ path: string }>(`/api/admin/posts/${lang}/${slug}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     }),
-  createPost: (body: { lang: Lang; slug: string; frontmatter: Record<string, unknown>; content: string }) =>
+  createPost: (body: {
+    lang: Lang;
+    slug: string;
+    frontmatter: Record<string, unknown>;
+    content: string;
+  }) =>
     json<{ path: string }>("/api/admin/posts", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -79,8 +103,7 @@ export const api = {
       body: JSON.stringify({ newSlug }),
     }),
   listComponents: () => json<ComponentMeta[]>("/api/admin/components"),
-  listImages: (slug: string) => json<ImageEntry[]>(`/api/admin/images/${slug}`),
-  listAllImageGroups: () => json<ImageGroup[]>("/api/admin/images-all"),
+  listAllImageGroups: () => json<ImageGroup[]>("/api/admin/images"),
   deleteImage: (slug: string, name: string) =>
     json<{ ok: true }>(`/api/admin/images/${slug}/${name}`, { method: "DELETE" }),
   uploadImage: async (slug: string, file: File): Promise<ImageEntry> => {
@@ -97,9 +120,9 @@ function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
-      const result = reader.result as string;
-      const comma = result.indexOf(",");
-      resolve(comma >= 0 ? result.slice(comma + 1) : result);
+      const r = reader.result as string;
+      const i = r.indexOf(",");
+      resolve(i >= 0 ? r.slice(i + 1) : r);
     };
     reader.onerror = () => reject(reader.error);
     reader.readAsDataURL(file);
