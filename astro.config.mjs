@@ -68,6 +68,14 @@ export default defineConfig({
   ],
   vite: {
     plugins: [tailwindcss(), adminPlugin()],
+    server: {
+      // Prevent Vite from watching blog content files — the admin manages those
+      // via its own API. Without this, saving a post triggers a full HMR reload
+      // which interrupts the editor mid-session.
+      watch: {
+        ignored: ["**/src/data/blog/**"],
+      },
+    },
     resolve: {
       alias: {
         nunjucks: "nunjucks/browser/nunjucks.js",
