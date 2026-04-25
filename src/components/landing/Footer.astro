@@ -58,7 +58,7 @@ const comparisons = comparisonPages.slice(0, 4);
     <div class="flex flex-col gap-10 lg:flex-row lg:justify-between lg:gap-16">
       <div class="max-w-sm">
         <a href={langPrefix || "/"} class="flex items-center gap-3 group">
-          <img src="/favicon.png" alt="Vstorm OSS" class="w-9 h-9 transition-transform group-hover:scale-110" width="36" height="36" />
+          <img src="/favicon.png" alt="" class="w-9 h-9 transition-transform group-hover:scale-110" width="36" height="36" loading="lazy" decoding="async" />
           <span class="text-xl font-bold tracking-tight">Vstorm OSS</span>
         </a>
         <p class="mt-4 text-sm leading-relaxed text-text-secondary">
@@ -84,7 +84,7 @@ const comparisons = comparisonPages.slice(0, 4);
           {t["footer.oss.cta.title"]}
         </p>
         <p class="mt-2 text-xs text-text-tertiary leading-relaxed">
-          We're <a href="https://vstorm.co" target="_blank" rel="noopener noreferrer" class="font-semibold text-text-secondary hover:text-accent transition-colors">Vstorm</a> &mdash; {t["footer.cta.description"]}
+          We're <a href="https://vstorm.co" target="_blank" rel="noopener noreferrer" class="font-semibold text-text underline underline-offset-2 hover:text-accent transition-colors">Vstorm</a> &mdash; {t["footer.cta.description"]}
         </p>
         <a
           href="https://vstorm.co/contact-us/"
@@ -106,7 +106,7 @@ const comparisons = comparisonPages.slice(0, 4);
     <div class="mx-auto max-w-[1400px] px-6 py-12 sm:px-8 lg:px-10">
       <div class="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-5">
         <div class="col-span-2 sm:col-span-1">
-          <h4 class="text-[11px] font-bold uppercase tracking-wider text-text-tertiary mb-4">{t["nav.projects"]}</h4>
+          <h3 class="text-[11px] font-bold uppercase tracking-wider text-text-tertiary mb-4">{t["nav.projects"]}</h3>
           <ul class="space-y-2.5">
             {releasedProjects.map((p) => (
               <li><a href={getProjectHref(p.slug)} class="text-sm text-text-secondary transition-colors hover:text-text">{p.name}</a></li>
@@ -115,7 +115,7 @@ const comparisons = comparisonPages.slice(0, 4);
           </ul>
         </div>
         <div>
-          <h4 class="text-[11px] font-bold uppercase tracking-wider text-text-tertiary mb-4">{t["nav.resources"] ?? "Resources"}</h4>
+          <h3 class="text-[11px] font-bold uppercase tracking-wider text-text-tertiary mb-4">{t["nav.resources"] ?? "Resources"}</h3>
           <ul class="space-y-2.5">
             <li><a href={usecasesHref} class="text-sm text-text-secondary transition-colors hover:text-text">{t["nav.usecases"] ?? "Use Cases"}</a></li>
             <li><a href={guidesHref} class="text-sm text-text-secondary transition-colors hover:text-text">{t["nav.guides"] ?? "Guides"}</a></li>
@@ -126,7 +126,7 @@ const comparisons = comparisonPages.slice(0, 4);
           </ul>
         </div>
         <div>
-          <h4 class="text-[11px] font-bold uppercase tracking-wider text-text-tertiary mb-4">{t["nav.compare"] ?? "Compare"}</h4>
+          <h3 class="text-[11px] font-bold uppercase tracking-wider text-text-tertiary mb-4">{t["nav.compare"] ?? "Compare"}</h3>
           <ul class="space-y-2.5">
             {comparisons.map((c) => (
               <li><a href={`${langPrefix}/compare/${c.slug}/`} class="text-sm text-text-secondary transition-colors hover:text-text">{c.product} vs {c.competitor}</a></li>
@@ -135,7 +135,7 @@ const comparisons = comparisonPages.slice(0, 4);
           </ul>
         </div>
         <div>
-          <h4 class="text-[11px] font-bold uppercase tracking-wider text-text-tertiary mb-4">{t["nav.blog"]}</h4>
+          <h3 class="text-[11px] font-bold uppercase tracking-wider text-text-tertiary mb-4">{t["nav.blog"]}</h3>
           <ul class="space-y-2.5">
             {recentPosts.map((post) => (
               <li><a href={`${langPrefix}/blog/${post.data.translationKey}/`} class="text-sm text-text-secondary transition-colors hover:text-text line-clamp-2 leading-snug">{post.data.title}</a></li>
@@ -144,7 +144,7 @@ const comparisons = comparisonPages.slice(0, 4);
           </ul>
         </div>
         <div>
-          <h4 class="text-[11px] font-bold uppercase tracking-wider text-text-tertiary mb-4">{t["nav.about"]}</h4>
+          <h3 class="text-[11px] font-bold uppercase tracking-wider text-text-tertiary mb-4">{t["nav.about"]}</h3>
           <ul class="space-y-2.5">
             <li><a href={aboutHref} class="text-sm text-text-secondary transition-colors hover:text-text">{t["nav.about"]}</a></li>
             <li><a href="https://vstorm.co/contact-us/" target="_blank" rel="noopener noreferrer" class="text-sm text-text-secondary transition-colors hover:text-text">{t["footer.cta.button"]}</a></li>
@@ -166,7 +166,7 @@ const comparisons = comparisonPages.slice(0, 4);
     <div class="mx-auto max-w-[1400px] px-6 py-6 sm:px-8 lg:px-10">
       <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
         <p class="text-xs text-text-tertiary">
-          &copy; {new Date().getFullYear()} Vstorm. {t["footer.built"]} <span class="text-accent">&hearts;</span> <a href="https://vstorm.co" target="_blank" rel="noopener noreferrer" class="text-text-secondary hover:text-text transition-colors">Vstorm</a>
+          &copy; {new Date().getFullYear()} Vstorm. {t["footer.built"]} <span class="text-accent">&hearts;</span> <a href="https://vstorm.co" target="_blank" rel="noopener noreferrer" class="text-text underline underline-offset-2 hover:text-accent transition-colors">Vstorm</a>
         </p>
         <div class="flex items-center gap-4">
           <a href="https://github.com/vstorm-co" target="_blank" rel="noopener noreferrer" class="text-text-tertiary hover:text-text transition-colors" aria-label="GitHub">

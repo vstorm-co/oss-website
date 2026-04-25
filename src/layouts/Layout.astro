@@ -1,8 +1,10 @@
 ---
-import { ClientRouter } from 'astro:transitions';
 import Analytics from '@vercel/analytics/astro';
 import SpeedInsights from '@vercel/speed-insights/astro';
 import AnnouncementBar from '../components/AnnouncementBar.astro';
+import '@fontsource-variable/inter';
+import interLatin from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import interLatinExt from '@fontsource-variable/inter/files/inter-latin-ext-wght-normal.woff2?url';
 import {
   websiteSchema as buildWebsiteSchema,
   breadcrumbSchema as buildBreadcrumbSchema,
@@ -132,21 +134,9 @@ const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbItems);
     <link rel="icon" type="image/png" sizes="192x192" href={`${base}favicon.png`} />
     <link rel="apple-touch-icon" href={`${base}apple-touch-icon.png`} />
     <link rel="manifest" href={`${base}site.webmanifest`} />
+    <link rel="preload" as="font" type="font/woff2" href={interLatin} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={interLatinExt} crossorigin />
     <link rel="dns-prefetch" href="https://github.com" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-      media="print"
-      onload="this.media='all'"
-    />
-    <noscript>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-      />
-    </noscript>
 
     {schemas.map((s) => (
       <script type="application/ld+json" set:html={JSON.stringify(s)} />
@@ -157,7 +147,6 @@ const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbItems);
     )}
 
     <title>{title}</title>
-    <ClientRouter />
   </head>
   <body class:list={["min-h-screen antialiased", isLight ? "section-light" : "bg-bg text-text"]}>
     <!-- Skip to content (accessibility) -->
