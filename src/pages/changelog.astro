@@ -1,11 +1,11 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Navbar from '../components/Navbar.astro';
-import OssFooter from '../components/oss/OssFooter.astro';
-import Breadcrumbs from '../components/shared/Breadcrumbs.astro';
-import { translations, languages, defaultLang } from '../i18n/translations';
-import { changelog } from '../data/changelog';
-import { webPageSchema, SITE_URL } from '../lib/schemas';
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/Navbar.astro";
+import OssFooter from "../components/oss/OssFooter.astro";
+import Breadcrumbs from "../components/shared/Breadcrumbs.astro";
+import { translations, languages, defaultLang } from "../i18n/translations";
+import { changelog } from "../data/changelog";
+import { webPageSchema, SITE_URL } from "../lib/schemas";
 
 const lang = defaultLang;
 const t = translations[lang];
@@ -36,50 +36,69 @@ const tagColors: Record<string, string> = {
   keywords="vstorm changelog, ai agent releases, pydantic deepagents changelog, open source ai updates"
   lang={lang}
   alternates={alternates}
-  schemas={[webPageSchema({ name: t["changelog.title"], description: t["changelog.subtitle"], url: SITE_URL + "/changelog/" })]}
+  schemas={[
+    webPageSchema({
+      name: t["changelog.title"],
+      description: t["changelog.subtitle"],
+      url: SITE_URL + "/changelog/",
+    }),
+  ]}
 >
   <Navbar currentLang={lang} />
 
-  <Breadcrumbs items={[
-    { label: "Home", href: "/" },
-    { label: t["changelog.title"] },
-  ]} />
+  <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: t["changelog.title"] }]} />
 
   <main class="mx-auto max-w-3xl px-4 pt-28 pb-16 sm:px-6 sm:pt-36 sm:pb-24 lg:px-8">
-    <div class="mb-12 text-center reveal">
-      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl heading-accent">{t["changelog.title"]}</h1>
-      <p class="mt-4 text-lg text-text-secondary">{t["changelog.subtitle"]}</p>
+    <div class="reveal mb-12 text-center">
+      <h1 class="heading-accent text-3xl font-bold tracking-tight sm:text-4xl">
+        {t["changelog.title"]}
+      </h1>
+      <p class="text-text-secondary mt-4 text-lg">{t["changelog.subtitle"]}</p>
     </div>
 
     <div class="reveal space-y-0">
-      {changelog.map((entry, i) => (
-        <div class="relative flex gap-5 pb-8 last:pb-0">
-          {/* Timeline line */}
-          {i < changelog.length - 1 && (
-            <div class="absolute left-[11px] top-6 bottom-0 w-px bg-border"></div>
-          )}
+      {
+        changelog.map((entry, i) => (
+          <div class="relative flex gap-5 pb-8 last:pb-0">
+            {/* Timeline line */}
+            {i < changelog.length - 1 && (
+              <div class="bg-border absolute top-6 bottom-0 left-[11px] w-px" />
+            )}
 
-          {/* Dot */}
-          <div class="relative z-10 mt-1.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-accent bg-bg">
-            <div class="h-2 w-2 rounded-full bg-accent"></div>
-          </div>
-
-          {/* Content */}
-          <div class="flex-1 glass-card rounded-xl p-4 sm:p-5">
-            <div class="flex items-center gap-2 mb-1.5 flex-wrap">
-              <span class="text-xs font-mono text-text-tertiary">{formatDate(entry.date)}</span>
-              <span class="rounded-full bg-accent/10 px-2 py-0.5 text-[11px] font-semibold text-accent">{entry.version}</span>
-              <span class="rounded-full border border-border px-2 py-0.5 text-[11px] text-text-tertiary">{entry.project}</span>
-              <span class={`rounded-full px-2 py-0.5 text-[11px] font-medium ${tagColors[entry.tag]}`}>{entry.tag}</span>
-              {entry.breaking && (
-                <span class="rounded-full bg-red-500/10 px-2 py-0.5 text-[11px] font-semibold text-red-400">BREAKING</span>
-              )}
+            {/* Dot */}
+            <div class="border-accent bg-bg relative z-10 mt-1.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2">
+              <div class="bg-accent h-2 w-2 rounded-full" />
             </div>
-            <h3 class="font-semibold text-sm sm:text-base">{entry.title[lang]}</h3>
-            <p class="mt-1 text-sm text-text-secondary leading-relaxed">{entry.description[lang]}</p>
+
+            {/* Content */}
+            <div class="glass-card flex-1 rounded-xl p-4 sm:p-5">
+              <div class="mb-1.5 flex flex-wrap items-center gap-2">
+                <span class="text-text-tertiary font-mono text-xs">{formatDate(entry.date)}</span>
+                <span class="bg-accent/10 text-accent rounded-full px-2 py-0.5 text-[11px] font-semibold">
+                  {entry.version}
+                </span>
+                <span class="border-border text-text-tertiary rounded-full border px-2 py-0.5 text-[11px]">
+                  {entry.project}
+                </span>
+                <span
+                  class={`rounded-full px-2 py-0.5 text-[11px] font-medium ${tagColors[entry.tag]}`}
+                >
+                  {entry.tag}
+                </span>
+                {entry.breaking && (
+                  <span class="rounded-full bg-red-500/10 px-2 py-0.5 text-[11px] font-semibold text-red-400">
+                    BREAKING
+                  </span>
+                )}
+              </div>
+              <h3 class="text-sm font-semibold sm:text-base">{entry.title[lang]}</h3>
+              <p class="text-text-secondary mt-1 text-sm leading-relaxed">
+                {entry.description[lang]}
+              </p>
+            </div>
           </div>
-        </div>
-      ))}
+        ))
+      }
     </div>
   </main>
 

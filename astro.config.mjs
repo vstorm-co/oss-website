@@ -71,7 +71,23 @@ export default defineConfig({
     resolve: {
       alias: {
         nunjucks: "nunjucks/browser/nunjucks.js",
+        "@": path.resolve(__dirname, "src"),
       },
+      // Prevent duplicate React copies — admin React + island React must match
+      dedupe: ["react", "react-dom"],
+    },
+    optimizeDeps: {
+      // Pre-bundle CodeMirror so the admin loads instantly in dev
+      include: [
+        "react",
+        "react-dom",
+        "@uiw/react-codemirror",
+        "@codemirror/lang-markdown",
+        "@codemirror/theme-one-dark",
+        "@codemirror/language",
+        "@codemirror/state",
+        "@codemirror/view",
+      ],
     },
   },
   output: "static",

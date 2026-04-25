@@ -1,10 +1,10 @@
 ---
-import Layout from '../../../layouts/Layout.astro';
-import Navbar from '../../../components/Navbar.astro';
-import ProjectGrid from '../../../components/oss/ProjectGrid.astro';
-import OssFooter from '../../../components/oss/OssFooter.astro';
-import { translations, languages, defaultLang, type Lang } from '../../../i18n/translations';
-import { collectionPageSchema, SITE_URL } from '../../../lib/schemas';
+import Layout from "../../../layouts/Layout.astro";
+import Navbar from "../../../components/Navbar.astro";
+import ProjectGrid from "../../../components/oss/ProjectGrid.astro";
+import OssFooter from "../../../components/oss/OssFooter.astro";
+import { translations, languages, defaultLang, type Lang } from "../../../i18n/translations";
+import { collectionPageSchema, SITE_URL } from "../../../lib/schemas";
 
 export function getStaticPaths() {
   return Object.keys(languages)
@@ -28,7 +28,13 @@ const alternates = [
   description={t["oss.projects.subtitle"]}
   lang={lang}
   alternates={alternates}
-  schemas={[collectionPageSchema({ name: t["oss.projects.title"], description: t["oss.projects.subtitle"], url: SITE_URL + `/${lang}/projects/` })]}
+  schemas={[
+    collectionPageSchema({
+      name: t["oss.projects.title"],
+      description: t["oss.projects.subtitle"],
+      url: SITE_URL + `/${lang}/projects/`,
+    }),
+  ]}
 >
   <Navbar currentLang={lang} />
   <ProjectGrid lang={lang} t={t} />

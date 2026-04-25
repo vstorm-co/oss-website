@@ -1,10 +1,10 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import Navbar from '../../components/Navbar.astro';
-import OssFooter from '../../components/oss/OssFooter.astro';
-import Breadcrumbs from '../../components/shared/Breadcrumbs.astro';
-import { translations, languages, defaultLang } from '../../i18n/translations';
-import { softwareApplicationSchema, SITE_URL } from '../../lib/schemas';
+import Layout from "../../layouts/Layout.astro";
+import Navbar from "../../components/Navbar.astro";
+import OssFooter from "../../components/oss/OssFooter.astro";
+import Breadcrumbs from "../../components/shared/Breadcrumbs.astro";
+import { translations, languages, defaultLang } from "../../i18n/translations";
+import { softwareApplicationSchema, SITE_URL } from "../../lib/schemas";
 
 const lang = defaultLang;
 const t = translations[lang];
@@ -17,20 +17,60 @@ const alternates = [
 ];
 
 const features = [
-  { icon: "🤖", title: "5 AI Frameworks", description: "Pydantic AI, LangChain, LangGraph, CrewAI, or Deep Agents — pick the one that fits." },
-  { icon: "🗄️", title: "4 Database Options", description: "PostgreSQL, MongoDB, SQLite, or none. With async drivers and migrations pre-configured." },
-  { icon: "🔐", title: "Flexible Auth", description: "JWT tokens, API keys, or both. OAuth2 support included." },
-  { icon: "📡", title: "Streaming & WebSockets", description: "Real-time AI responses with Server-Sent Events or WebSocket support." },
-  { icon: "📊", title: "Observability Built-in", description: "Pydantic Logfire, Sentry, and Prometheus metrics — ready from day one." },
-  { icon: "🐳", title: "Docker & K8s Ready", description: "Multi-stage Dockerfiles, docker-compose, and Kubernetes manifests included." },
+  {
+    icon: "🤖",
+    title: "5 AI Frameworks",
+    description:
+      "Pydantic AI, LangChain, LangGraph, CrewAI, or Deep Agents — pick the one that fits.",
+  },
+  {
+    icon: "🗄️",
+    title: "4 Database Options",
+    description:
+      "PostgreSQL, MongoDB, SQLite, or none. With async drivers and migrations pre-configured.",
+  },
+  {
+    icon: "🔐",
+    title: "Flexible Auth",
+    description: "JWT tokens, API keys, or both. OAuth2 support included.",
+  },
+  {
+    icon: "📡",
+    title: "Streaming & WebSockets",
+    description: "Real-time AI responses with Server-Sent Events or WebSocket support.",
+  },
+  {
+    icon: "📊",
+    title: "Observability Built-in",
+    description: "Pydantic Logfire, Sentry, and Prometheus metrics — ready from day one.",
+  },
+  {
+    icon: "🐳",
+    title: "Docker & K8s Ready",
+    description: "Multi-stage Dockerfiles, docker-compose, and Kubernetes manifests included.",
+  },
 ];
 
 const steps = [
-  { num: "1", title: t["tools.configurator.step1"] ?? "Choose your options", description: "Select AI framework, database, auth, integrations, and infrastructure across 9 configuration steps." },
-  { num: "2", title: t["tools.configurator.step2"] ?? "Preview your project", description: "See a live preview of your project structure, dependencies, and configuration as you build." },
-  { num: "3", title: t["tools.configurator.step3"] ?? "Download & run", description: "Download as ZIP or copy the CLI command. Your project runs locally in under 2 minutes." },
+  {
+    num: "1",
+    title: t["tools.configurator.step1"] ?? "Choose your options",
+    description:
+      "Select AI framework, database, auth, integrations, and infrastructure across 9 configuration steps.",
+  },
+  {
+    num: "2",
+    title: t["tools.configurator.step2"] ?? "Preview your project",
+    description:
+      "See a live preview of your project structure, dependencies, and configuration as you build.",
+  },
+  {
+    num: "3",
+    title: t["tools.configurator.step3"] ?? "Download & run",
+    description:
+      "Download as ZIP or copy the CLI command. Your project runs locally in under 2 minutes.",
+  },
 ];
-
 ---
 
 <Layout
@@ -39,71 +79,95 @@ const steps = [
   keywords="ai agent generator, ai project configurator, fastapi ai template, nextjs ai template, python ai project generator, free ai tool, pydantic ai setup, langchain project setup"
   lang={lang}
   alternates={alternates}
-  schemas={[softwareApplicationSchema({ name: "AI Agent Project Configurator", description: "Free online tool to configure and download a production-ready FastAPI + Next.js AI agent project with 75+ options.", url: SITE_URL + "/tools/ai-agent-configurator/", operatingSystem: "Web", featureList: "5 AI frameworks, 4 databases, JWT/API key auth, streaming, Docker, Kubernetes, observability" })]}
+  schemas={[
+    softwareApplicationSchema({
+      name: "AI Agent Project Configurator",
+      description:
+        "Free online tool to configure and download a production-ready FastAPI + Next.js AI agent project with 75+ options.",
+      url: SITE_URL + "/tools/ai-agent-configurator/",
+      operatingSystem: "Web",
+      featureList:
+        "5 AI frameworks, 4 databases, JWT/API key auth, streaming, Docker, Kubernetes, observability",
+    }),
+  ]}
   theme="light"
 >
   <Navbar currentLang={lang} />
 
-  <Breadcrumbs items={[
-    { label: "Home", href: "/" },
-    { label: t["tools.index.title"] ?? "Free Tools", href: "/tools/" },
-    { label: t["tools.configurator.title"] ?? "AI Agent Configurator" },
-  ]} />
+  <Breadcrumbs
+    items={[
+      { label: "Home", href: "/" },
+      { label: t["tools.index.title"] ?? "Free Tools", href: "/tools/" },
+      { label: t["tools.configurator.title"] ?? "AI Agent Configurator" },
+    ]}
+  />
 
   <!-- Hero -->
   <main class="mx-auto max-w-4xl px-4 py-16 sm:py-24">
-    <div class="mb-12 text-center reveal">
-      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl heading-accent">
+    <div class="reveal mb-12 text-center">
+      <h1 class="heading-accent text-3xl font-bold tracking-tight sm:text-4xl">
         {t["tools.configurator.title"] ?? "AI Agent Project Configurator"}
       </h1>
-      <p class="mt-4 text-lg text-text-secondary max-w-2xl mx-auto">
-        {t["tools.configurator.subtitle"] ?? "Configure a production-ready FastAPI + Next.js AI agent project with 75+ options. Download as ZIP or CLI — runs locally in under 2 minutes."}
+      <p class="text-text-secondary mx-auto mt-4 max-w-2xl text-lg">
+        {
+          t["tools.configurator.subtitle"] ??
+            "Configure a production-ready FastAPI + Next.js AI agent project with 75+ options. Download as ZIP or CLI — runs locally in under 2 minutes."
+        }
       </p>
       <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
         <a
           href="/projects/full-stack-ai-agent-template/configurator/"
-          class="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-base font-semibold text-white transition-colors hover:bg-accent-hover"
+          class="bg-accent hover:bg-accent-hover inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-semibold text-white transition-colors sm:px-8 sm:py-3 sm:text-base"
         >
           Open Configurator
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          <svg
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"
+            ></path>
           </svg>
         </a>
         <a
           href="#how-it-works"
-          class="inline-flex items-center gap-2 rounded-full border border-border px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-base font-medium text-text-secondary transition-colors hover:text-text hover:border-text-secondary"
+          class="border-border text-text-secondary hover:text-text hover:border-text-secondary inline-flex items-center gap-2 rounded-full border px-6 py-2.5 text-sm font-medium transition-colors sm:px-8 sm:py-3 sm:text-base"
         >
           How it works
         </a>
       </div>
-      <div class="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-text-tertiary">
+      <div class="text-text-tertiary mt-6 flex flex-wrap items-center justify-center gap-4 text-sm">
         <span>5 AI Frameworks</span>
-        <span class="h-1 w-1 rounded-full bg-border"></span>
+        <span class="bg-border h-1 w-1 rounded-full"></span>
         <span>75+ Options</span>
-        <span class="h-1 w-1 rounded-full bg-border"></span>
+        <span class="bg-border h-1 w-1 rounded-full"></span>
         <span>FastAPI + Next.js</span>
-        <span class="h-1 w-1 rounded-full bg-border"></span>
+        <span class="bg-border h-1 w-1 rounded-full"></span>
         <span>100% Open Source</span>
       </div>
     </div>
-  </section>
+  </main>
 
   <!-- Features -->
   <section class="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
     <div class="mx-auto max-w-4xl">
-      <div class="mb-10 text-center reveal">
+      <div class="reveal mb-10 text-center">
         <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
           {t["tools.configurator.features.title"] ?? "What you can configure"}
         </h2>
       </div>
-      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 reveal-group">
-        {features.map((f) => (
-          <div class="reveal glass-card rounded-xl p-5">
-            <div class="text-2xl mb-3">{f.icon}</div>
-            <h3 class="font-semibold text-sm">{f.title}</h3>
-            <p class="mt-1 text-xs text-text-secondary leading-relaxed">{f.description}</p>
-          </div>
-        ))}
+      <div class="reveal-group grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          features.map((f) => (
+            <div class="reveal glass-card rounded-xl p-5">
+              <div class="mb-3 text-2xl">{f.icon}</div>
+              <h3 class="text-sm font-semibold">{f.title}</h3>
+              <p class="text-text-secondary mt-1 text-xs leading-relaxed">{f.description}</p>
+            </div>
+          ))
+        }
       </div>
     </div>
   </section>
@@ -111,50 +175,61 @@ const steps = [
   <!-- How It Works -->
   <section id="how-it-works" class="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
     <div class="mx-auto max-w-4xl">
-      <div class="mb-10 text-center reveal">
+      <div class="reveal mb-10 text-center">
         <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
           {t["tools.configurator.howItWorks"] ?? "How It Works"}
         </h2>
       </div>
-      <div class="space-y-6 reveal-group">
-        {steps.map((step) => (
-          <div class="reveal glass-card rounded-2xl p-6 sm:p-8 flex gap-5">
-            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent font-bold text-lg">
-              {step.num}
+      <div class="reveal-group space-y-6">
+        {
+          steps.map((step) => (
+            <div class="reveal glass-card flex gap-5 rounded-2xl p-6 sm:p-8">
+              <div class="bg-accent/10 text-accent flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg font-bold">
+                {step.num}
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold">{step.title}</h3>
+                <p class="text-text-secondary mt-2 text-sm leading-relaxed">{step.description}</p>
+              </div>
             </div>
-            <div>
-              <h3 class="text-lg font-semibold">{step.title}</h3>
-              <p class="mt-2 text-sm text-text-secondary leading-relaxed">{step.description}</p>
-            </div>
-          </div>
-        ))}
+          ))
+        }
       </div>
     </div>
   </section>
 
   <!-- CTA -->
   <section class="px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
-    <div class="mx-auto max-w-3xl text-center reveal">
+    <div class="reveal mx-auto max-w-3xl text-center">
       <div class="glass-card glow-card rounded-2xl p-6 sm:p-10 lg:p-14">
         <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
           {t["tools.configurator.cta.title"] ?? "Ready to build your AI agent project?"}
         </h2>
-        <p class="mt-4 text-text-secondary">
-          {t["tools.configurator.cta.description"] ?? "Open the configurator, choose your stack, and download a production-ready project in minutes."}
+        <p class="text-text-secondary mt-4">
+          {
+            t["tools.configurator.cta.description"] ??
+              "Open the configurator, choose your stack, and download a production-ready project in minutes."
+          }
         </p>
         <a
           href="/projects/full-stack-ai-agent-template/configurator/"
-          class="mt-6 sm:mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-base font-semibold text-white transition-colors hover:bg-accent-hover"
+          class="bg-accent hover:bg-accent-hover mt-6 inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-semibold text-white transition-colors sm:mt-8 sm:px-8 sm:py-3 sm:text-base"
         >
           Open Free Configurator
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          <svg
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"
+            ></path>
           </svg>
         </a>
       </div>
     </div>
   </section>
-  </main>
-
-  <OssFooter t={t} />
 </Layout>
+
+<OssFooter t={t} />

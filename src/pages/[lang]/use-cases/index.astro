@@ -1,11 +1,11 @@
 ---
-import Layout from '../../../layouts/Layout.astro';
-import Navbar from '../../../components/Navbar.astro';
-import OssFooter from '../../../components/oss/OssFooter.astro';
-import Breadcrumbs from '../../../components/shared/Breadcrumbs.astro';
-import { translations, languages, defaultLang, type Lang } from '../../../i18n/translations';
-import { useCasePages } from '../../../data/use-case-pages';
-import { collectionPageSchema, SITE_URL } from '../../../lib/schemas';
+import Layout from "../../../layouts/Layout.astro";
+import Navbar from "../../../components/Navbar.astro";
+import OssFooter from "../../../components/oss/OssFooter.astro";
+import Breadcrumbs from "../../../components/shared/Breadcrumbs.astro";
+import { translations, languages, defaultLang, type Lang } from "../../../i18n/translations";
+import { useCasePages } from "../../../data/use-case-pages";
+import { collectionPageSchema, SITE_URL } from "../../../lib/schemas";
 
 export function getStaticPaths() {
   return Object.keys(languages)
@@ -32,53 +32,75 @@ function difficultyColor(d: string) {
 
 <Layout
   title={`${t["usecases.index.title"] ?? "Use Cases"} — Vstorm OSS`}
-  description={t["usecases.index.subtitle"] ?? "Real-world use cases with working code examples — research agents, RAG chatbots, SQL agents, and more."}
+  description={t["usecases.index.subtitle"] ??
+    "Real-world use cases with working code examples — research agents, RAG chatbots, SQL agents, and more."}
   keywords="ai agent use cases, python ai examples, rag chatbot tutorial, research agent, text to sql agent, code review agent"
   lang={lang}
   alternates={alternates}
-  schemas={[collectionPageSchema({ name: t["usecases.index.title"] ?? "Use Cases", description: t["usecases.index.subtitle"] ?? "Real-world use cases with working code examples — research agents, RAG chatbots, SQL agents, and more.", url: SITE_URL + `/${lang}/use-cases/` })]}
+  schemas={[
+    collectionPageSchema({
+      name: t["usecases.index.title"] ?? "Use Cases",
+      description:
+        t["usecases.index.subtitle"] ??
+        "Real-world use cases with working code examples — research agents, RAG chatbots, SQL agents, and more.",
+      url: SITE_URL + `/${lang}/use-cases/`,
+    }),
+  ]}
 >
   <Navbar currentLang={lang} />
 
-  <Breadcrumbs items={[
-    { label: "Home", href: `/${lang}/` },
-    { label: t["usecases.index.title"] ?? "Use Cases" },
-  ]} />
+  <Breadcrumbs
+    items={[
+      { label: "Home", href: `/${lang}/` },
+      { label: t["usecases.index.title"] ?? "Use Cases" },
+    ]}
+  />
 
   <main class="mx-auto max-w-4xl px-4 py-16 sm:py-24">
-    <div class="mb-12 text-center reveal">
-      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl heading-accent">
+    <div class="reveal mb-12 text-center">
+      <h1 class="heading-accent text-3xl font-bold tracking-tight sm:text-4xl">
         {t["usecases.index.title"] ?? "Use Cases"}
       </h1>
-      <p class="mt-4 text-lg text-text-secondary max-w-2xl mx-auto">
-        {t["usecases.index.subtitle"] ?? "Real-world use cases with working code examples — research agents, RAG chatbots, SQL agents, and more."}
+      <p class="text-text-secondary mx-auto mt-4 max-w-2xl text-lg">
+        {
+          t["usecases.index.subtitle"] ??
+            "Real-world use cases with working code examples — research agents, RAG chatbots, SQL agents, and more."
+        }
       </p>
     </div>
 
-    <div class="grid gap-6 sm:grid-cols-2 reveal-group">
-      {useCasePages.map((page) => (
-        <a
-          href={`/${lang}/use-cases/${page.slug}/`}
-          class="group glass-card rounded-2xl p-6 hover:border-accent/30 transition-all relative overflow-hidden flex flex-col"
-        >
-          <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/0 to-transparent group-hover:via-accent/50 transition-all duration-500"></div>
-          <div class="flex items-center gap-2 text-xs">
-            <span class={`rounded-full px-2.5 py-0.5 font-medium ${difficultyColor(page.difficulty)}`}>
-              {page.difficulty}
-            </span>
-            <span class="text-text-tertiary">{page.timeToComplete}</span>
-          </div>
-          <h2 class="mt-3 text-lg font-semibold text-text group-hover:text-accent transition-colors">
-            {page.title[lang]}
-          </h2>
-          <p class="mt-2 text-sm text-text-secondary line-clamp-3 flex-1">{page.description[lang]}</p>
-          <div class="mt-4 flex flex-wrap gap-1.5">
-            {page.tags.map((tag) => (
-              <span class="rounded-full border border-border px-2 py-0.5 text-[10px] text-text-tertiary">{tag}</span>
-            ))}
-          </div>
-        </a>
-      ))}
+    <div class="reveal-group grid gap-6 sm:grid-cols-2">
+      {
+        useCasePages.map((page) => (
+          <a
+            href={`/${lang}/use-cases/${page.slug}/`}
+            class="group glass-card hover:border-accent/30 relative flex flex-col overflow-hidden rounded-2xl p-6 transition-all"
+          >
+            <div class="via-accent/0 group-hover:via-accent/50 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent transition-all duration-500" />
+            <div class="flex items-center gap-2 text-xs">
+              <span
+                class={`rounded-full px-2.5 py-0.5 font-medium ${difficultyColor(page.difficulty)}`}
+              >
+                {page.difficulty}
+              </span>
+              <span class="text-text-tertiary">{page.timeToComplete}</span>
+            </div>
+            <h2 class="text-text group-hover:text-accent mt-3 text-lg font-semibold transition-colors">
+              {page.title[lang]}
+            </h2>
+            <p class="text-text-secondary mt-2 line-clamp-3 flex-1 text-sm">
+              {page.description[lang]}
+            </p>
+            <div class="mt-4 flex flex-wrap gap-1.5">
+              {page.tags.map((tag) => (
+                <span class="border-border text-text-tertiary rounded-full border px-2 py-0.5 text-[10px]">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </a>
+        ))
+      }
     </div>
   </main>
 

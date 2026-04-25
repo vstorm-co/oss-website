@@ -1,12 +1,12 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import Navbar from '../../components/Navbar.astro';
-import ProjectPage from '../../components/project/ProjectPage.astro';
-import OssFooter from '../../components/oss/OssFooter.astro';
-import Breadcrumbs from '../../components/shared/Breadcrumbs.astro';
-import { translations, languages, defaultLang } from '../../i18n/translations';
-import { getGenericProjects } from '../../data/projects';
-import { softwareApplicationSchema, SITE_URL, type JsonLdSchema } from '../../lib/schemas';
+import Layout from "../../layouts/Layout.astro";
+import Navbar from "../../components/Navbar.astro";
+import ProjectPage from "../../components/project/ProjectPage.astro";
+import OssFooter from "../../components/oss/OssFooter.astro";
+import Breadcrumbs from "../../components/shared/Breadcrumbs.astro";
+import { translations, languages, defaultLang } from "../../i18n/translations";
+import { getGenericProjects } from "../../data/projects";
+import { softwareApplicationSchema, SITE_URL, type JsonLdSchema } from "../../lib/schemas";
 
 export function getStaticPaths() {
   return getGenericProjects().map((p) => ({
@@ -26,15 +26,18 @@ const alternates = [
     .map((l) => ({ lang: l, href: `/${l}/projects/${project.slug}/` })),
 ];
 
-const schemas: JsonLdSchema[] = project.status === "released" ? [
-  softwareApplicationSchema({
-    name: project.name,
-    description: project.description[lang],
-    url: SITE_URL + `/projects/${project.slug}/`,
-    github: project.github,
-    pypi: project.pypi,
-  }),
-] : [];
+const schemas: JsonLdSchema[] =
+  project.status === "released"
+    ? [
+        softwareApplicationSchema({
+          name: project.name,
+          description: project.description[lang],
+          url: SITE_URL + `/projects/${project.slug}/`,
+          github: project.github,
+          pypi: project.pypi,
+        }),
+      ]
+    : [];
 ---
 
 <Layout
@@ -45,11 +48,13 @@ const schemas: JsonLdSchema[] = project.status === "released" ? [
   schemas={schemas}
 >
   <Navbar currentLang={lang} project={project} pathSuffix={`projects/${project.slug}/`} />
-  <Breadcrumbs items={[
-    { label: "Home", href: "/" },
-    { label: t["oss.projects.title"], href: "/projects/" },
-    { label: project.name },
-  ]} />
+  <Breadcrumbs
+    items={[
+      { label: "Home", href: "/" },
+      { label: t["oss.projects.title"], href: "/projects/" },
+      { label: project.name },
+    ]}
+  />
   <ProjectPage project={project} lang={lang} t={t} />
   <OssFooter t={t} />
 </Layout>

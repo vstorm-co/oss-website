@@ -154,7 +154,8 @@ export function blogPostingSchema(params: BlogPostingParams): JsonLdSchema {
         name: params.authorPerson.name,
         ...(params.authorPerson.jobTitle && { jobTitle: params.authorPerson.jobTitle }),
         ...(params.authorPerson.url && { url: params.authorPerson.url }),
-        ...(params.authorPerson.sameAs && params.authorPerson.sameAs.length > 0 && { sameAs: params.authorPerson.sameAs }),
+        ...(params.authorPerson.sameAs &&
+          params.authorPerson.sameAs.length > 0 && { sameAs: params.authorPerson.sameAs }),
       }
     : { "@type": "Organization" as const, name: params.author ?? "Vstorm" };
 
@@ -318,9 +319,7 @@ export function websiteSchema(lang: Lang = "en"): JsonLdSchema {
   };
 }
 
-export function breadcrumbSchema(
-  items: { name: string; item: string }[],
-): JsonLdSchema | null {
+export function breadcrumbSchema(items: { name: string; item: string }[]): JsonLdSchema | null {
   if (items.length <= 1) return null;
   return {
     "@context": CONTEXT,

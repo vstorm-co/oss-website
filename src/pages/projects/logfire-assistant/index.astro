@@ -1,22 +1,22 @@
 ---
-import Layout from '../../../layouts/Layout.astro';
-import Navbar from '../../../components/Navbar.astro';
-import LogfireHero from '../../../components/logfire/LogfireHero.astro';
-import LogfireFeatures from '../../../components/logfire/LogfireFeatures.astro';
-import HowItWorks from '../../../components/logfire/HowItWorks.astro';
-import LogfireUseCases from '../../../components/logfire/LogfireUseCases.astro';
-import LogfireScreenshots from '../../../components/logfire/LogfireScreenshots.astro';
-import LogfireTechStack from '../../../components/logfire/LogfireTechStack.astro';
-import OssFooter from '../../../components/oss/OssFooter.astro';
-import BeforeAfter from '../../../components/shared/BeforeAfter.astro';
-import ComparisonTable from '../../../components/shared/ComparisonTable.astro';
-import StarsBadge from '../../../components/shared/StarsBadge.astro';
-import FaqPreview from '../../../components/landing/FaqPreview.astro';
-import Breadcrumbs from '../../../components/shared/Breadcrumbs.astro';
-import { translations, languages, defaultLang } from '../../../i18n/translations';
-import { getProjectBySlug } from '../../../data/projects';
-import { getLogfireComparison } from '../../../data/comparisons';
-import { softwareApplicationSchema, faqPageSchema, SITE_URL } from '../../../lib/schemas';
+import Layout from "../../../layouts/Layout.astro";
+import Navbar from "../../../components/Navbar.astro";
+import LogfireHero from "../../../components/logfire/LogfireHero.astro";
+import LogfireFeatures from "../../../components/logfire/LogfireFeatures.astro";
+import HowItWorks from "../../../components/logfire/HowItWorks.astro";
+import LogfireUseCases from "../../../components/logfire/LogfireUseCases.astro";
+import LogfireScreenshots from "../../../components/logfire/LogfireScreenshots.astro";
+import LogfireTechStack from "../../../components/logfire/LogfireTechStack.astro";
+import OssFooter from "../../../components/oss/OssFooter.astro";
+import BeforeAfter from "../../../components/shared/BeforeAfter.astro";
+import ComparisonTable from "../../../components/shared/ComparisonTable.astro";
+import StarsBadge from "../../../components/shared/StarsBadge.astro";
+import FaqPreview from "../../../components/landing/FaqPreview.astro";
+import Breadcrumbs from "../../../components/shared/Breadcrumbs.astro";
+import { translations, languages, defaultLang } from "../../../i18n/translations";
+import { getProjectBySlug } from "../../../data/projects";
+import { getLogfireComparison } from "../../../data/comparisons";
+import { softwareApplicationSchema, faqPageSchema, SITE_URL } from "../../../lib/schemas";
 
 const lang = defaultLang;
 const t = translations[lang];
@@ -30,10 +30,26 @@ const alternates = [
 ];
 
 const logfireFaqItems = [
-  { question: "What is Logfire Assistant?", answer: "AI-powered debugging companion for Pydantic Logfire. Ask questions about your traces in plain English — get SQL queries, data tables, and charts back instantly." },
-  { question: "Do I need a Logfire account?", answer: "Yes, you need a Logfire account and a read token. Logfire has a generous free tier (up to 50M spans/month)." },
-  { question: "Is my data stored?", answer: "No. Conversations are processed in your browser and self-hosted backend. The Logfire read token never leaves your server. No data is sent to third parties beyond the LLM API." },
-  { question: "Which LLM providers does it support?", answer: "OpenAI, Anthropic Claude, Google Gemini, and any OpenAI-compatible endpoint. The agent uses the full Logfire SQL schema in its system prompt for accurate query generation." },
+  {
+    question: "What is Logfire Assistant?",
+    answer:
+      "AI-powered debugging companion for Pydantic Logfire. Ask questions about your traces in plain English — get SQL queries, data tables, and charts back instantly.",
+  },
+  {
+    question: "Do I need a Logfire account?",
+    answer:
+      "Yes, you need a Logfire account and a read token. Logfire has a generous free tier (up to 50M spans/month).",
+  },
+  {
+    question: "Is my data stored?",
+    answer:
+      "No. Conversations are processed in your browser and self-hosted backend. The Logfire read token never leaves your server. No data is sent to third parties beyond the LLM API.",
+  },
+  {
+    question: "Which LLM providers does it support?",
+    answer:
+      "OpenAI, Anthropic Claude, Google Gemini, and any OpenAI-compatible endpoint. The agent uses the full Logfire SQL schema in its system prompt for accurate query generation.",
+  },
 ];
 ---
 
@@ -44,22 +60,45 @@ const logfireFaqItems = [
   keywords="logfire assistant, pydantic logfire, ai observability, llm debugging, natural language sql, ai agent monitoring"
   lang={lang}
   alternates={alternates}
-  schemas={[softwareApplicationSchema({ name: "Logfire Assistant", description: t["logfire.meta.description"], url: SITE_URL + "/projects/logfire-assistant/", programmingLanguage: ["Python", "TypeScript"], github: "vstorm-co/logfire-assistant" }), faqPageSchema({ questions: logfireFaqItems })]}
+  schemas={[
+    softwareApplicationSchema({
+      name: "Logfire Assistant",
+      description: t["logfire.meta.description"],
+      url: SITE_URL + "/projects/logfire-assistant/",
+      programmingLanguage: ["Python", "TypeScript"],
+      github: "vstorm-co/logfire-assistant",
+    }),
+    faqPageSchema({ questions: logfireFaqItems }),
+  ]}
 >
   <Navbar currentLang={lang} project={project} pathSuffix="projects/logfire-assistant/" />
-  <Breadcrumbs items={[
-    { label: "Home", href: "/" },
-    { label: t["oss.projects.title"], href: "/projects/" },
-    { label: "Logfire Assistant" },
-  ]} />
+  <Breadcrumbs
+    items={[
+      { label: "Home", href: "/" },
+      { label: t["oss.projects.title"], href: "/projects/" },
+      { label: "Logfire Assistant" },
+    ]}
+  />
   <LogfireHero t={t} />
   <LogfireTechStack t={t} />
   <BeforeAfter
     title={t["beforeafter.title"]}
     beforeTitle={t["beforeafter.logfire.before.title"]}
     afterTitle={t["beforeafter.logfire.after.title"]}
-    beforeItems={[t["beforeafter.logfire.before.1"], t["beforeafter.logfire.before.2"], t["beforeafter.logfire.before.3"], t["beforeafter.logfire.before.4"], t["beforeafter.logfire.before.5"]]}
-    afterItems={[t["beforeafter.logfire.after.1"], t["beforeafter.logfire.after.2"], t["beforeafter.logfire.after.3"], t["beforeafter.logfire.after.4"], t["beforeafter.logfire.after.5"]]}
+    beforeItems={[
+      t["beforeafter.logfire.before.1"],
+      t["beforeafter.logfire.before.2"],
+      t["beforeafter.logfire.before.3"],
+      t["beforeafter.logfire.before.4"],
+      t["beforeafter.logfire.before.5"],
+    ]}
+    afterItems={[
+      t["beforeafter.logfire.after.1"],
+      t["beforeafter.logfire.after.2"],
+      t["beforeafter.logfire.after.3"],
+      t["beforeafter.logfire.after.4"],
+      t["beforeafter.logfire.after.5"],
+    ]}
   />
   <LogfireFeatures t={t} />
   <ComparisonTable t={t} data={getLogfireComparison(t)} />
@@ -71,17 +110,29 @@ const logfireFaqItems = [
   <!-- FAQ -->
   <section class="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
     <div class="mx-auto max-w-3xl">
-      <h2 class="text-2xl font-bold tracking-tight sm:text-3xl text-center mb-10">Frequently Asked Questions</h2>
+      <h2 class="mb-10 text-center text-2xl font-bold tracking-tight sm:text-3xl">
+        Frequently Asked Questions
+      </h2>
       <div class="space-y-3">
-        {logfireFaqItems.map((item) => (
-          <details class="glass-card rounded-xl p-5 group">
-            <summary class="flex items-center justify-between cursor-pointer font-semibold text-text">
-              {item.question}
-              <svg class="w-5 h-5 shrink-0 text-text-tertiary transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
-            </summary>
-            <p class="mt-3 text-text-secondary text-sm leading-relaxed">{item.answer}</p>
-          </details>
-        ))}
+        {
+          logfireFaqItems.map((item) => (
+            <details class="glass-card group rounded-xl p-5">
+              <summary class="text-text flex cursor-pointer items-center justify-between font-semibold">
+                {item.question}
+                <svg
+                  class="text-text-tertiary h-5 w-5 shrink-0 transition-transform group-open:rotate-180"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <p class="text-text-secondary mt-3 text-sm leading-relaxed">{item.answer}</p>
+            </details>
+          ))
+        }
       </div>
     </div>
   </section>

@@ -38,7 +38,9 @@ html {
   color: var(--color-text);
   font-size: 0.875rem;
   outline: none;
-  transition: border-color 0.2s, background-color 0.2s;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
 }
 
 .input:focus {
@@ -52,15 +54,33 @@ html {
 
 /* ---- Subtle gradient tints for visual rhythm ---- */
 .section-gradient-blue {
-  background: linear-gradient(180deg, var(--color-bg) 0%, #0c1222 40%, #0c1222 60%, var(--color-bg) 100%);
+  background: linear-gradient(
+    180deg,
+    var(--color-bg) 0%,
+    #0c1222 40%,
+    #0c1222 60%,
+    var(--color-bg) 100%
+  );
 }
 
 .section-gradient-purple {
-  background: linear-gradient(180deg, var(--color-bg) 0%, #120c20 40%, #120c20 60%, var(--color-bg) 100%);
+  background: linear-gradient(
+    180deg,
+    var(--color-bg) 0%,
+    #120c20 40%,
+    #120c20 60%,
+    var(--color-bg) 100%
+  );
 }
 
 .section-gradient-warm {
-  background: linear-gradient(180deg, var(--color-bg) 0%, #1a1008 40%, #1a1008 60%, var(--color-bg) 100%);
+  background: linear-gradient(
+    180deg,
+    var(--color-bg) 0%,
+    #1a1008 40%,
+    #1a1008 60%,
+    var(--color-bg) 100%
+  );
 }
 
 /* ---- Grid background ---- */
@@ -112,7 +132,7 @@ html {
 
 /* Rotating conic-gradient beam */
 .navbar-beam::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: -2px;
   border-radius: inherit;
@@ -127,8 +147,12 @@ html {
     transparent 95%,
     transparent 100%
   );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   animation: beam-rotate 4s linear infinite;
@@ -137,13 +161,15 @@ html {
 }
 
 @property --beam-angle {
-  syntax: '<angle>';
+  syntax: "<angle>";
   initial-value: 0deg;
   inherits: false;
 }
 
 @keyframes beam-rotate {
-  to { --beam-angle: 360deg; }
+  to {
+    --beam-angle: 360deg;
+  }
 }
 
 /* Subtle static border fallback (for browsers without @property support) */
@@ -151,15 +177,18 @@ html {
   .navbar-beam {
     border: 1px solid rgba(255, 255, 255, 0.08);
   }
-  .navbar-beam::before { display: none; }
+  .navbar-beam::before {
+    display: none;
+  }
 }
 
 /* ---- Scroll reveal animations ---- */
 .reveal {
   opacity: 0;
   transform: translateY(32px);
-  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .reveal.visible {
@@ -168,13 +197,27 @@ html {
 }
 
 /* Stagger children inside a reveal-group */
-.reveal-group .reveal { transition-delay: 0ms; }
-.reveal-group .reveal:nth-child(1) { transition-delay: 0ms; }
-.reveal-group .reveal:nth-child(2) { transition-delay: 80ms; }
-.reveal-group .reveal:nth-child(3) { transition-delay: 160ms; }
-.reveal-group .reveal:nth-child(4) { transition-delay: 240ms; }
-.reveal-group .reveal:nth-child(5) { transition-delay: 320ms; }
-.reveal-group .reveal:nth-child(6) { transition-delay: 400ms; }
+.reveal-group .reveal {
+  transition-delay: 0ms;
+}
+.reveal-group .reveal:nth-child(1) {
+  transition-delay: 0ms;
+}
+.reveal-group .reveal:nth-child(2) {
+  transition-delay: 80ms;
+}
+.reveal-group .reveal:nth-child(3) {
+  transition-delay: 160ms;
+}
+.reveal-group .reveal:nth-child(4) {
+  transition-delay: 240ms;
+}
+.reveal-group .reveal:nth-child(5) {
+  transition-delay: 320ms;
+}
+.reveal-group .reveal:nth-child(6) {
+  transition-delay: 400ms;
+}
 
 /* ---- Accent heading decoration ---- */
 .heading-accent {
@@ -183,7 +226,7 @@ html {
 }
 
 .heading-accent::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -6px;
   left: 50%;
@@ -200,7 +243,10 @@ html {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s,
+    background 0.3s;
 }
 
 .glass-card:hover {
@@ -225,7 +271,9 @@ html {
 /* ---- Glow border card ---- */
 .glow-card {
   position: relative;
-  transition: box-shadow 0.4s, border-color 0.3s;
+  transition:
+    box-shadow 0.4s,
+    border-color 0.3s;
   border-color: rgba(255, 255, 255, 0.06);
 }
 
@@ -268,7 +316,9 @@ html {
 }
 
 /* Ensure stacking sections have correct background */
-.section-stack:not(.section-light):not(.section-light-alt):not([class*="section-gradient"]):not([style*="background"]) {
+.section-stack:not(.section-light):not(.section-light-alt):not([class*="section-gradient"]):not(
+    [style*="background"]
+  ) {
   background-color: var(--color-bg);
 }
 
@@ -302,7 +352,10 @@ html {
   background: var(--color-surface);
   color: var(--color-text-tertiary);
   cursor: pointer;
-  transition: color 0.2s, border-color 0.2s, transform 0.2s;
+  transition:
+    color 0.2s,
+    border-color 0.2s,
+    transform 0.2s;
   animation: arrow-float 2s ease-in-out infinite;
 }
 
@@ -314,30 +367,37 @@ html {
 }
 
 @keyframes arrow-float {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(6px); }
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(6px);
+  }
 }
 
 /* ---- Terminal typing cursor ---- */
 .typing-cursor::after {
-  content: '▋';
+  content: "▋";
   display: inline-block;
   color: var(--color-accent);
   animation: blink 1s step-end infinite;
 }
 
 @keyframes blink {
-  50% { opacity: 0; }
+  50% {
+    opacity: 0;
+  }
 }
-
 
 /* ---- Micro-interactions ---- */
 
 /* Card hover lift — subtle translateY + shadow boost */
 .card-hover {
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.3s;
+  transition:
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.3s;
 }
 
 .card-hover:hover {
@@ -352,8 +412,9 @@ html {
 
 /* Icon container hover pulse */
 .icon-hover {
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              background-color 0.3s;
+  transition:
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.3s;
 }
 
 .group:hover .icon-hover {
@@ -362,7 +423,10 @@ html {
 
 /* Button press effect */
 .btn-press {
-  transition: transform 0.15s, box-shadow 0.15s, background-color 0.2s;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s,
+    background-color 0.2s;
 }
 
 .btn-press:hover {
@@ -376,7 +440,10 @@ html {
 
 /* Feature tag hover shimmer */
 .tag-hover {
-  transition: border-color 0.25s, background-color 0.25s, color 0.25s;
+  transition:
+    border-color 0.25s,
+    background-color 0.25s,
+    color 0.25s;
 }
 
 .group:hover .tag-hover {
@@ -386,9 +453,15 @@ html {
 
 /* Stat card counter bounce on reveal */
 @keyframes count-pop {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.08); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .count-pop {
@@ -397,12 +470,16 @@ html {
 
 /* CTA arrow slide on hover */
 .arrow-slide {
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), gap 0.3s;
+  transition:
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    gap 0.3s;
 }
 
 /* Smooth category badge color shift */
 .badge-hover {
-  transition: background-color 0.3s, color 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
 }
 
 .group:hover .badge-hover {

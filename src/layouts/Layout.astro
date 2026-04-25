@@ -1,15 +1,15 @@
 ---
-import Analytics from '@vercel/analytics/astro';
-import SpeedInsights from '@vercel/speed-insights/astro';
-import AnnouncementBar from '../components/AnnouncementBar.astro';
-import '@fontsource-variable/inter';
-import interLatin from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
-import interLatinExt from '@fontsource-variable/inter/files/inter-latin-ext-wght-normal.woff2?url';
+import Analytics from "@vercel/analytics/astro";
+import SpeedInsights from "@vercel/speed-insights/astro";
+import AnnouncementBar from "../components/AnnouncementBar.astro";
+import "@fontsource-variable/inter";
+import interLatin from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
+import interLatinExt from "@fontsource-variable/inter/files/inter-latin-ext-wght-normal.woff2?url";
 import {
   websiteSchema as buildWebsiteSchema,
   breadcrumbSchema as buildBreadcrumbSchema,
   type JsonLdSchema,
-} from '../lib/schemas';
+} from "../lib/schemas";
 
 interface Alternate {
   lang: string;
@@ -52,7 +52,9 @@ const siteUrl = Astro.site?.origin ?? "https://oss.vstorm.co";
 const canonicalURL = new URL(Astro.url.pathname, siteUrl).href;
 const ogImageURL = ogImage ?? new URL(`${base}og-image.png`, siteUrl).href;
 
-const keywords = keywordsOverride ?? "pydantic ai, ai agents, python, fastapi, langchain, langgraph, crewai, deepagents, llm, open source, vstorm, template, middleware, subagents";
+const keywords =
+  keywordsOverride ??
+  "pydantic ai, ai agents, python, fastapi, langchain, langgraph, crewai, deepagents, llm, open source, vstorm, template, middleware, subagents";
 
 // Auto-generate WebSite schema (lang-aware so translated pages don't claim inLanguage:"en")
 const websiteSchema = buildWebsiteSchema(lang as any);
@@ -60,26 +62,28 @@ const websiteSchema = buildWebsiteSchema(lang as any);
 // Auto-generate BreadcrumbList from URL path. Keep the lang prefix in every
 // item URL so translated pages don't emit English URLs as canonical signals
 // in their structured data — that was causing Google to refuse indexing them.
-const pathSegments = Astro.url.pathname.split('/').filter(Boolean);
-const knownLangs = ['pl', 'de', 'es'];
-const langPrefix = knownLangs.includes(pathSegments[0]) ? `/${pathSegments[0]}` : '';
-const cleanSegments = knownLangs.includes(pathSegments[0]) ? pathSegments.slice(1) : [...pathSegments];
+const pathSegments = Astro.url.pathname.split("/").filter(Boolean);
+const knownLangs = ["pl", "de", "es"];
+const langPrefix = knownLangs.includes(pathSegments[0]) ? `/${pathSegments[0]}` : "";
+const cleanSegments = knownLangs.includes(pathSegments[0])
+  ? pathSegments.slice(1)
+  : [...pathSegments];
 
 const breadcrumbItems: { name: string; item: string }[] = [
-  { name: "Home", item: new URL(langPrefix + '/', siteUrl).href },
+  { name: "Home", item: new URL(langPrefix + "/", siteUrl).href },
 ];
 
 if (cleanSegments.length > 0) {
-  let currentPath = '';
+  let currentPath = "";
   cleanSegments.forEach((seg, i) => {
     currentPath += `/${seg}`;
     const isLast = i === cleanSegments.length - 1;
     const name = isLast
-      ? title.split(' — ')[0]
-      : seg.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+      ? title.split(" — ")[0]
+      : seg.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
     breadcrumbItems.push({
       name,
-      item: new URL(langPrefix + currentPath + '/', siteUrl).href,
+      item: new URL(langPrefix + currentPath + "/", siteUrl).href,
     });
   });
 }
@@ -101,25 +105,37 @@ const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbItems);
     <link rel="canonical" href={canonicalURL} />
     <link rel="alternate" type="application/rss+xml" title="Vstorm OSS Blog" href="/rss.xml" />
 
-    {alternates.map((alt) => (
-      <link rel="alternate" hreflang={alt.lang} href={new URL(alt.href, siteUrl).href} />
-    ))}
-    {alternates.length > 0 && (
-      <link rel="alternate" hreflang="x-default" href={(() => {
-        const enAlt = alternates.find(a => a.lang === "en");
-        return enAlt ? new URL(enAlt.href, siteUrl).href : canonicalURL;
-      })()} />
-    )}
+    {
+      alternates.map((alt) => (
+        <link rel="alternate" hreflang={alt.lang} href={new URL(alt.href, siteUrl).href} />
+      ))
+    }
+    {
+      alternates.length > 0 && (
+        <link
+          rel="alternate"
+          hreflang="x-default"
+          href={(() => {
+            const enAlt = alternates.find((a) => a.lang === "en");
+            return enAlt ? new URL(enAlt.href, siteUrl).href : canonicalURL;
+          })()}
+        />
+      )
+    }
 
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content={ogType} />
-    {articleDates && (
-      <>
-        <meta property="article:published_time" content={articleDates.published} />
-        {articleDates.modified && <meta property="article:modified_time" content={articleDates.modified} />}
-      </>
-    )}
+    {
+      articleDates && (
+        <>
+          <meta property="article:published_time" content={articleDates.published} />
+          {articleDates.modified && (
+            <meta property="article:modified_time" content={articleDates.modified} />
+          )}
+        </>
+      )
+    }
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:image" content={ogImageURL} />
     <meta property="og:site_name" content="Vstorm OSS" />
@@ -138,26 +154,29 @@ const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbItems);
     <link rel="preload" as="font" type="font/woff2" href={interLatinExt} crossorigin />
     <link rel="dns-prefetch" href="https://github.com" />
 
-    {schemas.map((s) => (
-      <script type="application/ld+json" set:html={JSON.stringify(s)} />
-    ))}
+    {schemas.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
     <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
-    {breadcrumbSchema && (
-      <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
-    )}
+    {
+      breadcrumbSchema && (
+        <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+      )
+    }
 
     <title>{title}</title>
   </head>
   <body class:list={["min-h-screen antialiased", isLight ? "section-light" : "bg-bg text-text"]}>
     <!-- Skip to content (accessibility) -->
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:text-white focus:outline-none">
+    <a
+      href="#main-content"
+      class="focus:bg-accent sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:rounded-lg focus:px-4 focus:py-2 focus:text-white focus:outline-none"
+    >
       Skip to content
     </a>
 
     <AnnouncementBar lang={lang} />
 
     <!-- Grid background (dark theme only) -->
-    {!isLight && <div class="grid-bg pointer-events-none fixed inset-0 z-0" aria-hidden="true"></div>}
+    {!isLight && <div class="grid-bg pointer-events-none fixed inset-0 z-0" aria-hidden="true" />}
 
     <main id="main-content" class="relative z-10">
       <slot />
@@ -165,36 +184,110 @@ const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbItems);
     <Analytics />
     <SpeedInsights />
     <!-- Back to top -->
-    <button id="back-to-top" class:list={["fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full border shadow-lg opacity-0 translate-y-4 pointer-events-none transition-all duration-300 hover:text-accent hover:border-accent/40", isLight ? "border-border bg-white/80 backdrop-blur-2xl text-text-tertiary shadow-black/10" : "border-white/[0.08] bg-bg/60 backdrop-blur-2xl text-text-tertiary shadow-black/20"]} aria-label="Back to top">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14l-5-5-5 5"/></svg>
+    <button
+      id="back-to-top"
+      class:list={[
+        "hover:text-accent hover:border-accent/40 pointer-events-none fixed right-6 bottom-6 z-50 flex h-11 w-11 translate-y-4 items-center justify-center rounded-full border opacity-0 shadow-lg transition-all duration-300",
+        isLight
+          ? "border-border text-text-tertiary bg-white/80 shadow-black/10 backdrop-blur-2xl"
+          : "bg-bg/60 text-text-tertiary border-white/[0.08] shadow-black/20 backdrop-blur-2xl",
+      ]}
+      aria-label="Back to top"
+    >
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"><path d="M17 14l-5-5-5 5"></path></svg
+      >
     </button>
     <script is:inline>
       // ClientRouter (Astro view transitions) was removed for perf — but a lot
       // of components listen for `astro:page-load`. Fire it ourselves on
       // DOMContentLoaded so existing scripts keep working without changes.
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-          document.dispatchEvent(new Event('astro:page-load'));
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", function () {
+          document.dispatchEvent(new Event("astro:page-load"));
         });
       } else {
-        document.dispatchEvent(new Event('astro:page-load'));
+        document.dispatchEvent(new Event("astro:page-load"));
       }
     </script>
     <script is:inline>
-      document.addEventListener('astro:page-load', function() {
+      document.addEventListener("astro:page-load", function () {
         /* Scroll reveal */
-        var rio=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.classList.add('visible');rio.unobserve(x.target)}})},{threshold:.12});
-        document.querySelectorAll('.reveal:not(.visible)').forEach(function(el){rio.observe(el)});
+        const rio = new IntersectionObserver(
+          function (e) {
+            e.forEach(function (x) {
+              if (x.isIntersecting) {
+                x.target.classList.add("visible");
+                rio.unobserve(x.target);
+              }
+            });
+          },
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal:not(.visible)").forEach(function (el) {
+          rio.observe(el);
+        });
 
         /* Back to top */
-        var btn=document.getElementById('back-to-top');
-        if(btn){var s=false;window.addEventListener('scroll',function(){var v=window.scrollY>500;if(v!==s){s=v;btn.style.opacity=s?'1':'0';btn.style.transform=s?'translateY(0)':'translateY(1rem)';btn.style.pointerEvents=s?'auto':'none'}},{passive:true});btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})})}
+        const btn = document.getElementById("back-to-top");
+        if (btn) {
+          let s = false;
+          window.addEventListener(
+            "scroll",
+            function () {
+              const v = window.scrollY > 500;
+              if (v !== s) {
+                s = v;
+                btn.style.opacity = s ? "1" : "0";
+                btn.style.transform = s ? "translateY(0)" : "translateY(1rem)";
+                btn.style.pointerEvents = s ? "auto" : "none";
+              }
+            },
+            { passive: true },
+          );
+          btn.addEventListener("click", function () {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+        }
 
         /* Count-up animation */
-        var seen=new Set();
-        var cio=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting&&!seen.has(x.target)){seen.add(x.target);var el=x.target,raw=el.getAttribute('data-count-target')||el.textContent.trim(),suffix=raw.replace(/[\d,.]+/,''),target=parseFloat(raw.replace(/[^\d.]/g,'')),st=null;el.textContent='0'+suffix;function step(ts){if(!st)st=ts;var p=Math.min((ts-st)/1500,1),eased=1-Math.pow(1-p,3);el.textContent=Math.floor(eased*target).toLocaleString()+suffix;if(p<1)requestAnimationFrame(step);else el.textContent=raw}requestAnimationFrame(step)}})},{threshold:.3});
-        document.querySelectorAll('[data-count-up]').forEach(function(el){el.setAttribute('data-count-target',el.textContent.trim());cio.observe(el)});
-
+        const seen = new Set();
+        const cio = new IntersectionObserver(
+          function (e) {
+            e.forEach(function (x) {
+              if (x.isIntersecting && !seen.has(x.target)) {
+                seen.add(x.target);
+                const el = x.target,
+                  raw = el.getAttribute("data-count-target") || el.textContent.trim(),
+                  suffix = raw.replace(/[\d,.]+/, ""),
+                  target = parseFloat(raw.replace(/[^\d.]/g, ""));
+                let st = null;
+                el.textContent = "0" + suffix;
+                function step(ts) {
+                  if (!st) st = ts;
+                  const p = Math.min((ts - st) / 1500, 1),
+                    eased = 1 - Math.pow(1 - p, 3);
+                  el.textContent = Math.floor(eased * target).toLocaleString() + suffix;
+                  if (p < 1) requestAnimationFrame(step);
+                  else el.textContent = raw;
+                }
+                requestAnimationFrame(step);
+              }
+            });
+          },
+          { threshold: 0.3 },
+        );
+        document.querySelectorAll("[data-count-up]").forEach(function (el) {
+          el.setAttribute("data-count-target", el.textContent.trim());
+          cio.observe(el);
+        });
       });
     </script>
   </body>

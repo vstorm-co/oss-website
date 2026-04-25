@@ -1,11 +1,11 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import Navbar from '../../components/Navbar.astro';
-import OssFooter from '../../components/oss/OssFooter.astro';
-import Breadcrumbs from '../../components/shared/Breadcrumbs.astro';
-import ArchitectureQuiz from '../../components/tools/ArchitectureQuiz';
-import { translations, languages, defaultLang } from '../../i18n/translations';
-import { softwareApplicationSchema, SITE_URL } from '../../lib/schemas';
+import Layout from "../../layouts/Layout.astro";
+import Navbar from "../../components/Navbar.astro";
+import OssFooter from "../../components/oss/OssFooter.astro";
+import Breadcrumbs from "../../components/shared/Breadcrumbs.astro";
+import ArchitectureQuiz from "../../components/tools/ArchitectureQuiz";
+import { translations, languages, defaultLang } from "../../i18n/translations";
+import { softwareApplicationSchema, SITE_URL } from "../../lib/schemas";
 
 const lang = defaultLang;
 const t = translations[lang];
@@ -17,13 +17,27 @@ const alternates = [
     .map((l) => ({ lang: l, href: `/${l}/tools/architecture-quiz/` })),
 ];
 
-
 const architectures = [
-  { name: "Simple ReAct Agent", description: "Single agent with tool loop — great for chatbots and Q&A." },
-  { name: "RAG Pipeline", description: "Retrieval-augmented generation for knowledge-heavy tasks." },
-  { name: "Pipeline Agent", description: "Sequential multi-step processing for content and data workflows." },
-  { name: "Multi-Agent System", description: "Multiple specialized agents collaborating on complex tasks." },
-  { name: "Hierarchical Agents", description: "Orchestrator + specialists for enterprise-grade automation." },
+  {
+    name: "Simple ReAct Agent",
+    description: "Single agent with tool loop — great for chatbots and Q&A.",
+  },
+  {
+    name: "RAG Pipeline",
+    description: "Retrieval-augmented generation for knowledge-heavy tasks.",
+  },
+  {
+    name: "Pipeline Agent",
+    description: "Sequential multi-step processing for content and data workflows.",
+  },
+  {
+    name: "Multi-Agent System",
+    description: "Multiple specialized agents collaborating on complex tasks.",
+  },
+  {
+    name: "Hierarchical Agents",
+    description: "Orchestrator + specialists for enterprise-grade automation.",
+  },
 ];
 ---
 
@@ -33,84 +47,109 @@ const architectures = [
   keywords="ai agent architecture, agent design patterns, react agent pattern, rag pipeline architecture, multi agent system, hierarchical agents, ai agent quiz, agent architecture guide"
   lang={lang}
   alternates={alternates}
-  schemas={[softwareApplicationSchema({ name: "Agent Architecture Quiz", description: "Free interactive quiz to find the best AI agent architecture for your use case — from simple ReAct to hierarchical multi-agent systems.", url: SITE_URL + "/tools/architecture-quiz/", operatingSystem: "Web" })]}
+  schemas={[
+    softwareApplicationSchema({
+      name: "Agent Architecture Quiz",
+      description:
+        "Free interactive quiz to find the best AI agent architecture for your use case — from simple ReAct to hierarchical multi-agent systems.",
+      url: SITE_URL + "/tools/architecture-quiz/",
+      operatingSystem: "Web",
+    }),
+  ]}
   theme="light"
 >
   <Navbar currentLang={lang} />
 
-  <Breadcrumbs items={[
-    { label: "Home", href: "/" },
-    { label: t["tools.index.title"] ?? "Free Tools", href: "/tools/" },
-    { label: t["tools.quiz.title"] ?? "Architecture Quiz" },
-  ]} />
+  <Breadcrumbs
+    items={[
+      { label: "Home", href: "/" },
+      { label: t["tools.index.title"] ?? "Free Tools", href: "/tools/" },
+      { label: t["tools.quiz.title"] ?? "Architecture Quiz" },
+    ]}
+  />
 
   <!-- Hero -->
   <main class="mx-auto max-w-4xl px-4 py-16 sm:py-24">
-    <div class="mb-12 text-center reveal">
-      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl heading-accent">
+    <div class="reveal mb-12 text-center">
+      <h1 class="heading-accent text-3xl font-bold tracking-tight sm:text-4xl">
         {t["tools.quiz.title"] ?? "Agent Architecture Quiz"}
       </h1>
-      <p class="mt-4 text-lg text-text-secondary max-w-2xl mx-auto">
-        {t["tools.quiz.subtitle"] ?? "Answer 5 quick questions about your project and discover the ideal agent architecture pattern — with a framework recommendation and next steps."}
+      <p class="text-text-secondary mx-auto mt-4 max-w-2xl text-lg">
+        {
+          t["tools.quiz.subtitle"] ??
+            "Answer 5 quick questions about your project and discover the ideal agent architecture pattern — with a framework recommendation and next steps."
+        }
       </p>
     </div>
 
-  <!-- Quiz -->
-  <section class="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-    <div class="mx-auto max-w-2xl">
-      <ArchitectureQuiz client:only="react" />
-    </div>
-  </section>
-
-  <!-- Architecture Patterns Overview -->
-  <section class="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-    <div class="mx-auto max-w-4xl">
-      <div class="mb-10 text-center reveal">
-        <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
-          {t["tools.quiz.patterns.title"] ?? "Architecture Patterns We Evaluate"}
-        </h2>
+    <!-- Quiz -->
+    <section class="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <div class="mx-auto max-w-2xl">
+        <ArchitectureQuiz client:only="react" />
       </div>
-      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 reveal-group">
-        {architectures.map((arch) => (
-          <div class="reveal glass-card rounded-xl p-5">
-            <h3 class="font-semibold text-sm">{arch.name}</h3>
-            <p class="mt-1 text-xs text-text-secondary leading-relaxed">{arch.description}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- CTA -->
-  <section class="px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
-    <div class="mx-auto max-w-3xl text-center reveal">
-      <div class="glass-card glow-card rounded-2xl p-6 sm:p-10 lg:p-14">
-        <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
-          {t["tools.quiz.cta.title"] ?? "Know your architecture — now pick a framework"}
-        </h2>
-        <p class="mt-4 text-text-secondary">
-          {t["tools.quiz.cta.description"] ?? "Use our framework comparison calculator to find the best framework for your chosen architecture."}
-        </p>
-        <div class="mt-6 sm:mt-8 flex flex-wrap items-center justify-center gap-3">
-          <a
-            href="/tools/framework-comparison/"
-            class="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-base font-semibold text-white transition-colors hover:bg-accent-hover"
-          >
-            Compare Frameworks
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-          </a>
-          <a
-            href="/tools/ai-agent-configurator/"
-            class="inline-flex items-center gap-2 rounded-full border border-border px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-base font-medium text-text-secondary transition-colors hover:text-text hover:border-text-secondary"
-          >
-            Generate a project
-          </a>
+    <!-- Architecture Patterns Overview -->
+    <section class="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <div class="mx-auto max-w-4xl">
+        <div class="reveal mb-10 text-center">
+          <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
+            {t["tools.quiz.patterns.title"] ?? "Architecture Patterns We Evaluate"}
+          </h2>
+        </div>
+        <div class="reveal-group grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {
+            architectures.map((arch) => (
+              <div class="reveal glass-card rounded-xl p-5">
+                <h3 class="text-sm font-semibold">{arch.name}</h3>
+                <p class="text-text-secondary mt-1 text-xs leading-relaxed">{arch.description}</p>
+              </div>
+            ))
+          }
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+
+    <!-- CTA -->
+    <section class="px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
+      <div class="reveal mx-auto max-w-3xl text-center">
+        <div class="glass-card glow-card rounded-2xl p-6 sm:p-10 lg:p-14">
+          <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
+            {t["tools.quiz.cta.title"] ?? "Know your architecture — now pick a framework"}
+          </h2>
+          <p class="text-text-secondary mt-4">
+            {
+              t["tools.quiz.cta.description"] ??
+                "Use our framework comparison calculator to find the best framework for your chosen architecture."
+            }
+          </p>
+          <div class="mt-6 flex flex-wrap items-center justify-center gap-3 sm:mt-8">
+            <a
+              href="/tools/framework-comparison/"
+              class="bg-accent hover:bg-accent-hover inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-semibold text-white transition-colors sm:px-8 sm:py-3 sm:text-base"
+            >
+              Compare Frameworks
+              <svg
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"
+                ></path>
+              </svg>
+            </a>
+            <a
+              href="/tools/ai-agent-configurator/"
+              class="border-border text-text-secondary hover:text-text hover:border-text-secondary inline-flex items-center gap-2 rounded-full border px-6 py-2.5 text-sm font-medium transition-colors sm:px-8 sm:py-3 sm:text-base"
+            >
+              Generate a project
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <OssFooter t={t} />

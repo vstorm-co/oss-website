@@ -1,11 +1,11 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import Navbar from '../../components/Navbar.astro';
-import OssFooter from '../../components/oss/OssFooter.astro';
-import Breadcrumbs from '../../components/shared/Breadcrumbs.astro';
-import { translations, languages, defaultLang } from '../../i18n/translations';
-import { seoFrameworks, seoUseCases } from '../../data/seo-guides';
-import { collectionPageSchema, SITE_URL } from '../../lib/schemas';
+import Layout from "../../layouts/Layout.astro";
+import Navbar from "../../components/Navbar.astro";
+import OssFooter from "../../components/oss/OssFooter.astro";
+import Breadcrumbs from "../../components/shared/Breadcrumbs.astro";
+import { translations, languages, defaultLang } from "../../i18n/translations";
+import { seoFrameworks, seoUseCases } from "../../data/seo-guides";
+import { collectionPageSchema, SITE_URL } from "../../lib/schemas";
 
 const lang = defaultLang;
 const t = translations[lang];
@@ -20,53 +20,78 @@ const alternates = [
 
 <Layout
   title={`${t["guides.index.title"] ?? "Guides"} — Vstorm OSS`}
-  description={t["guides.index.subtitle"] ?? "Learn how to build AI agents with different frameworks — step-by-step tutorials with working code."}
+  description={t["guides.index.subtitle"] ??
+    "Learn how to build AI agents with different frameworks — step-by-step tutorials with working code."}
   keywords="ai agent tutorial, python ai framework, pydantic ai tutorial, langchain tutorial, langgraph guide, crewai example, deep agents guide"
   lang={lang}
   alternates={alternates}
-  schemas={[collectionPageSchema({ name: t["guides.index.title"] ?? "Guides", description: t["guides.index.subtitle"] ?? "Learn how to build AI agents with different frameworks — step-by-step tutorials with working code.", url: SITE_URL + "/guides/" })]}
+  schemas={[
+    collectionPageSchema({
+      name: t["guides.index.title"] ?? "Guides",
+      description:
+        t["guides.index.subtitle"] ??
+        "Learn how to build AI agents with different frameworks — step-by-step tutorials with working code.",
+      url: SITE_URL + "/guides/",
+    }),
+  ]}
 >
   <Navbar currentLang={lang} />
 
-  <Breadcrumbs items={[
-    { label: "Home", href: "/" },
-    { label: t["guides.index.title"] ?? "Guides" },
-  ]} />
+  <Breadcrumbs
+    items={[{ label: "Home", href: "/" }, { label: t["guides.index.title"] ?? "Guides" }]}
+  />
 
   <main class="mx-auto max-w-5xl px-4 py-16 sm:py-24">
-    <div class="mb-12 text-center reveal">
-      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl heading-accent">
+    <div class="reveal mb-12 text-center">
+      <h1 class="heading-accent text-3xl font-bold tracking-tight sm:text-4xl">
         {t["guides.index.title"] ?? "Guides"}
       </h1>
-      <p class="mt-4 text-lg text-text-secondary max-w-2xl mx-auto">
-        {t["guides.index.subtitle"] ?? "Learn how to build AI agents with different frameworks — step-by-step tutorials with working code."}
+      <p class="text-text-secondary mx-auto mt-4 max-w-2xl text-lg">
+        {
+          t["guides.index.subtitle"] ??
+            "Learn how to build AI agents with different frameworks — step-by-step tutorials with working code."
+        }
       </p>
     </div>
 
-    {seoUseCases.map((uc) => (
-      <div class="mb-12 reveal">
-        <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
-          <span class="h-px flex-1 bg-border"></span>
-          <span class="px-3">{uc.pageTitle[lang].replace("{framework}", "").replace(" with ", "").replace(" z ", "").replace(" mit ", "").replace(" con ", "").trim()}</span>
-          <span class="h-px flex-1 bg-border"></span>
-        </h2>
-        <div class="grid gap-3 sm:grid-cols-5">
-          {seoFrameworks.map((fw) => (
-            <a
-              href={`/guides/${uc.slug}-with-${fw.slug}/`}
-              class="group glass-card rounded-xl p-4 hover:border-accent/30 transition-all text-center"
-            >
-              <span class="text-sm font-semibold text-text group-hover:text-accent transition-colors">{fw.name}</span>
-              <div class="mt-1 flex flex-wrap justify-center gap-1">
-                {uc.tags.slice(0, 2).map((tag) => (
-                  <span class="rounded-full border border-border px-1.5 py-0.5 text-[9px] text-text-tertiary">{tag}</span>
-                ))}
-              </div>
-            </a>
-          ))}
+    {
+      seoUseCases.map((uc) => (
+        <div class="reveal mb-12">
+          <h2 class="mb-4 flex items-center gap-2 text-xl font-semibold">
+            <span class="bg-border h-px flex-1" />
+            <span class="px-3">
+              {uc.pageTitle[lang]
+                .replace("{framework}", "")
+                .replace(" with ", "")
+                .replace(" z ", "")
+                .replace(" mit ", "")
+                .replace(" con ", "")
+                .trim()}
+            </span>
+            <span class="bg-border h-px flex-1" />
+          </h2>
+          <div class="grid gap-3 sm:grid-cols-5">
+            {seoFrameworks.map((fw) => (
+              <a
+                href={`/guides/${uc.slug}-with-${fw.slug}/`}
+                class="group glass-card hover:border-accent/30 rounded-xl p-4 text-center transition-all"
+              >
+                <span class="text-text group-hover:text-accent text-sm font-semibold transition-colors">
+                  {fw.name}
+                </span>
+                <div class="mt-1 flex flex-wrap justify-center gap-1">
+                  {uc.tags.slice(0, 2).map((tag) => (
+                    <span class="border-border text-text-tertiary rounded-full border px-1.5 py-0.5 text-[9px]">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </a>
+            ))}
+          </div>
         </div>
-      </div>
-    ))}
+      ))
+    }
   </main>
 
   <OssFooter t={t} />

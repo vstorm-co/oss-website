@@ -1,11 +1,11 @@
 ---
-import Layout from '../../../layouts/Layout.astro';
-import Navbar from '../../../components/Navbar.astro';
-import OssFooter from '../../../components/oss/OssFooter.astro';
-import Breadcrumbs from '../../../components/shared/Breadcrumbs.astro';
-import { translations, languages, defaultLang, type Lang } from '../../../i18n/translations';
-import { comparisonPages } from '../../../data/compare-pages';
-import { collectionPageSchema, SITE_URL } from '../../../lib/schemas';
+import Layout from "../../../layouts/Layout.astro";
+import Navbar from "../../../components/Navbar.astro";
+import OssFooter from "../../../components/oss/OssFooter.astro";
+import Breadcrumbs from "../../../components/shared/Breadcrumbs.astro";
+import { translations, languages, defaultLang, type Lang } from "../../../i18n/translations";
+import { comparisonPages } from "../../../data/compare-pages";
+import { collectionPageSchema, SITE_URL } from "../../../lib/schemas";
 
 export function getStaticPaths() {
   return Object.keys(languages)
@@ -26,53 +26,66 @@ const alternates = [
 
 <Layout
   title={`${t["compare.index.title"] ?? "Compare"} — Vstorm OSS`}
-  description={t["compare.index.subtitle"] ?? "Side-by-side comparisons of AI agent frameworks, templates, and tools."}
+  description={t["compare.index.subtitle"] ??
+    "Side-by-side comparisons of AI agent frameworks, templates, and tools."}
   keywords="ai framework comparison, pydantic ai vs langchain, ai agent template comparison, python ai tools"
   lang={lang}
   alternates={alternates}
-  schemas={[collectionPageSchema({ name: t["compare.index.title"] ?? "Compare", description: t["compare.index.subtitle"] ?? "Side-by-side comparisons of AI agent frameworks, templates, and tools.", url: SITE_URL + `/${lang}/compare/` })]}
+  schemas={[
+    collectionPageSchema({
+      name: t["compare.index.title"] ?? "Compare",
+      description:
+        t["compare.index.subtitle"] ??
+        "Side-by-side comparisons of AI agent frameworks, templates, and tools.",
+      url: SITE_URL + `/${lang}/compare/`,
+    }),
+  ]}
 >
   <Navbar currentLang={lang} />
 
-  <Breadcrumbs items={[
-    { label: "Home", href: `/${lang}/` },
-    { label: t["compare.index.title"] ?? "Compare" },
-  ]} />
+  <Breadcrumbs
+    items={[{ label: "Home", href: `/${lang}/` }, { label: t["compare.index.title"] ?? "Compare" }]}
+  />
 
   <main class="mx-auto max-w-3xl px-4 py-16 sm:py-24">
     <!-- Hero -->
-    <div class="mb-12 text-center reveal">
-      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl heading-accent">
+    <div class="reveal mb-12 text-center">
+      <h1 class="heading-accent text-3xl font-bold tracking-tight sm:text-4xl">
         {t["compare.index.title"] ?? "Compare"}
       </h1>
-      <p class="mt-4 text-lg text-text-secondary max-w-2xl mx-auto">
-        {t["compare.index.subtitle"] ?? "Side-by-side comparisons of AI agent frameworks, templates, and tools."}
+      <p class="text-text-secondary mx-auto mt-4 max-w-2xl text-lg">
+        {
+          t["compare.index.subtitle"] ??
+            "Side-by-side comparisons of AI agent frameworks, templates, and tools."
+        }
       </p>
     </div>
 
     <!-- List -->
-    <div class="space-y-4 reveal-group">
-      {comparisonPages.map((page) => (
-        <a
-          href={`/${lang}/compare/${page.slug}/`}
-          class="group block glass-card rounded-xl p-6 hover:border-accent/30 relative overflow-hidden"
-        >
-          <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/0 to-transparent group-hover:via-accent/50 transition-all duration-500"></div>
-          <div class="flex items-center gap-3 text-sm text-text-tertiary">
-            <span class="rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent">
-              {page.category}
-            </span>
-            <span>&middot;</span>
-            <span>{page.highlights.length} key differences</span>
-            <span>&middot;</span>
-            <span>{page.tableRows.length} features compared</span>
-          </div>
-          <h2 class="mt-2 text-lg font-semibold text-text group-hover:text-accent transition-colors">
-            {page.product} vs {page.competitor}
-          </h2>
-          <p class="mt-2 text-sm text-text-secondary line-clamp-2">{page.verdict[lang]}</p>
-        </a>
-      ))}
+    <div class="reveal-group space-y-4">
+      {
+        comparisonPages.map((page) => (
+          <a
+            href={`/${lang}/compare/${page.slug}/`}
+            class="group glass-card hover:border-accent/30 relative block overflow-hidden rounded-xl p-6"
+          >
+            <div class="via-accent/0 group-hover:via-accent/50 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent transition-all duration-500" />
+            <div class="text-text-tertiary flex items-center gap-3 text-sm">
+              <span class="bg-accent/10 text-accent rounded-full px-2.5 py-0.5 text-xs font-medium">
+                {page.category}
+              </span>
+              <span>&middot;</span>
+              <span>{page.highlights.length} key differences</span>
+              <span>&middot;</span>
+              <span>{page.tableRows.length} features compared</span>
+            </div>
+            <h2 class="text-text group-hover:text-accent mt-2 text-lg font-semibold transition-colors">
+              {page.product} vs {page.competitor}
+            </h2>
+            <p class="text-text-secondary mt-2 line-clamp-2 text-sm">{page.verdict[lang]}</p>
+          </a>
+        ))
+      }
     </div>
   </main>
 

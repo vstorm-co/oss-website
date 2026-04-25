@@ -1,18 +1,18 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import Navbar from '../../components/Navbar.astro';
-import Footer from '../../components/landing/Footer.astro';
-import BlogCard from '../../components/blog/BlogCard.astro';
-import Pagination from '../../components/blog/Pagination.astro';
-import { getCollection } from 'astro:content';
-import Breadcrumbs from '../../components/shared/Breadcrumbs.astro';
-import BlogSearch from '../../components/blog/BlogSearch.astro';
-import { translations, languages, defaultLang } from '../../i18n/translations';
-import { collectionPageSchema, SITE_URL } from '../../lib/schemas';
+import Layout from "../../layouts/Layout.astro";
+import Navbar from "../../components/Navbar.astro";
+import Footer from "../../components/landing/Footer.astro";
+import BlogCard from "../../components/blog/BlogCard.astro";
+import Pagination from "../../components/blog/Pagination.astro";
+import { getCollection } from "astro:content";
+import Breadcrumbs from "../../components/shared/Breadcrumbs.astro";
+import BlogSearch from "../../components/blog/BlogSearch.astro";
+import { translations, languages, defaultLang } from "../../i18n/translations";
+import { collectionPageSchema, SITE_URL } from "../../lib/schemas";
 
 export async function getStaticPaths({ paginate }: { paginate: Function }) {
   const allPosts = (
-    await getCollection('blog', ({ data }) => data.lang === 'en' && !data.draft)
+    await getCollection("blog", ({ data }) => data.lang === "en" && !data.draft)
   ).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
   return paginate(allPosts, { pageSize: 20 });
@@ -37,18 +37,23 @@ const alternates = [
   keywords="ai agent blog, pydantic ai tutorials, python ai guides, ai framework comparison, llm engineering"
   lang={lang}
   alternates={alternates}
-  schemas={[collectionPageSchema({ name: t["blog.title"], description: t["blog.subtitle"], url: SITE_URL + "/blog/" })]}
+  schemas={[
+    collectionPageSchema({
+      name: t["blog.title"],
+      description: t["blog.subtitle"],
+      url: SITE_URL + "/blog/",
+    }),
+  ]}
 >
   <Navbar currentLang={lang} languageLinks={alternates} />
-  <Breadcrumbs items={[
-    { label: "Home", href: "/" },
-    { label: t["nav.blog"] },
-  ]} />
+  <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: t["nav.blog"] }]} />
 
   <main class="mx-auto max-w-3xl px-4 py-16 sm:py-24">
-    <div class="mb-12 text-center reveal">
-      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl heading-accent">{t["blog.title"]}</h1>
-      <p class="mt-4 text-lg text-text-secondary max-w-2xl mx-auto">{t["blog.subtitle"]}</p>
+    <div class="reveal mb-12 text-center">
+      <h1 class="heading-accent text-3xl font-bold tracking-tight sm:text-4xl">
+        {t["blog.title"]}
+      </h1>
+      <p class="text-text-secondary mx-auto mt-4 max-w-2xl text-lg">{t["blog.subtitle"]}</p>
     </div>
 
     <!-- Category filter tabs -->
@@ -59,25 +64,28 @@ const alternates = [
       >
         {t["blog.allCategories"]}
       </a>
-      {categories.map((cat) => (
-        <a
-          href={`/blog/category/${cat}/`}
-          class="category-tab rounded-full px-4 py-1.5 text-sm font-medium transition-colors"
-        >
-          {t[`blog.category.${cat}` as keyof typeof t]}
-        </a>
-      ))}
+      {
+        categories.map((cat) => (
+          <a
+            href={`/blog/category/${cat}/`}
+            class="category-tab rounded-full px-4 py-1.5 text-sm font-medium transition-colors"
+          >
+            {t[`blog.category.${cat}` as keyof typeof t]}
+          </a>
+        ))
+      }
     </div>
 
     <BlogSearch placeholder={t["blog.search"]} />
 
-    {page.data.length === 0 ? (
-      <p class="text-center text-text-secondary">{t["blog.noPosts"]}</p>
-    ) : (
-      <div class="space-y-4">
-        {page.data.map((post) => {
-          const slug = post.id.split('/').slice(1).join('/');
-          return (
+    {
+      page.data.length === 0 ? (
+        <p class="text-text-secondary text-center">{t["blog.noPosts"]}</p>
+      ) : (
+        <div class="space-y-4">
+          {page.data.map((post) => {
+            const slug = post.id.split("/").slice(1).join("/");
+            return (
               <BlogCard
                 title={post.data.title}
                 description={post.data.description}
@@ -88,19 +96,17 @@ const alternates = [
                 category={post.data.category}
                 author={post.data.author}
               />
-          );
-        })}
-      </div>
-    )}
+            );
+          })}
+        </div>
+      )
+    }
 
-    <p id="no-filtered-posts" class="text-center text-text-secondary py-8" style="display:none;">{t["blog.noPosts"]}</p>
+    <p id="no-filtered-posts" class="text-text-secondary py-8 text-center" style="display:none;">
+      {t["blog.noPosts"]}
+    </p>
 
-    <Pagination
-      currentPage={page.currentPage}
-      lastPage={page.lastPage}
-      basePath="/blog"
-      t={t}
-    />
+    <Pagination currentPage={page.currentPage} lastPage={page.lastPage} basePath="/blog" t={t} />
   </main>
 
   <Footer t={t} />
@@ -122,4 +128,3 @@ const alternates = [
     border-color: var(--color-accent);
   }
 </style>
-

@@ -14,9 +14,9 @@ export const GET: APIRoute = async ({ site }) => {
     })
     .join("\n");
 
-  const posts = (
-    await getCollection("blog", ({ data }) => data.lang === "en" && !data.draft)
-  ).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  const posts = (await getCollection("blog", ({ data }) => data.lang === "en" && !data.draft)).sort(
+    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+  );
 
   const blogList = posts
     .map((post) => {
@@ -26,7 +26,9 @@ export const GET: APIRoute = async ({ site }) => {
     .join("\n");
 
   const compareList = comparisonPages
-    .map((c) => `- [${c.product} vs ${c.competitor}](${siteUrl}/compare/${c.slug}/): ${c.verdict.en}`)
+    .map(
+      (c) => `- [${c.product} vs ${c.competitor}](${siteUrl}/compare/${c.slug}/): ${c.verdict.en}`,
+    )
     .join("\n");
 
   const body = `# ${new URL(siteUrl).hostname}

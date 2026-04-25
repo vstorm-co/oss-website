@@ -14,19 +14,11 @@ export const GET: APIRoute = async ({ site }) => {
       const entries = catProjects
         .map((p) => {
           const status = p.status === "coming-soon" ? " [COMING SOON]" : "";
-          const install = p.installCommand
-            ? `\nInstall: \`${p.installCommand}\``
-            : "";
-          const github = p.github
-            ? `\nGitHub: https://github.com/${p.github}`
-            : "";
-          const pypi = p.pypi
-            ? `\nPyPI: https://pypi.org/project/${p.pypi}/`
-            : "";
+          const install = p.installCommand ? `\nInstall: \`${p.installCommand}\`` : "";
+          const github = p.github ? `\nGitHub: https://github.com/${p.github}` : "";
+          const pypi = p.pypi ? `\nPyPI: https://pypi.org/project/${p.pypi}/` : "";
           const features =
-            p.features.en.length > 0
-              ? `\nFeatures: ${p.features.en.join(", ")}`
-              : "";
+            p.features.en.length > 0 ? `\nFeatures: ${p.features.en.join(", ")}` : "";
 
           return `### ${p.name}${status}
 
@@ -43,9 +35,9 @@ ${entries}`;
     .filter(Boolean)
     .join("\n\n---\n\n");
 
-  const posts = (
-    await getCollection("blog", ({ data }) => data.lang === "en" && !data.draft)
-  ).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  const posts = (await getCollection("blog", ({ data }) => data.lang === "en" && !data.draft)).sort(
+    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+  );
 
   const blogList = posts
     .map((post) => {
@@ -150,13 +142,17 @@ All blog posts available in 4 languages: English (default), Polish (/pl/), Germa
 Side-by-side comparisons of AI agent frameworks, templates, and tools.
 Compare index: ${siteUrl}/compare/
 
-${comparisonPages.map((c) => `### ${c.product} vs ${c.competitor}
+${comparisonPages
+  .map(
+    (c) => `### ${c.product} vs ${c.competitor}
 ${siteUrl}/compare/${c.slug}/
 
 ${c.verdict.en}
 
 Key differences: ${c.highlights.map((h) => h.title.en).join(", ")}
-Features compared: ${c.tableRows.length}`).join("\n\n")}
+Features compared: ${c.tableRows.length}`,
+  )
+  .join("\n\n")}
 
 ---
 

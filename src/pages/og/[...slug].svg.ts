@@ -1,10 +1,10 @@
-import type { APIRoute, GetStaticPaths } from 'astro';
-import { getCollection } from 'astro:content';
+import type { APIRoute, GetStaticPaths } from "astro";
+import { getCollection } from "astro:content";
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const posts = await getCollection('blog', ({ data }) => data.lang === 'en' && !data.draft);
+  const posts = await getCollection("blog", ({ data }) => data.lang === "en" && !data.draft);
   return posts.map((post) => {
-    const slug = post.id.split('/').slice(1).join('/');
+    const slug = post.id.split("/").slice(1).join("/");
     return {
       params: { slug },
       props: { title: post.data.title, tags: post.data.tags || [] },
@@ -17,16 +17,16 @@ export const GET: APIRoute = async ({ props }) => {
 
   // Word wrap the title for SVG
   const maxCharsPerLine = 30;
-  const words = title.split(' ');
+  const words = title.split(" ");
   const lines: string[] = [];
-  let currentLine = '';
+  let currentLine = "";
 
   for (const word of words) {
-    if ((currentLine + ' ' + word).trim().length > maxCharsPerLine) {
+    if ((currentLine + " " + word).trim().length > maxCharsPerLine) {
       if (currentLine) lines.push(currentLine.trim());
       currentLine = word;
     } else {
-      currentLine = (currentLine + ' ' + word).trim();
+      currentLine = (currentLine + " " + word).trim();
     }
   }
   if (currentLine) lines.push(currentLine.trim());
@@ -34,10 +34,10 @@ export const GET: APIRoute = async ({ props }) => {
   // Limit to 3 lines
   const displayLines = lines.slice(0, 3);
   if (lines.length > 3) {
-    displayLines[2] = displayLines[2] + '...';
+    displayLines[2] = displayLines[2] + "...";
   }
 
-  const tagString = tags.slice(0, 3).join(' \u00B7 ');
+  const tagString = tags.slice(0, 3).join(" \u00B7 ");
 
   const titleY = 280;
   const lineHeight = 60;
@@ -71,22 +71,30 @@ export const GET: APIRoute = async ({ props }) => {
   <text x="80" y="110" font-family="system-ui,-apple-system,sans-serif" font-size="20" font-weight="600" fill="#a1a1aa">Vstorm OSS</text>
 
   <!-- Title -->
-  ${displayLines.map((line, i) =>
-    `<text x="80" y="${titleY + i * lineHeight}" font-family="system-ui,-apple-system,sans-serif" font-size="48" font-weight="700" fill="#fafafa">${escapeXml(line)}</text>`
-  ).join('\n  ')}
+  ${displayLines
+    .map(
+      (line, i) =>
+        `<text x="80" y="${titleY + i * lineHeight}" font-family="system-ui,-apple-system,sans-serif" font-size="48" font-weight="700" fill="#fafafa">${escapeXml(line)}</text>`,
+    )
+    .join("\n  ")}
 
   <!-- Tags -->
-  ${tagString ? `<text x="80" y="540" font-family="system-ui,-apple-system,sans-serif" font-size="18" fill="#ef4444">${escapeXml(tagString)}</text>` : ''}
+  ${tagString ? `<text x="80" y="540" font-family="system-ui,-apple-system,sans-serif" font-size="18" fill="#ef4444">${escapeXml(tagString)}</text>` : ""}
 
   <!-- Domain -->
   <text x="80" y="580" font-family="system-ui,-apple-system,sans-serif" font-size="16" fill="#52525b">oss.vstorm.co</text>
 </svg>`;
 
   return new Response(svg, {
-    headers: { 'Content-Type': 'image/svg+xml' },
+    headers: { "Content-Type": "image/svg+xml" },
   });
 };
 
 function escapeXml(str: string): string {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
 }

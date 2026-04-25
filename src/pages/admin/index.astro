@@ -1,20 +1,73 @@
 ---
-import AdminApp from '../../components/admin/AdminApp.tsx';
-
+import AdminApp from "@/components/admin/AdminApp";
 const isDev = import.meta.env.DEV;
 ---
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex,nofollow" />
-    <title>Blog Admin · Local</title>
+    <title>Admin · Local</title>
     <link rel="icon" href="/favicon.svg" />
     <style is:global>
       html, body { margin: 0; padding: 0; height: 100%; background: #09090b; color: #fafafa; font-family: Inter, system-ui, sans-serif; }
       #admin-root { height: 100vh; }
     </style>
+    {isDev && (
+      <script is:inline>
+        // Block Vite/Astro full-page reloads triggered by content file changes.
+        // Must run synchronously before @vite/client connects its WebSocket.
+        (function () {
+          function shouldBlock(raw) {
+            try {
+              const d = JSON.parse(raw);
+              // Block full-reloads. Updates are handled by our React app via the API.
+              if (d.type === 'full-reload') return true;
+              // Block hot-updates for content/data files — we manage those manually.
+              if (d.type === 'update' && Array.isArray(d.updates)) {
+                d.updates = d.updates.filter(function (u) {
+                  const p = u.path || '';
+                  return !p.includes('/src/data/') && !p.includes('astro:content');
+                });
+                return d.updates.length === 0;
+              }
+            } catch (_) {}
+            return false;
+          }
+
+          // Wrap addEventListener on WebSocket.prototype so any WS Vite creates gets filtered.
+          const proto = WebSocket.prototype;
+          const origAdd = proto.addEventListener;
+          proto.addEventListener = function (type, fn, opts) {
+            if (type === 'message' && typeof fn === 'function') {
+              const wrapped = function (e) {
+        if (shouldBlock(e.data)) return;
+        fn.call(this, e);
+      };
+              return origAdd.call(this, type, wrapped, opts);
+            }
+            return origAdd.call(this, type, fn, opts);
+          };
+
+          // Also cover ws.onmessage = handler pattern.
+          const desc = Object.getOwnPropertyDescriptor(proto, 'onmessage');
+          if (desc && desc.set) {
+            Object.defineProperty(proto, 'onmessage', {
+              configurable: true,
+              get: desc.get,
+              set: function (fn) {
+                if (typeof fn !== 'function') { desc.set.call(this, fn); return; }
+                desc.set.call(this, function (e) {
+                  if (shouldBlock(e.data)) return;
+                  fn.call(this, e);
+                });
+              },
+            });
+          }
+        })();
+      </script>
+    )}
   </head>
   <body>
     {isDev ? (

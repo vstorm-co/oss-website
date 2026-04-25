@@ -1,9 +1,9 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import Navbar from '../../components/Navbar.astro';
-import OssFooter from '../../components/oss/OssFooter.astro';
-import Breadcrumbs from '../../components/shared/Breadcrumbs.astro';
-import { translations, defaultLang } from '../../i18n/translations';
+import Layout from "../../layouts/Layout.astro";
+import Navbar from "../../components/Navbar.astro";
+import OssFooter from "../../components/oss/OssFooter.astro";
+import Breadcrumbs from "../../components/shared/Breadcrumbs.astro";
+import { translations, defaultLang } from "../../i18n/translations";
 import {
   getAllGlossarySlugs,
   getGlossaryTermBySlug,
@@ -12,8 +12,8 @@ import {
   categoryColors,
   termToProjectMap,
   termToBlogMap,
-} from '../../data/glossary';
-import { definedTermSchema, SITE_URL } from '../../lib/schemas';
+} from "../../data/glossary";
+import { definedTermSchema, SITE_URL } from "../../lib/schemas";
 
 export function getStaticPaths() {
   return getAllGlossarySlugs().map((slug) => ({ params: { slug } }));
@@ -41,123 +41,149 @@ const glossaryMetaDesc = rawMetaDesc.length > 160 ? rawMetaDesc.slice(0, 157) + 
   keywords={`${term.term}, ${categoryLabels[term.category]}, ai glossary, definition, ${term.relatedTerms.join(", ")}`}
   lang={lang}
   alternates={[{ lang: "en", href: `/glossary/${slug}/` }]}
-  schemas={[definedTermSchema({ name: term.term, description: term.definition, url: SITE_URL + `/glossary/${slug}/`, inDefinedTermSet: "AI & ML Glossary" })]}
+  schemas={[
+    definedTermSchema({
+      name: term.term,
+      description: term.definition,
+      url: SITE_URL + `/glossary/${slug}/`,
+      inDefinedTermSet: "AI & ML Glossary",
+    }),
+  ]}
   theme="light"
 >
   <Navbar currentLang={lang} languageLinks={languageLinks} />
 
-  <Breadcrumbs items={[
-    { label: "Home", href: "/" },
-    { label: "Glossary", href: "/glossary/" },
-    { label: term.term },
-  ]} />
+  <Breadcrumbs
+    items={[
+      { label: "Home", href: "/" },
+      { label: "Glossary", href: "/glossary/" },
+      { label: term.term },
+    ]}
+  />
 
   <main class="mx-auto max-w-4xl px-4 py-16 sm:py-24">
     <!-- Hero -->
-    <div class="mb-12 text-center reveal">
-      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl heading-accent">
+    <div class="reveal mb-12 text-center">
+      <h1 class="heading-accent text-3xl font-bold tracking-tight sm:text-4xl">
         {term.term}
       </h1>
-      <p class="mt-4 text-lg text-text-secondary max-w-2xl mx-auto">
+      <p class="text-text-secondary mx-auto mt-4 max-w-2xl text-lg">
         {term.definition}
       </p>
     </div>
 
     <!-- Vstorm OSS Tools -->
-    {projects.length > 0 && (
-      <section class="mb-12 reveal">
-        <h2 class="text-xl font-bold tracking-tight sm:text-2xl mb-4">
-          Vstorm OSS Tools for This
-        </h2>
-        <div class="grid gap-3 sm:grid-cols-2">
-          {projects.map((project) => (
-            <a
-              href={`/projects/${project.slug}/`}
-              class="group glass-card rounded-xl p-5 hover:border-accent/30 transition-all relative overflow-hidden flex items-center justify-between gap-3"
-            >
-              <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/0 to-transparent group-hover:via-accent/50 transition-all duration-500" />
-              <div>
-                <h3 class="font-semibold text-text group-hover:text-accent transition-colors">
-                  {project.name}
-                </h3>
-                <p class="text-xs text-text-tertiary mt-0.5">View project &rarr;</p>
-              </div>
-              <svg class="w-5 h-5 shrink-0 text-text-tertiary group-hover:text-accent transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </a>
-          ))}
-        </div>
-      </section>
-    )}
+    {
+      projects.length > 0 && (
+        <section class="reveal mb-12">
+          <h2 class="mb-4 text-xl font-bold tracking-tight sm:text-2xl">
+            Vstorm OSS Tools for This
+          </h2>
+          <div class="grid gap-3 sm:grid-cols-2">
+            {projects.map((project) => (
+              <a
+                href={`/projects/${project.slug}/`}
+                class="group glass-card hover:border-accent/30 relative flex items-center justify-between gap-3 overflow-hidden rounded-xl p-5 transition-all"
+              >
+                <div class="via-accent/0 group-hover:via-accent/50 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent transition-all duration-500" />
+                <div>
+                  <h3 class="text-text group-hover:text-accent font-semibold transition-colors">
+                    {project.name}
+                  </h3>
+                  <p class="text-text-tertiary mt-0.5 text-xs">View project &rarr;</p>
+                </div>
+                <svg
+                  class="text-text-tertiary group-hover:text-accent h-5 w-5 shrink-0 transition-colors"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            ))}
+          </div>
+        </section>
+      )
+    }
 
     <!-- Learn More (blog posts) -->
-    {blogPosts.length > 0 && (
-      <section class="mb-12 reveal">
-        <h2 class="text-xl font-bold tracking-tight sm:text-2xl mb-4">
-          Learn More on Our Blog
-        </h2>
-        <div class="grid gap-3">
-          {blogPosts.map((post) => (
-            <a
-              href={`/blog/${post.slug}/`}
-              class="group glass-card rounded-xl p-5 hover:border-accent/30 transition-all relative overflow-hidden flex items-center justify-between gap-3"
-            >
-              <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/0 to-transparent group-hover:via-accent/50 transition-all duration-500" />
-              <div>
-                <h3 class="font-semibold text-text group-hover:text-accent transition-colors text-sm">
-                  {post.title}
-                </h3>
-                <p class="text-xs text-text-tertiary mt-0.5">Read article &rarr;</p>
-              </div>
-              <svg class="w-5 h-5 shrink-0 text-text-tertiary group-hover:text-accent transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </a>
-          ))}
-        </div>
-      </section>
-    )}
+    {
+      blogPosts.length > 0 && (
+        <section class="reveal mb-12">
+          <h2 class="mb-4 text-xl font-bold tracking-tight sm:text-2xl">Learn More on Our Blog</h2>
+          <div class="grid gap-3">
+            {blogPosts.map((post) => (
+              <a
+                href={`/blog/${post.slug}/`}
+                class="group glass-card hover:border-accent/30 relative flex items-center justify-between gap-3 overflow-hidden rounded-xl p-5 transition-all"
+              >
+                <div class="via-accent/0 group-hover:via-accent/50 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent transition-all duration-500" />
+                <div>
+                  <h3 class="text-text group-hover:text-accent text-sm font-semibold transition-colors">
+                    {post.title}
+                  </h3>
+                  <p class="text-text-tertiary mt-0.5 text-xs">Read article &rarr;</p>
+                </div>
+                <svg
+                  class="text-text-tertiary group-hover:text-accent h-5 w-5 shrink-0 transition-colors"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            ))}
+          </div>
+        </section>
+      )
+    }
 
     <!-- Related Terms -->
-    {related.length > 0 && (
-      <section class="mb-12 reveal">
-        <h2 class="text-xl font-bold tracking-tight sm:text-2xl mb-4">
-          Related Terms
-        </h2>
-        <div class="grid gap-3 sm:grid-cols-2">
-          {related.map((rel) => {
-            const firstSentence = rel.definition.split(". ")[0] + ".";
-            return (
-              <a
-                href={`/glossary/${rel.slug}/`}
-                class="group glass-card rounded-xl p-5 hover:border-accent/30 transition-all relative overflow-hidden block"
-              >
-                <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/0 to-transparent group-hover:via-accent/50 transition-all duration-500" />
-                <div class="flex items-center gap-2 mb-1.5">
-                  <h3 class="text-sm font-semibold text-text group-hover:text-accent transition-colors truncate">
-                    {rel.term}
-                  </h3>
-                  <span class={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${categoryColors[rel.category]}`}>
-                    {categoryLabels[rel.category]}
-                  </span>
-                </div>
-                <p class="text-xs text-text-secondary line-clamp-2">{firstSentence}</p>
-              </a>
-            );
-          })}
-        </div>
-      </section>
-    )}
+    {
+      related.length > 0 && (
+        <section class="reveal mb-12">
+          <h2 class="mb-4 text-xl font-bold tracking-tight sm:text-2xl">Related Terms</h2>
+          <div class="grid gap-3 sm:grid-cols-2">
+            {related.map((rel) => {
+              const firstSentence = rel.definition.split(". ")[0] + ".";
+              return (
+                <a
+                  href={`/glossary/${rel.slug}/`}
+                  class="group glass-card hover:border-accent/30 relative block overflow-hidden rounded-xl p-5 transition-all"
+                >
+                  <div class="via-accent/0 group-hover:via-accent/50 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent transition-all duration-500" />
+                  <div class="mb-1.5 flex items-center gap-2">
+                    <h3 class="text-text group-hover:text-accent truncate text-sm font-semibold transition-colors">
+                      {rel.term}
+                    </h3>
+                    <span
+                      class={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${categoryColors[rel.category]}`}
+                    >
+                      {categoryLabels[rel.category]}
+                    </span>
+                  </div>
+                  <p class="text-text-secondary line-clamp-2 text-xs">{firstSentence}</p>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+      )
+    }
 
     <!-- Back to Glossary -->
-    <div class="text-center reveal">
+    <div class="reveal text-center">
       <a
         href="/glossary/"
-        class="inline-flex items-center gap-2 rounded-full border border-border px-6 py-2.5 text-sm font-semibold text-text transition-colors hover:border-accent/40 hover:bg-accent/5 hover:text-accent"
+        class="border-border text-text hover:border-accent/40 hover:bg-accent/5 hover:text-accent inline-flex items-center gap-2 rounded-full border px-6 py-2.5 text-sm font-semibold transition-colors"
       >
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12"
+          ></path>
         </svg>
         Back to Glossary
       </a>

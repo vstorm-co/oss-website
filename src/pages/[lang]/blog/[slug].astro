@@ -1,17 +1,18 @@
 ---
-import { getCollection, render } from 'astro:content';
-import BlogLayout from '../../../layouts/BlogLayout.astro';
-import { languages, defaultLang, type Lang } from '../../../i18n/translations';
+import { getCollection, render } from "astro:content";
+import BlogLayout from "../../../layouts/BlogLayout.astro";
+import { languages, defaultLang, type Lang } from "../../../i18n/translations";
 
 export async function getStaticPaths() {
   const nonDefaultLocales = Object.keys(languages).filter((l) => l !== defaultLang);
 
-  const posts = await getCollection('blog', ({ data }) =>
-    nonDefaultLocales.includes(data.lang) && !data.draft
+  const posts = await getCollection(
+    "blog",
+    ({ data }) => nonDefaultLocales.includes(data.lang) && !data.draft,
   );
 
   return posts.map((post) => {
-    const slug = post.id.split('/').slice(1).join('/');
+    const slug = post.id.split("/").slice(1).join("/");
     return {
       params: { lang: post.data.lang, slug },
       props: { post },
@@ -22,14 +23,17 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const lang = post.data.lang as Lang;
 const { Content, headings } = await render(post);
-const readingTime = post.body ? Math.max(1, Math.ceil(post.body.split(/\s+/).length / 200)) : undefined;
+const readingTime = post.body
+  ? Math.max(1, Math.ceil(post.body.split(/\s+/).length / 200))
+  : undefined;
 
-const allPosts = await getCollection('blog', ({ data }) =>
-  data.translationKey === post.data.translationKey && !data.draft
+const allPosts = await getCollection(
+  "blog",
+  ({ data }) => data.translationKey === post.data.translationKey && !data.draft,
 );
 const allTranslations = allPosts.map((p) => ({
   lang: p.data.lang as Lang,
-  slug: p.id.split('/').slice(1).join('/'),
+  slug: p.id.split("/").slice(1).join("/"),
 }));
 ---
 

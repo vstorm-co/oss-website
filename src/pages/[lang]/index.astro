@@ -1,19 +1,19 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import Navbar from '../../components/Navbar.astro';
-import OssHero from '../../components/oss/OssHero.astro';
-import FeaturedProjects from '../../components/oss/FeaturedProjects.astro';
-import OssFooter from '../../components/oss/OssFooter.astro';
-import CommunityRecognition from '../../components/oss/CommunityRecognition.astro';
-import TrustedBy from '../../components/oss/TrustedBy.astro';
-import HowWeWork from '../../components/oss/HowWeWork.astro';
-import Manifesto from '../../components/oss/Manifesto.astro';
-import FaqPreview from '../../components/landing/FaqPreview.astro';
-import Changelog from '../../components/oss/Changelog.astro';
-import Contributors from '../../components/oss/Contributors.astro';
-import RecentPosts from '../../components/oss/RecentPosts.astro';
-import { translations, languages, defaultLang, type Lang } from '../../i18n/translations';
-import { organizationSchema } from '../../lib/schemas';
+import Layout from "../../layouts/Layout.astro";
+import Navbar from "../../components/Navbar.astro";
+import OssHero from "../../components/oss/OssHero.astro";
+import FeaturedProjects from "../../components/oss/FeaturedProjects.astro";
+import OssFooter from "../../components/oss/OssFooter.astro";
+import CommunityRecognition from "../../components/oss/CommunityRecognition.astro";
+import TrustedBy from "../../components/oss/TrustedBy.astro";
+import HowWeWork from "../../components/oss/HowWeWork.astro";
+import Manifesto from "../../components/oss/Manifesto.astro";
+import FaqPreview from "../../components/landing/FaqPreview.astro";
+import Changelog from "../../components/oss/Changelog.astro";
+import Contributors from "../../components/oss/Contributors.astro";
+import RecentPosts from "../../components/oss/RecentPosts.astro";
+import { translations, languages, defaultLang, type Lang } from "../../i18n/translations";
+import { organizationSchema } from "../../lib/schemas";
 
 export function getStaticPaths() {
   return Object.keys(languages)

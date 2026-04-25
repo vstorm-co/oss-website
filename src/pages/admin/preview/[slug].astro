@@ -1,0 +1,140 @@
+---
+import type { GetStaticPaths } from "astro";
+import { getCollection, render, type CollectionEntry } from "astro:content";
+import "@/styles/global.css";
+import ImageZoom from "@/components/blog/ImageZoom.astro";
+
+type Post = CollectionEntry<"blog">;
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  if (!import.meta.env.DEV) return [];
+  // oss-website has multilingual blog. Admin only edits English posts —
+  // limit preview to English so slugs match what the editor saves.
+  const posts = await getCollection("blog", ({ data }) => data.lang === "en");
+  return posts.map((post) => {
+    const slug = post.id.replace(/^en\//, "");
+    return { params: { slug }, props: { post } };
+  });
+};
+
+const { post } = Astro.props as { post: Post };
+const { Content } = await render(post);
+const { data } = post;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{data.title} · Preview</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 2rem 1.5rem 4rem;
+        background: var(--color-bg);
+        color: var(--color-text);
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+      }
+      .preview-wrap {
+        max-width: 68ch;
+        margin: 0 auto;
+      }
+      .preview-meta {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--color-border);
+      }
+      .preview-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1.2;
+        color: var(--color-text);
+        margin: 0 0 0.5rem;
+      }
+      .preview-desc {
+        color: var(--color-text-secondary);
+        font-size: 1rem;
+        margin: 0 0 0.75rem;
+      }
+      .preview-tags {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+      }
+      .preview-tag {
+        font-size: 0.75rem;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        padding: 0.15em 0.6em;
+        border-radius: 4px;
+        color: var(--color-text-secondary);
+      }
+      .preview-cover {
+        margin-top: 1rem;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid var(--color-border);
+      }
+      .preview-cover img {
+        width: 100%;
+        max-height: 320px;
+        object-fit: cover;
+        display: block;
+      }
+      .preview-draft {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #f59e0b;
+        background: rgba(245, 158, 11, 0.1);
+        border: 1px solid rgba(245, 158, 11, 0.25);
+        padding: 0.15em 0.6em;
+        border-radius: 4px;
+        margin-bottom: 0.75rem;
+      }
+    </style>
+    <script is:inline>
+      // Inherit theme from admin parent (avoids FOUC)
+      try {
+        const t = window.parent?.document?.documentElement?.getAttribute?.("data-theme");
+        if (t === "light") document.documentElement.setAttribute("data-theme", "light");
+      } catch {
+        /* cross-origin read — ignore */
+      }
+    </script>
+  </head>
+  <body>
+    <ImageZoom />
+    <div class="preview-wrap">
+      <div class="preview-meta">
+        {data.draft && <div class="preview-draft">● Draft</div>}
+        <h1 class="preview-title">{data.title}</h1>
+        {data.description && <p class="preview-desc">{data.description}</p>}
+        {
+          data.tags?.length > 0 && (
+            <div class="preview-tags">
+              {data.tags.map((t) => (
+                <span class="preview-tag">{t}</span>
+              ))}
+            </div>
+          )
+        }
+        {
+          data.cover && (
+            <div class="preview-cover">
+              <img src={data.cover.src} alt={data.coverAlt ?? data.title} />
+            </div>
+          )
+        }
+      </div>
+      <article class="prose">
+        <Content />
+      </article>
+    </div>
+  </body>
+</html>

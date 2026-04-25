@@ -1,15 +1,15 @@
 ---
-import Layout from '../../../layouts/Layout.astro';
-import Navbar from '../../../components/Navbar.astro';
-import Footer from '../../../components/landing/Footer.astro';
-import BlogCard from '../../../components/blog/BlogCard.astro';
-import Breadcrumbs from '../../../components/shared/Breadcrumbs.astro';
-import { getCollection } from 'astro:content';
-import { translations, languages, defaultLang } from '../../../i18n/translations';
-import { collectionPageSchema, SITE_URL } from '../../../lib/schemas';
+import Layout from "../../../layouts/Layout.astro";
+import Navbar from "../../../components/Navbar.astro";
+import Footer from "../../../components/landing/Footer.astro";
+import BlogCard from "../../../components/blog/BlogCard.astro";
+import Breadcrumbs from "../../../components/shared/Breadcrumbs.astro";
+import { getCollection } from "astro:content";
+import { translations, languages, defaultLang } from "../../../i18n/translations";
+import { collectionPageSchema, SITE_URL } from "../../../lib/schemas";
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog', ({ data }) => data.lang === 'en' && !data.draft);
+  const posts = await getCollection("blog", ({ data }) => data.lang === "en" && !data.draft);
 
   const tagMap = new Map<string, typeof posts>();
   for (const post of posts) {
@@ -32,9 +32,11 @@ const { tag, posts } = Astro.props;
 const lang = defaultLang;
 const t = translations[lang];
 
-const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const allPosts = await getCollection("blog", ({ data }) => !data.draft);
 const alternates = Object.keys(languages)
-  .filter((locale) => allPosts.some((p) => p.data.lang === locale && (p.data.tags ?? []).includes(tag)))
+  .filter((locale) =>
+    allPosts.some((p) => p.data.lang === locale && (p.data.tags ?? []).includes(tag)),
+  )
   .map((locale) => ({
     lang: locale,
     href: locale === defaultLang ? `/blog/tag/${tag}/` : `/${locale}/blog/tag/${tag}/`,
@@ -51,43 +53,53 @@ const postCount = t["blog.tag.postCount"].replace("{count}", String(posts.length
   description={`Browse ${postCount} tagged "${tag}" — tutorials, guides, and deep dives on building production AI agents with Python.`}
   lang={lang}
   alternates={alternates}
-  schemas={[collectionPageSchema({ name: pageTitle, description: `Browse ${postCount} tagged "${tag}" — tutorials, guides, and deep dives on building production AI agents with Python.`, url: SITE_URL + `/blog/tag/${tag}/` })]}
+  schemas={[
+    collectionPageSchema({
+      name: pageTitle,
+      description: `Browse ${postCount} tagged "${tag}" — tutorials, guides, and deep dives on building production AI agents with Python.`,
+      url: SITE_URL + `/blog/tag/${tag}/`,
+    }),
+  ]}
   noindex={true}
 >
   <Navbar currentLang={lang} languageLinks={alternates} />
-  <Breadcrumbs items={[
-    { label: "Home", href: "/" },
-    { label: t["nav.blog"], href: "/blog/" },
-    { label: pageTitle },
-  ]} />
+  <Breadcrumbs
+    items={[
+      { label: "Home", href: "/" },
+      { label: t["nav.blog"], href: "/blog/" },
+      { label: pageTitle },
+    ]}
+  />
 
   <main class="mx-auto max-w-3xl px-4 py-16 sm:py-24">
     <div class="mb-12 text-center">
       <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">{pageTitle}</h1>
-      <p class="mt-4 text-text-secondary">{postCount}</p>
+      <p class="text-text-secondary mt-4">{postCount}</p>
     </div>
 
-    {posts.length === 0 ? (
-      <p class="text-center text-text-secondary">{t["blog.noPosts"]}</p>
-    ) : (
-      <div class="space-y-4">
-        {posts.map((post) => {
-          const slug = post.id.split('/').slice(1).join('/');
-          return (
-            <BlogCard
-              title={post.data.title}
-              description={post.data.description}
-              pubDate={post.data.pubDate}
-              href={`/blog/${slug}/`}
-              tags={post.data.tags}
-              lang={lang}
-              category={post.data.category}
+    {
+      posts.length === 0 ? (
+        <p class="text-text-secondary text-center">{t["blog.noPosts"]}</p>
+      ) : (
+        <div class="space-y-4">
+          {posts.map((post) => {
+            const slug = post.id.split("/").slice(1).join("/");
+            return (
+              <BlogCard
+                title={post.data.title}
+                description={post.data.description}
+                pubDate={post.data.pubDate}
+                href={`/blog/${slug}/`}
+                tags={post.data.tags}
+                lang={lang}
+                category={post.data.category}
                 author={post.data.author}
-            />
-          );
-        })}
-      </div>
-    )}
+              />
+            );
+          })}
+        </div>
+      )
+    }
   </main>
 
   <Footer t={t} />

@@ -1,54 +1,96 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Navbar from '../components/Navbar.astro';
-import Footer from '../components/landing/Footer.astro';
-import { translations } from '../i18n/translations';
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/Navbar.astro";
+import Footer from "../components/landing/Footer.astro";
+import { translations } from "../i18n/translations";
 
 const t = translations.en;
 ---
 
-<Layout title="Privacy Policy — Vstorm OSS" description="Privacy policy for oss.vstorm.co — how we handle your data.">
+<Layout
+  title="Privacy Policy — Vstorm OSS"
+  description="Privacy policy for oss.vstorm.co — how we handle your data."
+>
   <Navbar showLang={false} />
-  <main class="max-w-3xl mx-auto px-6 py-20">
-    <h1 class="text-3xl font-bold mb-8">Privacy Policy</h1>
-    <p class="text-sm text-zinc-500 mb-8">Last updated: March 22, 2026</p>
+  <main class="mx-auto max-w-3xl px-6 py-20">
+    <h1 class="mb-8 text-3xl font-bold">Privacy Policy</h1>
+    <p class="mb-8 text-sm text-zinc-500">Last updated: March 22, 2026</p>
 
     <div class="prose prose-zinc dark:prose-invert max-w-none">
       <h2>Who we are</h2>
-      <p>This website (<strong>oss.vstorm.co</strong>) is operated by <strong>Vstorm</strong> (vstorm.co), an Applied Agentic AI Engineering Consultancy based in Poland. We build and maintain open-source tools for the AI agent ecosystem.</p>
+      <p>
+        This website (<strong>oss.vstorm.co</strong>) is operated by <strong>Vstorm</strong> (vstorm.co),
+        an Applied Agentic AI Engineering Consultancy based in Poland. We build and maintain open-source
+        tools for the AI agent ecosystem.
+      </p>
 
       <h2>What data we collect</h2>
       <h3>Analytics</h3>
-      <p>We use <strong>Vercel Analytics</strong> and <strong>Vercel Speed Insights</strong> for aggregated, privacy-friendly website analytics. These tools collect:</p>
+      <p>
+        We use <strong>Vercel Analytics</strong> and <strong>Vercel Speed Insights</strong> for aggregated,
+        privacy-friendly website analytics. These tools collect:
+      </p>
       <ul>
         <li>Page views (aggregated, no individual tracking)</li>
         <li>Performance metrics (Core Web Vitals)</li>
         <li>Referrer URLs</li>
         <li>Country-level geolocation (no IP addresses stored)</li>
       </ul>
-      <p>Vercel Analytics does <strong>not</strong> use cookies and does <strong>not</strong> track individual users across sessions.</p>
+      <p>
+        Vercel Analytics does <strong>not</strong> use cookies and does <strong>not</strong> track individual
+        users across sessions.
+      </p>
 
       <h3>No cookies</h3>
-      <p>This website does not set any cookies. We do not use tracking pixels, fingerprinting, or any other form of individual user identification.</p>
+      <p>
+        This website does not set any cookies. We do not use tracking pixels, fingerprinting, or any
+        other form of individual user identification.
+      </p>
 
       <h3>No personal data collection</h3>
-      <p>We do not collect names, email addresses, or any personally identifiable information through this website. There are no forms, accounts, or sign-up flows on oss.vstorm.co.</p>
+      <p>
+        We do not collect names, email addresses, or any personally identifiable information through
+        this website. There are no forms, accounts, or sign-up flows on oss.vstorm.co.
+      </p>
 
       <h2>Third-party services</h2>
       <ul>
-        <li><strong>Vercel</strong> — hosting and analytics (<a href="https://vercel.com/legal/privacy-policy">Vercel Privacy Policy</a>)</li>
-        <li><strong>Cloudflare</strong> — DNS and CDN (<a href="https://www.cloudflare.com/privacypolicy/">Cloudflare Privacy Policy</a>)</li>
-        <li><strong>GitHub</strong> — source code hosting, linked from project pages (<a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub Privacy Statement</a>)</li>
+        <li>
+          <strong>Vercel</strong> — hosting and analytics (<a
+            href="https://vercel.com/legal/privacy-policy">Vercel Privacy Policy</a
+          >)
+        </li>
+        <li>
+          <strong>Cloudflare</strong> — DNS and CDN (<a
+            href="https://www.cloudflare.com/privacypolicy/">Cloudflare Privacy Policy</a
+          >)
+        </li>
+        <li>
+          <strong>GitHub</strong> — source code hosting, linked from project pages (<a
+            href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement"
+            >GitHub Privacy Statement</a
+          >)
+        </li>
       </ul>
 
       <h2>Open-source projects</h2>
-      <p>Our open-source projects are hosted on GitHub. Any data you provide when interacting with GitHub (issues, pull requests, discussions) is governed by GitHub's privacy policy. We do not collect additional data from GitHub users.</p>
+      <p>
+        Our open-source projects are hosted on GitHub. Any data you provide when interacting with
+        GitHub (issues, pull requests, discussions) is governed by GitHub's privacy policy. We do
+        not collect additional data from GitHub users.
+      </p>
 
       <h2>Contact</h2>
-      <p>For privacy-related questions, contact us at <strong>privacy&#64;vstorm.co</strong> or via our <a href="https://github.com/vstorm-co">GitHub organization</a>.</p>
+      <p>
+        For privacy-related questions, contact us at <strong>privacy&#64;vstorm.co</strong> or via our
+        <a href="https://github.com/vstorm-co">GitHub organization</a>.
+      </p>
 
       <h2>Changes</h2>
-      <p>We may update this policy from time to time. Changes will be posted on this page with an updated date.</p>
+      <p>
+        We may update this policy from time to time. Changes will be posted on this page with an
+        updated date.
+      </p>
     </div>
   </main>
   <Footer t={t} lang="en" />
