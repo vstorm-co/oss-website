@@ -169,6 +169,18 @@ const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbItems);
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14l-5-5-5 5"/></svg>
     </button>
     <script is:inline>
+      // ClientRouter (Astro view transitions) was removed for perf — but a lot
+      // of components listen for `astro:page-load`. Fire it ourselves on
+      // DOMContentLoaded so existing scripts keep working without changes.
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          document.dispatchEvent(new Event('astro:page-load'));
+        });
+      } else {
+        document.dispatchEvent(new Event('astro:page-load'));
+      }
+    </script>
+    <script is:inline>
       document.addEventListener('astro:page-load', function() {
         /* Scroll reveal */
         var rio=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.classList.add('visible');rio.unobserve(x.target)}})},{threshold:.12});
