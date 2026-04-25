@@ -7,25 +7,85 @@ export interface Props {
 const { title, icon, href } = Astro.props;
 const Tag = href ? "a" : "div";
 ---
+
 {/* @mdx-label InfoCard */}
-{/* @mdx-description Titled card — optional icon and link */}
-{/* @mdx-snippet
+{/* @mdx-description Titled card with optional icon and link */}
+{
+  /* @mdx-snippet
 <InfoCard title="Your title" icon="📘" href="/optional-link">
   Body content with **markdown** and links.
 </InfoCard>
-*/}
+*/
+}
+{
+  /* @mdx-preview
+<div style="border:1px solid #27272a;border-radius:10px;padding:14px 16px;background:#0e0e11">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+    <span style="font-size:18px">📘</span>
+    <span style="font-size:13px;font-weight:600;color:#fafafa">Your title</span>
+  </div>
+  <p style="font-size:12px;color:#a1a1aa;margin:0;line-height:1.5">Body content with links and formatted text.</p>
+</div>
+*/
+}
 
-<Tag
-  href={href}
-  class={`not-prose my-6 block rounded-xl border border-border bg-surface/50 p-5 transition ${href ? "hover:border-accent/50 hover:bg-surface" : ""}`}
->
-  <div class="flex items-start gap-3">
-    {icon && <span class="text-2xl leading-none">{icon}</span>}
-    <div class="flex-1 min-w-0">
-      <div class="font-semibold text-text mb-1">{title}</div>
-      <div class="text-sm text-text-secondary leading-relaxed [&>p]:mb-2 [&>p:last-child]:mb-0 [&_a]:text-accent [&_a:hover]:underline">
-        <slot />
-      </div>
+<Tag href={href} class:list={["info-card", { "info-card-link": !!href }]}>
+  <div class="info-card-row">
+    {
+      icon && (
+        <span class="info-card-icon" aria-hidden>
+          {icon}
+        </span>
+      )
+    }
+    <div class="info-card-body">
+      <p class="info-card-title">{title}</p>
+      <div class="info-card-content"><slot /></div>
     </div>
   </div>
 </Tag>
+
+<style>
+  .info-card {
+    display: block;
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+  .info-card-link:hover {
+    border-color: var(--color-accent);
+    background: var(--color-surface-hover);
+  }
+  .info-card-row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+  .info-card-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .info-card-title {
+    font-weight: 600;
+    margin: 0 0 0.3rem;
+  }
+  .info-card-content {
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+  }
+  .info-card-content > :global(p) {
+    margin: 0.3rem 0;
+  }
+  .info-card-content > :global(p):first-child {
+    margin-top: 0;
+  }
+  .info-card-content > :global(p):last-child {
+    margin-bottom: 0;
+  }
+</style>

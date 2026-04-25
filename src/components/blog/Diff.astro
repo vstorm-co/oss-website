@@ -1,0 +1,112 @@
+---
+export interface Props {
+  before: string;
+  after: string;
+  lang?: string;
+  title?: string;
+}
+const { before, after, lang = "text", title } = Astro.props;
+
+function splitDiff(a: string, b: string) {
+  const aLines = a.split("\n");
+  const bLines = b.split("\n");
+  return { aLines, bLines };
+}
+const { aLines, bLines } = splitDiff(before, after);
+void lang; // reserved for future Shiki integration
+---
+
+{/* @mdx-label Diff */}
+{/* @mdx-description Inline before/after code diff. For simple two-version comparisons. */}
+{
+  /* @mdx-snippet
+<Diff
+  lang="ts"
+  title="before & after"
+  before={`function greet(name) {\n  return "Hello " + name\n}`}
+  after={`function greet(name: string): string {\n  return \`Hello \${name}\`\n}`}
+/>
+*/
+}
+{
+  /* @mdx-preview
+<div style="font-family:monospace;font-size:12px;background:#09090b;border:1px solid #27272a;border-radius:8px;overflow:hidden">
+  <div style="padding:4px 12px;background:rgba(239,68,68,.08);color:#f87171;border-left:3px solid #ef4444">- const old = "before"</div>
+  <div style="padding:4px 12px;background:rgba(34,197,94,.08);color:#4ade80;border-left:3px solid #22c55e">+ const new = "after"</div>
+  <div style="padding:4px 12px;color:#71717a;border-left:3px solid transparent">  // unchanged line</div>
+</div>
+*/
+}
+
+<div class="diff">
+  {title && <p class="diff-title">{title}</p>}
+  <div class="diff-panes">
+    <div class="diff-pane diff-before">
+      <p class="diff-label">Before</p>
+      <pre>{aLines.map((l) => <div class="diff-line">{`- ${l}`}</div>)}</pre>
+    </div>
+    <div class="diff-pane diff-after">
+      <p class="diff-label">After</p>
+      <pre>{bLines.map((l) => <div class="diff-line">{`+ ${l}`}</div>)}</pre>
+    </div>
+  </div>
+</div>
+
+<style>
+  .diff {
+    margin: 1.5rem 0;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--color-surface);
+  }
+  .diff-title {
+    margin: 0;
+    padding: 0.5rem 0.9rem;
+    font-size: 0.8rem;
+    color: var(--color-text-tertiary);
+    border-bottom: 1px solid var(--color-border);
+    font-family: var(--font-mono);
+  }
+  .diff-panes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .diff-pane {
+    padding: 0.6rem 0.8rem;
+    font-family: var(--font-mono);
+    font-size: 0.825rem;
+    line-height: 1.6;
+    overflow-x: auto;
+  }
+  .diff-pane + .diff-pane {
+    border-left: 1px solid var(--color-border);
+  }
+  .diff-label {
+    margin: 0 0 0.3rem;
+    font-size: 0.7rem;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .diff-pane pre {
+    margin: 0;
+  }
+  .diff-before .diff-line {
+    color: #fb7185;
+    background: rgba(244, 63, 94, 0.05);
+  }
+  .diff-after .diff-line {
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.05);
+  }
+  @media (max-width: 640px) {
+    .diff-panes {
+      grid-template-columns: 1fr;
+    }
+    .diff-pane + .diff-pane {
+      border-left: 0;
+      border-top: 1px solid var(--color-border);
+    }
+  }
+</style>

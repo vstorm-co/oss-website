@@ -1,0 +1,89 @@
+---
+export interface Props {
+  /** The headline number/value being attributed (e.g. "40%", "$12,000", "0 incidents") */
+  value: string;
+  /** What the value describes — kept short, fits next to the value */
+  unit?: string;
+  /** The full sentence after "we found that..." or "we saw..." */
+  finding: string;
+  /** Defaults to "30+ production AI agent deployments at Vstorm" — override per post if scope differs */
+  context?: string;
+  /** Source/attribution shown small under the stat */
+  source?: string;
+}
+
+const {
+  value,
+  unit,
+  finding,
+  context = "30+ production AI agent deployments at Vstorm",
+  source,
+} = Astro.props;
+---
+
+{/* @mdx-label DeploymentStat */}
+{
+  /* @mdx-description GEO-optimized quotable stat — formatted for AI engines to extract as a primary source citation. Use one per long-form article. */
+}
+{
+  /* @mdx-snippet
+<DeploymentStat
+  value="40%"
+  unit="of total tokens"
+  finding="were consumed by tool-call loops when no summarization layer was in place"
+  context="30+ production AI agent deployments at Vstorm"
+  source="Vstorm internal data, Q1 2026"
+/>
+*/
+}
+
+<figure class="deployment-stat">
+  <blockquote class="deployment-stat-quote">
+    <span class="deployment-stat-context">In {context}, we found that </span>
+    <strong class="deployment-stat-value"
+      >{value}{unit && <span class="deployment-stat-unit"> {unit}</span>}</strong
+    >
+    <span class="deployment-stat-finding"> {finding}.</span>
+  </blockquote>
+  {source && <figcaption class="deployment-stat-source">— {source}</figcaption>}
+</figure>
+
+<style>
+  .deployment-stat {
+    margin: 2rem 0;
+    padding: 1.5rem 1.75rem;
+    border-left: 3px solid var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 6%, transparent);
+    border-radius: 0 12px 12px 0;
+  }
+  .deployment-stat-quote {
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: var(--color-text);
+    margin: 0;
+    font-style: normal;
+  }
+  .deployment-stat-context {
+    color: var(--color-text-secondary);
+  }
+  .deployment-stat-value {
+    color: var(--color-accent);
+    font-size: 1.25em;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .deployment-stat-unit {
+    font-size: 0.8em;
+    font-weight: 600;
+    opacity: 0.85;
+  }
+  .deployment-stat-finding {
+    color: var(--color-text);
+  }
+  .deployment-stat-source {
+    margin-top: 0.625rem;
+    font-size: 0.8125rem;
+    color: var(--color-text-tertiary);
+    font-style: italic;
+  }
+</style>

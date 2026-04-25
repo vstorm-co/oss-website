@@ -1,0 +1,99 @@
+---
+export interface FileTreeItem {
+  label: string;
+  children?: FileTreeItem[];
+}
+export interface Props {
+  items: FileTreeItem[];
+}
+
+const { items } = Astro.props;
+
+function esc(s: string): string {
+  return s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c] ?? c);
+}
+
+function buildHtml(nodes: FileTreeItem[]): string {
+  const lines: string[] = ["<ul>"];
+  for (const n of nodes) {
+    const isDir = !!n.children && n.children.length > 0;
+    lines.push(
+      `<li><span class="${isDir ? "ft-dir" : ""}">${esc(n.label)}${isDir ? "/" : ""}</span>`,
+    );
+    if (isDir) lines.push(buildHtml(n.children!));
+    lines.push("</li>");
+  }
+  lines.push("</ul>");
+  return lines.join("");
+}
+
+const html = buildHtml(items);
+---
+
+{/* @mdx-label FileTree */}
+{/* @mdx-description Visual directory listing. Pass a nested `items` array. */}
+{
+  /* @mdx-snippet
+<FileTree items={[
+  { label: "src", children: [
+    { label: "pages", children: [{ label: "index.astro" }] },
+    { label: "site.config.ts" },
+  ]},
+  { label: "README.md" },
+]} />
+*/
+}
+{
+  /* @mdx-preview
+<div style="background:#09090b;border:1px solid #27272a;border-radius:8px;padding:10px 14px;font-family:monospace;font-size:12px;line-height:1.9">
+  <div style="color:#a1a1aa">📁 <span style="color:#fafafa">src/</span></div>
+  <div style="color:#a1a1aa;padding-left:16px">📁 <span style="color:#fafafa">components/</span></div>
+  <div style="color:#a1a1aa;padding-left:32px">📄 <span style="color:#60a5fa">Button.astro</span></div>
+  <div style="color:#a1a1aa;padding-left:16px">📄 <span style="color:#fafafa">index.astro</span></div>
+</div>
+*/
+}
+
+<div class="file-tree" set:html={html} />
+
+<style>
+  .file-tree {
+    margin: 1.5rem 0;
+    padding: 0.8rem 1rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--color-text);
+    line-height: 1.7;
+  }
+  .file-tree :global(ul) {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .file-tree :global(li) {
+    position: relative;
+    padding-left: 1.3rem;
+  }
+  .file-tree :global(li)::before {
+    content: "├─";
+    position: absolute;
+    left: 0;
+    color: var(--color-text-tertiary);
+  }
+  .file-tree :global(li:last-child)::before {
+    content: "└─";
+  }
+  .file-tree :global(li ul) {
+    padding-left: 1rem;
+    border-left: 1px solid var(--color-border);
+    margin-left: -0.3rem;
+    margin-top: 0.2rem;
+  }
+  .file-tree :global(.ft-dir) {
+    color: var(--color-accent);
+    font-weight: 500;
+  }
+</style>

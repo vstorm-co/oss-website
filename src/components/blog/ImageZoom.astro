@@ -1,0 +1,173 @@
+<style is:global>
+  .zoom-wrap {
+    display: block;
+    position: relative;
+    cursor: zoom-in;
+    line-height: 0;
+  }
+
+  .zoom-wrap img {
+    transition: filter 0.2s;
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .zoom-wrap:hover img {
+    filter: brightness(0.78);
+  }
+
+  .zoom-wrap::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.16);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+    background-position: center;
+    background-size: 30px;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  .zoom-wrap:hover::after {
+    opacity: 1;
+  }
+
+  /* Lightbox overlay */
+  .lb-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+
+  .lb-overlay.lb-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .lb-img {
+    max-width: min(90vw, 1280px);
+    max-height: 90vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.65);
+    transform: scale(0.93);
+    transition: transform 0.28s;
+    display: block;
+  }
+
+  .lb-overlay.lb-open .lb-img {
+    transform: scale(1);
+  }
+
+  .lb-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(0, 0, 0, 0.45);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s;
+    line-height: 1;
+    padding: 0;
+  }
+
+  .lb-close:hover {
+    background: rgba(0, 0, 0, 0.72);
+    color: white;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const overlay = document.createElement("div");
+    overlay.className = "lb-overlay";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "lb-close";
+    closeBtn.setAttribute("aria-label", "Close");
+    closeBtn.innerHTML = "&times;";
+
+    const lbImg = document.createElement("img");
+    lbImg.className = "lb-img";
+    lbImg.alt = "";
+
+    overlay.appendChild(closeBtn);
+    overlay.appendChild(lbImg);
+    document.body.appendChild(overlay);
+
+    function open(src, alt) {
+      lbImg.src = src;
+      lbImg.alt = alt || "";
+      overlay.classList.add("lb-open");
+      document.body.style.overflow = "hidden";
+    }
+
+    function close() {
+      overlay.classList.remove("lb-open");
+      document.body.style.overflow = "";
+    }
+
+    overlay.addEventListener("click", function (e) {
+      if (e.target === overlay || e.target === closeBtn || e.target === lbImg.parentElement) return;
+      if (e.target === overlay) close();
+    });
+
+    overlay.addEventListener("click", function (e) {
+      if (e.target === overlay) close();
+    });
+
+    closeBtn.addEventListener("click", close);
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") close();
+    });
+
+    function initZoom() {
+      const imgs = document.querySelectorAll(
+        ".prose img:not(.lb-img), figure.figure img:not(.lb-img)",
+      );
+      imgs.forEach(function (img) {
+        if (img.closest(".zoom-wrap")) return;
+        const wrap = document.createElement("span");
+        wrap.className = "zoom-wrap";
+        img.parentNode.insertBefore(wrap, img);
+        wrap.appendChild(img);
+        wrap.addEventListener("click", function () {
+          open(img.currentSrc || img.src, img.alt);
+        });
+      });
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initZoom);
+    } else {
+      initZoom();
+    }
+  })();
+</script>

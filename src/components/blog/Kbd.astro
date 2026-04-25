@@ -1,0 +1,39 @@
+---
+// <Kbd> renders its children inside a styled <kbd>. Inline, for shortcuts.
+---
+
+{/* @mdx-label Kbd */}
+{/* @mdx-description Inline keyboard key. Use like <Kbd>⌘</Kbd>. */}
+{
+  /* @mdx-snippet
+Press <Kbd>⌘</Kbd> + <Kbd>K</Kbd> to open search.
+*/
+}
+{
+  /* @mdx-preview
+<p style="font-size:13px;color:#a1a1aa;margin:0">Press
+  <kbd style="display:inline-block;padding:.1em .45em;background:#18181b;border:1px solid #3f3f46;border-bottom-width:2px;border-radius:4px;font-size:12px;font-family:monospace;color:#fafafa">⌘</kbd>
+  +
+  <kbd style="display:inline-block;padding:.1em .45em;background:#18181b;border:1px solid #3f3f46;border-bottom-width:2px;border-radius:4px;font-size:12px;font-family:monospace;color:#fafafa">K</kbd>
+  to open search.
+</p>
+*/
+}
+
+<kbd class="kbd"><slot /></kbd>
+
+<style>
+  .kbd {
+    display: inline-block;
+    padding: 0.1em 0.45em;
+    background: var(--color-surface);
+    color: var(--color-text);
+    border: 1px solid var(--color-border-hover);
+    border-bottom-width: 2px;
+    border-radius: 5px;
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    line-height: 1;
+    vertical-align: baseline;
+  }
+</style>

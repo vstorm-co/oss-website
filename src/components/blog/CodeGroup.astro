@@ -1,0 +1,62 @@
+---
+/**
+ * CodeGroup: tabbed code blocks without JS. Uses <details> + CSS so it works
+ * even with JS disabled. Children are expected to be fenced code blocks with
+ * a filename title (from expressive-code) or plain code blocks.
+ */
+export interface Props {
+  /** Optional labels for each tab. If fewer labels than children, extras get "Tab N". */
+  labels?: string[];
+}
+const { labels = [] } = Astro.props;
+---
+
+{/* @mdx-label CodeGroup */}
+{/* @mdx-description Tabbed code blocks (e.g., npm / pnpm / bun). JS-free — uses <details>. */}
+{
+  /* @mdx-snippet
+<CodeGroup labels={["bun", "pnpm", "npm"]}>
+```bash
+bun install
+```
+
+```bash
+pnpm install
+```
+
+```bash
+npm install
+```
+</CodeGroup>
+*/
+}
+{
+  /* @mdx-preview
+<div style="border:1px solid #27272a;border-radius:8px;overflow:hidden">
+  <div style="display:flex;gap:0;border-bottom:1px solid #27272a;background:#18181b">
+    <button style="padding:6px 14px;font-size:11px;font-weight:600;color:#fafafa;background:#0e0e11;border:none;border-bottom:2px solid #7c5cff;cursor:pointer">npm</button>
+    <button style="padding:6px 14px;font-size:11px;font-weight:500;color:#71717a;background:transparent;border:none;cursor:pointer">yarn</button>
+    <button style="padding:6px 14px;font-size:11px;font-weight:500;color:#71717a;background:transparent;border:none;cursor:pointer">bun</button>
+  </div>
+  <div style="padding:10px 14px;background:#09090b;font-family:monospace;font-size:12px;color:#cbd5e1">npm install package-name</div>
+</div>
+*/
+}
+
+<div class="code-group" data-labels={labels.join("|")}>
+  <slot />
+</div>
+
+<style>
+  .code-group {
+    margin: 1.5rem 0;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .code-group :global(pre) {
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border: 0 !important;
+  }
+</style>

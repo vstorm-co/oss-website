@@ -1,0 +1,66 @@
+---
+export interface Props {
+  title?: string;
+}
+const { title } = Astro.props;
+---
+
+{/* @mdx-label Aside */}
+{/* @mdx-description Tangential side note — floats right on wide screens, inline on narrow. */}
+{
+  /* @mdx-snippet
+<Aside title="Side note">
+  An aside is for tangential commentary without breaking the main flow.
+</Aside>
+*/
+}
+{
+  /* @mdx-preview
+<aside style="background:#131317;border-left:2px solid #35353e;padding:10px 14px;border-radius:0 8px 8px 0">
+  <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#a1a1aa;margin:0 0 4px">Side note</p>
+  <p style="font-size:12px;color:#a1a1aa;margin:0;line-height:1.5">An aside is for tangential commentary without breaking the main flow.</p>
+</aside>
+*/
+}
+
+<aside class="aside">
+  {title && <p class="aside-title">{title}</p>}
+  <div class="aside-body"><slot /></div>
+</aside>
+
+<style>
+  .aside {
+    background: var(--color-surface);
+    border-left: 2px solid var(--color-border-hover);
+    padding: 0.8rem 1rem;
+    margin: 1.25rem 0;
+    border-radius: 0 10px 10px 0;
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+  }
+  .aside-title {
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0 0 0.3rem;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .aside-body > :global(p) {
+    margin: 0.3rem 0;
+  }
+  .aside-body > :global(p):first-child {
+    margin-top: 0;
+  }
+  .aside-body > :global(p):last-child {
+    margin-bottom: 0;
+  }
+
+  @media (min-width: 64rem) {
+    .aside {
+      float: right;
+      margin: 0 -10rem 1rem 1.5rem;
+      max-width: 14rem;
+    }
+  }
+</style>

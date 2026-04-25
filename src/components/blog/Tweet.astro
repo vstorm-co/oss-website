@@ -1,0 +1,143 @@
+---
+export interface Props {
+  author: string;
+  handle: string;
+  url: string;
+  date?: string;
+  avatar?: string;
+}
+const { author, handle, url, date, avatar } = Astro.props;
+const displayHandle = handle.startsWith("@") ? handle : `@${handle}`;
+---
+
+{/* @mdx-label Tweet */}
+{/* @mdx-description Static quote-style render of an X post. No Twitter script — pure HTML. */}
+{
+  /* @mdx-snippet
+<Tweet
+  author="Jane Doe"
+  handle="janedoe"
+  url="https://x.com/janedoe/status/1234567890"
+  date="2026-04-24"
+>
+  The tweet body goes here. Newlines and **bold** work.
+</Tweet>
+*/
+}
+{
+  /* @mdx-preview
+<div style="border:1px solid #27272a;border-radius:10px;padding:14px;background:#0e0e11">
+  <div style="display:flex;gap:10px;margin-bottom:10px">
+    <div style="width:36px;height:36px;border-radius:50%;background:#27272a;flex-shrink:0"></div>
+    <div>
+      <p style="font-size:13px;font-weight:700;color:#fafafa;margin:0">User Name</p>
+      <p style="font-size:11px;color:#71717a;margin:0">@handle</p>
+    </div>
+    <div style="margin-left:auto;color:#1d9bf0;font-size:18px">𝕏</div>
+  </div>
+  <p style="font-size:13px;color:#e4e4e7;margin:0;line-height:1.5">Tweet content goes here. This is an embedded tweet card.</p>
+</div>
+*/
+}
+
+<figure class="tweet">
+  <header class="tweet-header">
+    {
+      avatar ? (
+        <img class="tweet-avatar" src={avatar} alt={`${author} avatar`} loading="lazy" />
+      ) : (
+        <span class="tweet-avatar tweet-avatar-placeholder" aria-hidden>
+          {author[0]}
+        </span>
+      )
+    }
+    <div class="tweet-names">
+      <span class="tweet-author">{author}</span>
+      <span class="tweet-handle">{displayHandle}</span>
+    </div>
+    <span class="tweet-brand" aria-label="X" title="Posted on X">𝕏</span>
+  </header>
+  <div class="tweet-body">
+    <slot />
+  </div>
+  <footer class="tweet-footer">
+    {date && <time>{date}</time>}
+    <a href={url} target="_blank" rel="noopener">View on X ↗</a>
+  </footer>
+</figure>
+
+<style>
+  .tweet {
+    margin: 1.5rem 0;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: var(--color-surface);
+    max-width: 40rem;
+  }
+  .tweet-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .tweet-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    background: var(--color-surface-hover);
+  }
+  .tweet-avatar-placeholder {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+  }
+  .tweet-names {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+    flex: 1;
+    min-width: 0;
+  }
+  .tweet-author {
+    font-weight: 600;
+    color: var(--color-text);
+  }
+  .tweet-handle {
+    color: var(--color-text-tertiary);
+    font-size: 0.875rem;
+  }
+  .tweet-brand {
+    font-size: 1.25rem;
+    color: var(--color-text-tertiary);
+  }
+  .tweet-body {
+    margin-top: 0.75rem;
+    color: var(--color-text);
+    line-height: 1.5;
+    white-space: pre-wrap;
+  }
+  .tweet-body > :global(p) {
+    margin: 0.3rem 0;
+  }
+  .tweet-body > :global(p):first-child {
+    margin-top: 0;
+  }
+  .tweet-body > :global(p):last-child {
+    margin-bottom: 0;
+  }
+  .tweet-footer {
+    margin-top: 0.75rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--color-border);
+    font-size: 0.8rem;
+    color: var(--color-text-tertiary);
+    display: flex;
+    justify-content: space-between;
+  }
+  .tweet-footer a {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+</style>

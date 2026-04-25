@@ -5,20 +5,58 @@ export interface Props {
 }
 const { author, role } = Astro.props;
 ---
+
 {/* @mdx-label PullQuote */}
 {/* @mdx-description Highlighted pull quote with optional attribution */}
-{/* @mdx-snippet
+{
+  /* @mdx-snippet
 <PullQuote author="Jane Doe" role="Staff Engineer">
   The quote text goes here.
 </PullQuote>
-*/}
-
-<blockquote class="not-prose my-8 border-l-4 border-accent/60 pl-6 py-2">
-  <p class="text-xl leading-snug text-text italic [&>p]:m-0"><slot /></p>
-  {(author || role) && (
-    <footer class="mt-3 text-sm text-text-tertiary not-italic">
-      {author && <span class="font-semibold text-text-secondary">— {author}</span>}
-      {role && <span>, {role}</span>}
-    </footer>
-  )}
+*/
+}
+{
+  /* @mdx-preview
+<blockquote style="margin:0;padding:8px 0 8px 18px;border-left:3px solid #7c5cff">
+  <p style="font-size:15px;font-style:italic;color:#fafafa;margin:0 0 8px;line-height:1.5">"The quote text goes here."</p>
+  <footer style="font-size:12px;color:#a1a1aa">— Jane Doe, Staff Engineer</footer>
 </blockquote>
+*/
+}
+
+<blockquote class="pull-quote">
+  <p class="pull-quote-body"><slot /></p>
+  {
+    (author || role) && (
+      <footer class="pull-quote-footer">
+        {author && <span class="pull-quote-author">— {author}</span>}
+        {role && <span class="pull-quote-role">, {role}</span>}
+      </footer>
+    )
+  }
+</blockquote>
+
+<style>
+  .pull-quote {
+    margin: 2rem 0;
+    padding: 0.5rem 0 0.5rem 1.5rem;
+    border-left: 3px solid var(--color-accent);
+  }
+  .pull-quote-body {
+    font-size: 1.2rem;
+    line-height: 1.5;
+    color: var(--color-text);
+    font-style: italic;
+    margin: 0;
+  }
+  .pull-quote-footer {
+    margin-top: 0.6rem;
+    font-size: 0.9rem;
+    color: var(--color-text-tertiary);
+    font-style: normal;
+  }
+  .pull-quote-author {
+    font-weight: 500;
+    color: var(--color-text-secondary);
+  }
+</style>

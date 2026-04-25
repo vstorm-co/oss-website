@@ -7,49 +7,60 @@ const { placeholder } = Astro.props;
 
 <div class="relative mb-8" id="blog-search-wrapper">
   <div class="relative">
-    <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-      <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+    <svg
+      class="text-text-tertiary pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"></path>
     </svg>
     <input
       type="search"
       id="blog-search-input"
       placeholder={placeholder}
-      class="w-full rounded-xl border border-border bg-surface pl-10 pr-4 py-2.5 text-sm text-text placeholder:text-text-tertiary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
+      class="border-border bg-surface text-text placeholder:text-text-tertiary focus:border-accent focus:ring-accent w-full rounded-xl border py-2.5 pr-4 pl-10 text-sm transition-colors focus:ring-1 focus:outline-none"
       autocomplete="off"
     />
   </div>
 </div>
 
 <script>
-  const input = document.getElementById('blog-search-input') as HTMLInputElement;
-  const posts = document.querySelectorAll<HTMLElement>('[data-post-category]');
-  const noResults = document.getElementById('no-filtered-posts');
-  const tabs = document.querySelectorAll<HTMLButtonElement>('.category-tab');
+  const input = document.getElementById("blog-search-input") as HTMLInputElement;
+  const posts = document.querySelectorAll<HTMLElement>("[data-post-category]");
+  const noResults = document.getElementById("no-filtered-posts");
+  const tabs = document.querySelectorAll<HTMLButtonElement>(".category-tab");
 
   if (input) {
-    input.addEventListener('input', () => {
+    input.addEventListener("input", () => {
       const query = input.value.toLowerCase().trim();
 
       // Reset category filter to "All" when searching
       if (query && tabs.length) {
-        tabs.forEach(t => t.classList.remove('active'));
-        tabs[0]?.classList.add('active');
+        tabs.forEach((t) => t.classList.remove("active"));
+        tabs[0]?.classList.add("active");
       }
 
       let visible = 0;
       posts.forEach((post) => {
-        const card = post.querySelector('a');
-        const title = card?.querySelector('h2')?.textContent?.toLowerCase() || '';
-        const desc = card?.querySelector('p')?.textContent?.toLowerCase() || '';
-        const tags = Array.from(card?.querySelectorAll('.rounded-full') || [])
-          .map(el => el.textContent?.toLowerCase() || '').join(' ');
+        const card = post.querySelector("a");
+        const title = card?.querySelector("h2")?.textContent?.toLowerCase() || "";
+        const desc = card?.querySelector("p")?.textContent?.toLowerCase() || "";
+        const tags = Array.from(card?.querySelectorAll(".rounded-full") || [])
+          .map((el) => el.textContent?.toLowerCase() || "")
+          .join(" ");
 
-        const matches = !query || title.includes(query) || desc.includes(query) || tags.includes(query);
-        post.style.display = matches ? '' : 'none';
+        const matches =
+          !query || title.includes(query) || desc.includes(query) || tags.includes(query);
+        post.style.display = matches ? "" : "none";
         if (matches) visible++;
       });
 
-      if (noResults) noResults.style.display = visible === 0 ? '' : 'none';
+      if (noResults) noResults.style.display = visible === 0 ? "" : "none";
     });
   }
 </script>

@@ -8,26 +8,28 @@ const { headings, label } = Astro.props;
 const filtered = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 ---
 
-{filtered.length > 0 && (
-  <nav id="toc-nav">
-    <h3 class="mb-3 text-xs font-semibold uppercase tracking-wider text-text-tertiary">
-      {label}
-    </h3>
-    <ul class="space-y-1 text-sm">
-      {filtered.map((heading) => (
-        <li class={heading.depth === 3 ? "pl-4" : ""}>
-          <a
-            href={`#${heading.slug}`}
-            data-toc-link={heading.slug}
-            class="toc-link block py-1 text-text-tertiary hover:text-accent transition-colors border-l-2 border-transparent pl-3 -ml-px"
-          >
-            {heading.text}
-          </a>
-        </li>
-      ))}
-    </ul>
-  </nav>
-)}
+{
+  filtered.length > 0 && (
+    <nav id="toc-nav">
+      <h3 class="text-text-tertiary mb-3 text-xs font-semibold tracking-wider uppercase">
+        {label}
+      </h3>
+      <ul class="space-y-1 text-sm">
+        {filtered.map((heading) => (
+          <li class={heading.depth === 3 ? "pl-4" : ""}>
+            <a
+              href={`#${heading.slug}`}
+              data-toc-link={heading.slug}
+              class="toc-link text-text-tertiary hover:text-accent -ml-px block border-l-2 border-transparent py-1 pl-3 transition-colors"
+            >
+              {heading.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
 
 <style>
   .toc-link.active {
@@ -37,22 +39,28 @@ const filtered = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 </style>
 
 <script is:inline>
-  document.addEventListener('astro:page-load', function() {
-    var links = document.querySelectorAll('[data-toc-link]');
+  document.addEventListener("astro:page-load", function () {
+    const links = document.querySelectorAll("[data-toc-link]");
     if (!links.length) return;
 
-    var slugs = [];
-    links.forEach(function(l) { slugs.push(l.getAttribute('data-toc-link')); });
+    const slugs = [];
+    links.forEach(function (l) {
+      slugs.push(l.getAttribute("data-toc-link"));
+    });
 
-    var headings = slugs.map(function(s) { return document.getElementById(s); }).filter(Boolean);
+    const headings = slugs
+      .map(function (s) {
+        return document.getElementById(s);
+      })
+      .filter(Boolean);
     if (!headings.length) return;
 
-    var current = null;
+    let current = null;
 
     function update() {
-      var found = null;
+      let found = null;
 
-      for (var i = headings.length - 1; i >= 0; i--) {
+      for (let i = headings.length - 1; i >= 0; i--) {
         if (headings[i].getBoundingClientRect().top <= 100) {
           found = headings[i].id;
           break;
@@ -61,17 +69,17 @@ const filtered = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 
       if (found !== current) {
         current = found;
-        links.forEach(function(l) {
-          if (l.getAttribute('data-toc-link') === current) {
-            l.classList.add('active');
+        links.forEach(function (l) {
+          if (l.getAttribute("data-toc-link") === current) {
+            l.classList.add("active");
           } else {
-            l.classList.remove('active');
+            l.classList.remove("active");
           }
         });
       }
     }
 
-    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener("scroll", update, { passive: true });
     update();
   });
 </script>

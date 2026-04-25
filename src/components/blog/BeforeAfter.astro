@@ -1,0 +1,242 @@
+---
+{
+  /* @mdx-label Before / After */
+}
+{
+  /* @mdx-description Side-by-side image comparison with a draggable slider. Perfect for redesigns, photo edits, and UI changes. */
+}
+{
+  /* @mdx-snippet
+<BeforeAfter
+  before={{ src: "/images/before.jpg", alt: "Before" }}
+  after={{ src: "/images/after.jpg", alt: "After" }}
+  initialPosition={50}
+/>
+*/
+}
+{
+  /* @mdx-preview
+<div style="position:relative;height:90px;border-radius:10px;overflow:hidden;border:1px solid #27272a;background:#18181b;display:flex;align-items:center;justify-content:center">
+  <div style="position:absolute;inset:0;left:0;right:50%;background:linear-gradient(135deg,#27272a,#3f3f46)"></div>
+  <div style="position:absolute;inset:0;left:50%;background:linear-gradient(135deg,#7c5cff22,#7c5cff44)"></div>
+  <div style="position:absolute;left:50%;transform:translateX(-50%);width:2px;height:100%;background:#7c5cff;z-index:2"></div>
+  <div style="position:absolute;left:50%;transform:translateX(-50%);width:24px;height:24px;background:#7c5cff;border-radius:50%;border:2px solid #fff;z-index:3;display:flex;align-items:center;justify-content:center">
+    <span style="color:#fff;font-size:9px;font-weight:700">↔</span>
+  </div>
+  <div style="position:absolute;top:8px;left:12px;font-size:10px;font-weight:600;color:#a1a1aa;z-index:2">Before</div>
+  <div style="position:absolute;top:8px;right:12px;font-size:10px;font-weight:600;color:#a1a1aa;z-index:2">After</div>
+</div>
+*/
+}
+
+export interface SlideImage {
+  src: string;
+  alt: string;
+  label?: string;
+}
+
+export interface Props {
+  before: SlideImage;
+  after: SlideImage;
+  initialPosition?: number;
+  aspectRatio?: string;
+}
+
+const { before, after, initialPosition = 50, aspectRatio = "16/9" } = Astro.props;
+const id = `ba-${Math.random().toString(36).slice(2, 8)}`;
+const beforeLabel = before.label ?? "Before";
+const afterLabel = after.label ?? "After";
+---
+
+<div
+  class="ba"
+  id={id}
+  style={`aspect-ratio:${aspectRatio}`}
+  role="group"
+  aria-label={`Image comparison: ${before.alt} vs ${after.alt}`}
+>
+  <div class="ba-after">
+    <img
+      src={after.src}
+      alt={after.alt}
+      class="ba-img"
+      draggable="false"
+      loading="lazy"
+      decoding="async"
+    />
+    <span class="ba-label ba-label-after" aria-hidden>{afterLabel}</span>
+  </div>
+  <div class="ba-before" style={`width:${initialPosition}%`}>
+    <img
+      src={before.src}
+      alt={before.alt}
+      class="ba-img"
+      draggable="false"
+      loading="lazy"
+      decoding="async"
+    />
+    <span class="ba-label ba-label-before" aria-hidden>{beforeLabel}</span>
+  </div>
+  <div class="ba-divider" style={`left:${initialPosition}%`} aria-hidden>
+    <div class="ba-handle">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden
+      >
+        <path d="M18 8l4 4-4 4M6 8l-4 4 4 4"></path>
+      </svg>
+    </div>
+  </div>
+  <input
+    type="range"
+    class="ba-slider"
+    min="0"
+    max="100"
+    value={initialPosition}
+    step="0.1"
+    aria-label="Comparison slider"
+  />
+</div>
+
+<style>
+  .ba {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid var(--color-border);
+    margin: 1.5em 0;
+    user-select: none;
+    cursor: ew-resize;
+    background: var(--color-surface);
+  }
+  .ba-after,
+  .ba-before {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .ba-before {
+    right: auto;
+    border-right: 2px solid rgba(255, 255, 255, 0.8);
+  }
+  .ba-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+    opacity: 1;
+  }
+  .ba-label {
+    position: absolute;
+    top: 0.6rem;
+    padding: 0.2em 0.6em;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    color: #fff;
+    pointer-events: none;
+  }
+  .ba-label-before {
+    right: 0.6rem;
+  }
+  .ba-label-after {
+    right: 0.6rem;
+  }
+  .ba-divider {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    transform: translateX(-50%);
+    z-index: 3;
+    pointer-events: none;
+  }
+  .ba-handle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    border: 3px solid #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    transition: all 0.15s;
+  }
+  .ba:active .ba-handle,
+  .ba:focus-within .ba-handle {
+    transform: translate(-50%, -50%) scale(1.12);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  }
+  .ba-slider {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: ew-resize;
+    margin: 0;
+    z-index: 4;
+  }
+  .ba-slider:focus {
+    outline: none;
+  }
+  .ba:focus-within {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    function initBA(el) {
+      if (el._baInit) return;
+      el._baInit = true;
+
+      const before = el.querySelector(".ba-before");
+      const divider = el.querySelector(".ba-divider");
+      const slider = el.querySelector(".ba-slider");
+      if (!before || !divider || !slider) return;
+
+      function setPos(pct) {
+        pct = Math.max(0, Math.min(100, pct));
+        before.style.width = pct + "%";
+        divider.style.left = pct + "%";
+      }
+
+      slider.addEventListener("input", function () {
+        setPos(parseFloat(slider.value));
+      });
+
+      setPos(parseFloat(slider.value));
+    }
+
+    function initAll() {
+      document.querySelectorAll(".ba").forEach(initBA);
+    }
+
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initAll);
+    else initAll();
+    document.addEventListener("astro:page-load", initAll);
+  })();
+</script>

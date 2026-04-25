@@ -1,0 +1,127 @@
+---
+type Mark = "yes" | "no" | "partial";
+export interface Row {
+  label: string;
+  left: Mark | string;
+  right: Mark | string;
+}
+export interface Props {
+  leftHeader: string;
+  rightHeader: string;
+  rows: Row[];
+}
+const { leftHeader, rightHeader, rows } = Astro.props;
+
+const markSymbol: Record<Mark, string> = { yes: "✓", no: "✗", partial: "~" };
+const markClass: Record<Mark, string> = { yes: "yes", no: "no", partial: "partial" };
+function render(value: Mark | string) {
+  if (value === "yes" || value === "no" || value === "partial") {
+    return { symbol: markSymbol[value], cls: markClass[value] };
+  }
+  return { symbol: value, cls: "text" };
+}
+---
+
+{/* @mdx-label Comparison */}
+{/* @mdx-description Opinionated "A vs B" comparison table with ✓ / ✗ / ~ marks. */}
+{
+  /* @mdx-snippet
+<Comparison
+  leftHeader="Option A"
+  rightHeader="Option B"
+  rows={[
+    { label: "Feature 1", left: "yes", right: "yes" },
+    { label: "Feature 2", left: "yes", right: "no" },
+    { label: "Feature 3", left: "partial", right: "yes" },
+    { label: "Pricing", left: "$0", right: "$10/mo" },
+  ]}
+/>
+*/
+}
+{
+  /* @mdx-preview
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #27272a;border-radius:8px;overflow:hidden">
+  <div style="padding:10px 12px;background:#1a0e0e;border-right:1px solid #27272a">
+    <p style="font-size:10px;font-weight:700;color:#f87171;margin:0 0 4px;text-transform:uppercase">❌ Don't</p>
+    <p style="font-size:12px;color:#a1a1aa;margin:0">Bad practice example</p>
+  </div>
+  <div style="padding:10px 12px;background:#0e1a0e">
+    <p style="font-size:10px;font-weight:700;color:#4ade80;margin:0 0 4px;text-transform:uppercase">✅ Do</p>
+    <p style="font-size:12px;color:#a1a1aa;margin:0">Good practice example</p>
+  </div>
+</div>
+*/
+}
+
+<table class="comparison">
+  <thead>
+    <tr>
+      <th></th>
+      <th>{leftHeader}</th>
+      <th>{rightHeader}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {
+      rows.map((row) => {
+        const l = render(row.left);
+        const r = render(row.right);
+        return (
+          <tr>
+            <th scope="row">{row.label}</th>
+            <td>
+              <span class:list={["cmp", l.cls]}>{l.symbol}</span>
+            </td>
+            <td>
+              <span class:list={["cmp", r.cls]}>{r.symbol}</span>
+            </td>
+          </tr>
+        );
+      })
+    }
+  </tbody>
+</table>
+
+<style>
+  .comparison {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.95rem;
+  }
+  .comparison th,
+  .comparison td {
+    text-align: left;
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .comparison thead th {
+    font-weight: 600;
+    color: var(--color-text);
+    border-bottom-width: 2px;
+  }
+  .comparison tbody th {
+    font-weight: 500;
+    color: var(--color-text);
+  }
+  .cmp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+  .cmp.yes {
+    color: #34d399;
+  }
+  .cmp.no {
+    color: #fb7185;
+  }
+  .cmp.partial {
+    color: #f59e0b;
+  }
+  .cmp.text {
+    font-weight: 500;
+    color: var(--color-text);
+  }
+</style>

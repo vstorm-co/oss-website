@@ -1,0 +1,77 @@
+---
+export interface Props {
+  summary: string;
+  open?: boolean;
+}
+const { summary, open = false } = Astro.props;
+---
+
+{/* @mdx-label Details */}
+{/* @mdx-description Collapsible <details> with consistent styling. Good for solution reveals. */}
+{
+  /* @mdx-snippet
+<Details summary="Click to reveal">
+  Hidden content goes here.
+</Details>
+*/
+}
+{
+  /* @mdx-preview
+<details style="border:1px solid #27272a;border-radius:8px;overflow:hidden" open>
+  <summary style="padding:10px 14px;background:#18181b;cursor:pointer;font-size:13px;font-weight:500;color:#fafafa;list-style:none;display:flex;justify-content:space-between">Click to reveal <span>▾</span></summary>
+  <div style="padding:10px 14px;font-size:12px;color:#a1a1aa;background:#0e0e11">Hidden content goes here.</div>
+</details>
+*/
+}
+
+<details class="details" open={open}>
+  <summary>{summary}</summary>
+  <div class="details-body">
+    <slot />
+  </div>
+</details>
+
+<style>
+  .details {
+    margin: 1.25rem 0;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    overflow: hidden;
+  }
+  .details > summary {
+    cursor: pointer;
+    padding: 0.8rem 1rem;
+    font-weight: 500;
+    list-style: none;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .details > summary::marker {
+    display: none;
+  }
+  .details > summary::-webkit-details-marker {
+    display: none;
+  }
+  .details > summary::before {
+    content: "▶";
+    font-size: 0.7rem;
+    color: var(--color-text-tertiary);
+    transition: transform 0.15s;
+  }
+  .details[open] > summary::before {
+    transform: rotate(90deg);
+  }
+  .details-body {
+    padding: 0 1rem 1rem;
+    color: var(--color-text-secondary);
+  }
+  .details-body > :global(p):first-child {
+    margin-top: 0;
+  }
+  .details-body > :global(p):last-child {
+    margin-bottom: 0;
+  }
+</style>

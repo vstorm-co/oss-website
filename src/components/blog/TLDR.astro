@@ -1,0 +1,81 @@
+---
+export interface Props {
+  /** Optional override for the visible label. Defaults to "TL;DR". */
+  label?: string;
+}
+
+const { label = "TL;DR" } = Astro.props;
+---
+
+{/* @mdx-label TLDR */}
+{
+  /* @mdx-description Styled TL;DR block — opens long-form articles with a scannable summary. AI engines often extract this verbatim, so write it as a self-contained answer. */
+}
+{
+  /* @mdx-snippet
+<TLDR>
+  Most agent loops are mechanical, not model failures. **StuckLoopDetection** in
+  pydantic-deep v0.3.8 catches three patterns (repeated calls, A-B-A-B alternating, no-op)
+  before they waste your API budget. Configurable threshold, configurable action.
+</TLDR>
+*/
+}
+
+<aside class="tldr">
+  <div class="tldr-label">{label}</div>
+  <div class="tldr-body">
+    <slot />
+  </div>
+</aside>
+
+<style>
+  .tldr {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    align-items: start;
+    margin: 2rem 0 2.5rem;
+    padding: 1.25rem 1.5rem;
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-accent) 10%, transparent),
+      color-mix(in srgb, var(--color-accent) 4%, transparent)
+    );
+    border: 1px solid color-mix(in srgb, var(--color-accent) 25%, transparent);
+    border-radius: 12px;
+    position: relative;
+  }
+  .tldr-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    padding: 0.25rem 0.625rem;
+    background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+    border-radius: 6px;
+    align-self: start;
+    white-space: nowrap;
+  }
+  .tldr-body {
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: var(--color-text);
+  }
+  .tldr-body :global(p) {
+    margin: 0 0 0.75rem;
+  }
+  .tldr-body :global(p:last-child) {
+    margin-bottom: 0;
+  }
+  .tldr-body :global(strong) {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+  @media (max-width: 540px) {
+    .tldr {
+      grid-template-columns: 1fr;
+      gap: 0.625rem;
+    }
+  }
+</style>

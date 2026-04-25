@@ -1,0 +1,231 @@
+---
+{
+  /* @mdx-label Embed (CodePen / StackBlitz) */
+}
+{
+  /* @mdx-description Lazy iframe for CodePen, StackBlitz, CodeSandbox — loads on click. */
+}
+{
+  /* @mdx-snippet
+<Embed
+  src="https://stackblitz.com/edit/vitejs-vite-example?embed=1&file=src/main.ts"
+  title="Vite example on StackBlitz"
+  height={480}
+/>
+*/
+}
+{
+  /* @mdx-preview
+<div style="background:#18181b;border:1px solid #27272a;border-radius:10px;overflow:hidden">
+  <div style="padding:10px 14px;border-bottom:1px solid #27272a;display:flex;align-items:center;gap:8px">
+    <div style="width:8px;height:8px;border-radius:50%;background:#ef4444"></div>
+    <div style="width:8px;height:8px;border-radius:50%;background:#f59e0b"></div>
+    <div style="width:8px;height:8px;border-radius:50%;background:#22c55e"></div>
+    <div style="flex:1;height:20px;background:#27272a;border-radius:4px;margin-left:4px"></div>
+  </div>
+  <div style="height:70px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px">
+    <div style="width:36px;height:36px;background:#27272a;border-radius:6px;display:flex;align-items:center;justify-content:center">
+      <span style="color:#7c5cff;font-size:16px">▶</span>
+    </div>
+    <span style="font-size:11px;color:#71717a">Click to load</span>
+  </div>
+</div>
+*/
+}
+
+export type EmbedProvider = "codepen" | "stackblitz" | "codesandbox" | "replit" | "custom";
+
+export interface Props {
+  src: string;
+  title: string;
+  height?: number;
+  provider?: EmbedProvider;
+  allow?: string;
+  lazy?: boolean;
+}
+
+function detectProvider(url: string): EmbedProvider {
+  if (url.includes("codepen.io")) return "codepen";
+  if (url.includes("stackblitz.com")) return "stackblitz";
+  if (url.includes("codesandbox.io")) return "codesandbox";
+  if (url.includes("replit.com")) return "replit";
+  return "custom";
+}
+
+function getLabel(provider: EmbedProvider): string {
+  switch (provider) {
+    case "codepen":
+      return "CodePen";
+    case "stackblitz":
+      return "StackBlitz";
+    case "codesandbox":
+      return "CodeSandbox";
+    case "replit":
+      return "Replit";
+    default:
+      return "Embed";
+  }
+}
+
+const {
+  src,
+  title,
+  height = 480,
+  provider: _provider,
+  allow = "accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
+  lazy = true,
+} = Astro.props;
+
+const provider = _provider ?? detectProvider(src);
+const label = getLabel(provider);
+const id = `em-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<div
+  class="embed-wrap"
+  id={id}
+  style={`height:${height}px`}
+  data-src={src}
+  data-title={title}
+  data-allow={allow}
+>
+  {
+    lazy ? (
+      <button class="embed-placeholder" aria-label={`Load ${label}: ${title}`}>
+        <span class="embed-provider-badge">{label}</span>
+        <span class="embed-play-icon" aria-hidden>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </span>
+        <span class="embed-load-text">Click to load</span>
+        <span class="embed-title">{title}</span>
+      </button>
+    ) : (
+      <iframe
+        src={src}
+        title={title}
+        height={height}
+        allow={allow}
+        allowfullscreen
+        loading="lazy"
+        class="embed-iframe"
+      />
+    )
+  }
+</div>
+
+<style>
+  .embed-wrap {
+    position: relative;
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    margin: 1.5em 0;
+    background: var(--color-surface);
+  }
+  .embed-placeholder {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: var(--color-text-secondary);
+    transition: background 0.15s;
+  }
+  .embed-placeholder:hover {
+    background: var(--color-surface-hover);
+  }
+  .embed-provider-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface));
+    border: 1px solid color-mix(in srgb, var(--color-accent) 30%, var(--color-border));
+    padding: 0.2em 0.7em;
+    border-radius: 100px;
+    margin-bottom: 0.25rem;
+  }
+  .embed-play-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--color-surface-hover);
+    border: 2px solid var(--color-border-hover);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-accent);
+    transition: all 0.15s;
+  }
+  .embed-placeholder:hover .embed-play-icon {
+    transform: scale(1.08);
+    border-color: var(--color-accent);
+  }
+  .embed-load-text {
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .embed-title {
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+    max-width: 28rem;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 1rem;
+  }
+  .embed-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    function initEmbed(el) {
+      if (el._emInit) return;
+      el._emInit = true;
+      const placeholder = el.querySelector(".embed-placeholder");
+      if (!placeholder) return;
+
+      placeholder.addEventListener("click", function () {
+        const src = el.getAttribute("data-src");
+        const title = el.getAttribute("data-title") || "Embed";
+        const allow = el.getAttribute("data-allow") || "";
+        const iframe = document.createElement("iframe");
+        iframe.src = src;
+        iframe.title = title;
+        iframe.allow = allow;
+        iframe.allowFullscreen = true;
+        iframe.loading = "lazy";
+        iframe.className = "embed-iframe";
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        iframe.style.border = "none";
+        placeholder.replaceWith(iframe);
+      });
+    }
+
+    function initAll() {
+      document.querySelectorAll(".embed-wrap").forEach(initEmbed);
+    }
+
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initAll);
+    else initAll();
+    document.addEventListener("astro:page-load", initAll);
+  })();
+</script>

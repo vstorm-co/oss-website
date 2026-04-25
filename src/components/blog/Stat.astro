@@ -5,15 +5,63 @@ export interface Props {
   trend?: "up" | "down" | "neutral";
 }
 const { value, label, trend = "neutral" } = Astro.props;
-const trendColor = trend === "up" ? "text-emerald-400" : trend === "down" ? "text-rose-400" : "text-accent";
 ---
-{/* @mdx-label Stat */}
-{/* @mdx-description Big-number callout (optional trend: up | down | neutral) */}
-{/* @mdx-snippet
-<Stat value="10×" label="Faster than manual setup" trend="up" />
-*/}
 
-<div class="not-prose my-6 inline-flex flex-col items-start rounded-xl border border-border bg-surface/50 px-5 py-4">
-  <div class={`text-4xl font-bold tracking-tight ${trendColor}`}>{value}</div>
-  <div class="mt-1 text-sm text-text-secondary">{label}</div>
+{/* @mdx-label Stat */}
+{/* @mdx-description Big-number stat with optional trend: up | down | neutral. */}
+{
+  /* @mdx-snippet
+<Stat value="10×" label="Faster than manual setup" trend="up" />
+*/
+}
+{
+  /* @mdx-preview
+<div style="display:flex;gap:16px">
+  <div style="flex:1;border:1px solid #27272a;border-radius:10px;padding:14px;background:#0e0e11;text-align:center">
+    <div style="font-size:28px;font-weight:800;color:#22c55e">10×</div>
+    <div style="font-size:11px;color:#a1a1aa;margin-top:4px">Faster than manual</div>
+  </div>
+  <div style="flex:1;border:1px solid #27272a;border-radius:10px;padding:14px;background:#0e0e11;text-align:center">
+    <div style="font-size:28px;font-weight:800;color:#7c5cff">98%</div>
+    <div style="font-size:11px;color:#a1a1aa;margin-top:4px">User satisfaction</div>
+  </div>
 </div>
+*/
+}
+
+<div class:list={["stat", `stat-${trend}`]}>
+  <div class="stat-value">{value}</div>
+  <div class="stat-label">{label}</div>
+</div>
+
+<style>
+  .stat {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.9rem 1.25rem;
+    margin: 1rem 0;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+  }
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .stat-label {
+    color: var(--color-text-tertiary);
+    font-size: 0.85rem;
+  }
+  .stat-up .stat-value {
+    color: #34d399;
+  }
+  .stat-down .stat-value {
+    color: #fb7185;
+  }
+  .stat-neutral .stat-value {
+    color: var(--color-accent);
+  }
+</style>

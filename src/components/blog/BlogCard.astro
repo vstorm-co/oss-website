@@ -1,6 +1,6 @@
 ---
-import type { Lang } from '../../i18n/translations';
-import { translations } from '../../i18n/translations';
+import type { Lang } from "../../i18n/translations";
+import { translations } from "../../i18n/translations";
 
 interface Props {
   title: string;
@@ -14,7 +14,17 @@ interface Props {
   author?: string;
 }
 
-const { title, description, pubDate, href, tags = [], lang = 'en', category, readingTime, author } = Astro.props;
+const {
+  title,
+  description,
+  pubDate,
+  href,
+  tags = [],
+  lang = "en",
+  category,
+  readingTime,
+  author,
+} = Astro.props;
 const t = translations[lang as Lang];
 
 const estimatedReadTime = readingTime ?? 5; // default 5 min
@@ -28,42 +38,51 @@ const categoryLabel = category && t[categoryKey] ? t[categoryKey] : null;
 
 <a
   href={href}
-  class="group block glass-card rounded-xl p-6 hover:border-accent/30 relative overflow-hidden"
+  class="group glass-card hover:border-accent/30 relative block overflow-hidden rounded-xl p-6"
 >
-  <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/0 to-transparent group-hover:via-accent/50 transition-all duration-500"></div>
-  <div class="flex items-center gap-3 text-sm text-text-tertiary">
+  <div
+    class="via-accent/0 group-hover:via-accent/50 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent transition-all duration-500"
+  >
+  </div>
+  <div class="text-text-tertiary flex items-center gap-3 text-sm">
     <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
     <span>&middot;</span>
     <span>{estimatedReadTime} min read</span>
-    {author && (
-      <>
-        <span>&middot;</span>
-        <span>{author}</span>
-      </>
-    )}
-    {categoryLabel && (
-      <>
-        <span>&middot;</span>
-        <span class="rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent">
-          {categoryLabel}
-        </span>
-      </>
-    )}
+    {
+      author && (
+        <>
+          <span>&middot;</span>
+          <span>{author}</span>
+        </>
+      )
+    }
+    {
+      categoryLabel && (
+        <>
+          <span>&middot;</span>
+          <span class="bg-accent/10 text-accent rounded-full px-2.5 py-0.5 text-xs font-medium">
+            {categoryLabel}
+          </span>
+        </>
+      )
+    }
   </div>
 
-  <h2 class="mt-2 text-lg font-semibold text-text group-hover:text-accent transition-colors">
+  <h2 class="text-text group-hover:text-accent mt-2 text-lg font-semibold transition-colors">
     {title}
   </h2>
 
-  <p class="mt-2 text-sm text-text-secondary line-clamp-2">{description}</p>
+  <p class="text-text-secondary mt-2 line-clamp-2 text-sm">{description}</p>
 
-  {tags.length > 0 && (
-    <div class="mt-4 flex flex-wrap gap-2">
-      {tags.map((tag) => (
-        <span class="rounded-full bg-accent/[0.10] px-2.5 py-0.5 text-xs font-medium text-accent border border-accent/25">
-          {tag}
-        </span>
-      ))}
-    </div>
-  )}
+  {
+    tags.length > 0 && (
+      <div class="mt-4 flex flex-wrap gap-2">
+        {tags.map((tag) => (
+          <span class="bg-accent/[0.10] text-accent border-accent/25 rounded-full border px-2.5 py-0.5 text-xs font-medium">
+            {tag}
+          </span>
+        ))}
+      </div>
+    )
+  }
 </a>

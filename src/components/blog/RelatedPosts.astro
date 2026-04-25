@@ -1,7 +1,7 @@
 ---
-import { getCollection } from 'astro:content';
-import type { Lang } from '../../i18n/translations';
-import { defaultLang } from '../../i18n/translations';
+import { getCollection } from "astro:content";
+import type { Lang } from "../../i18n/translations";
+import { defaultLang } from "../../i18n/translations";
 
 interface Props {
   currentSlug: string;
@@ -13,19 +13,19 @@ interface Props {
 const { currentSlug, currentTags, lang, t } = Astro.props;
 
 const allPosts = (
-  await getCollection('blog', ({ data }) => data.lang === lang && !data.draft)
+  await getCollection("blog", ({ data }) => data.lang === lang && !data.draft)
 ).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 // Filter out the current post
 const otherPosts = allPosts.filter((p) => {
-  const postSlug = p.id.split('/').slice(1).join('/');
+  const postSlug = p.id.split("/").slice(1).join("/");
   const href = lang === defaultLang ? `/blog/${postSlug}/` : `/${lang}/blog/${postSlug}/`;
   return href !== currentSlug;
 });
 
 // Find posts with matching tags
 let related = otherPosts.filter((p) =>
-  p.data.tags.some((tag: string) => currentTags.includes(tag))
+  p.data.tags.some((tag: string) => currentTags.includes(tag)),
 );
 
 // If no tag matches, fall back to latest posts
@@ -36,36 +36,38 @@ if (related.length === 0) {
 const posts = related.slice(0, 3);
 
 const formatDate = (date: Date) =>
-  date.toLocaleDateString(lang, { year: 'numeric', month: 'short', day: 'numeric' });
+  date.toLocaleDateString(lang, { year: "numeric", month: "short", day: "numeric" });
 
 const truncate = (text: string, max: number) =>
-  text.length > max ? text.slice(0, max).trimEnd() + '...' : text;
+  text.length > max ? text.slice(0, max).trimEnd() + "..." : text;
 ---
 
-{posts.length > 0 && (
-  <section class="mt-16">
-    <h2 class="mb-6 text-xl font-bold">{t["blog.relatedPosts"]}</h2>
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {posts.map((post) => {
-        const postSlug = post.id.split('/').slice(1).join('/');
-        const href = lang === defaultLang ? `/blog/${postSlug}/` : `/${lang}/blog/${postSlug}/`;
-        return (
-          <a
-            href={href}
-            class="group block glass-card rounded-xl p-5 hover:border-accent/30 transition-all"
-          >
-            <time class="text-xs text-text-tertiary" datetime={post.data.pubDate.toISOString()}>
-              {formatDate(post.data.pubDate)}
-            </time>
-            <h3 class="mt-1.5 text-sm font-semibold text-text group-hover:text-accent transition-colors line-clamp-2">
-              {post.data.title}
-            </h3>
-            <p class="mt-1.5 text-xs text-text-secondary line-clamp-2">
-              {truncate(post.data.description, 120)}
-            </p>
-          </a>
-        );
-      })}
-    </div>
-  </section>
-)}
+{
+  posts.length > 0 && (
+    <section class="mt-16">
+      <h2 class="mb-6 text-xl font-bold">{t["blog.relatedPosts"]}</h2>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {posts.map((post) => {
+          const postSlug = post.id.split("/").slice(1).join("/");
+          const href = lang === defaultLang ? `/blog/${postSlug}/` : `/${lang}/blog/${postSlug}/`;
+          return (
+            <a
+              href={href}
+              class="group glass-card hover:border-accent/30 block rounded-xl p-5 transition-all"
+            >
+              <time class="text-text-tertiary text-xs" datetime={post.data.pubDate.toISOString()}>
+                {formatDate(post.data.pubDate)}
+              </time>
+              <h3 class="text-text group-hover:text-accent mt-1.5 line-clamp-2 text-sm font-semibold transition-colors">
+                {post.data.title}
+              </h3>
+              <p class="text-text-secondary mt-1.5 line-clamp-2 text-xs">
+                {truncate(post.data.description, 120)}
+              </p>
+            </a>
+          );
+        })}
+      </div>
+    </section>
+  )
+}

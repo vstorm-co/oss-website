@@ -1,0 +1,201 @@
+---
+{
+  /* @mdx-label Accordion */
+}
+{
+  /* @mdx-description Multi-panel FAQ with animated expand/collapse. Better than Details when you have many questions. */
+}
+{
+  /* @mdx-snippet
+<Accordion
+  items={[
+    { title: "How does it work?", content: "Click a heading to expand the answer. Each panel can be opened independently." },
+    { title: "Can multiple panels be open?", content: "Yes — each item opens independently." },
+    { title: "Third question", content: "And here is the answer to the third question." },
+  ]}
+/>
+*/
+}
+{
+  /* @mdx-preview
+<div style="border:1px solid #27272a;border-radius:10px;overflow:hidden">
+  <div style="padding:12px 16px;border-bottom:1px solid #27272a;display:flex;justify-content:space-between;align-items:center;background:#18181b">
+    <span style="font-size:13px;font-weight:500;color:#fafafa">How does it work?</span>
+    <span style="color:#7c5cff;font-size:16px">▾</span>
+  </div>
+  <div style="padding:10px 16px;font-size:12px;color:#a1a1aa;background:#0e0e11">Click a heading to expand the answer.</div>
+  <div style="padding:12px 16px;border-top:1px solid #27272a;display:flex;justify-content:space-between;align-items:center">
+    <span style="font-size:13px;font-weight:500;color:#a1a1aa">Second question</span>
+    <span style="color:#71717a">›</span>
+  </div>
+</div>
+*/
+}
+
+export interface AccordionItem {
+  title: string;
+  content: string;
+}
+
+export interface Props {
+  items: AccordionItem[];
+  allowMultiple?: boolean;
+}
+
+const { items, allowMultiple = true } = Astro.props;
+const id = `ac-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<div class="accordion" id={id} data-multi={allowMultiple ? "true" : "false"}>
+  {
+    items.map((item, i) => (
+      <div class="accordion-item">
+        <button
+          class="accordion-trigger"
+          aria-expanded="false"
+          aria-controls={`${id}-panel-${i}`}
+          id={`${id}-btn-${i}`}
+        >
+          <span class="accordion-title">{item.title}</span>
+          <span class="accordion-icon" aria-hidden>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </span>
+        </button>
+        <div
+          class="accordion-panel"
+          id={`${id}-panel-${i}`}
+          role="region"
+          aria-labelledby={`${id}-btn-${i}`}
+          hidden
+        >
+          <div class="accordion-content" set:html={item.content} />
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .accordion {
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 1.5em 0;
+  }
+  .accordion-item {
+    border-bottom: 1px solid var(--color-border);
+  }
+  .accordion-item:last-child {
+    border-bottom: none;
+  }
+  .accordion-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text);
+    text-align: left;
+    transition: background 0.15s;
+    font-family: inherit;
+    font-size: 0.975rem;
+  }
+  .accordion-trigger:hover {
+    background: var(--color-surface-hover);
+  }
+  .accordion-trigger[aria-expanded="true"] {
+    background: var(--color-surface);
+  }
+  .accordion-title {
+    font-weight: 500;
+    flex: 1;
+    line-height: 1.4;
+  }
+  .accordion-icon {
+    flex-shrink: 0;
+    color: var(--color-text-tertiary);
+    transition: all 0.25s;
+  }
+  .accordion-trigger[aria-expanded="true"] .accordion-icon {
+    transform: rotate(180deg);
+    color: var(--color-accent);
+  }
+  .accordion-panel {
+    overflow: hidden;
+  }
+  .accordion-panel[hidden] {
+    display: none;
+  }
+  .accordion-panel.animating {
+    display: block;
+  }
+  .accordion-content {
+    padding: 0.75rem 1.25rem 1.1rem;
+    color: var(--color-text-secondary);
+    font-size: 0.925rem;
+    line-height: 1.65;
+    border-top: 1px solid var(--color-border);
+  }
+  .accordion-content p {
+    margin: 0.5em 0;
+  }
+  .accordion-content p:first-child {
+    margin-top: 0;
+  }
+  .accordion-content p:last-child {
+    margin-bottom: 0;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    function initAccordion(el) {
+      if (el._accInit) return;
+      el._accInit = true;
+      const multi = el.getAttribute("data-multi") === "true";
+      const triggers = el.querySelectorAll(".accordion-trigger");
+
+      triggers.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          const expanded = btn.getAttribute("aria-expanded") === "true";
+          if (!multi) {
+            triggers.forEach(function (b) {
+              b.setAttribute("aria-expanded", "false");
+              const p = document.getElementById(b.getAttribute("aria-controls"));
+              if (p) p.hidden = true;
+            });
+          }
+          const panelId = btn.getAttribute("aria-controls");
+          const panel = document.getElementById(panelId);
+          if (!panel) return;
+          const next = !expanded;
+          btn.setAttribute("aria-expanded", String(next));
+          panel.hidden = !next;
+        });
+      });
+    }
+
+    function initAll() {
+      document.querySelectorAll(".accordion").forEach(initAccordion);
+    }
+
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initAll);
+    else initAll();
+    document.addEventListener("astro:page-load", initAll);
+  })();
+</script>

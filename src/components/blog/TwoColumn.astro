@@ -5,9 +5,11 @@ export interface Props {
 }
 const { leftTitle, rightTitle } = Astro.props;
 ---
+
 {/* @mdx-label TwoColumn */}
-{/* @mdx-description Side-by-side comparison — uses named slots: left and right */}
-{/* @mdx-snippet
+{/* @mdx-description Side-by-side comparison — uses named slots `left` and `right`. */}
+{
+  /* @mdx-snippet
 <TwoColumn leftTitle="Before" rightTitle="After">
   <Fragment slot="left">
     Left column content.
@@ -16,15 +18,66 @@ const { leftTitle, rightTitle } = Astro.props;
     Right column content.
   </Fragment>
 </TwoColumn>
-*/}
-
-<div class="not-prose my-6 grid gap-4 sm:grid-cols-2">
-  <div class="rounded-lg border border-border bg-surface/50 p-4">
-    {leftTitle && <div class="font-semibold text-text mb-2">{leftTitle}</div>}
-    <div class="text-sm text-text-secondary [&>p]:mb-2 [&>p:last-child]:mb-0"><slot name="left" /></div>
+*/
+}
+{
+  /* @mdx-preview
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+  <div style="border:1px solid #27272a;border-radius:8px;padding:10px;background:#0e0e11">
+    <p style="font-size:10px;font-weight:700;text-transform:uppercase;color:#71717a;margin:0 0 6px;letter-spacing:.06em">Before</p>
+    <p style="font-size:12px;color:#a1a1aa;margin:0">Left column content.</p>
   </div>
-  <div class="rounded-lg border border-border bg-surface/50 p-4">
-    {rightTitle && <div class="font-semibold text-text mb-2">{rightTitle}</div>}
-    <div class="text-sm text-text-secondary [&>p]:mb-2 [&>p:last-child]:mb-0"><slot name="right" /></div>
+  <div style="border:1px solid #27272a;border-radius:8px;padding:10px;background:#0e0e11">
+    <p style="font-size:10px;font-weight:700;text-transform:uppercase;color:#71717a;margin:0 0 6px;letter-spacing:.06em">After</p>
+    <p style="font-size:12px;color:#a1a1aa;margin:0">Right column content.</p>
   </div>
 </div>
+*/
+}
+
+<div class="two-col">
+  <div class="two-col-pane">
+    {leftTitle && <p class="two-col-title">{leftTitle}</p>}
+    <slot name="left" />
+  </div>
+  <div class="two-col-pane">
+    {rightTitle && <p class="two-col-title">{rightTitle}</p>}
+    <slot name="right" />
+  </div>
+</div>
+
+<style>
+  .two-col {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr 1fr;
+    margin: 1.5rem 0;
+  }
+  .two-col-pane {
+    padding: 1rem 1.25rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    font-size: 0.95rem;
+  }
+  .two-col-title {
+    font-weight: 600;
+    margin: 0 0 0.4rem;
+    color: var(--color-text);
+  }
+  .two-col-pane > :global(p) {
+    margin: 0.4rem 0;
+    color: var(--color-text-secondary);
+  }
+  .two-col-pane > :global(p):first-of-type {
+    margin-top: 0;
+  }
+  .two-col-pane > :global(p):last-of-type {
+    margin-bottom: 0;
+  }
+  @media (max-width: 640px) {
+    .two-col {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,85 @@
+---
+export interface Props {
+  tone?: "default" | "success" | "warn" | "danger" | "info";
+}
+const { tone = "default" } = Astro.props;
+---
+
+{/* @mdx-label Badge */}
+{
+  /* @mdx-description Inline pill for tags/notes. Tones: default | success | warn | danger | info. */
+}
+{
+  /* @mdx-snippet
+Here's a <Badge tone="success">stable</Badge> marker.
+*/
+}
+{
+  /* @mdx-preview
+<div style="display:flex;gap:6px;flex-wrap:wrap;padding:4px 0">
+  <span style="display:inline-block;padding:.1em .55em;font-size:11px;font-weight:600;border-radius:4px;background:#27272a;color:#a1a1aa;border:1px solid #3f3f46">default</span>
+  <span style="display:inline-block;padding:.1em .55em;font-size:11px;font-weight:600;border-radius:4px;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.25)">success</span>
+  <span style="display:inline-block;padding:.1em .55em;font-size:11px;font-weight:600;border-radius:4px;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.25)">warn</span>
+  <span style="display:inline-block;padding:.1em .55em;font-size:11px;font-weight:600;border-radius:4px;background:rgba(239,68,68,.12);color:#ef4444;border:1px solid rgba(239,68,68,.25)">danger</span>
+  <span style="display:inline-block;padding:.1em .55em;font-size:11px;font-weight:600;border-radius:4px;background:rgba(96,165,250,.12);color:#60a5fa;border:1px solid rgba(96,165,250,.25)">info</span>
+</div>
+*/
+}
+
+<span class:list={["badge", `badge-${tone}`]}>
+  <slot />
+</span>
+
+<style>
+  .badge {
+    display: inline-block;
+    padding: 0.1em 0.55em;
+    border-radius: 9999px;
+    font-size: 0.8em;
+    font-weight: 500;
+    line-height: 1.4;
+    vertical-align: baseline;
+    border: 1px solid transparent;
+  }
+  .badge-default {
+    background: var(--color-surface);
+    color: var(--color-text-secondary);
+    border-color: var(--color-border);
+  }
+  .badge-success {
+    background: rgba(16, 185, 129, 0.12);
+    color: #34d399;
+    border-color: rgba(16, 185, 129, 0.4);
+  }
+  .badge-warn {
+    background: rgba(245, 158, 11, 0.12);
+    color: #fbbf24;
+    border-color: rgba(245, 158, 11, 0.4);
+  }
+  .badge-danger {
+    background: rgba(244, 63, 94, 0.12);
+    color: #fb7185;
+    border-color: rgba(244, 63, 94, 0.4);
+  }
+  .badge-info {
+    background: rgba(76, 127, 255, 0.12);
+    color: #a7c0ff;
+    border-color: rgba(76, 127, 255, 0.4);
+  }
+  :root[data-theme="light"] .badge-success,
+  :global(.section-light) .badge-success {
+    color: #047857;
+  }
+  :root[data-theme="light"] .badge-warn,
+  :global(.section-light) .badge-warn {
+    color: #b45309;
+  }
+  :root[data-theme="light"] .badge-danger,
+  :global(.section-light) .badge-danger {
+    color: #be123c;
+  }
+  :root[data-theme="light"] .badge-info,
+  :global(.section-light) .badge-info {
+    color: #3257c4;
+  }
+</style>

@@ -1,0 +1,124 @@
+---
+export interface Props {
+  url: string;
+  title: string;
+  description?: string;
+  favicon?: string;
+  image?: string;
+}
+const { url, title, description, favicon, image } = Astro.props;
+let host = "";
+try {
+  host = new URL(url).host;
+} catch {
+  host = url;
+}
+---
+
+{/* @mdx-label Bookmark */}
+{
+  /* @mdx-description Rich link card — you fill in title/description manually (no build-time scraping). */
+}
+{
+  /* @mdx-snippet
+<Bookmark
+  url="https://astro.build"
+  title="Astro — The web framework for content-driven websites"
+  description="Build fast websites, faster. Astro is the top-rated framework for content."
+/>
+*/
+}
+{
+  /* @mdx-preview
+<a style="display:flex;gap:12px;padding:12px 14px;border:1px solid #27272a;border-radius:10px;background:#0e0e11;text-decoration:none">
+  <div style="width:40px;height:40px;border-radius:6px;background:#1a1a2e;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px">🔖</div>
+  <div style="min-width:0">
+    <p style="font-size:13px;font-weight:600;color:#fafafa;margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Article or resource title</p>
+    <p style="font-size:11px;color:#71717a;margin:0">example.com</p>
+  </div>
+</a>
+*/
+}
+
+<a class="bookmark" href={url} target="_blank" rel="noopener">
+  <div class="bookmark-body">
+    <p class="bookmark-title">{title}</p>
+    {description && <p class="bookmark-description">{description}</p>}
+    <p class="bookmark-footer">
+      {favicon && <img src={favicon} alt="" width="16" height="16" loading="lazy" />}
+      <span>{host}</span>
+    </p>
+  </div>
+  {
+    image && (
+      <div class="bookmark-image">
+        <img src={image} alt="" loading="lazy" />
+      </div>
+    )
+  }
+</a>
+
+<style>
+  .bookmark {
+    display: flex;
+    gap: 1rem;
+    align-items: stretch;
+    margin: 1.5rem 0;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: var(--color-surface);
+    text-decoration: none;
+    color: var(--color-text);
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .bookmark:hover {
+    border-color: var(--color-accent);
+  }
+  .bookmark-body {
+    padding: 0.9rem 1.1rem;
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .bookmark-title {
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.3;
+  }
+  .bookmark-description {
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+    margin: 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .bookmark-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--color-text-tertiary);
+    font-size: 0.8rem;
+    margin: 0.3rem 0 0;
+  }
+  .bookmark-image {
+    flex: 0 0 9rem;
+    overflow: hidden;
+  }
+  .bookmark-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @media (max-width: 540px) {
+    .bookmark-image {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,173 @@
+---
+{
+  /* @mdx-label Testimonial */
+}
+{
+  /* @mdx-description Pull quote with avatar, name, and role. Great for case studies and recommendations. */
+}
+{
+  /* @mdx-snippet
+<Testimonial
+  quote="This tool changed the way we work — we saved 10 hours a week."
+  name="Jane Smith"
+  role="CTO"
+  company="Acme Corp"
+  avatar="/images/avatar.jpg"
+/>
+*/
+}
+{
+  /* @mdx-preview
+<div style="border:1px solid #27272a;border-radius:12px;padding:16px;background:#0e0e11;position:relative">
+  <div style="font-size:28px;color:#7c5cff;line-height:1;margin-bottom:8px">"</div>
+  <p style="font-size:13px;color:#e4e4e7;font-style:italic;line-height:1.6;margin:0 0 12px">"This tool changed the way we work."</p>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div style="width:28px;height:28px;background:#3f3f46;border-radius:50%"></div>
+    <div>
+      <div style="font-size:12px;font-weight:600;color:#fafafa">Jane Smith</div>
+      <div style="font-size:11px;color:#71717a">CTO · Acme Corp</div>
+    </div>
+  </div>
+</div>
+*/
+}
+
+export interface Props {
+  quote: string;
+  name: string;
+  role?: string;
+  company?: string;
+  avatar?: string;
+  url?: string;
+  size?: "sm" | "md" | "lg";
+}
+
+const { quote, name, role, company, avatar, url, size = "md" } = Astro.props;
+const meta = [role, company].filter(Boolean).join(" · ");
+---
+
+<figure class:list={["testimonial", `testimonial-${size}`]}>
+  <span class="testimonial-mark" aria-hidden>"</span>
+  <blockquote class="testimonial-quote">
+    <p>{quote}</p>
+  </blockquote>
+  <figcaption class="testimonial-author">
+    {
+      avatar && (
+        <img
+          src={avatar}
+          alt={name}
+          class="testimonial-avatar"
+          width="40"
+          height="40"
+          loading="lazy"
+        />
+      )
+    }
+    {
+      !avatar && (
+        <span class="testimonial-avatar-placeholder" aria-hidden>
+          {name.charAt(0).toUpperCase()}
+        </span>
+      )
+    }
+    <div>
+      {
+        url ? (
+          <a href={url} class="testimonial-name" rel="noopener">
+            {name}
+          </a>
+        ) : (
+          <span class="testimonial-name">{name}</span>
+        )
+      }
+      {meta && <span class="testimonial-meta">{meta}</span>}
+    </div>
+  </figcaption>
+</figure>
+
+<style>
+  .testimonial {
+    position: relative;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    background: var(--color-surface);
+    margin: 1.5em 0;
+  }
+  .testimonial-mark {
+    position: absolute;
+    top: 0.75rem;
+    left: 1.25rem;
+    font-size: 3.5rem;
+    line-height: 1;
+    color: var(--color-accent);
+    opacity: 0.25;
+    font-family: var(--font-serif);
+    user-select: none;
+    pointer-events: none;
+  }
+  .testimonial-quote {
+    margin: 0 0 1.25rem;
+    padding-top: 0.5rem;
+  }
+  .testimonial-quote p {
+    font-size: 1.05rem;
+    line-height: 1.65;
+    font-style: italic;
+    color: var(--color-text);
+    margin: 0;
+  }
+  .testimonial-sm .testimonial-quote p {
+    font-size: 0.95rem;
+  }
+  .testimonial-lg .testimonial-quote p {
+    font-size: 1.2rem;
+  }
+
+  .testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-top: 1px solid var(--color-border);
+    padding-top: 1rem;
+  }
+  .testimonial-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 2px solid var(--color-border);
+  }
+  .testimonial-avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--color-accent) 15%, var(--color-surface-hover));
+    border: 2px solid color-mix(in srgb, var(--color-accent) 30%, var(--color-border));
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--color-accent);
+  }
+  .testimonial-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-text);
+    text-decoration: none;
+    display: block;
+  }
+  a.testimonial-name:hover {
+    color: var(--color-accent);
+  }
+  .testimonial-meta {
+    font-size: 0.78rem;
+    color: var(--color-text-tertiary);
+    display: block;
+    margin-top: 0.1rem;
+  }
+</style>

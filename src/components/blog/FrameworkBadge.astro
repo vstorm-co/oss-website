@@ -1,0 +1,96 @@
+---
+export interface Props {
+  /** Framework slug, e.g. "pydantic-ai", "langchain", "openai" */
+  framework: string;
+  /** Optional override for displayed label (default: prettified slug) */
+  label?: string;
+  size?: "sm" | "md";
+}
+
+const FRAMEWORK_LABELS: Record<string, string> = {
+  "pydantic-ai": "Pydantic AI",
+  langchain: "LangChain",
+  langgraph: "LangGraph",
+  crewai: "CrewAI",
+  deepagents: "DeepAgents",
+  fastapi: "FastAPI",
+  nextjs: "Next.js",
+  logfire: "Logfire",
+  openai: "OpenAI",
+  anthropic: "Anthropic",
+  gemini: "Gemini",
+  groq: "Groq",
+  mistral: "Mistral",
+  ollama: "Ollama",
+};
+
+const FRAMEWORK_TONE: Record<string, string> = {
+  "pydantic-ai": "#e92063",
+  langchain: "#10b981",
+  langgraph: "#b45309",
+  crewai: "#8b5cf6",
+  deepagents: "#dc2626",
+  fastapi: "#009688",
+  nextjs: "#000000",
+  logfire: "#dc2626",
+  openai: "#10a37f",
+  anthropic: "#d97757",
+  gemini: "#4285f4",
+  groq: "#f55036",
+  mistral: "#fa500f",
+  ollama: "#000000",
+};
+
+const { framework, label, size = "md" } = Astro.props;
+const display = label ?? FRAMEWORK_LABELS[framework] ?? framework;
+const color = FRAMEWORK_TONE[framework] ?? "#71717a";
+---
+
+{/* @mdx-label FrameworkBadge */}
+{
+  /* @mdx-description Inline pill identifying an AI framework / model provider with brand color. Mix into prose to flag tech stack. */
+}
+{
+  /* @mdx-snippet
+We tested with <FrameworkBadge framework="pydantic-ai" /> and <FrameworkBadge framework="langchain" />.
+*/
+}
+
+<span
+  class={`framework-badge framework-badge-${size}`}
+  style={`--fw-color: ${color}`}
+  data-framework={framework}
+>
+  <span class="framework-dot"></span>
+  {display}
+</span>
+
+<style>
+  .framework-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.125rem 0.625rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--fw-color) 12%, transparent);
+    color: var(--fw-color);
+    border: 1px solid color-mix(in srgb, var(--fw-color) 25%, transparent);
+    font-weight: 600;
+    line-height: 1.4;
+    vertical-align: baseline;
+    white-space: nowrap;
+  }
+  .framework-badge-sm {
+    font-size: 0.75rem;
+  }
+  .framework-badge-md {
+    font-size: 0.8125rem;
+  }
+  .framework-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--fw-color);
+    flex-shrink: 0;
+  }
+</style>

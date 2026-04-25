@@ -1,0 +1,109 @@
+---
+export interface Props {
+  user?: string;
+  host?: string;
+  cwd?: string;
+  title?: string;
+}
+const { user = "you", host = "machine", cwd = "~", title } = Astro.props;
+---
+
+{/* @mdx-label Terminal */}
+{/* @mdx-description Styled terminal transcript with prompt and output. Children are plain text. */}
+{
+  /* @mdx-snippet
+<Terminal user="you" host="machine" cwd="~">
+  $ bun run dev
+  astro dev server running at http://localhost:4321
+</Terminal>
+*/
+}
+{
+  /* @mdx-preview
+<div style="background:#09090b;border-radius:8px;overflow:hidden;border:1px solid #27272a">
+  <div style="padding:8px 12px;border-bottom:1px solid #27272a;display:flex;gap:6px">
+    <span style="width:10px;height:10px;border-radius:50%;background:#ef4444"></span>
+    <span style="width:10px;height:10px;border-radius:50%;background:#f59e0b"></span>
+    <span style="width:10px;height:10px;border-radius:50%;background:#22c55e"></span>
+    <span style="flex:1;text-align:center;font-size:10px;color:#71717a;font-family:monospace">you@machine: ~</span>
+  </div>
+  <div style="padding:10px 12px;font-family:monospace;font-size:12px;line-height:1.7">
+    <div><span style="color:#22c55e">you@machine</span><span style="color:#a1a1aa">:~$</span> <span style="color:#fafafa">bun run dev</span></div>
+    <div style="color:#71717a">astro dev server running at http://localhost:4321</div>
+  </div>
+</div>
+*/
+}
+
+<div class="terminal">
+  <header class="terminal-header">
+    <span class="terminal-dot red" aria-hidden></span>
+    <span class="terminal-dot yellow" aria-hidden></span>
+    <span class="terminal-dot green" aria-hidden></span>
+    <span class="terminal-title">{title ?? `${user}@${host}: ${cwd}`}</span>
+  </header>
+  <pre class="terminal-body"><slot /></pre>
+</div>
+
+<style>
+  .terminal {
+    margin: 1.5rem 0;
+    border: 1px solid #2a2a30;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #0a0a0c;
+    color: #e3e3e8;
+    color-scheme: dark;
+  }
+  .terminal-header {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.75rem;
+    background: #141419;
+    border-bottom: 1px solid #27272a;
+  }
+  .terminal-dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 9999px;
+    flex-shrink: 0;
+  }
+  .terminal-dot.red {
+    background: #ff5f56;
+  }
+  .terminal-dot.yellow {
+    background: #ffbd2e;
+  }
+  .terminal-dot.green {
+    background: #27c93f;
+  }
+  .terminal-title {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: #8b8b93;
+  }
+  .terminal-body {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.55;
+    padding: 0.9rem 1rem;
+    margin: 0;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    color: #e3e3e8;
+    background: #0a0a0c;
+  }
+  /* Reset any prose styles that bleed in from light mode */
+  .terminal-body :global(*) {
+    color: inherit;
+    background: transparent;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
+</style>

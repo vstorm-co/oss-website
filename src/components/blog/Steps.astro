@@ -1,29 +1,98 @@
 ---
+export interface StepItem {
+  title: string;
+  body?: string;
+}
 export interface Props {
-  items: Array<{ title: string; body?: string }>;
+  items: StepItem[];
 }
 const { items } = Astro.props;
 ---
-{/* @mdx-label Steps */}
-{/* @mdx-description Numbered step-by-step list */}
-{/* @mdx-snippet
-<Steps items={[
-  { title: "Install", body: "Run the install command." },
-  { title: "Configure", body: "Edit the config file." },
-  { title: "Ship", body: "Deploy to production." },
-]} />
-*/}
 
-<ol class="not-prose my-6 space-y-4">
-  {items.map((item, i) => (
-    <li class="flex gap-4">
-      <span class="flex-shrink-0 w-8 h-8 rounded-full bg-accent/10 border border-accent/40 text-accent flex items-center justify-center font-semibold text-sm">
-        {i + 1}
-      </span>
-      <div class="flex-1 min-w-0 pt-1">
-        <div class="font-semibold text-text">{item.title}</div>
-        {item.body && <div class="mt-1 text-sm text-text-secondary">{item.body}</div>}
-      </div>
-    </li>
-  ))}
+{/* @mdx-label Steps */}
+{/* @mdx-description Numbered step list, data-driven. */}
+{
+  /* @mdx-snippet
+<Steps items={[
+  { title: "Install", body: "Run bun install." },
+  { title: "Configure", body: "Edit site.config.ts." },
+  { title: "Deploy", body: "Click the Vercel button." },
+]} />
+*/
+}
+{
+  /* @mdx-preview
+<div style="display:flex;flex-direction:column;gap:0">
+  <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0">
+    <span style="width:22px;height:22px;border-radius:50%;background:#7c5cff;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</span>
+    <div><p style="font-size:13px;font-weight:600;color:#fafafa;margin:0">Install</p><p style="font-size:12px;color:#a1a1aa;margin:2px 0 0">Run bun install.</p></div>
+  </div>
+  <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid #27272a">
+    <span style="width:22px;height:22px;border-radius:50%;background:#7c5cff;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</span>
+    <div><p style="font-size:13px;font-weight:600;color:#fafafa;margin:0">Configure</p><p style="font-size:12px;color:#a1a1aa;margin:2px 0 0">Edit site.config.ts.</p></div>
+  </div>
+  <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid #27272a">
+    <span style="width:22px;height:22px;border-radius:50%;background:#7c5cff;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</span>
+    <div><p style="font-size:13px;font-weight:600;color:#fafafa;margin:0">Deploy</p><p style="font-size:12px;color:#a1a1aa;margin:2px 0 0">Click the Vercel button.</p></div>
+  </div>
+</div>
+*/
+}
+
+<ol class="steps">
+  {
+    items.map((item, i) => (
+      <li class="step">
+        <span class="step-index" aria-hidden>
+          {i + 1}
+        </span>
+        <div class="step-body">
+          <p class="step-title">{item.title}</p>
+          {item.body && <p class="step-desc">{item.body}</p>}
+        </div>
+      </li>
+    ))
+  }
 </ol>
+
+<style>
+  .steps {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .step {
+    display: flex;
+    gap: 0.9rem;
+    padding: 0.85rem 1rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+  }
+  .step-index {
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .step-title {
+    font-weight: 500;
+    color: var(--color-text);
+    margin: 0.25rem 0 0.2rem;
+  }
+  .step-desc {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+  }
+</style>

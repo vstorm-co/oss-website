@@ -1,0 +1,216 @@
+---
+{
+  /* @mdx-label Video (Lite) */
+}
+{
+  /* @mdx-description YouTube/Vimeo with poster image — iframe loads only on click. Much faster than a regular embed. */
+}
+{
+  /* @mdx-snippet
+<VideoLite
+  src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+  title="Video title"
+/>
+*/
+}
+{
+  /* @mdx-preview
+<div style="position:relative;padding-bottom:56.25%;background:#18181b;border-radius:10px;overflow:hidden;border:1px solid #27272a">
+  <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">
+    <div style="width:52px;height:52px;background:rgba(255,50,50,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center">
+      <div style="width:0;height:0;border-style:solid;border-width:10px 0 10px 18px;border-color:transparent transparent transparent white;margin-left:4px"></div>
+    </div>
+    <span style="font-size:12px;color:#a1a1aa">Click to play</span>
+  </div>
+</div>
+*/
+}
+
+import type { ImageMetadata } from "astro";
+
+export interface Props {
+  src: string;
+  title: string;
+  poster?: string | ImageMetadata;
+  start?: number;
+  aspectRatio?: "16/9" | "4/3" | "9/16" | "1/1";
+}
+
+const { src, title, poster, start = 0, aspectRatio = "16/9" } = Astro.props;
+
+function getEmbedUrl(raw: string, startSec: number): string {
+  try {
+    const u = new URL(raw);
+    const host = u.hostname.replace("www.", "");
+
+    if (host === "youtube.com" || host === "youtu.be") {
+      const id =
+        host === "youtu.be"
+          ? u.pathname.slice(1)
+          : (u.searchParams.get("v") ?? u.pathname.split("/").pop() ?? "");
+      const params = new URLSearchParams({ autoplay: "1", rel: "0" });
+      if (startSec) params.set("start", String(startSec));
+      return `https://www.youtube-nocookie.com/embed/${id}?${params}`;
+    }
+    if (host === "vimeo.com") {
+      const id = u.pathname.split("/").pop() ?? "";
+      const params = new URLSearchParams({ autoplay: "1" });
+      if (startSec) params.set("t", String(startSec));
+      return `https://player.vimeo.com/video/${id}?${params}`;
+    }
+  } catch {}
+  return src;
+}
+
+function getThumbnail(raw: string): string | null {
+  try {
+    const u = new URL(raw);
+    const host = u.hostname.replace("www.", "");
+    if (host === "youtube.com" || host === "youtu.be") {
+      const id =
+        host === "youtu.be"
+          ? u.pathname.slice(1)
+          : (u.searchParams.get("v") ?? u.pathname.split("/").pop() ?? "");
+      return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
+    }
+  } catch {}
+  return null;
+}
+
+const embedUrl = getEmbedUrl(src, start);
+const autoThumb = !poster ? getThumbnail(src) : null;
+const posterSrc = typeof poster === "string" ? poster : ((poster as ImageMetadata)?.src ?? null);
+const thumbSrc = posterSrc ?? autoThumb;
+const id = `vl-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<figure class="vl" data-vl-id={id} style={`aspect-ratio:${aspectRatio}`}>
+  {
+    thumbSrc ? (
+      <img
+        src={thumbSrc}
+        alt={`Play: ${title}`}
+        class="vl-poster"
+        loading="lazy"
+        decoding="async"
+      />
+    ) : (
+      <div class="vl-poster vl-poster-blank" aria-hidden />
+    )
+  }
+  <button class="vl-play" aria-label={`Play ${title}`} data-embed={embedUrl} data-title={title}>
+    <span class="vl-play-icon" aria-hidden>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+        <path d="M8 5v14l11-7z"></path>
+      </svg>
+    </span>
+  </button>
+  <noscript>
+    <iframe
+      src={embedUrl}
+      title={title}
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen
+      class="vl-iframe"></iframe>
+  </noscript>
+</figure>
+
+<style>
+  .vl {
+    position: relative;
+    display: block;
+    width: 100%;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 1.5em 0;
+    cursor: pointer;
+    border: 1px solid var(--color-border);
+  }
+  .vl-poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.25s;
+    display: block;
+  }
+  .vl-poster-blank {
+    background: linear-gradient(135deg, #18181b, #09090b);
+  }
+  .vl:hover .vl-poster {
+    filter: brightness(0.75);
+    transform: scale(1.02);
+  }
+  .vl-play {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .vl-play-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    transition: all 0.2s;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+  }
+  .vl:hover .vl-play-icon {
+    transform: scale(1.1);
+    background: rgba(0, 0, 0, 0.85);
+  }
+  .vl-iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  .vl.loaded .vl-poster {
+    display: none;
+  }
+  .vl.loaded .vl-play {
+    display: none;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    function init() {
+      document.querySelectorAll("[data-vl-id]").forEach(function (fig) {
+        if (fig._vlInit) return;
+        fig._vlInit = true;
+        const btn = fig.querySelector(".vl-play");
+        if (!btn) return;
+        btn.addEventListener("click", function () {
+          const embed = btn.getAttribute("data-embed");
+          const title = btn.getAttribute("data-title") || "Video";
+          const iframe = document.createElement("iframe");
+          iframe.src = embed;
+          iframe.title = title;
+          iframe.allow =
+            "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+          iframe.allowFullscreen = true;
+          iframe.className = "vl-iframe";
+          fig.appendChild(iframe);
+          fig.classList.add("loaded");
+        });
+      });
+    }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+    else init();
+    document.addEventListener("astro:page-load", init);
+  })();
+</script>

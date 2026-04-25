@@ -1,0 +1,90 @@
+---
+export interface GalleryImage {
+  src: string;
+  alt: string;
+  caption?: string;
+}
+export interface Props {
+  images: GalleryImage[];
+  columns?: 2 | 3 | 4;
+}
+const { images, columns = 2 } = Astro.props;
+---
+
+{/* @mdx-label Gallery */}
+{/* @mdx-description Grid of images with captions. Click opens in a new tab. */}
+{
+  /* @mdx-snippet
+<Gallery
+  columns={2}
+  images={[
+    { src: "/images/blog/slug/a.png", alt: "A", caption: "Before" },
+    { src: "/images/blog/slug/b.png", alt: "B", caption: "After" },
+  ]}
+/>
+*/
+}
+{
+  /* @mdx-preview
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+  <div style="height:55px;background:linear-gradient(135deg,#1a1a2e,#27272a);border-radius:6px;border:1px solid #27272a"></div>
+  <div style="height:55px;background:linear-gradient(135deg,#0e1a2e,#1a2e3e);border-radius:6px;border:1px solid #27272a"></div>
+  <div style="height:55px;background:linear-gradient(135deg,#1a2e1a,#1a3e1a);border-radius:6px;border:1px solid #27272a"></div>
+  <div style="height:55px;background:linear-gradient(135deg,#2e1a1a,#3e1a1a);border-radius:6px;border:1px solid #27272a"></div>
+</div>
+*/
+}
+
+<div class:list={["gallery", `gallery-cols-${columns}`]}>
+  {
+    images.map((img) => (
+      <figure class="gallery-item">
+        <a href={img.src} target="_blank" rel="noopener">
+          <img src={img.src} alt={img.alt} loading="lazy" decoding="async" />
+        </a>
+        {img.caption && <figcaption>{img.caption}</figcaption>}
+      </figure>
+    ))
+  }
+</div>
+
+<style>
+  .gallery {
+    display: grid;
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+  }
+  .gallery-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .gallery-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .gallery-cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .gallery-item {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .gallery-item img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+  }
+  .gallery-item figcaption {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--color-text-tertiary);
+    margin-top: 0.4rem;
+  }
+  @media (max-width: 640px) {
+    .gallery {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+  }
+</style>

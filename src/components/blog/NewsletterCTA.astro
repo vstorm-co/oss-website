@@ -1,0 +1,235 @@
+---
+{
+  /* @mdx-label Newsletter CTA */
+}
+{
+  /* @mdx-description Inline newsletter signup with an email field. Customisable heading and button. */
+}
+{
+  /* @mdx-snippet
+<NewsletterCTA
+  heading="Stay in the loop"
+  description="New articles every week. Zero spam."
+  placeholder="your@email.com"
+  buttonText="Subscribe"
+  action="https://your-list-url.com/subscribe"
+/>
+*/
+}
+{
+  /* @mdx-preview
+<div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid #27272a;border-radius:12px;padding:20px 24px;text-align:center">
+  <div style="font-size:18px;font-weight:700;color:#fafafa;margin-bottom:6px">📬 Stay in the loop</div>
+  <div style="font-size:12px;color:#a1a1aa;margin-bottom:14px">New articles every week. Zero spam.</div>
+  <div style="display:flex;gap:8px;max-width:320px;margin:0 auto">
+    <div style="flex:1;height:34px;background:#27272a;border-radius:6px;border:1px solid #3f3f46"></div>
+    <div style="height:34px;padding:0 14px;background:#7c5cff;border-radius:6px;display:flex;align-items:center;font-size:12px;font-weight:600;color:#fff;white-space:nowrap">Subscribe</div>
+  </div>
+</div>
+*/
+}
+
+export interface Props {
+  heading?: string;
+  description?: string;
+  placeholder?: string;
+  buttonText?: string;
+  action?: string;
+  method?: "post" | "get";
+  nameAttr?: string;
+  successMessage?: string;
+  variant?: "default" | "minimal" | "accent";
+}
+
+const {
+  heading = "Stay in the loop",
+  description,
+  placeholder = "your@email.com",
+  buttonText = "Subscribe",
+  action = "#",
+  method = "post",
+  nameAttr = "email",
+  successMessage = "Thanks! Check your inbox.",
+  variant = "default",
+} = Astro.props;
+---
+
+<div class:list={["nl-cta", `nl-cta-${variant}`]}>
+  {heading && <p class="nl-heading">{heading}</p>}
+  {description && <p class="nl-description">{description}</p>}
+  <form class="nl-form" method={method} action={action} data-success={successMessage} novalidate>
+    <div class="nl-row">
+      <label class="nl-label">
+        <span class="sr-only">Email address</span>
+        <input
+          type="email"
+          name={nameAttr}
+          class="nl-input"
+          placeholder={placeholder}
+          required
+          autocomplete="email"
+          inputmode="email"
+        />
+      </label>
+      <button type="submit" class="nl-btn">{buttonText}</button>
+    </div>
+    <p class="nl-status" role="status" aria-live="polite" hidden></p>
+  </form>
+</div>
+
+<style>
+  .nl-cta {
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 1.75rem 2rem;
+    margin: 1.5em 0;
+    text-align: center;
+    background: var(--color-surface);
+  }
+  .nl-cta-accent {
+    background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface));
+    border-color: color-mix(in srgb, var(--color-accent) 25%, var(--color-border));
+  }
+  .nl-cta-minimal {
+    background: transparent;
+    border-style: dashed;
+    padding: 1.25rem 1.5rem;
+  }
+  .nl-heading {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 0.35rem;
+  }
+  .nl-description {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    margin: 0 0 1.1rem;
+  }
+  .nl-form {
+    max-width: 420px;
+    margin: 0 auto;
+  }
+  .nl-label {
+    flex: 1;
+    min-width: 0;
+  }
+  .nl-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .nl-input {
+    width: 100%;
+    padding: 0.55rem 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: all 0.15s;
+    outline: none;
+  }
+  .nl-input:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 20%, transparent);
+  }
+  .nl-input::placeholder {
+    color: var(--color-text-tertiary);
+  }
+  .nl-btn {
+    padding: 0.55rem 1.2rem;
+    background: var(--color-accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .nl-btn:hover {
+    opacity: 0.88;
+  }
+  .nl-btn:active {
+    transform: scale(0.97);
+  }
+  .nl-btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+  .nl-status {
+    margin: 0.6rem 0 0;
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+  }
+  .nl-status.error {
+    color: #f87171;
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    function initNL(form) {
+      if (form._nlInit) return;
+      form._nlInit = true;
+      const status = form.querySelector(".nl-status");
+      const btn = form.querySelector(".nl-btn");
+      const successMsg = form.getAttribute("data-success") || "Thanks!";
+      const action = form.getAttribute("action");
+
+      if (action === "#") return;
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const input = form.querySelector(".nl-input");
+        if (!input || !input.value.includes("@")) {
+          showStatus("Please enter a valid email.", true);
+          return;
+        }
+        btn.disabled = true;
+        const data = new FormData(form);
+        fetch(action, { method: form.method || "post", body: data })
+          .then(function (r) {
+            if (!r.ok) throw new Error(r.statusText);
+            showStatus(successMsg, false);
+            form.reset();
+          })
+          .catch(function () {
+            showStatus("Something went wrong. Please try again.", true);
+          })
+          .finally(function () {
+            btn.disabled = false;
+          });
+      });
+
+      function showStatus(msg, isError) {
+        status.textContent = msg;
+        status.hidden = false;
+        status.classList.toggle("error", isError);
+      }
+    }
+
+    function initAll() {
+      document.querySelectorAll(".nl-form").forEach(initNL);
+    }
+
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initAll);
+    else initAll();
+    document.addEventListener("astro:page-load", initAll);
+  })();
+</script>

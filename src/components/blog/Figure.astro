@@ -3,28 +3,51 @@ export interface Props {
   src: string;
   alt: string;
   caption?: string;
-  width?: number | string;
-  height?: number | string;
+  width?: number;
+  height?: number;
 }
 const { src, alt, caption, width, height } = Astro.props;
 ---
-{/* @mdx-label Figure */}
-{/* @mdx-description Image with optional caption */}
-{/* @mdx-snippet
-<Figure src="/images/blog/your-slug/image.png" alt="Alt text" caption="Optional caption" />
-*/}
 
-<figure class="not-prose my-8">
-  <img
-    src={src}
-    alt={alt}
-    width={width}
-    height={height}
-    loading="lazy"
-    decoding="async"
-    class="w-full rounded-lg border border-border"
-  />
-  {caption && (
-    <figcaption class="mt-2 text-center text-sm text-text-tertiary italic">{caption}</figcaption>
-  )}
+{/* @mdx-label Figure */}
+{/* @mdx-description Image with optional caption. `alt` is required. */}
+{
+  /* @mdx-snippet
+<Figure src="/images/blog/your-slug/image.png" alt="Alt text" caption="Optional caption" />
+*/
+}
+{
+  /* @mdx-preview
+<figure style="margin:0;border-radius:8px;overflow:hidden;border:1px solid #27272a">
+  <div style="height:70px;background:linear-gradient(135deg,#1a1a2e,#27272a);display:flex;align-items:center;justify-content:center">
+    <span style="font-size:24px;opacity:.4">🖼</span>
+  </div>
+  <figcaption style="padding:6px 10px;font-size:11px;color:#71717a;text-align:center;background:#0e0e11">Optional caption text</figcaption>
 </figure>
+*/
+}
+
+<figure class="figure">
+  <img src={src} alt={alt} width={width} height={height} loading="eager" decoding="async" />
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .figure {
+    margin: 2rem 0;
+  }
+  .figure img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    border: 1px solid var(--color-border);
+    display: block;
+  }
+  .figure figcaption {
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--color-text-tertiary);
+    margin-top: 0.6rem;
+    font-style: italic;
+  }
+</style>
