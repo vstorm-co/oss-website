@@ -3,8 +3,6 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 
-// oss-website stores translations under src/data/blog/{en,pl,de,es}/. The admin
-// edits all four — every post is keyed on (lang, slug).
 const BLOG_DIR = path.resolve(process.cwd(), "src/data/blog");
 const IMAGES_DIR = path.resolve(process.cwd(), "public/images/blog");
 const PUBLIC_DIR = path.resolve(process.cwd(), "public");
@@ -15,7 +13,7 @@ const PUBLIC_IGNORE = new Set(["_astro", "pagefind", "site.webmanifest"]);
 
 const SLUG_RE = /^[a-z0-9][a-z0-9-]*$/;
 
-const LANGS = ["en", "pl", "de", "es"] as const;
+const LANGS = ["en"] as const;
 type Lang = (typeof LANGS)[number];
 
 function isLang(v: string): v is Lang {

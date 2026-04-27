@@ -1,28 +1,25 @@
 ---
 import { isPublished } from "@/lib/blog";
-import type { translations, Lang } from "../../i18n/translations";
+import type { translations } from "../../i18n/translations";
 import { getCollection } from "astro:content";
 import { projects } from "../../data/projects";
 import { comparisonPages } from "../../data/compare-pages";
 
 interface Props {
   t: typeof translations.en;
-  lang?: Lang;
 }
 
-const { t, lang = "en" } = Astro.props;
+const { t } = Astro.props;
 
-const langPrefix = lang === "en" ? "" : `/${lang}`;
+const getProjectHref = (slug: string) => `/projects/${slug}/`;
+const blogHref = `/blog/`;
+const usecasesHref = `/use-cases/`;
+const guidesHref = `/guides/`;
+const toolsHref = `/tools/`;
+const compareHref = `/compare/`;
+const aboutHref = `/about/`;
 
-const getProjectHref = (slug: string) => `${langPrefix}/projects/${slug}/`;
-const blogHref = `${langPrefix}/blog/`;
-const usecasesHref = `${langPrefix}/use-cases/`;
-const guidesHref = `${langPrefix}/guides/`;
-const toolsHref = `${langPrefix}/tools/`;
-const compareHref = `${langPrefix}/compare/`;
-const aboutHref = `${langPrefix}/about/`;
-
-const allPosts = await getCollection("blog", ({ data }) => data.lang === lang && isPublished(data));
+const allPosts = await getCollection("blog", ({ data }) => data.lang === "en" && isPublished(data));
 const recentPosts = allPosts
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 5);
@@ -66,7 +63,7 @@ const comparisons = comparisonPages.slice(0, 4);
   <div class="mx-auto max-w-[1400px] px-6 pt-16 pb-12 sm:px-8 lg:px-10">
     <div class="flex flex-col gap-10 lg:flex-row lg:justify-between lg:gap-16">
       <div class="max-w-sm">
-        <a href={langPrefix || "/"} class="group flex items-center gap-3">
+        <a href="/" class="group flex items-center gap-3">
           <img
             src="/favicon.png"
             alt=""
@@ -202,7 +199,7 @@ const comparisons = comparisonPages.slice(0, 4);
             }
             <li>
               <a
-                href={`${langPrefix}/projects/`}
+                href={`/projects/`}
                 class="text-accent hover:text-accent-hover text-sm font-medium transition-colors"
                 >{t["nav.projects"]} &rarr;</a
               >
@@ -250,7 +247,7 @@ const comparisons = comparisonPages.slice(0, 4);
             </li>
             <li>
               <a
-                href={`${langPrefix}/changelog/`}
+                href={`/changelog/`}
                 class="text-text-secondary hover:text-text text-sm transition-colors"
                 >{t["changelog.title"] ?? "Changelog"}</a
               >
@@ -266,7 +263,7 @@ const comparisons = comparisonPages.slice(0, 4);
               comparisons.map((c) => (
                 <li>
                   <a
-                    href={`${langPrefix}/compare/${c.slug}/`}
+                    href={`/compare/${c.slug}/`}
                     class="text-text-secondary hover:text-text text-sm transition-colors"
                   >
                     {c.product} vs {c.competitor}
@@ -292,7 +289,7 @@ const comparisons = comparisonPages.slice(0, 4);
               recentPosts.map((post) => (
                 <li>
                   <a
-                    href={`${langPrefix}/blog/${post.data.translationKey}/`}
+                    href={`/blog/${post.data.translationKey}/`}
                     class="text-text-secondary hover:text-text line-clamp-2 text-sm leading-snug transition-colors"
                   >
                     {post.data.title}

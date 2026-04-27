@@ -1,13 +1,10 @@
 export type Collection = "blog";
-export type Lang = "en" | "pl" | "de" | "es";
+export type Lang = "en";
 
-export const LANGS: readonly Lang[] = ["en", "pl", "de", "es"] as const;
+export const LANGS: readonly Lang[] = ["en"] as const;
 
 export const LANG_LABELS: Record<Lang, string> = {
   en: "English",
-  pl: "Polski",
-  de: "Deutsch",
-  es: "Español",
 };
 
 export interface PostSummary {

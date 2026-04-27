@@ -26,7 +26,7 @@
   "redirects": [
     {
       "source": "/:lang(pl|de|es)/:slug(awesome-pydantic-ai|pydantic-ai-backend|pydantic-ai-rlm|pydantic-ai-middleware|database-pydantic-ai|pydantic-deepagents|full-stack-ai-agent-template|memv|subagents-pydantic-ai|pydantic-ai-todo|logfire-assistant|summarization-pydantic-ai|pydantic-ai-examples)/:rest*",
-      "destination": "/:lang/projects/:slug/:rest*",
+      "destination": "/projects/:slug/:rest*",
       "statusCode": 301
     },
     {
@@ -64,6 +64,13 @@
     { "source": "/es/terms/:rest*", "destination": "/terms/", "statusCode": 301 },
     { "source": "/pl/privacy/:rest*", "destination": "/privacy/", "statusCode": 301 },
     { "source": "/de/privacy/:rest*", "destination": "/privacy/", "statusCode": 301 },
-    { "source": "/es/privacy/:rest*", "destination": "/privacy/", "statusCode": 301 }
+    { "source": "/es/privacy/:rest*", "destination": "/privacy/", "statusCode": 301 },
+
+    { "source": "/pl", "destination": "/", "statusCode": 301 },
+    { "source": "/de", "destination": "/", "statusCode": 301 },
+    { "source": "/es", "destination": "/", "statusCode": 301 },
+    { "source": "/pl/:rest*", "destination": "/:rest*", "statusCode": 301 },
+    { "source": "/de/:rest*", "destination": "/:rest*", "statusCode": 301 },
+    { "source": "/es/:rest*", "destination": "/:rest*", "statusCode": 301 }
   ]
 }

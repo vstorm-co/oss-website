@@ -68,10 +68,6 @@ ${compareList}
 
 ${blogList}
 
-## i18n
-
-All pages available in 4 languages: English (default), Polish (/pl/), German (/de/), Spanish (/es/).
-
 ## Links
 
 - GitHub: https://github.com/vstorm-co

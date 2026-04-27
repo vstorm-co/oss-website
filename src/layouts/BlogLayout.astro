@@ -3,13 +3,11 @@ import Layout from "./Layout.astro";
 import Navbar from "../components/Navbar.astro";
 import Footer from "../components/landing/Footer.astro";
 import TableOfContents from "../components/blog/TableOfContents.astro";
-import TranslationLinks from "../components/blog/TranslationLinks.astro";
 import ShareButtons from "../components/blog/ShareButtons.astro";
 import RelatedPosts from "../components/blog/RelatedPosts.astro";
 import StickyCTA from "../components/blog/StickyCTA.astro";
 import Breadcrumbs from "../components/shared/Breadcrumbs.astro";
-import type { Lang } from "../i18n/translations";
-import { translations, languages, defaultLang } from "../i18n/translations";
+import { translations, defaultLang } from "../i18n/translations";
 import {
   blogPostingSchema,
   howToSchema as buildHowToSchema,
@@ -26,10 +24,8 @@ interface Props {
   updatedDate?: Date;
   author: string;
   tags: string[];
-  lang: Lang;
-  translationKey: string;
+  translationKey?: string;
   headings: { depth: number; slug: string; text: string }[];
-  allTranslations?: { lang: Lang; slug: string }[];
   readingTime?: number;
   category?: string;
 }
@@ -42,34 +38,20 @@ const {
   updatedDate,
   author,
   tags,
-  lang,
   translationKey,
   headings,
-  allTranslations = [],
   readingTime,
   category,
 } = Astro.props;
 
-const t = translations[lang];
-const blogHref = lang === defaultLang ? "/blog/" : `/${lang}/blog/`;
-
-// Build language links for the language switcher - only show languages that have actual translations
-const languageLinks = allTranslations.map((tr) => ({
-  lang: tr.lang,
-  href: tr.lang === defaultLang ? `/blog/${tr.slug}/` : `/${tr.lang}/blog/${tr.slug}/`,
-}));
-
-const alternates = allTranslations.map((tr) => ({
-  lang: tr.lang,
-  href: tr.lang === defaultLang ? `/blog/${tr.slug}/` : `/${tr.lang}/blog/${tr.slug}/`,
-}));
+const lang = defaultLang;
+const t = translations.en;
+const blogHref = "/blog/";
 
 const formatDate = (date: Date) =>
-  date.toLocaleDateString(lang, { year: "numeric", month: "long", day: "numeric" });
+  date.toLocaleDateString("en", { year: "numeric", month: "long", day: "numeric" });
 
-// Find the English slug for the OG image (all languages share the same OG via translationKey)
-const enTranslation = allTranslations.find((tr) => tr.lang === defaultLang);
-const ogSlug = enTranslation?.slug ?? translationKey;
+const ogSlug = translationKey ?? Astro.url.pathname.split("/").filter(Boolean).pop() ?? "default";
 const siteUrl = Astro.site?.origin ?? "https://oss.vstorm.co";
 const ogImage = new URL(`/og/${ogSlug}.svg`, siteUrl).href;
 
@@ -120,8 +102,6 @@ if (category === "tutorial" && headings.length > 0) {
   title={`${seoTitle ?? title} — Vstorm OSS`}
   description={description}
   keywords={tags.join(", ")}
-  lang={lang}
-  alternates={alternates}
   ogImage={ogImage}
   ogType="article"
   articleDates={{ published: pubDate.toISOString(), modified: updatedDate?.toISOString() }}
@@ -135,10 +115,10 @@ if (category === "tutorial" && headings.length > 0) {
   >
   </div>
 
-  <Navbar currentLang={lang} languageLinks={languageLinks} />
+  <Navbar />
   <Breadcrumbs
     items={[
-      { label: "Home", href: lang === defaultLang ? "/" : `/${lang}/` },
+      { label: "Home", href: "/" },
       { label: t["nav.blog"], href: blogHref },
       { label: title },
     ]}
@@ -203,24 +183,11 @@ if (category === "tutorial" && headings.length > 0) {
             tags.length > 0 && (
               <div class="mt-4 flex flex-wrap gap-2">
                 {tags.map((tag) => (
-                  <a
-                    href={lang === defaultLang ? `/blog/tag/${tag}/` : `/${lang}/blog/tag/${tag}/`}
-                    class="bg-surface text-text-secondary hover:text-accent hover:bg-accent/10 rounded-full px-3 py-1 text-xs font-medium transition-colors"
-                  >
+                  <span class="bg-surface text-text-secondary rounded-full px-3 py-1 text-xs font-medium">
                     {tag}
-                  </a>
+                  </span>
                 ))}
               </div>
-            )
-          }
-
-          {
-            allTranslations.length > 1 && (
-              <TranslationLinks
-                translations={allTranslations}
-                currentLang={lang}
-                label={t["blog.availableIn"]}
-              />
             )
           }
         </header>
@@ -242,7 +209,7 @@ if (category === "tutorial" && headings.length > 0) {
 
         <ShareButtons title={title} url={Astro.url.href} t={t} />
 
-        <RelatedPosts currentSlug={Astro.url.pathname} currentTags={tags} lang={lang} t={t} />
+        <RelatedPosts currentSlug={Astro.url.pathname} currentTags={tags} t={t} />
       </article>
 
       <!-- Sidebar TOC (desktop only) -->
@@ -258,7 +225,7 @@ if (category === "tutorial" && headings.length > 0) {
     </div>
   </main>
 
-  <Footer t={t} lang={lang} />
+  <Footer t={t} />
   <StickyCTA t={t} />
 
   <script is:inline>

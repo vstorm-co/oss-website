@@ -1,17 +1,15 @@
 ---
-import type { Lang } from '../../i18n/translations';
 import type { Project } from '../../data/projects';
 import { Code } from 'astro-expressive-code/components';
 
 interface Props {
   project: Project;
-  lang: Lang;
   t: Record<string, string>;
 }
 
-const { project, lang, t } = Astro.props;
+const { project, t } = Astro.props;
 const isComingSoon = project.status === "coming-soon";
-const homeHref = lang === "en" ? "/" : `/${lang}/`;
+const homeHref = "/";
 ---
 
 <main class="mx-auto max-w-4xl px-4 py-16 sm:py-24">
@@ -33,7 +31,7 @@ const homeHref = lang === "en" ? "/" : `/${lang}/`;
         </span>
       )}
     </div>
-    <p class="text-lg text-text-secondary leading-relaxed">{project.tagline[lang]}</p>
+    <p class="text-lg text-text-secondary leading-relaxed">{project.tagline.en}</p>
   </div>
 
   {isComingSoon ? (
@@ -57,7 +55,7 @@ const homeHref = lang === "en" ? "/" : `/${lang}/`;
     <>
       <!-- Description -->
       <div class="mb-10">
-        <p class="text-text-secondary leading-relaxed">{project.description[lang]}</p>
+        <p class="text-text-secondary leading-relaxed">{project.description.en}</p>
       </div>
 
       <!-- Install -->
@@ -96,18 +94,18 @@ const homeHref = lang === "en" ? "/" : `/${lang}/`;
       </div>
 
       <!-- Long Description -->
-      {project.longDescription?.[lang] && (
+      {project.longDescription?.en && (
         <div class="mb-10">
-          <p class="text-text-secondary leading-relaxed whitespace-pre-line">{project.longDescription[lang]}</p>
+          <p class="text-text-secondary leading-relaxed whitespace-pre-line">{project.longDescription.en}</p>
         </div>
       )}
 
       <!-- Features -->
-      {project.features[lang] && project.features[lang].length > 0 && (
+      {project.features.en && project.features.en.length > 0 && (
         <div class="mb-10">
           <h2 class="text-lg font-semibold mb-4">{t["project.features"]}</h2>
           <div class="grid gap-3 sm:grid-cols-2">
-            {project.features[lang].map((feature) => (
+            {project.features.en.map((feature) => (
               <div class="flex items-center gap-2.5 rounded-xl border border-accent/15 bg-accent/[0.04] px-4 py-3">
                 <span class="text-accent">&mdash;</span>
                 <span class="text-sm text-text-secondary">{feature}</span>
@@ -126,11 +124,11 @@ const homeHref = lang === "en" ? "/" : `/${lang}/`;
       )}
 
       <!-- Use Cases -->
-      {project.useCases?.[lang] && project.useCases[lang].length > 0 && (
+      {project.useCases?.en && project.useCases.en.length > 0 && (
         <div class="mb-10">
           <h2 class="text-lg font-semibold mb-4">{t["project.useCases"]}</h2>
           <div class="grid gap-3 sm:grid-cols-2">
-            {project.useCases[lang].map((uc) => (
+            {project.useCases.en.map((uc) => (
               <div class="rounded-xl border border-border bg-surface px-4 py-4">
                 <h3 class="text-sm font-semibold mb-1">{uc.name}</h3>
                 <p class="text-sm text-text-secondary leading-relaxed">{uc.description}</p>

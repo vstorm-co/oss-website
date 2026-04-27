@@ -1,17 +1,16 @@
 ---
 import { isPublished } from "@/lib/blog";
-import type { translations, Lang } from "../../i18n/translations";
+import type { translations } from "../../i18n/translations";
 import { getCollection } from "astro:content";
-import { projects, categories, getProjectsByCategory } from "../../data/projects";
+import { projects, getProjectsByCategory } from "../../data/projects";
 import { comparisonPages } from "../../data/compare-pages";
 
 interface Props {
   t: typeof translations.en;
   variant?: "oss" | "deepagents" | "logfire";
-  lang?: Lang;
 }
 
-const { t, variant = "oss", lang = "en" } = Astro.props;
+const { t, variant = "oss" } = Astro.props;
 
 const ctaLinks: Record<string, string> = {
   oss: "/projects/full-stack-ai-agent-template/configurator/",
@@ -19,18 +18,15 @@ const ctaLinks: Record<string, string> = {
   logfire: "https://github.com/vstorm-co/logfire-assistant",
 };
 
-const langPrefix = lang === "en" ? "" : `/${lang}`;
+const getProjectHref = (slug: string) => `/projects/${slug}/`;
+const blogHref = `/blog/`;
+const usecasesHref = `/use-cases/`;
+const guidesHref = `/guides/`;
+const toolsHref = `/tools/`;
+const compareHref = `/compare/`;
+const aboutHref = `/about/`;
 
-const getProjectHref = (slug: string) => `${langPrefix}/projects/${slug}/`;
-const blogHref = `${langPrefix}/blog/`;
-const usecasesHref = `${langPrefix}/use-cases/`;
-const guidesHref = `${langPrefix}/guides/`;
-const toolsHref = `${langPrefix}/tools/`;
-const compareHref = `${langPrefix}/compare/`;
-const aboutHref = `${langPrefix}/about/`;
-
-// Get latest 5 blog posts for current language
-const allPosts = await getCollection("blog", ({ data }) => data.lang === lang && isPublished(data));
+const allPosts = await getCollection("blog", ({ data }) => data.lang === "en" && isPublished(data));
 const recentPosts = allPosts
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 5);
@@ -83,7 +79,7 @@ const comparisons = comparisonPages.slice(0, 4);
       <div class="flex flex-col gap-10 lg:flex-row lg:justify-between lg:gap-16">
         <!-- Brand -->
         <div class="max-w-sm">
-          <a href={langPrefix || "/"} class="group flex items-center gap-3">
+          <a href="/" class="group flex items-center gap-3">
             <img
               src="/favicon.png"
               alt=""
@@ -223,7 +219,7 @@ const comparisons = comparisonPages.slice(0, 4);
               }
               <li>
                 <a
-                  href={`${langPrefix}/projects/`}
+                  href={`/projects/`}
                   class="text-sm font-medium text-red-400 transition-colors hover:text-red-300"
                 >
                   {t["nav.projects"]} &rarr;
@@ -272,7 +268,7 @@ const comparisons = comparisonPages.slice(0, 4);
               </li>
               <li>
                 <a
-                  href={`${langPrefix}/changelog/`}
+                  href={`/changelog/`}
                   class="text-sm text-zinc-400 transition-colors hover:text-white"
                   >{t["changelog.title"] ?? "Changelog"}</a
                 >
@@ -290,7 +286,7 @@ const comparisons = comparisonPages.slice(0, 4);
                 comparisons.map((c) => (
                   <li>
                     <a
-                      href={`${langPrefix}/compare/${c.slug}/`}
+                      href={`/compare/${c.slug}/`}
                       class="text-sm text-zinc-400 transition-colors hover:text-white"
                     >
                       {c.product} vs {c.competitor}
@@ -319,7 +315,7 @@ const comparisons = comparisonPages.slice(0, 4);
                 recentPosts.map((post) => (
                   <li>
                     <a
-                      href={`${langPrefix}/blog/${post.data.translationKey}/`}
+                      href={`/blog/${post.data.translationKey}/`}
                       class="line-clamp-2 text-sm leading-snug text-zinc-400 transition-colors hover:text-white"
                     >
                       {post.data.title}

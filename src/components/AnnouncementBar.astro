@@ -1,26 +1,6 @@
 ---
-interface Props {
-  lang?: string;
-}
-
-const { lang = "en" } = Astro.props;
-
-const messages: Record<string, string> = {
-  en: "We're open source — help us grow!",
-  pl: "Jesteśmy open source — pomóż nam rosnąć!",
-  de: "Wir sind Open Source — hilf uns wachsen!",
-  es: "Somos open source — ¡ayúdanos a crecer!",
-};
-
-const cta: Record<string, string> = {
-  en: "Star us on GitHub",
-  pl: "Daj gwiazdkę na GitHub",
-  de: "Stern auf GitHub",
-  es: "Estrella en GitHub",
-};
-
-const message = messages[lang] || messages.en;
-const ctaText = cta[lang] || cta.en;
+const message = "We're open source — help us grow!";
+const ctaText = "Star us on GitHub";
 ---
 
 <div

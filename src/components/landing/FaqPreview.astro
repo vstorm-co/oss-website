@@ -1,17 +1,15 @@
 ---
-import type { Lang } from "../../i18n/translations";
 import { faqItems } from "../../data/faq";
 
 interface Props {
   t: Record<string, string>;
-  lang?: Lang;
   category?: "template" | "deepagents" | "logfire";
 }
 
-const { t, lang = "en", category } = Astro.props;
+const { t, category } = Astro.props;
 const filteredItems = category ? faqItems.filter((item) => item.category === category) : faqItems;
 const previewItems = filteredItems.slice(0, 5);
-const faqHref = lang === "en" ? "/faq/" : `/${lang}/faq/`;
+const faqHref = "/faq/";
 ---
 
 <section class="section-light-alt px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
@@ -26,7 +24,7 @@ const faqHref = lang === "en" ? "/faq/" : `/${lang}/faq/`;
         previewItems.map((item) => (
           <details class="reveal group border-border bg-surface hover:border-accent/30 rounded-lg border transition-colors">
             <summary class="flex cursor-pointer items-center justify-between px-6 py-4 font-medium select-none">
-              <span>{item.question[lang]}</span>
+              <span>{item.question.en}</span>
               <svg
                 class="text-text-tertiary h-5 w-5 shrink-0 transition-transform group-open:rotate-180"
                 fill="none"
@@ -37,7 +35,7 @@ const faqHref = lang === "en" ? "/faq/" : `/${lang}/faq/`;
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             </summary>
-            <div class="text-text-secondary px-6 pb-4 leading-relaxed">{item.answer[lang]}</div>
+            <div class="text-text-secondary px-6 pb-4 leading-relaxed">{item.answer.en}</div>
           </details>
         ))
       }

@@ -1,30 +1,26 @@
 ---
-import LanguageSwitcher from "./LanguageSwitcher.astro";
-import { translations, type Lang } from "../i18n/translations";
+import { translations } from "../i18n/translations";
 import type { Project } from "../data/projects";
-import { projects, categories, getProjectsByCategory } from "../data/projects";
+import { projects, getProjectsByCategory } from "../data/projects";
 
 interface Props {
-  currentLang?: Lang;
-  showLang?: boolean;
   project?: Project | null;
-  pathSuffix?: string;
-  languageLinks?: { lang: Lang; href: string }[];
 }
 
-const { currentLang = "en", showLang = true, project, pathSuffix, languageLinks } = Astro.props;
-const t = translations[currentLang];
+const { project } = Astro.props;
+const currentLang = "en" as const;
+const t = translations.en;
 const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith("/") ? rawBase : rawBase + "/";
 
-const homeHref = currentLang === "en" ? "/" : `/${currentLang}/`;
-const projectsHref = currentLang === "en" ? "/projects/" : `/${currentLang}/projects/`;
-const blogHref = currentLang === "en" ? "/blog/" : `/${currentLang}/blog/`;
-const compareHref = currentLang === "en" ? "/compare/" : `/${currentLang}/compare/`;
-const usecasesHref = currentLang === "en" ? "/use-cases/" : `/${currentLang}/use-cases/`;
-const guidesHref = currentLang === "en" ? "/guides/" : `/${currentLang}/guides/`;
-const toolsHref = currentLang === "en" ? "/tools/" : `/${currentLang}/tools/`;
-const aboutHref = currentLang === "en" ? "/about/" : `/${currentLang}/about/`;
+const homeHref = "/";
+const projectsHref = "/projects/";
+const blogHref = "/blog/";
+const compareHref = "/compare/";
+const usecasesHref = "/use-cases/";
+const guidesHref = "/guides/";
+const toolsHref = "/tools/";
+const aboutHref = "/about/";
 
 const pathname = Astro.url.pathname;
 const isProjects = pathname.includes("/projects");
@@ -43,8 +39,7 @@ const githubHref = project?.github
 const featured = projects.filter((p) => p.hasCustomLanding && p.status === "released").slice(0, 2);
 const grouped = getProjectsByCategory(currentLang);
 
-const getProjectHref = (slug: string) =>
-  currentLang === "en" ? `/projects/${slug}/` : `/${currentLang}/projects/${slug}/`;
+const getProjectHref = (slug: string) => `/projects/${slug}/`;
 ---
 
 <nav
@@ -180,17 +175,6 @@ const getProjectHref = (slug: string) =>
       >
         {t["footer.cta.button"]}
       </a>
-      {
-        showLang && (
-          <div class="hidden lg:block">
-            <LanguageSwitcher
-              currentLang={currentLang}
-              pathSuffix={pathSuffix}
-              languageLinks={languageLinks}
-            />
-          </div>
-        )
-      }
       <!-- Hamburger (mobile only) -->
       <button
         id="mobile-menu-btn"
@@ -551,17 +535,6 @@ const getProjectHref = (slug: string) =>
         </svg>
         GitHub
       </a>
-      {
-        showLang && (
-          <div class="px-3 pt-2">
-            <LanguageSwitcher
-              currentLang={currentLang}
-              pathSuffix={pathSuffix}
-              languageLinks={languageLinks}
-            />
-          </div>
-        )
-      }
     </div>
   </div>
 </div>

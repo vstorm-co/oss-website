@@ -117,8 +117,6 @@ Chrome extension + FastAPI backend for querying Pydantic Logfire data with natur
 
 ${blogList}
 
-All blog posts available in 4 languages: English (default), Polish (/pl/), German (/de/), Spanish (/es/).
-
 ---
 
 ## Site Features

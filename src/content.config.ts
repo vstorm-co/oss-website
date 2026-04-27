@@ -12,7 +12,7 @@ const blog = defineCollection({
       pubDate: z.coerce.date(),
       updatedDate: z.coerce.date().optional(),
       author: z.string().default("Vstorm"),
-      lang: z.enum(["en", "pl", "de", "es"]),
+      lang: z.literal("en").default("en"),
       translationKey: z.string(),
       tags: z.array(z.string()).default([]),
       cover: image().optional(),
