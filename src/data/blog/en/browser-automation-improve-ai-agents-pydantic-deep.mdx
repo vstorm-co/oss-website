@@ -28,7 +28,7 @@ For three months my AI agent searched GitHub for the wrong query every single se
 
 Search "pydantic", zero results. Search "pydantic-ai", forty-seven results. Click the right repo. Every session, same wasted first query, because the agent forgot the lesson at session end.
 
-This week I shipped the fix in pydantic-deep v0.3.4, along with browser automation in v0.3.5. Combined with [StuckLoopDetection](/blog/stuck-loop-detection-ai-agents-pydantic-deep/), [context window warnings](/blog/context-window-limit-warner-bm25-pydantic-deep/), [curl install](/blog/ai-agent-install-curl-bash-pydantic-deep/), and [Docker sandbox](/blog/ai-agents-docker-sandbox-ci-cd-pydantic-deep/) shipped earlier this week, the two together changed what an AI agent actually is for me.
+This week I shipped the fix in pydantic-deep v0.3.4, along with browser automation in v0.3.5. Combined with [StuckLoopDetection](/blog/stuck-loop-detection-ai-agents-pydantic-deep/), [context window warnings](/blog/context-window-blindness-ai-agents-limit-warner/), [curl install](/blog/pydantic-deep-one-command-install-curl-bash/), and [Docker sandbox](/blog/ai-agents-docker-sandbox-ci-cd-pydantic-deep/) shipped earlier this week, the two together changed what an AI agent actually is for me.
 
 pydantic-deep is the modular agent runtime for Python. An agent that can't see the web is limited to what it already knows and what's in your codebase. An agent that doesn't learn from its sessions resets to zero every run. Both limitations are solvable, and in pydantic-deep v0.3.5 and v0.3.4, we solved them.
 
@@ -196,7 +196,7 @@ Also: `/config` TUI command, view and edit `config.toml` without leaving the int
 After this week, the full capability stack:
 
 1. Agent detects stuck loops ([StuckLoopDetection](/blog/stuck-loop-detection-ai-agents-pydantic-deep/))
-2. Agent knows when context is running out ([LimitWarnerCapability](/blog/context-window-limit-warner-bm25-pydantic-deep/))
+2. Agent knows when context is running out ([LimitWarnerCapability](/blog/context-window-blindness-ai-agents-limit-warner/))
 3. Agent installs in 30 seconds (curl install)
 4. Agent runs in isolated Docker ([Docker sandbox](/blog/ai-agents-docker-sandbox-ci-cd-pydantic-deep/))
 5. Agent can browse the web (BrowserCapability)
