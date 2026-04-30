@@ -20,18 +20,18 @@
   ],
   "rewrites": [
     { "source": "/admin", "destination": "/404" },
-    { "source": "/admin/:path*", "destination": "/404" },
-    { "source": "/api/admin/:path*", "destination": "/404" }
+    { "source": "/admin/:path(.*)", "destination": "/404" },
+    { "source": "/api/admin/:path(.*)", "destination": "/404" }
   ],
   "redirects": [
     {
-      "source": "/:lang(pl|de|es)/:slug(awesome-pydantic-ai|pydantic-ai-backend|pydantic-ai-rlm|pydantic-ai-middleware|database-pydantic-ai|pydantic-deepagents|full-stack-ai-agent-template|memv|subagents-pydantic-ai|pydantic-ai-todo|logfire-assistant|summarization-pydantic-ai|pydantic-ai-examples)/:rest*",
-      "destination": "/projects/:slug/:rest*",
+      "source": "/:lang(pl|de|es)/:slug(awesome-pydantic-ai|pydantic-ai-backend|pydantic-ai-rlm|pydantic-ai-middleware|database-pydantic-ai|pydantic-deepagents|full-stack-ai-agent-template|memv|subagents-pydantic-ai|pydantic-ai-todo|logfire-assistant|summarization-pydantic-ai|pydantic-ai-examples)/:rest(.*)",
+      "destination": "/projects/:slug/:rest",
       "statusCode": 301
     },
     {
-      "source": "/:slug(awesome-pydantic-ai|pydantic-ai-backend|pydantic-ai-rlm|pydantic-ai-middleware|database-pydantic-ai|pydantic-deepagents|full-stack-ai-agent-template|memv|subagents-pydantic-ai|pydantic-ai-todo|logfire-assistant|summarization-pydantic-ai|pydantic-ai-examples)/configurator/:path*",
-      "destination": "/projects/:slug/configurator/:path*",
+      "source": "/:slug(awesome-pydantic-ai|pydantic-ai-backend|pydantic-ai-rlm|pydantic-ai-middleware|database-pydantic-ai|pydantic-deepagents|full-stack-ai-agent-template|memv|subagents-pydantic-ai|pydantic-ai-todo|logfire-assistant|summarization-pydantic-ai|pydantic-ai-examples)/configurator/:path(.*)",
+      "destination": "/projects/:slug/configurator/:path",
       "statusCode": 301
     },
     {
@@ -40,37 +40,37 @@
       "statusCode": 301
     },
     {
-      "source": "/:lang(pl|de|es)/glossary/:slug(a-b-testing|agent-observability|agent-planning|agent-swarm|alignment|anthropic|artificial-intelligence|artificial-narrow-intelligence|attention-mechanism|autonomous-agents|backpropagation|batch-size|bias|business-process-automation|chatbot|claude|claude-3-5-sonnet|claude-code|claude-md|confusion-matrix|cost-tracking|dall-e|data-augmentation|data-lake|data-pipeline|deferred-tools|dependency-injection|embedding-dimensions|embeddings-api|encoder|endpointing|feature-store|fine-tuning|function-calling|generative-ai|generative-pre-trained-transformer|google-gemini|graph-rag|graph-state|hallucination|hybrid-search|in-context-learning|indexing-pipeline|input-tokens|instruction-tuning|intent-achievement-rate|knowledge-graph|large-language-models|llama|llama-3|lora|loss-function|machine-learning|machine-translation|microsoft-copilot|mistral|model-registry|multi-agent-system|multimodal-large-language-model|object-detection|open-weights-model|overfitting|parameter-count|prompt-engineering|prompt-injection|pydantic-basemodel|quantization|re-ranking|react|recommender-system|run-context|sentiment-analysis|speech-to-text|stategraph|supervised-learning|system-prompt|text-to-speech|tf-idf|token-budget|tool-calling|top-k-sampling|training-data|transfer-learning|turing-test|unstructured-rag|unsupervised-learning|virtual-assistant|vision-language-model|voice-ai-agent|voice-cloning|weaviate|word2vec|workflow-automation)/:rest*",
+      "source": "/:lang(pl|de|es)/glossary/:slug(a-b-testing|agent-observability|agent-planning|agent-swarm|alignment|anthropic|artificial-intelligence|artificial-narrow-intelligence|attention-mechanism|autonomous-agents|backpropagation|batch-size|bias|business-process-automation|chatbot|claude|claude-3-5-sonnet|claude-code|claude-md|confusion-matrix|cost-tracking|dall-e|data-augmentation|data-lake|data-pipeline|deferred-tools|dependency-injection|embedding-dimensions|embeddings-api|encoder|endpointing|feature-store|fine-tuning|function-calling|generative-ai|generative-pre-trained-transformer|google-gemini|graph-rag|graph-state|hallucination|hybrid-search|in-context-learning|indexing-pipeline|input-tokens|instruction-tuning|intent-achievement-rate|knowledge-graph|large-language-models|llama|llama-3|lora|loss-function|machine-learning|machine-translation|microsoft-copilot|mistral|model-registry|multi-agent-system|multimodal-large-language-model|object-detection|open-weights-model|overfitting|parameter-count|prompt-engineering|prompt-injection|pydantic-basemodel|quantization|re-ranking|react|recommender-system|run-context|sentiment-analysis|speech-to-text|stategraph|supervised-learning|system-prompt|text-to-speech|tf-idf|token-budget|tool-calling|top-k-sampling|training-data|transfer-learning|turing-test|unstructured-rag|unsupervised-learning|virtual-assistant|vision-language-model|voice-ai-agent|voice-cloning|weaviate|word2vec|workflow-automation)/:rest(.*)",
       "destination": "/glossary/",
       "statusCode": 301
     },
     {
-      "source": "/glossary/:slug(a-b-testing|agent-observability|agent-planning|agent-swarm|alignment|anthropic|artificial-intelligence|artificial-narrow-intelligence|attention-mechanism|autonomous-agents|backpropagation|batch-size|bias|business-process-automation|chatbot|claude|claude-3-5-sonnet|claude-code|claude-md|confusion-matrix|cost-tracking|dall-e|data-augmentation|data-lake|data-pipeline|deferred-tools|dependency-injection|embedding-dimensions|embeddings-api|encoder|endpointing|feature-store|fine-tuning|function-calling|generative-ai|generative-pre-trained-transformer|google-gemini|graph-rag|graph-state|hallucination|hybrid-search|in-context-learning|indexing-pipeline|input-tokens|instruction-tuning|intent-achievement-rate|knowledge-graph|large-language-models|llama|llama-3|lora|loss-function|machine-learning|machine-translation|microsoft-copilot|mistral|model-registry|multi-agent-system|multimodal-large-language-model|object-detection|open-weights-model|overfitting|parameter-count|prompt-engineering|prompt-injection|pydantic-basemodel|quantization|re-ranking|react|recommender-system|run-context|sentiment-analysis|speech-to-text|stategraph|supervised-learning|system-prompt|text-to-speech|tf-idf|token-budget|tool-calling|top-k-sampling|training-data|transfer-learning|turing-test|unstructured-rag|unsupervised-learning|virtual-assistant|vision-language-model|voice-ai-agent|voice-cloning|weaviate|word2vec|workflow-automation)/:rest*",
+      "source": "/glossary/:slug(a-b-testing|agent-observability|agent-planning|agent-swarm|alignment|anthropic|artificial-intelligence|artificial-narrow-intelligence|attention-mechanism|autonomous-agents|backpropagation|batch-size|bias|business-process-automation|chatbot|claude|claude-3-5-sonnet|claude-code|claude-md|confusion-matrix|cost-tracking|dall-e|data-augmentation|data-lake|data-pipeline|deferred-tools|dependency-injection|embedding-dimensions|embeddings-api|encoder|endpointing|feature-store|fine-tuning|function-calling|generative-ai|generative-pre-trained-transformer|google-gemini|graph-rag|graph-state|hallucination|hybrid-search|in-context-learning|indexing-pipeline|input-tokens|instruction-tuning|intent-achievement-rate|knowledge-graph|large-language-models|llama|llama-3|lora|loss-function|machine-learning|machine-translation|microsoft-copilot|mistral|model-registry|multi-agent-system|multimodal-large-language-model|object-detection|open-weights-model|overfitting|parameter-count|prompt-engineering|prompt-injection|pydantic-basemodel|quantization|re-ranking|react|recommender-system|run-context|sentiment-analysis|speech-to-text|stategraph|supervised-learning|system-prompt|text-to-speech|tf-idf|token-budget|tool-calling|top-k-sampling|training-data|transfer-learning|turing-test|unstructured-rag|unsupervised-learning|virtual-assistant|vision-language-model|voice-ai-agent|voice-cloning|weaviate|word2vec|workflow-automation)/:rest(.*)",
       "destination": "/glossary/",
       "statusCode": 301
     },
     {
-      "source": "/:lang(pl|de|es)/glossary/:rest*",
-      "destination": "/glossary/:rest*",
+      "source": "/:lang(pl|de|es)/glossary/:rest(.*)",
+      "destination": "/glossary/:rest",
       "statusCode": 301
     },
     {
-      "source": "/configurator/:path*",
-      "destination": "/projects/full-stack-ai-agent-template/configurator/:path*",
+      "source": "/configurator/:path(.*)",
+      "destination": "/projects/full-stack-ai-agent-template/configurator/:path",
       "statusCode": 301
     },
-    { "source": "/pl/terms/:rest*", "destination": "/terms/", "statusCode": 301 },
-    { "source": "/de/terms/:rest*", "destination": "/terms/", "statusCode": 301 },
-    { "source": "/es/terms/:rest*", "destination": "/terms/", "statusCode": 301 },
-    { "source": "/pl/privacy/:rest*", "destination": "/privacy/", "statusCode": 301 },
-    { "source": "/de/privacy/:rest*", "destination": "/privacy/", "statusCode": 301 },
-    { "source": "/es/privacy/:rest*", "destination": "/privacy/", "statusCode": 301 },
+    { "source": "/pl/terms/:rest(.*)", "destination": "/terms/", "statusCode": 301 },
+    { "source": "/de/terms/:rest(.*)", "destination": "/terms/", "statusCode": 301 },
+    { "source": "/es/terms/:rest(.*)", "destination": "/terms/", "statusCode": 301 },
+    { "source": "/pl/privacy/:rest(.*)", "destination": "/privacy/", "statusCode": 301 },
+    { "source": "/de/privacy/:rest(.*)", "destination": "/privacy/", "statusCode": 301 },
+    { "source": "/es/privacy/:rest(.*)", "destination": "/privacy/", "statusCode": 301 },
 
     { "source": "/pl", "destination": "/", "statusCode": 301 },
     { "source": "/de", "destination": "/", "statusCode": 301 },
     { "source": "/es", "destination": "/", "statusCode": 301 },
-    { "source": "/pl/:rest*", "destination": "/:rest*", "statusCode": 301 },
-    { "source": "/de/:rest*", "destination": "/:rest*", "statusCode": 301 },
-    { "source": "/es/:rest*", "destination": "/:rest*", "statusCode": 301 }
+    { "source": "/pl/:rest(.*)", "destination": "/:rest", "statusCode": 301 },
+    { "source": "/de/:rest(.*)", "destination": "/:rest", "statusCode": 301 },
+    { "source": "/es/:rest(.*)", "destination": "/:rest", "statusCode": 301 }
   ]
 }
