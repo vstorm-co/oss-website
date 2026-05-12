@@ -1,0 +1,174 @@
+---
+title: "Python Document Parsing and OCR for AI Agents: Inside LiteparseToolset"
+seoTitle: "Python Document Parsing OCR for AI Agents: LiteparseToolset (pydantic-deepagents v0.3.17)"
+description: "How LiteparseToolset gives any pydantic-deepagents agent unified PDF text extraction and per-page OCR through one tool API. Tesseract local or HTTP OCR server. Page-level citations across both formats."
+pubDate: 2026-05-06
+updatedDate: 2026-05-06
+author: "Kacper Włodarczyk"
+lang: en
+translationKey: liteparse-toolset-document-parsing-pydantic-deepagents
+tags: ["pydantic-deepagents", "ocr", "ai-agents", "python", "document-parsing"]
+category: article
+draft: false
+---
+
+import MetricsBar from "@/components/blog/MetricsBar.astro";
+import Callout from "@/components/blog/Callout.astro";
+import Comparison from "@/components/blog/Comparison.astro";
+
+<MetricsBar
+  metrics={[
+    { value: "v0.3.17", label: "pydantic-deepagents" },
+    { value: "2", label: "OCR backends" },
+    { value: "1", label: "Tool API" },
+    { value: "MIT", label: "License" },
+  ]}
+/>
+
+Three production AI agent demos in a row. Three different clients. Same failure pattern.
+
+A 47-page legal contract from a European automotive client, scanned by their legal team. A 200-page compliance bundle from a Tier-1 manufacturer. A loan application a bank had pushed through a 2019 fax machine. Each one demoed beautifully on synthetic test PDFs. Each one fell over the moment the real client document hit production.
+
+**LiteparseToolset is a Python toolset that gives any pydantic-deepagents agent unified access to PDF text extraction, per-page OCR (Tesseract local or HTTP OCR server), and image references through a single tool API.** It shipped in v0.3.17 of our open-source agent runtime, and it's the smallest possible answer to "treat scans as a tool concern, not a pipeline concern".
+
+This post is the technical walkthrough. On Monday I covered what LiteparseToolset _does_ through the [RAG chatbot use case](/use-cases/rag-chatbot/). Today is _how_: the internal pipeline, the OCR backends, and where this design pattern is the right call vs the wrong one.
+
+_I'm Kacper, AI Engineer at [Vstorm](https://vstorm.co), an Applied Agentic AI Engineering Consultancy. We've shipped 30+ production AI agent implementations and open-source our tooling at [github.com/vstorm-co](https://github.com/vstorm-co). Connect with me on [LinkedIn](https://www.linkedin.com/in/kacper-wlodarczyk/)._
+
+## Why Python Document Parsing OCR Belongs in the Agent's Tool Surface
+
+**Document parsing for AI agents is the process of converting raw documents into structured text and metadata the model can reason over, with citations back to the source.**
+
+Most agent frameworks treat this as an upstream concern. You write an ingestion script that runs once a day, dumps chunks into a vector store, and the agent queries the store with no awareness of where the text came from. That works as long as your documents have text layers and your users never ask "which page did that come from?".
+
+It stops working the moment 30% of your documents are scans. Now you need a second ingestion path. Then a third for an OCR backend. Then forks of the agent to know which path produced the data it's looking at.
+
+We tried that pattern across three Q1 client engagements. Each time the team ended up with two codebases pretending to be one. Each time the post-mortem said "we should have made document parsing a tool concern from day one".
+
+LiteparseToolset is the version we'd use if we started over.
+
+## How LiteparseToolset Works Internally
+
+The agent calls one tool method. The toolset does the rest:
+
+1. **Open the PDF.** Read the document with `pypdfium2` or `PyMuPDF` (configurable). Detect text-layer presence per page.
+2. **Branch on text layer.** Pages with usable text go through standard extraction. Pages without text fall through to the OCR backend.
+3. **Run OCR (when needed).** The configured backend (Tesseract locally or HTTP OCR server) processes image-only pages. The OCR'd text is tagged with the source page number.
+4. **Return one shape.** Per-page records with `page_number`, `text`, `source` (`text_layer` or `ocr`), `image_refs`, and `metadata`. The agent doesn't see which path ran.
+
+The non-obvious part is step 4. Whether the source page was a clean PDF or a scan, the agent gets the same return shape. That single decision removes "branch on document type" from the agent's logic.
+
+```python
+from pydantic_deep.toolsets import LiteparseToolset
+from pydantic_deep import Agent
+
+toolset = LiteparseToolset(
+    ocr_backend="tesseract",   # or "http", "none"
+    ocr_server_url=None,       # required when ocr_backend="http"
+    fallback_threshold=10,     # min chars per page before OCR fallback
+)
+
+agent = Agent(
+    name="document_qa",
+    toolsets=[toolset, ...],
+)
+```
+
+The `fallback_threshold` is the small detail that matters. Some PDFs have a sad text layer (40 characters of header on an otherwise-image page). The threshold says "if the extracted text is shorter than N characters, treat the page as a scan and run OCR". Defaults to 10. Tunable.
+
+{/* IMAGE IDEA: D2 diagram showing the LiteparseToolset internal pipeline — agent → tool call → text-layer detection → branch (extract OR OCR) → unified return shape. Use animated edges from agent to tool to convey "one call, two paths underneath". */}
+
+## Tesseract OCR LLM Pipeline vs HTTP OCR Server
+
+**A Tesseract OCR LLM pipeline is a chain that uses Tesseract (an open-source OCR engine) for image-to-text conversion before passing the extracted text to a language model.**
+
+Two OCR backends ship with LiteparseToolset:
+
+**Tesseract local.** Wraps `pytesseract` over `pdf2image`. Runs on the same host as the agent. Cheap, batch-friendly, no network round trips. Trade-off: Tesseract is solid on typed and printed text and starts missing footnotes and small print below 200dpi. Handwritten content is not its strong suit.
+
+**HTTP OCR server.** A backend interface, not a specific service. Point it at AWS Textract, Azure Document Intelligence, a self-hosted Donut, GOT-OCR-2.0, or anything that speaks the same contract. Higher accuracy, latency cost, monetary cost.
+
+The architecture choice that pays off in production: **default to Tesseract, route low-confidence pages to the paid backend.** On mixed-quality corpora that strategy saves around 60-80% of OCR cost compared to running everything through the paid service, with negligible accuracy loss for the typed-document majority of the corpus.
+
+<Callout type="warn" title="Accuracy claims without benchmarks">
+  We do not claim a public benchmark on legal-document OCR accuracy. On internal corpora of about
+  200 contracts, Tesseract was acceptable on typed legal text and struggled with footnotes below
+  200dpi. For "compliance-grade" accuracy we route clients to a dedicated OCR server. Numbers
+  without a benchmark are marketing fluff and we are not making them.
+</Callout>
+
+## Per-Page Citations Across Mixed Inputs
+
+Citations are the part that breaks first when you patch OCR in late.
+
+The pattern that holds: every record in the pipeline carries the page number, end-to-end. Parser returns one record per page. Chunker carries page numbers into chunk metadata. Vector store stores chunk + page. Agent's answer cites the page directly.
+
+Skip step one and you cannot backfill it. The page boundary disappears the moment you concatenate text. We learned this the hard way when a compliance team asked for "exact page" citations on output that had been chunked across page boundaries.
+
+LiteparseToolset returns page-tagged records by default. Whether the page came from a text layer or an OCR run, the citation looks identical to the agent and to the end user.
+
+## When LiteparseToolset Is the Right Tool
+
+<Comparison
+  leftHeader="LiteparseToolset"
+  rightHeader="Hosted parser (LlamaParse, Unstructured)"
+  rows={[
+    { label: "Mixed clean PDFs + scans", left: "yes", right: "yes" },
+    { label: "On-prem / air-gapped", left: "yes", right: "no" },
+    { label: "Per-page citations", left: "yes", right: "partial" },
+    { label: "Single tool API for the agent", left: "yes", right: "no" },
+    { label: "Specialized table extraction", left: "partial", right: "yes" },
+    { label: "Handwritten content", left: "partial", right: "yes" },
+    { label: "Per-page cost", left: "$0", right: "paid" },
+    { label: "Setup time", left: "minutes", right: "minutes" },
+  ]}
+/>
+
+The honest framing: LiteparseToolset is not a competitor to LlamaParse. They occupy different design points. Hosted parsers optimize for accuracy at any cost. LiteparseToolset optimizes for "one tool, offline-first, swap the OCR backend without rewriting the agent". Pick the one that fits the deployment you actually need to ship.
+
+## In 30+ Production Deployments
+
+In 30+ production AI agent deployments at Vstorm, every multi-document Q&A workflow eventually hit a scanned PDF the original ingestion pipeline could not read. The teams that planned for OCR from day one shipped without rewrites. The teams that did not added 20-50 hours of refactor debt before their first scale event.
+
+LiteparseToolset is what we wish had existed for the first three of those deployments.
+
+## Key Takeaways
+
+- Treat document parsing as a tool concern, not an upstream pipeline. Branching on document type leaks into every layer above it.
+- Page-level citations have to be preserved end-to-end from the parser. You cannot backfill them after chunking.
+- A two-tier OCR strategy (Tesseract default, paid backend for low-confidence pages) keeps cost down on mixed-quality corpora.
+- Hosted parsers and an OCR-aware toolset are different design points, not competitors. Pick by deployment constraint.
+- LiteparseToolset shipped in [pydantic-deepagents](/projects/pydantic-deepagents/) v0.3.17. MIT.
+
+## Frequently Asked Questions
+
+### How do I add OCR and document parsing to a Python AI agent?
+
+Add a single toolset to the agent that handles both clean-PDF text extraction and OCR fallback for image-only pages. In pydantic-deepagents, that's `LiteparseToolset` from v0.3.17 onward, configured with one of the supported OCR backends (Tesseract local or an HTTP OCR server). The agent makes one tool call regardless of source format.
+
+### What is LiteparseToolset?
+
+LiteparseToolset is a Python toolset for the pydantic-deepagents runtime that exposes unified PDF text extraction, per-page OCR, and image-reference handling through a single tool API. The agent calls one tool; the toolset detects whether OCR is needed and runs the configured backend internally.
+
+### Does LiteparseToolset work without an OCR server?
+
+Yes. The default backend is Tesseract running locally on the agent host via `pytesseract`. No external service is required. The HTTP OCR backend is opt-in for teams that need higher accuracy or hosted scaling.
+
+### How does LiteparseToolset compare to LlamaParse or Unstructured.io?
+
+LiteparseToolset and hosted parsers like LlamaParse occupy different design points. Hosted parsers optimize for accuracy at any cost and require sending documents off-prem. LiteparseToolset optimizes for offline-first, on-prem, swappable-backend deployments where the agent stays simple and the team controls the OCR pipeline. Pick by deployment constraint, not feature count.
+
+### When should I use LiteparseToolset versus a hosted document parser?
+
+Use LiteparseToolset when your agent will see mixed clean and scanned PDFs, you need on-prem or air-gapped deployment, page-level citations matter, or you want one codebase for both formats. Use a hosted parser when all your documents have text layers, accuracy on niche document types outweighs offline support, and per-page costs are acceptable.
+
+## What's Next
+
+Wednesday covered the internals. On Friday I'll show the cross-ecosystem use case: a production knowledge base over 1000 PDFs, built on the [full-stack-ai-agent-template](/projects/full-stack-ai-agent-template/) with LiteparseToolset doing the document parsing.
+
+If you want this in your stack today:
+
+- Repo: [github.com/vstorm-co/pydantic-deepagents](https://github.com/vstorm-co/pydantic-deepagents)
+- Install: `pip install pydantic-deepagents>=0.3.17`
+- Project page: [pydantic-deepagents](/projects/pydantic-deepagents/)
+- Monday's launch use case: [RAG chatbot](/use-cases/rag-chatbot/)

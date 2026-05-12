@@ -12,19 +12,7 @@ import { translations, defaultLang } from "../../../../i18n/translations";
 import { collectionPageSchema, SITE_URL } from "../../../../lib/schemas";
 
 export async function getStaticPaths({ paginate }: { paginate: Function }) {
-  const allPosts = (
-    await getCollection("blog", ({ data }) => data.lang === "en" && isPublished(data))
-  ).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
-
-  const categories = ["open-source", "tutorial", "article", "news"] as const;
-
-  return categories.flatMap((cat) => {
-    const filtered = allPosts.filter((p) => p.data.category === cat);
-    return paginate(filtered, {
-      pageSize: 20,
-      params: { category: cat },
-    });
-  });
+  return [];
 }
 
 const lang = defaultLang;

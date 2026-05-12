@@ -4,7 +4,6 @@ import Layout from "../../layouts/Layout.astro";
 import Navbar from "../../components/Navbar.astro";
 import Footer from "../../components/landing/Footer.astro";
 import BlogCard from "../../components/blog/BlogCard.astro";
-import Pagination from "../../components/blog/Pagination.astro";
 import { getCollection } from "astro:content";
 import Breadcrumbs from "../../components/shared/Breadcrumbs.astro";
 import BlogSearch from "../../components/blog/BlogSearch.astro";
@@ -16,7 +15,7 @@ export async function getStaticPaths({ paginate }: { paginate: Function }) {
     await getCollection("blog", ({ data }) => data.lang === "en" && isPublished(data))
   ).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
-  return paginate(allPosts, { pageSize: 20 });
+  return paginate(allPosts, { pageSize: 1000 });
 }
 
 const lang = defaultLang;
@@ -33,12 +32,11 @@ const alternates = [
 ---
 
 <Layout
-  title={`${t["blog.title"]}${page.currentPage > 1 ? ` — Page ${page.currentPage}` : ""} — Vstorm OSS`}
+  title={`${t["blog.title"]} — Vstorm OSS`}
   description={t["blog.subtitle"]}
   keywords="ai agent blog, pydantic ai tutorials, python ai guides, ai framework comparison, llm engineering"
   lang={lang}
   alternates={alternates}
-  noindex={page.currentPage > 1}
   schemas={[
     collectionPageSchema({
       name: t["blog.title"],
@@ -109,8 +107,6 @@ const alternates = [
     <p id="no-filtered-posts" class="text-text-secondary py-8 text-center" style="display:none;">
       {t["blog.noPosts"]}
     </p>
-
-    <Pagination currentPage={page.currentPage} lastPage={page.lastPage} basePath="/blog" t={t} />
   </main>
 
   <Footer t={t} />

@@ -8,6 +8,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { adminPlugin } from "./src/lib/admin/vite-plugin.ts";
+import { indexableGlossarySlugs } from "./src/data/seo-indexing.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -39,10 +40,10 @@ function buildBlogDateMap() {
 
 const blogDateMap = buildBlogDateMap();
 
-// Only the meaningfully-noindexed/utility paths are excluded — admin is rewritten
-// to /404 in vercel.json, and blog tag/category/pagination pages are intentionally
-// noindex. Everything else (compare, glossary, use-cases, guides, tools, projects,
-// about, faq, changelog, blog posts, home) ships in the sitemap.
+// Keep the sitemap focused on URLs we actively want Google to index. Generated
+// archives, utility routes, and broad programmatic matrices are still reachable
+// where useful, but they should not compete with canonical product and article
+// pages for crawl budget.
 function shouldIncludeInSitemap(page) {
   const url = new URL(page);
   const segments = url.pathname.split("/").filter(Boolean);
@@ -54,10 +55,9 @@ function shouldIncludeInSitemap(page) {
   if (section === "admin") return false;
   if (section === "404") return false;
 
-  // Programmatic guides (framework × use-case matrix) — kept reachable via
-  // internal links but excluded from the sitemap to avoid signalling Google
-  // to crawl pages it has historically rejected as too-similar.
   if (section === "guides" && segments.length > 1) return false;
+
+  if (section === "glossary" && second) return indexableGlossarySlugs.has(second);
 
   if (section === "blog") {
     if (second === "tag" || second === "category") return false;

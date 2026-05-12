@@ -10,6 +10,7 @@ import {
   categoryLabels,
   categoryColors,
 } from "../../data/glossary";
+import { indexableGlossarySlugs } from "../../data/seo-indexing.mjs";
 import { definedTermSetSchema, SITE_URL } from "../../lib/schemas";
 
 const lang = defaultLang;
@@ -17,6 +18,9 @@ const t = translations[lang];
 
 const grouped = getTermsGroupedByLetter();
 const letters = Array.from(grouped.keys()).sort();
+const schemaTerms = glossaryTerms
+  .filter((term) => indexableGlossarySlugs.has(term.slug))
+  .map((term) => ({ name: term.term, url: SITE_URL + `/glossary/${term.slug}/` }));
 
 // Glossary is English-only - only show English in language switcher
 const languageLinks = [{ lang: defaultLang, href: "/glossary/" }];
@@ -34,7 +38,7 @@ const languageLinks = [{ lang: defaultLang, href: "/glossary/" }];
       description:
         "A comprehensive glossary of AI, machine learning, LLM, RAG, and agent terminology for developers.",
       url: SITE_URL + "/glossary/",
-      terms: glossaryTerms.map((t) => ({ name: t.term, url: SITE_URL + `/glossary/${t.slug}/` })),
+      terms: schemaTerms,
     }),
   ]}
   theme="light"
@@ -126,9 +130,10 @@ const languageLinks = [{ lang: defaultLang, href: "/glossary/" }];
             <div class="mt-3 grid gap-3">
               {grouped.get(letter)!.map((term) => {
                 const firstSentence = term.definition.split(". ")[0] + ".";
+                const isIndexable = indexableGlossarySlugs.has(term.slug);
                 return (
                   <a
-                    href={`/glossary/${term.slug}/`}
+                    href={isIndexable ? `/glossary/${term.slug}/` : undefined}
                     class="glossary-card group glass-card hover:border-accent/30 relative block overflow-hidden rounded-xl p-5 transition-all"
                     data-term={term.term.toLowerCase()}
                     data-category={term.category}
@@ -149,15 +154,17 @@ const languageLinks = [{ lang: defaultLang, href: "/glossary/" }];
                         </div>
                         <p class="text-text-secondary line-clamp-2 text-sm">{firstSentence}</p>
                       </div>
-                      <svg
-                        class="text-text-tertiary group-hover:text-accent mt-1 h-4 w-4 shrink-0 transition-colors"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                      </svg>
+                      {isIndexable && (
+                        <svg
+                          class="text-text-tertiary group-hover:text-accent mt-1 h-4 w-4 shrink-0 transition-colors"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          stroke-width="2"
+                        >
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                      )}
                     </div>
                   </a>
                 );

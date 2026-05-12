@@ -24,6 +24,23 @@
     { "source": "/api/admin/:path(.*)", "destination": "/404" }
   ],
   "redirects": [
+    { "source": "/admin", "destination": "/", "statusCode": 301 },
+    { "source": "/admin/", "destination": "/", "statusCode": 301 },
+    { "source": "/admin/:path(.*)", "destination": "/", "statusCode": 301 },
+    { "source": "/blog/tag/:path(.*)", "destination": "/blog/", "statusCode": 301 },
+    { "source": "/blog/category/:path(.*)", "destination": "/blog/", "statusCode": 301 },
+    { "source": "/blog/:page(\\d+)", "destination": "/blog/", "statusCode": 301 },
+    { "source": "/blog/:page(\\d+)/:path(.*)", "destination": "/blog/", "statusCode": 301 },
+    {
+      "source": "/glossary/:slug(celery|milvus|containerization|reverse-proxy|load-balancing|health-check|fastapi-framework|api-router|depends|path-parameter|query-parameter|http-exception|status-code|response-model|openapi-schema|uvicorn|asgi|middleware|cors-fastapi|dependency-injection-fastapi|webhook|python-async-await|typeddict|json-schema|sdk|nextjs-framework|app-router|server-component|client-component|server-action|route-handler|api-route|react-server-components|vercel|edge-runtime|middleware-nextjs|streaming-frontend|image-optimization|metadata-nextjs|aws|azure|google-cloud-platform|aws-lambda|kubernetes-cloud|docker-cloud|container|helm|terraform|serverless-function|cloud-run|hybrid-cloud|private-cloud|edge-deployment|inference-pipeline|ai-ethics|ai-safety|ai-governance|data-poisoning|differential-privacy|zero-data-retention|hipaa-compliance|privacy-enhancing-technologies|bias-auditing|responsible-ai|jupyter-notebook|pandas|numpy|pytorch|tensorflow|scikit-learn)",
+      "destination": "/glossary/",
+      "statusCode": 301
+    },
+    {
+      "source": "/glossary/:slug(celery|milvus|containerization|reverse-proxy|load-balancing|health-check|fastapi-framework|api-router|depends|path-parameter|query-parameter|http-exception|status-code|response-model|openapi-schema|uvicorn|asgi|middleware|cors-fastapi|dependency-injection-fastapi|webhook|python-async-await|typeddict|json-schema|sdk|nextjs-framework|app-router|server-component|client-component|server-action|route-handler|api-route|react-server-components|vercel|edge-runtime|middleware-nextjs|streaming-frontend|image-optimization|metadata-nextjs|aws|azure|google-cloud-platform|aws-lambda|kubernetes-cloud|docker-cloud|container|helm|terraform|serverless-function|cloud-run|hybrid-cloud|private-cloud|edge-deployment|inference-pipeline|ai-ethics|ai-safety|ai-governance|data-poisoning|differential-privacy|zero-data-retention|hipaa-compliance|privacy-enhancing-technologies|bias-auditing|responsible-ai|jupyter-notebook|pandas|numpy|pytorch|tensorflow|scikit-learn)/:rest(.*)",
+      "destination": "/glossary/",
+      "statusCode": 301
+    },
     {
       "source": "/:lang(pl|de|es)/:slug(awesome-pydantic-ai|pydantic-ai-backend|pydantic-ai-rlm|pydantic-ai-middleware|database-pydantic-ai|pydantic-deepagents|full-stack-ai-agent-template|memv|subagents-pydantic-ai|pydantic-ai-todo|logfire-assistant|summarization-pydantic-ai|pydantic-ai-examples)/:rest(.*)",
       "destination": "/projects/:slug/:rest",

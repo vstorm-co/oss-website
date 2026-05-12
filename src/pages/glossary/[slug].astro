@@ -13,10 +13,13 @@ import {
   termToProjectMap,
   termToBlogMap,
 } from "../../data/glossary";
+import { indexableGlossarySlugs } from "../../data/seo-indexing.mjs";
 import { definedTermSchema, SITE_URL } from "../../lib/schemas";
 
 export function getStaticPaths() {
-  return getAllGlossarySlugs().map((slug) => ({ params: { slug } }));
+  return getAllGlossarySlugs()
+    .filter((slug) => indexableGlossarySlugs.has(slug))
+    .map((slug) => ({ params: { slug } }));
 }
 
 const lang = defaultLang;
@@ -150,9 +153,10 @@ const glossaryMetaDesc = rawMetaDesc.length > 160 ? rawMetaDesc.slice(0, 157) + 
           <div class="grid gap-3 sm:grid-cols-2">
             {related.map((rel) => {
               const firstSentence = rel.definition.split(". ")[0] + ".";
+              const isIndexable = indexableGlossarySlugs.has(rel.slug);
               return (
                 <a
-                  href={`/glossary/${rel.slug}/`}
+                  href={isIndexable ? `/glossary/${rel.slug}/` : undefined}
                   class="group glass-card hover:border-accent/30 relative block overflow-hidden rounded-xl p-5 transition-all"
                 >
                   <div class="via-accent/0 group-hover:via-accent/50 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent transition-all duration-500" />

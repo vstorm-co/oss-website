@@ -10,23 +10,7 @@ import { translations, languages, defaultLang } from "../../../i18n/translations
 import { collectionPageSchema, SITE_URL } from "../../../lib/schemas";
 
 export async function getStaticPaths() {
-  const posts = await getCollection("blog", ({ data }) => data.lang === "en" && isPublished(data));
-
-  const tagMap = new Map<string, typeof posts>();
-  for (const post of posts) {
-    for (const tag of post.data.tags ?? []) {
-      if (!tagMap.has(tag)) tagMap.set(tag, []);
-      tagMap.get(tag)!.push(post);
-    }
-  }
-
-  return [...tagMap.entries()].map(([tag, tagPosts]) => ({
-    params: { tag },
-    props: {
-      tag,
-      posts: tagPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()),
-    },
-  }));
+  return [];
 }
 
 const { tag, posts } = Astro.props;
