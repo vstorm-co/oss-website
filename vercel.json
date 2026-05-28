@@ -2,6 +2,11 @@
   "headers": [
     {
       "source": "/(.*)",
+      "has": [{ "type": "host", "value": "oss-website-sigma.vercel.app" }],
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }]
+    },
+    {
+      "source": "/(.*)",
       "headers": [
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
@@ -24,9 +29,27 @@
     { "source": "/api/admin/:path(.*)", "destination": "/404" }
   ],
   "redirects": [
+    {
+      "source": "/:path(.*)",
+      "has": [{ "type": "host", "value": "oss-website-sigma.vercel.app" }],
+      "destination": "https://oss.vstorm.co/:path",
+      "statusCode": 301
+    },
     { "source": "/admin", "destination": "/", "statusCode": 301 },
     { "source": "/admin/", "destination": "/", "statusCode": 301 },
     { "source": "/admin/:path(.*)", "destination": "/", "statusCode": 301 },
+    { "source": "/:lang(pl|de|es)/blog/tag/:path(.*)", "destination": "/blog/", "statusCode": 301 },
+    {
+      "source": "/:lang(pl|de|es)/blog/category/:path(.*)",
+      "destination": "/blog/",
+      "statusCode": 301
+    },
+    { "source": "/:lang(pl|de|es)/blog/:page(\\d+)", "destination": "/blog/", "statusCode": 301 },
+    {
+      "source": "/:lang(pl|de|es)/blog/:page(\\d+)/:path(.*)",
+      "destination": "/blog/",
+      "statusCode": 301
+    },
     { "source": "/blog/tag/:path(.*)", "destination": "/blog/", "statusCode": 301 },
     { "source": "/blog/category/:path(.*)", "destination": "/blog/", "statusCode": 301 },
     { "source": "/blog/:page(\\d+)", "destination": "/blog/", "statusCode": 301 },
